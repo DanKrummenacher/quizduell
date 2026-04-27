@@ -1,0 +1,118 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+
+:host {
+  display: block;
+}
+
+.header-container {
+  padding: functions.rem(12) functions.rem(12) 0;
+  width: 100%;
+}
+
+.header-content {
+  background-color: colors.$dt-color-white-100;
+  height: functions.rem(65);
+  border-radius: functions.rem(4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  width: functions.rem(50);
+  margin-top: functions.rem(3);
+}
+
+.separator {
+  margin: 0 functions.rem(6);
+}
+
+.header-title {
+  margin: 0;
+}
+
+.main-content {
+  padding: 0 functions.rem(30);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.main-title {
+  font-size: functions.rem(28);
+  font-weight: miscs.$css-ui-font-weight-medium;
+  color: colors.$dt-color-darkblue-100;
+  margin: functions.rem(33) 0 0;
+  text-align: center;
+}
+
+.subtitle {
+  display: block;
+  font-size: functions.rem(20);
+  line-height: 1.2;
+  margin: functions.rem(15) 0 0;
+  text-align: center;
+}
+
+.features-row {
+  display: flex;
+  justify-content: center;
+  gap: functions.rem(40);
+  margin-top: functions.rem(50);
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.feature-circle {
+  width: functions.rem(60);
+  height: functions.rem(60);
+  background-color: colors.$dt-color-white-100;
+  border-radius: 50%;
+  border: functions.rem(1) solid #8098be;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-icon {
+  display: block;
+  width: functions.rem(32);
+  height: functions.rem(32);
+  color: colors.$dt-color-darkblue-100;
+  fill: colors.$dt-color-darkblue-100;
+  stroke: colors.$dt-color-darkblue-100;
+  stroke-width: functions.rem(2);
+}
+
+.feature-text {
+  margin-top: functions.rem(18);
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  margin-top: functions.rem(55);
+}
+
+.name-input {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+
+.start-button {
+  display: block;
+  width: 100%;
+  margin: functions.rem(20) 0 0;
+}
+
+.info-text {
+  display: block;
+  margin-top: functions.rem(15);
+  text-align: center;
+}
