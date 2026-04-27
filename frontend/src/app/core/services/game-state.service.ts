@@ -19,7 +19,6 @@ export interface GameState {
   providedIn: 'root'
 })
 export class GameStateService {
-  // Using modern Angular Signals for state management
   readonly state = signal<GameState>({
     playerName: '',
     opponentName: null,
@@ -50,7 +49,6 @@ export class GameStateService {
     });
 
     this.socketService.on('gameStart', (session: any) => {
-      // Find opponent name
       const opponent = Object.values(session.players).find((p: any) => p.name !== this.state().playerName) as any;
       this.updateState({
         status: 'pre-game',
@@ -61,7 +59,7 @@ export class GameStateService {
     this.socketService.on('roundResult', (session: any) => {
       const me = Object.values(session.players).find((p: any) => p.name === this.state().playerName) as any;
       const opponent = Object.values(session.players).find((p: any) => p.name !== this.state().playerName) as any;
-      
+
       this.updateState({
         playerScore: me?.score || 0,
         opponentScore: opponent?.score || 0,
@@ -69,13 +67,11 @@ export class GameStateService {
     });
 
     this.socketService.on('opponentLeft', () => {
-      // Simple error handling
       this.updateState({ status: 'start', gameCode: null, opponentName: null });
       alert('Der Gegner hat das Spiel verlassen.');
     });
   }
 
-  // Actions
   createGame(playerName: string) {
     this.updateState({ playerName });
     this.socketService.connect();

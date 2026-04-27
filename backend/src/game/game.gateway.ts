@@ -22,10 +22,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private readonly logger = new Logger(GameGateway.name);
 
-  // Simple mapping to keep track of which socket is in which game
   private clientToGameMap = new Map<string, string>();
 
-  constructor(private readonly gameService: GameService) {}
+  constructor(private readonly gameService: GameService) { }
 
   handleConnection(client: Socket) {
     this.logger.log(`Client connected: ${client.id}`);
@@ -35,7 +34,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.logger.log(`Client disconnected: ${client.id}`);
     const gameCode = this.clientToGameMap.get(client.id);
     if (gameCode) {
-      // Handle player leaving... for now we just notify the other player
       this.server.to(gameCode).emit('opponentLeft');
       this.clientToGameMap.delete(client.id);
     }
@@ -71,7 +69,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.join(session.gameCode);
     this.clientToGameMap.set(client.id, session.gameCode);
 
-    // Notify both players that the pre-game countdown can start
+
     this.server.to(session.gameCode).emit('gameStart', session);
   }
 
@@ -89,18 +87,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (!session) return;
 
-    // Check if both players answered
     if (this.gameService.bothPlayersAnswered(session)) {
-      // In a real app we fetch the correct answer from DB. 
-      // For now we assume correctAnswerIndex is 0 for testing, this will be integrated later.
-      const correctAnswerIndex = 0; 
-      
+      const correctAnswerIndex = 0;
+
       this.gameService.evaluateRound(session, correctAnswerIndex);
-      
-      // Emit the round result to both players
+
       this.server.to(session.gameCode).emit('roundResult', session);
     } else {
-      // Tell the other player that opponent has answered
       client.broadcast.to(session.gameCode).emit('opponentAnswered');
     }
   }

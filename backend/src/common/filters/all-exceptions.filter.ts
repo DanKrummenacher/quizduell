@@ -16,7 +16,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
-    // Check if the exception is an HTTP exception or something else (e.g. database error)
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
@@ -27,7 +26,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getResponse()
         : 'Internal server error';
 
-    // Logging the error properly as demanded by G16
     this.logger.error(
       `HTTP Status: ${status} Error Message: ${JSON.stringify(message)}`,
       exception instanceof Error ? exception.stack : '',

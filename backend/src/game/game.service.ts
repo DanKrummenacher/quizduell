@@ -4,13 +4,9 @@ import { GameSession, Player } from './game.types';
 @Injectable()
 export class GameService {
   private readonly logger = new Logger(GameService.name);
-  
-  // In-memory store for active game sessions
+
   private activeGames = new Map<string, GameSession>();
 
-  /**
-   * Generates a 4-character random game code (e.g., A7B9)
-   */
   private generateGameCode(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let code = '';
@@ -20,9 +16,6 @@ export class GameService {
     return code;
   }
 
-  /**
-   * Creates a new game session and adds the host player.
-   */
   createGame(socketId: string, playerName: string): GameSession {
     let gameCode = this.generateGameCode();
     while (this.activeGames.has(gameCode)) {
@@ -30,11 +23,11 @@ export class GameService {
     }
 
     const newPlayer: Player = { socketId, name: playerName, score: 0 };
-    
+
     const session: GameSession = {
       gameCode,
       players: { [socketId]: newPlayer },
-      questions: [], // We will fetch this from DB later
+      questions: [],
       currentQuestionIndex: 0,
       status: 'lobby',
     };
@@ -44,31 +37,34 @@ export class GameService {
     return session;
   }
 
-  /**
-   * Adds a second player to an existing game.
-   */
-  joinGame(gameCode: string, socketId: string, playerName: string): GameSession | null {
+  joinGame(
+    gameCode: string,
+    socketId: string,
+    playerName: string,
+  ): GameSession | null {
     const session = this.activeGames.get(gameCode);
-    
+
     if (!session) {
-      return null; // Game not found
+      return null;
     }
-    
+
     if (Object.keys(session.players).length >= 2) {
-      return null; // Game is full
+      return null;
     }
 
     session.players[socketId] = { socketId, name: playerName, score: 0 };
     session.status = 'pre-game';
     this.logger.log(`Player ${playerName} joined game ${gameCode}`);
-    
+
     return session;
   }
 
-  /**
-   * Registers a player's answer and calculates points based on the 200-point formula.
-   */
-  submitAnswer(gameCode: string, socketId: string, answerIndex: number, timeTakenMs: number): GameSession | null {
+  submitAnswer(
+    gameCode: string,
+    socketId: string,
+    answerIndex: number,
+    timeTakenMs: number,
+  ): GameSession | null {
     const session = this.activeGames.get(gameCode);
     if (!session) return null;
 
@@ -81,37 +77,29 @@ export class GameService {
     return session;
   }
 
-  /**
-   * Checks if both players have submitted their answers.
-   */
   bothPlayersAnswered(session: GameSession): boolean {
     const players = Object.values(session.players);
     if (players.length !== 2) return false;
-    
-    return players.every(p => p.currentAnswerIndex !== undefined && p.currentAnswerIndex !== null);
+
+    return players.every(
+      (p) => p.currentAnswerIndex !== undefined && p.currentAnswerIndex !== null,
+    );
   }
 
-  /**
-   * Evaluates the round and calculates points based on the requested formula:
-   * Max points: 200 (100 base + 100 time bonus)
-   */
   evaluateRound(session: GameSession, correctAnswerIndex: number) {
     const MAX_TIME_MS = 20000;
-    
+
     for (const player of Object.values(session.players)) {
       if (player.currentAnswerIndex === correctAnswerIndex) {
-        // Calculate points based on the 200 point formula
         const timeTakenMs = player.answerTimeMs || MAX_TIME_MS;
         const remainingMs = Math.max(0, MAX_TIME_MS - timeTakenMs);
-        
-        // Formel: 100 + ( 100 x (Verbleibende Millisekunden / Gesamtzeit in Millisekunden))
+
         const bonus = 100 * (remainingMs / MAX_TIME_MS);
         const pointsThisRound = 100 + Math.round(bonus);
-        
+
         player.score += pointsThisRound;
       }
-      
-      // Reset for next round
+
       player.currentAnswerIndex = null;
       player.answerTimeMs = null;
     }
