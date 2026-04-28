@@ -1,0 +1,13 @@
+<div class="top-bar">
+  <calc-button
+    variant="transparent"
+    class="back-button"
+    (click)="navigateBack.emit()"
+  >
+    <calc-icon icon="angle-left-circle" slot="icon"></calc-icon>
+    Zurück
+  </calc-button>
+</div>
+
+<h1 class="greeting-title">Hallo {{ playerName() }}</h1>
+<calc-text textMedium class="greeting-subtitle">Fordere jemanden heraus!</calc-text>

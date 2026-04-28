@@ -1,0 +1,31 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+
+:host {
+  display: block;
+}
+
+.top-bar {
+  margin-bottom: functions.rem(35);
+}
+
+.back-button {
+  margin: 0;
+  display: inline-block;
+}
+
+.greeting-title {
+  font-size: functions.rem(28);
+  font-weight: miscs.$css-ui-font-weight-regular;
+  color: colors.$dt-color-darkblue-100;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.greeting-subtitle {
+  margin-top: functions.rem(4);
+}
