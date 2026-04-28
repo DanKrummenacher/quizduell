@@ -1,0 +1,11 @@
+<app-lobby-ui
+  [state]="lobbyState()"
+  [playerName]="playerName()"
+  [roomCode]="roomCode()"
+  [opponentName]="opponentName()"
+  [joinError]="connectionError()"
+  (navigateBack)="handleBack()"
+  (createGame)="handleCreate()"
+  (joinGame)="handleJoin($event)"
+>
+</app-lobby-ui>
