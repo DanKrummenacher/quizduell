@@ -1,0 +1,24 @@
+<div class="input-section">
+  <calc-input-text
+    id="playerName"
+    label="Dein Name"
+    placeholder="z.B. Max Mustermann"
+    [errorMessage]="errorMessage"
+    (input)="onNameInput($event)"
+  >
+  </calc-input-text>
+
+  <calc-button
+    expanded
+    variant="primary"
+    class="start-button"
+    (click)="submitForm()"
+  >
+    <calc-icon icon="angle-right-circle" slot="icon"></calc-icon>
+    Los Geht's
+  </calc-button>
+
+  <calc-text textMedium class="info-text">
+    Direkt loslegen - kein Account nötig
+  </calc-text>
+</div>

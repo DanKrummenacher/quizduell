@@ -1,0 +1,30 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-helpers/styles' as functions;
+
+:host {
+  display: block;
+}
+
+.header-container {
+  padding: functions.rem(12) functions.rem(12) 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header-content {
+  background-color: colors.$dt-color-white-100;
+  height: functions.rem(65);
+  border-radius: functions.rem(4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  width: functions.rem(50);
+  margin-top: functions.rem(3);
+}
+
+.separator {
+  margin: 0 functions.rem(6);
+}
