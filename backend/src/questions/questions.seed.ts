@@ -51,7 +51,12 @@ export const SEED_QUESTIONS = [
   },
   {
     text: 'Wenn es heute Null Grad hat und es morgen doppelt so kalt wird, wie kalt ist es dann?',
-    options: ['Null Grad', '-2 Grad', 'Das kann man so nicht rechnen', '-273 Grad'],
+    options: [
+      'Null Grad',
+      '-2 Grad',
+      'Das kann man so nicht rechnen',
+      '-273 Grad',
+    ],
     correctAnswerIndex: 2,
-  }
+  },
 ];
