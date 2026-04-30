@@ -1,0 +1,22 @@
+<div class="results-list">
+  @for (player of players(); track player.name) {
+    <div
+      class="player-result-card"
+      [class.state-win]="player.cardState === 'win'"
+      [class.state-loss]="player.cardState === 'loss'"
+    >
+      <div class="player-name-box">
+        <calc-text textMedium class="player-name-text" [title]="player.name">{{
+          player.name
+        }}</calc-text>
+        @if (player.isMe) {
+          <calc-text textMedium class="is-me-badge">&nbsp;(Du)</calc-text>
+        }
+      </div>
+
+      <calc-text textLarge textLead class="player-score-text"
+        >{{ player.score }} Pkt.</calc-text
+      >
+    </div>
+  }
+</div>
