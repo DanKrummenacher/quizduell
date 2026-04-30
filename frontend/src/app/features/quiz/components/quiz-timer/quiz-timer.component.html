@@ -1,0 +1,20 @@
+<div class="timer-section">
+  <div class="timer-header" [class.is-reveal]="isReveal()">
+    @if (isReveal()) {
+      <calc-text textSmall textLead>Es geht weiter in:</calc-text>
+    }
+
+    <div class="timer-right">
+      <calc-icon icon="time-limit" class="timer-icon"></calc-icon>
+      <calc-text textSmall textLead>{{ timeLeft() }}s</calc-text>
+    </div>
+  </div>
+
+  <div class="timer-track">
+    <div
+      class="timer-progress"
+      [style.width.%]="timerPercent()"
+      [style.transition]="timerPercent() >= 99.5 ? 'none' : 'width 0.1s linear'"
+    ></div>
+  </div>
+</div>

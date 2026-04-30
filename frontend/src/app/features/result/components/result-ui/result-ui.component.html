@@ -1,0 +1,23 @@
+<main class="main-content">
+  <div class="center-content">
+    <div class="result-icon-box">
+      <calc-icon [attr.icon]="statusIcon()" class="result-icon"></calc-icon>
+    </div>
+
+    <h1 class="result-title">{{ statusTitle() }}</h1>
+    <calc-text textMedium class="result-subtitle">{{ statusSubtitle() }}</calc-text>
+
+    <app-result-players [players]="players()"></app-result-players>
+  </div>
+
+  <div class="home-button-wrapper">
+    <calc-button
+      expanded
+      variant="primary"
+      (click)="navigateHome.emit()"
+    >
+      <calc-icon icon="home" slot="icon"></calc-icon>
+      Zum Start
+    </calc-button>
+  </div>
+</main>

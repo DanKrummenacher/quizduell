@@ -1,0 +1,15 @@
+<h2 class="status-title">Raum erstellt</h2>
+<calc-text textMedium class="status-subtitle"
+  >Teile diesen Code mit deinem Gegner</calc-text
+>
+
+<div class="code-box">
+  <calc-text class="code-text">{{ roomCode() }}</calc-text>
+</div>
+
+<calc-button variant="transparent" class="copy-button" (click)="copyCode()">
+  <calc-icon icon="copy" slot="icon"></calc-icon>
+  Code kopieren
+</calc-button>
+
+<calc-text textSmall class="waiting-text">Warte auf den Gegner...</calc-text>

@@ -1,0 +1,17 @@
+@use '@css-ch/calc-helpers/styles' as functions;
+
+:host {
+  display: block;
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  gap: functions.rem(15);
+  width: 100%;
+}
+
+.info-text {
+  text-align: center;
+  margin-top: functions.rem(5);
+}
