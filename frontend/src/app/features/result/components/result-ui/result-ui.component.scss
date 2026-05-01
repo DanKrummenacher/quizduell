@@ -1,0 +1,68 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: functions.rem(40) functions.rem(20) functions.rem(90);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.center-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  padding-bottom: functions.rem(20);
+}
+
+.result-icon-box {
+  width: functions.rem(63);
+  height: functions.rem(63);
+  background-color: colors.$dt-color-white-100;
+  border: functions.rem(1) solid #8098be;
+  border-radius: functions.rem(4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-icon {
+  width: functions.rem(32);
+  height: functions.rem(32);
+  color: colors.$dt-color-darkblue-100;
+  stroke-width: functions.rem(2);
+}
+
+.result-title {
+  display: block;
+  font-size: functions.rem(28);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: colors.$dt-color-darkblue-100;
+  margin-top: functions.rem(16);
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.result-subtitle {
+  display: block;
+  margin-top: functions.rem(6);
+  text-align: center;
+}
+
+.home-button-wrapper {
+  width: 100%;
+  padding: 0 functions.rem(25);
+  box-sizing: border-box;
+}
