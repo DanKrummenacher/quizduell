@@ -141,6 +141,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (session.roundTimer) clearTimeout(session.roundTimer);
 
+    const playerAnswers: Record<string, number | null> = {};
+    for (const [socketId, player] of Object.entries(session.players)) {
+      playerAnswers[socketId] =
+        player.currentAnswerIndex !== undefined
+          ? player.currentAnswerIndex
+          : null;
+    }
+
     this.gameService.evaluateRound(session);
 
     const correctAnswer =
@@ -149,6 +157,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(session.gameCode).emit(GameEvents.ROUND_RESULT, {
       session: this.gameService.toClientSession(session),
       correctAnswer,
+      playerAnswers,
       nextRoundStartTimeMs,
       totalDurationMs: ROUND_RESULT_DURATION_MS,
     });

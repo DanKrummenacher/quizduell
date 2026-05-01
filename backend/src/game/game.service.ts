@@ -106,7 +106,7 @@ export class GameService {
   }
 
   private addPointsToPlayer(player: Player, maxTimeMs: number) {
-    const timeTakenMs = player.answerTimeMs || maxTimeMs;
+    const timeTakenMs = player.answerTimeMs ?? maxTimeMs;
     const remainingMs = Math.max(0, maxTimeMs - timeTakenMs);
     const bonus = 100 * (remainingMs / maxTimeMs);
     player.score += 100 + Math.round(bonus);

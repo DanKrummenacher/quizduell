@@ -38,3 +38,11 @@ export interface ClientSession {
   totalQuestions: number;
   status: GameStatus;
 }
+
+export interface RoundResultData {
+  session: ClientSession;
+  correctAnswer: number;
+  playerAnswers: Record<string, number | null>;
+  nextRoundStartTimeMs: number;
+  totalDurationMs: number;
+}

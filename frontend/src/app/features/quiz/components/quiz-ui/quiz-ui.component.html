@@ -25,7 +25,7 @@
       [answers]="answers()"
       [feedbackText]="feedbackText()"
       [feedbackType]="feedbackType()"
-      [opponentInitial]="opponentName()[0]"
+      [opponentInitial]="opponentName().charAt(0).toUpperCase()"
       (answerSelected)="answerSelected.emit($event)"
     >
     </app-quiz-question>

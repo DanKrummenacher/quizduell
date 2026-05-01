@@ -16,6 +16,7 @@ export interface QuestionData {
 export interface RoundResultData {
   session: GameSessionState;
   correctAnswer: number;
+  playerAnswers: Record<string, number | null>;
   nextRoundStartTimeMs: number;
   totalDurationMs: number;
 }
