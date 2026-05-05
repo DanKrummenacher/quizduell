@@ -113,6 +113,23 @@ export class QuizContainerComponent implements OnDestroy {
         const letters = ['A', 'B', 'C', 'D'];
         this.correctLetter.set(letters[result.correctAnswer]);
 
+        const myId = this.socketService.getSocketId();
+        const opponentId = Object.keys(result.playerAnswers).find(
+          (id) => id !== myId,
+        );
+
+        if (
+          opponentId &&
+          result.playerAnswers[opponentId] !== null &&
+          result.playerAnswers[opponentId] !== undefined
+        ) {
+          this.opponentLetter.set(
+            letters[result.playerAnswers[opponentId] as number],
+          );
+        } else {
+          this.opponentLetter.set(null);
+        }
+
         this.pointsEarnedThisRound.set(this.playerScore() - this.previousScore);
 
         this.startTimer(result.totalDurationMs, result.nextRoundStartTimeMs);
