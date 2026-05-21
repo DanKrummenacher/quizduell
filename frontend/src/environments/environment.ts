@@ -1,3 +1,3 @@
 export const environment = {
-  backendUrl: 'https://quizduell-backend.onrender.com'
+  backendUrl: 'https://quizduell-backend.onrender.com',
 };

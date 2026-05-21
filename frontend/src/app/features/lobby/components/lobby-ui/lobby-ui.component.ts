@@ -4,13 +4,17 @@ import { LobbyHeaderComponent } from '../lobby-header/lobby-header.component';
 import { LobbyActionsComponent } from '../lobby-actions/lobby-actions.component';
 import { LobbyWaitingComponent } from '../lobby-waiting/lobby-waiting.component';
 import { LobbyMatchFoundComponent } from '../lobby-match-found/lobby-match-found.component';
+import { LobbyModeComponent } from '../lobby-mode/lobby-mode.component';
+import { LobbySearchingComponent } from '../lobby-searching/lobby-searching.component';
 
 @Component({
   selector: 'app-lobby-ui',
   imports: [
     LobbyHeaderComponent,
+    LobbyModeComponent,
     LobbyActionsComponent,
     LobbyWaitingComponent,
+    LobbySearchingComponent,
     LobbyMatchFoundComponent,
   ],
   templateUrl: './lobby-ui.component.html',
@@ -25,6 +29,9 @@ export class LobbyUiComponent {
   readonly joinError = input<string>('');
 
   readonly navigateBack = output<void>();
+  readonly selectFastGame = output<void>();
+  readonly selectChallenge = output<void>();
   readonly createGame = output<void>();
   readonly joinGame = output<string>();
+  readonly cancelSearch = output<void>();
 }

@@ -1,0 +1,17 @@
+<h2 class="action-title">Spielmodus</h2>
+
+<button class="action-card mode-card" (click)="selectFastGame.emit()">
+  <calc-icon icon="lightning-strike" class="card-icon"></calc-icon>
+  <div class="card-text-wrapper">
+    <calc-text textMedium textLead class="card-title">Schnellspiel 1vs1</calc-text>
+    <calc-text textSmall class="card-desc">Spiele gegen einen zufälligen Gegner</calc-text>
+  </div>
+</button>
+
+<button class="action-card mode-card" (click)="selectChallenge.emit()">
+  <calc-icon icon="conference" class="card-icon"></calc-icon>
+  <div class="card-text-wrapper">
+    <calc-text textMedium textLead class="card-title">Freund herausfordern</calc-text>
+    <calc-text textSmall class="card-desc">Erstelle oder tritt einem Spiel bei</calc-text>
+  </div>
+</button>

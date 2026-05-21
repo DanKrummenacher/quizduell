@@ -47,7 +47,13 @@ export class ResultContainerComponent {
   });
 
   readonly playersView = computed<PlayerResultView[]>(() => {
-    const sorted = [...this.rawPlayers()].sort((a, b) => b.score - a.score);
+    const sorted = [...this.rawPlayers()];
+    sorted.sort((a, b) => {
+      if (b.score !== a.score) {
+        return b.score - a.score;
+      }
+      return a.isMe ? -1 : 1;
+    });
     const result = this.gameResult();
 
     return sorted.map((p) => {

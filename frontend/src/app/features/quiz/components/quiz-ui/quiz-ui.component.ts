@@ -2,10 +2,7 @@ import { Component, input, output, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { QuizScoreboardComponent } from '../quiz-scoreboard/quiz-scoreboard.component';
 import { QuizTimerComponent } from '../quiz-timer/quiz-timer.component';
 import { QuizQuestionComponent } from '../quiz-question/quiz-question.component';
-import {
-  QuizPhase,
-  AnswerViewData,
-} from '../../quiz.types';
+import { QuizPhase, AnswerViewData } from '../../quiz.types';
 import '@css-ch/calc-ui-text';
 
 @Component({

@@ -1,9 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  Logger,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, Logger } from '@nestjs/common';
 
 @Catch()
 export class WsExceptionsFilter implements ExceptionFilter {

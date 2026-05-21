@@ -51,6 +51,14 @@ export class GameSocketService {
       this.currentQuestion.set(question);
       this.opponentAnswered.set(false);
       this.roundResult.set(null);
+
+      const currentSession = this.session();
+      if (currentSession) {
+        this.session.set({
+          ...currentSession,
+          currentQuestionIndex: question.questionIndex,
+        });
+      }
     });
 
     this.socket.on(SocketEvents.OPPONENT_ANSWERED, () => {
@@ -94,6 +102,16 @@ export class GameSocketService {
     this.socket.emit(SocketEvents.CREATE_GAME, { playerName });
   }
 
+  public startMatchmaking(playerName: string) {
+    this.connect();
+    this.connectionError.set(null);
+    this.socket.emit('startMatchmaking', { playerName });
+  }
+
+  public cancelMatchmaking() {
+    this.socket.emit('cancelMatchmaking');
+  }
+
   public joinGame(gameCode: string, playerName: string) {
     this.connect();
     this.connectionError.set(null);
@@ -101,7 +119,11 @@ export class GameSocketService {
   }
 
   public submitAnswer(gameCode: string, answerIndex: number, timeTakenMs: number) {
-    this.socket.emit(SocketEvents.SUBMIT_ANSWER, { gameCode, answerIndex, timeTakenMs });
+    this.socket.emit(SocketEvents.SUBMIT_ANSWER, {
+      gameCode,
+      answerIndex,
+      timeTakenMs,
+    });
   }
 
   public getSocketId(): string {
