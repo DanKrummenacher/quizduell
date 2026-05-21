@@ -31,6 +31,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private readonly logger = new Logger(GameGateway.name);
   private clientToGameMap = new Map<string, string>();
+  private matchmakingQueue: { socketId: string; playerName: string }[] = [];
 
   constructor(private readonly gameService: GameService) {}
 
@@ -46,6 +47,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.clientToGameMap.delete(client.id);
       this.gameService.scheduleGameCleanup(gameCode);
     }
+    this.removeFromMatchmaking(client.id);
+  }
+
+  private removeFromMatchmaking(socketId: string) {
+    this.matchmakingQueue = this.matchmakingQueue.filter(
+      (p) => p.socketId !== socketId,
+    );
   }
 
   @UsePipes(new ValidationPipe())
@@ -91,6 +99,58 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @UsePipes(new ValidationPipe())
+  @SubscribeMessage(GameEvents.START_MATCHMAKING)
+  handleStartMatchmaking(
+    @MessageBody() data: { playerName: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.logger.log(`Player ${data.playerName} joined matchmaking`);
+
+    this.removeFromMatchmaking(client.id);
+
+    if (this.matchmakingQueue.length > 0) {
+      const opponent = this.matchmakingQueue.shift();
+
+      const session = this.gameService.createGame(
+        opponent.socketId,
+        opponent.playerName,
+      );
+
+      const startedSession = this.gameService.joinGame(
+        session.gameCode,
+        client.id,
+        data.playerName,
+      );
+
+      this.server.in(opponent.socketId).socketsJoin(startedSession.gameCode);
+      this.server.in(client.id).socketsJoin(startedSession.gameCode);
+
+      this.clientToGameMap.set(opponent.socketId, startedSession.gameCode);
+      this.clientToGameMap.set(client.id, startedSession.gameCode);
+
+      this.server
+        .to(startedSession.gameCode)
+        .emit(
+          GameEvents.GAME_START,
+          this.gameService.toClientSession(startedSession),
+        );
+
+      setTimeout(() => this.sendQuestion(startedSession), 3000);
+    } else {
+      this.matchmakingQueue.push({
+        socketId: client.id,
+        playerName: data.playerName,
+      });
+    }
+  }
+
+  @SubscribeMessage(GameEvents.CANCEL_MATCHMAKING)
+  handleCancelMatchmaking(@ConnectedSocket() client: Socket) {
+    this.logger.log(`Client ${client.id} cancelled matchmaking`);
+    this.removeFromMatchmaking(client.id);
+  }
+
+  @UsePipes(new ValidationPipe())
   @SubscribeMessage(GameEvents.SUBMIT_ANSWER)
   handleSubmitAnswer(
     @MessageBody() data: SubmitAnswerDto,
@@ -125,9 +185,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       options: currentQ.options,
       endTimeMs,
       totalDurationMs: QUESTION_DURATION_MS,
+      questionIndex: session.currentQuestionIndex,
     };
 
-    this.server.to(session.gameCode).emit(GameEvents.NEW_QUESTION, safeQuestion);
+    this.server
+      .to(session.gameCode)
+      .emit(GameEvents.NEW_QUESTION, safeQuestion);
 
     session.roundTimer = setTimeout(
       () => this.endRound(session),

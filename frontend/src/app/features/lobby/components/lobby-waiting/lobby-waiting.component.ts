@@ -11,6 +11,8 @@ export class LobbyWaitingComponent {
   readonly roomCode = input.required<string>();
 
   copyCode() {
-    navigator.clipboard.writeText(this.roomCode()).catch(() => {});
+    navigator.clipboard.writeText(this.roomCode()).catch((error) => {
+      console.warn('Code konnte nicht kopiert werden', error);
+    });
   }
 }

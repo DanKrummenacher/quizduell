@@ -122,7 +122,10 @@ export class GameService {
   }
 
   toClientSession(session: GameSession): ClientSession {
-    const clientPlayers: Record<string, { socketId: string; name: string; score: number }> = {};
+    const clientPlayers: Record<
+      string,
+      { socketId: string; name: string; score: number }
+    > = {};
 
     for (const [key, player] of Object.entries(session.players)) {
       clientPlayers[key] = {

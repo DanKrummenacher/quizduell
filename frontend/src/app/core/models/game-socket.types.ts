@@ -11,6 +11,7 @@ export interface QuestionData {
   options: string[];
   endTimeMs: number;
   totalDurationMs: number;
+  questionIndex: number;
 }
 
 export interface RoundResultData {

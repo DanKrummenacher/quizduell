@@ -13,7 +13,7 @@ export class LobbyContainerComponent {
   private readonly router = inject(Router);
   private readonly socketService = inject(GameSocketService);
 
-  readonly lobbyState = signal<LobbyState>('CHOOSE_ACTION');
+  readonly lobbyState = signal<LobbyState>('CHOOSE_MODE');
 
   readonly playerName = signal<string>('');
   readonly roomCode = signal<string>('');
@@ -65,11 +65,31 @@ export class LobbyContainerComponent {
   }
 
   handleBack() {
-    if (this.lobbyState() !== 'CHOOSE_ACTION') {
+    const state = this.lobbyState();
+    if (state === 'WAITING' || state === 'FOUND') {
       this.lobbyState.set('CHOOSE_ACTION');
+    } else if (state === 'SEARCHING') {
+      this.lobbyState.set('CHOOSE_MODE');
+      this.socketService.cancelMatchmaking();
+    } else if (state === 'CHOOSE_ACTION') {
+      this.lobbyState.set('CHOOSE_MODE');
     } else {
       void this.router.navigate(['/']);
     }
+  }
+
+  handleSelectFastGame() {
+    this.lobbyState.set('SEARCHING');
+    this.socketService.startMatchmaking(this.playerName());
+  }
+
+  handleCancelSearch() {
+    this.lobbyState.set('CHOOSE_MODE');
+    this.socketService.cancelMatchmaking();
+  }
+
+  handleSelectChallenge() {
+    this.lobbyState.set('CHOOSE_ACTION');
   }
 
   handleCreate() {

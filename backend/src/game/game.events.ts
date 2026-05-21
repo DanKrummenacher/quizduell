@@ -1,6 +1,8 @@
 export const GameEvents = {
   CREATE_GAME: 'createGame',
   JOIN_GAME: 'joinGame',
+  START_MATCHMAKING: 'startMatchmaking',
+  CANCEL_MATCHMAKING: 'cancelMatchmaking',
   SUBMIT_ANSWER: 'submitAnswer',
   GAME_CREATED: 'gameCreated',
   GAME_START: 'gameStart',

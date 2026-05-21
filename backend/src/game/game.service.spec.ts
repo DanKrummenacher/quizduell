@@ -8,7 +8,12 @@ describe('GameService', () => {
 
   const mockQuestionsService = {
     getRandomQuestions: jest.fn().mockReturnValue([
-      { id: '1', question: 'Test?', options: ['A', 'B', 'C', 'D'], correctAnswerIndex: 0 }
+      {
+        id: '1',
+        question: 'Test?',
+        options: ['A', 'B', 'C', 'D'],
+        correctAnswerIndex: 0,
+      },
     ]),
   };
 
@@ -40,7 +45,12 @@ describe('GameService', () => {
 
   describe('addPointsToPlayer (Scoring Logic)', () => {
     it('should add exactly 100 points if time taken is maximum (0 seconds left)', () => {
-      const player: Player = { socketId: 'p1', name: 'Dan', score: 0, answerTimeMs: 20000 };
+      const player: Player = {
+        socketId: 'p1',
+        name: 'Dan',
+        score: 0,
+        answerTimeMs: 20000,
+      };
       const maxTimeMs = 20000;
 
       (service as any).addPointsToPlayer(player, maxTimeMs);
@@ -49,7 +59,12 @@ describe('GameService', () => {
     });
 
     it('should add exactly 200 points if time taken is 0 (20 seconds left)', () => {
-      const player: Player = { socketId: 'p1', name: 'Dan', score: 0, answerTimeMs: 0 };
+      const player: Player = {
+        socketId: 'p1',
+        name: 'Dan',
+        score: 0,
+        answerTimeMs: 0,
+      };
       const maxTimeMs = 20000;
 
       (service as any).addPointsToPlayer(player, maxTimeMs);
@@ -58,7 +73,12 @@ describe('GameService', () => {
     });
 
     it('should add proportional bonus points based on time', () => {
-      const player: Player = { socketId: 'p1', name: 'Dan', score: 0, answerTimeMs: 10000 };
+      const player: Player = {
+        socketId: 'p1',
+        name: 'Dan',
+        score: 0,
+        answerTimeMs: 10000,
+      };
       const maxTimeMs = 20000;
 
       (service as any).addPointsToPlayer(player, maxTimeMs);
