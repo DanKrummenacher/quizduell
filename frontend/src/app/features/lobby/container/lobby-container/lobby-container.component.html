@@ -4,11 +4,13 @@
   [roomCode]="roomCode()"
   [opponentName]="opponentName()"
   [joinError]="connectionError()"
+  [opponentLeft]="opponentLeft()"
   (navigateBack)="handleBack()"
   (selectFastGame)="handleSelectFastGame()"
   (selectChallenge)="handleSelectChallenge()"
   (createGame)="handleCreate()"
   (joinGame)="handleJoin($event)"
   (cancelSearch)="handleCancelSearch()"
+  (acknowledgeOpponentLeft)="handleOpponentLeftAcknowledge()"
 >
 </app-lobby-ui>

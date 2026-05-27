@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "^21.2.10",
     "@angular/router": "^21.2.10",
     "@css-ch/calc-ui-button": "^5.4.0",
+    "@css-ch/calc-ui-flyout": "^5.0.4",
     "@css-ch/calc-ui-icon": "^1.2.16",
     "@css-ch/calc-ui-input-text": "^2.0.1",
     "@css-ch/calc-ui-logo": "^1.2.8",

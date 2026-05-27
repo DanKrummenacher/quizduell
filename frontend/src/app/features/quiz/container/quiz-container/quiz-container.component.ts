@@ -141,15 +141,15 @@ export class QuizContainerComponent implements OnDestroy {
         void this.router.navigate(['/result']);
       }
     });
+  }
 
-    effect(() => {
-      if (this.socketService.opponentLeft()) {
-        window.alert(
-          'Dein Gegner hat das Spiel verlassen. Das Spiel wurde abgebrochen.',
-        );
-        this.socketService.resetGame();
-        void this.router.navigate(['/']);
-      }
+  readonly opponentLeft = this.socketService.opponentLeft;
+
+  handleOpponentLeftAcknowledge() {
+    const name = this.playerName();
+    this.socketService.resetGame();
+    void this.router.navigate(['/lobby'], {
+      state: { playerName: name !== 'Du' ? name : undefined },
     });
   }
 

@@ -1,4 +1,4 @@
-import { Component, input, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { Component, input, signal, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import '@css-ch/calc-ui-text';
 
 @Component({
@@ -10,9 +10,19 @@ import '@css-ch/calc-ui-text';
 export class LobbyWaitingComponent {
   readonly roomCode = input.required<string>();
 
+  readonly isCopied = signal<boolean>(false);
+
   copyCode() {
-    navigator.clipboard.writeText(this.roomCode()).catch((error) => {
-      console.warn('Code konnte nicht kopiert werden', error);
-    });
+    navigator.clipboard
+      .writeText(this.roomCode())
+      .then(() => {
+        this.isCopied.set(true);
+        setTimeout(() => {
+          this.isCopied.set(false);
+        }, 1000);
+      })
+      .catch((error) => {
+        console.warn('Code konnte nicht kopiert werden', error);
+      });
   }
 }

@@ -12,6 +12,8 @@
   [answers]="answersView()"
   [feedbackText]="feedbackText()"
   [feedbackType]="feedbackType()"
+  [opponentLeft]="opponentLeft()"
   (answerSelected)="handleAnswer($event)"
+  (acknowledgeOpponentLeft)="handleOpponentLeftAcknowledge()"
 >
 </app-quiz-ui>
