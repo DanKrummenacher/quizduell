@@ -25,6 +25,10 @@ export class GameService {
     return code;
   }
 
+  getSession(gameCode: string): GameSession | undefined {
+    return this.activeGames.get(gameCode);
+  }
+
   createGame(socketId: string, playerName: string): GameSession {
     let gameCode = this.generateGameCode();
     while (this.activeGames.has(gameCode)) {
@@ -38,6 +42,7 @@ export class GameService {
       questions: this.questionsService.getRandomQuestions(QUESTIONS_PER_GAME),
       currentQuestionIndex: 0,
       status: 'lobby',
+      rematchRequests: [],
     };
 
     this.activeGames.set(gameCode, session);
@@ -49,7 +54,7 @@ export class GameService {
     gameCode: string,
     socketId: string,
     playerName: string,
-  ): GameSession | null {
+  ): GameSession | 'OWN_GAME' | null {
     const session = this.activeGames.get(gameCode);
 
     if (!session) {
@@ -57,6 +62,10 @@ export class GameService {
     }
     if (Object.keys(session.players).length >= 2) {
       return null;
+    }
+
+    if (session.players[socketId]) {
+      return 'OWN_GAME';
     }
 
     session.players[socketId] = { socketId, name: playerName, score: 0 };
@@ -150,9 +159,66 @@ export class GameService {
     }
   }
 
-  scheduleGameCleanup(gameCode: string) {
-    setTimeout(() => {
-      this.removeGame(gameCode);
+  markSessionAborted(gameCode: string) {
+    const session = this.activeGames.get(gameCode);
+    if (session) {
+      session.status = 'aborted' as any;
+      if (session.roundTimer) {
+        clearTimeout(session.roundTimer);
+      }
+    }
+  }
+
+  scheduleGameCleanup(gameCode: string, onCleanup?: () => void) {
+    const session = this.activeGames.get(gameCode);
+    if (!session) return;
+
+    if (session.roundTimer) {
+      clearTimeout(session.roundTimer);
+    }
+
+    session.roundTimer = setTimeout(() => {
+      if (onCleanup) onCleanup();
+      this.activeGames.delete(gameCode);
+      this.logger.log(`Game removed: ${gameCode}`);
     }, GAME_CLEANUP_DELAY_MS);
+  }
+
+  handleRematchRequest(gameCode: string, socketId: string): boolean {
+    const session = this.activeGames.get(gameCode);
+    if (!session) return false;
+
+    if (!session.rematchRequests.includes(socketId)) {
+      session.rematchRequests.push(socketId);
+    }
+
+    return (
+      session.rematchRequests.length === Object.keys(session.players).length &&
+      Object.keys(session.players).length === 2
+    );
+  }
+
+  restartGame(gameCode: string): GameSession | null {
+    const session = this.activeGames.get(gameCode);
+    if (!session) return null;
+
+    if (session.roundTimer) clearTimeout(session.roundTimer);
+
+    session.status = 'pre-game';
+    session.rematchRequests = [];
+    session.rematchTimer = undefined;
+    session.currentQuestionIndex = 0;
+    session.questions =
+      this.questionsService.getRandomQuestions(QUESTIONS_PER_GAME);
+    session.questionStartTimeMs = undefined;
+
+    for (const player of Object.values(session.players)) {
+      player.score = 0;
+      player.currentAnswerIndex = null;
+      player.answerTimeMs = null;
+    }
+
+    this.logger.log(`Game restarted: ${gameCode}`);
+    return session;
   }
 }

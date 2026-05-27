@@ -4,6 +4,7 @@ import { QuizTimerComponent } from '../quiz-timer/quiz-timer.component';
 import { QuizQuestionComponent } from '../quiz-question/quiz-question.component';
 import { QuizPhase, AnswerViewData } from '../../quiz.types';
 import '@css-ch/calc-ui-text';
+import '@css-ch/calc-ui-flyout';
 
 @Component({
   selector: 'app-quiz-ui',
@@ -28,6 +29,8 @@ export class QuizUiComponent {
   readonly answers = input.required<AnswerViewData[]>();
   readonly feedbackText = input.required<string | null>();
   readonly feedbackType = input.required<'default' | 'success' | 'error' | null>();
+  readonly opponentLeft = input<boolean>(false);
 
   readonly answerSelected = output<string>();
+  readonly acknowledgeOpponentLeft = output<void>();
 }

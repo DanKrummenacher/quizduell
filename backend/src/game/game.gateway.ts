@@ -13,8 +13,10 @@ import { Logger, UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CreateGameDto, JoinGameDto, SubmitAnswerDto } from './dto/game.dto';
 import {
   GameSession,
+  RoundResultData,
   QUESTION_DURATION_MS,
   ROUND_RESULT_DURATION_MS,
+  REMATCH_TIMEOUT_MS,
 } from './game.types';
 import { GameEvents } from './game.events';
 import { WsExceptionsFilter } from '../common/filters/ws-exceptions.filter';
@@ -45,7 +47,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (gameCode) {
       this.server.to(gameCode).emit(GameEvents.OPPONENT_LEFT);
       this.clientToGameMap.delete(client.id);
-      this.gameService.scheduleGameCleanup(gameCode);
+      this.gameService.markSessionAborted(gameCode);
+      this.gameService.scheduleGameCleanup(gameCode, () => {
+        this.server.to(gameCode).emit(GameEvents.SESSION_EXPIRED);
+      });
     }
     this.removeFromMatchmaking(client.id);
   }
@@ -84,6 +89,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       data.playerName,
     );
 
+    if (session === 'OWN_GAME') {
+      return { event: GameEvents.ERROR, data: 'Cannot join own game' };
+    }
+
     if (!session) {
       return { event: GameEvents.ERROR, data: 'Game not found or full' };
     }
@@ -95,7 +104,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
       .to(session.gameCode)
       .emit(GameEvents.GAME_START, this.gameService.toClientSession(session));
 
-    setTimeout(() => this.sendQuestion(session), 3000);
+    session.roundTimer = setTimeout(() => this.sendQuestion(session), 3000);
   }
 
   @UsePipes(new ValidationPipe())
@@ -122,6 +131,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         data.playerName,
       );
 
+      if (!startedSession || startedSession === 'OWN_GAME') {
+        return;
+      }
+
       this.server.in(opponent.socketId).socketsJoin(startedSession.gameCode);
       this.server.in(client.id).socketsJoin(startedSession.gameCode);
 
@@ -135,7 +148,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
           this.gameService.toClientSession(startedSession),
         );
 
-      setTimeout(() => this.sendQuestion(startedSession), 3000);
+      startedSession.roundTimer = setTimeout(
+        () => this.sendQuestion(startedSession),
+        3000,
+      );
     } else {
       this.matchmakingQueue.push({
         socketId: client.id,
@@ -173,6 +189,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private sendQuestion(session: GameSession) {
+    if (session.status === ('aborted' as any)) return;
     if (session.roundTimer) clearTimeout(session.roundTimer);
 
     session.status = 'in-game';
@@ -214,16 +231,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     this.gameService.evaluateRound(session);
 
-    const correctAnswer =
-      session.questions[session.currentQuestionIndex].correctAnswerIndex;
+    const question = session.questions[session.currentQuestionIndex];
     const nextRoundStartTimeMs = Date.now() + ROUND_RESULT_DURATION_MS;
-    this.server.to(session.gameCode).emit(GameEvents.ROUND_RESULT, {
+    const payload: RoundResultData = {
       session: this.gameService.toClientSession(session),
-      correctAnswer,
+      correctAnswer: question.correctAnswerIndex,
       playerAnswers,
       nextRoundStartTimeMs,
       totalDurationMs: ROUND_RESULT_DURATION_MS,
-    });
+    };
+
+    this.server.to(session.gameCode).emit(GameEvents.ROUND_RESULT, payload);
 
     setTimeout(() => {
       const hasNext = this.gameService.nextRound(session);
@@ -236,8 +254,51 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
             GameEvents.GAME_OVER,
             this.gameService.toClientSession(session),
           );
-        this.gameService.scheduleGameCleanup(session.gameCode);
+        this.gameService.scheduleGameCleanup(session.gameCode, () => {
+          this.server.to(session.gameCode).emit(GameEvents.SESSION_EXPIRED);
+        });
       }
     }, ROUND_RESULT_DURATION_MS);
+  }
+
+  @SubscribeMessage(GameEvents.REMATCH_REQUEST)
+  handleRematchRequest(@ConnectedSocket() client: Socket) {
+    const gameCode = this.clientToGameMap.get(client.id);
+    if (!gameCode) return;
+
+    const session = this.gameService.getSession(gameCode);
+    if (!session) return;
+
+    const bothReady = this.gameService.handleRematchRequest(
+      gameCode,
+      client.id,
+    );
+    if (bothReady) {
+      if (session.rematchTimer) clearTimeout(session.rematchTimer);
+      const newSession = this.gameService.restartGame(gameCode);
+      if (newSession) {
+        this.server
+          .to(newSession.gameCode)
+          .emit(
+            GameEvents.GAME_START,
+            this.gameService.toClientSession(newSession),
+          );
+
+        newSession.roundTimer = setTimeout(
+          () => this.sendQuestion(newSession),
+          3000,
+        );
+      }
+    } else {
+      if (!session.rematchTimer) {
+        client.to(gameCode).emit(GameEvents.OPPONENT_REQUESTED_REMATCH);
+        session.rematchTimer = setTimeout(() => {
+          this.server.to(gameCode).emit(GameEvents.OPPONENT_LEFT);
+          this.gameService.scheduleGameCleanup(gameCode, () => {
+            this.server.to(gameCode).emit(GameEvents.SESSION_EXPIRED);
+          });
+        }, REMATCH_TIMEOUT_MS);
+      }
+    }
   }
 }

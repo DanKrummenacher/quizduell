@@ -1,5 +1,10 @@
 <div class="page-wrapper">
-  @if (state() === 'CHOOSE_MODE' || state() === 'CHOOSE_ACTION' || state() === 'WAITING' || state() === 'SEARCHING') {
+  @if (
+    state() === 'CHOOSE_MODE' ||
+    state() === 'CHOOSE_ACTION' ||
+    state() === 'WAITING' ||
+    state() === 'SEARCHING'
+  ) {
     <div class="header-area">
       <app-lobby-header
         [playerName]="playerName()"
@@ -25,7 +30,9 @@
         >
         </app-lobby-actions>
       } @else if (state() === 'SEARCHING') {
-        <app-lobby-searching (cancelSearch)="cancelSearch.emit()"></app-lobby-searching>
+        <app-lobby-searching
+          (cancelSearch)="cancelSearch.emit()"
+        ></app-lobby-searching>
       } @else if (state() === 'WAITING') {
         <app-lobby-waiting [roomCode]="roomCode()"></app-lobby-waiting>
       } @else if (state() === 'FOUND') {
@@ -36,3 +43,20 @@
     </div>
   </main>
 </div>
+
+@if (opponentLeft()) {
+  <calc-flyout
+    withoutCloseButton
+    size="small"
+    title="Schade! Lobby geschlossen"
+    main="Dein Gegner hat die Lobby verlassen. Du kannst nun ein neues Spiel starten oder einen neuen Gegner suchen."
+  >
+    <calc-button
+      variant="primary"
+      slot="calc-button"
+      (click)="acknowledgeOpponentLeft.emit()"
+    >
+      Zurück zur Lobby
+    </calc-button>
+  </calc-flyout>
+}

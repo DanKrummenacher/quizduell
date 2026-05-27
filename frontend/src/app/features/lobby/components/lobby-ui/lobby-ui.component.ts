@@ -6,6 +6,7 @@ import { LobbyWaitingComponent } from '../lobby-waiting/lobby-waiting.component'
 import { LobbyMatchFoundComponent } from '../lobby-match-found/lobby-match-found.component';
 import { LobbyModeComponent } from '../lobby-mode/lobby-mode.component';
 import { LobbySearchingComponent } from '../lobby-searching/lobby-searching.component';
+import '@css-ch/calc-ui-flyout';
 
 @Component({
   selector: 'app-lobby-ui',
@@ -27,6 +28,7 @@ export class LobbyUiComponent {
   readonly roomCode = input.required<string>();
   readonly opponentName = input.required<string>();
   readonly joinError = input<string>('');
+  readonly opponentLeft = input<boolean>(false);
 
   readonly navigateBack = output<void>();
   readonly selectFastGame = output<void>();
@@ -34,4 +36,5 @@ export class LobbyUiComponent {
   readonly createGame = output<void>();
   readonly joinGame = output<string>();
   readonly cancelSearch = output<void>();
+  readonly acknowledgeOpponentLeft = output<void>();
 }

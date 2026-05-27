@@ -3,7 +3,8 @@ import { Question } from '../questions/questions.types';
 export const QUESTIONS_PER_GAME = 7;
 export const QUESTION_DURATION_MS = 20000;
 export const ROUND_RESULT_DURATION_MS = 4000;
-export const GAME_CLEANUP_DELAY_MS = 10000;
+export const GAME_CLEANUP_DELAY_MS = 180000;
+export const REMATCH_TIMEOUT_MS = 45000;
 
 export interface Player {
   socketId: string;
@@ -23,6 +24,8 @@ export interface GameSession {
   status: GameStatus;
   questionStartTimeMs?: number;
   roundTimer?: ReturnType<typeof setTimeout>;
+  rematchTimer?: ReturnType<typeof setTimeout>;
+  rematchRequests: string[];
 }
 
 export interface ClientPlayer {

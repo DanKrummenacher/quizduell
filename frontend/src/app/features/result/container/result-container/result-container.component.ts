@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { ResultUiComponent } from '../../components/result-ui/result-ui.component';
 import { GameSocketService } from '../../../../core/services/game-socket.service';
@@ -17,7 +17,66 @@ export class ResultContainerComponent {
     if (!this.socketService.session()) {
       void this.router.navigate(['/']);
     }
+
+    effect(() => {
+      const session = this.socketService.session();
+      if (session && session.status === 'pre-game') {
+        const playerName = this.rawPlayers().find((p) => p.isMe)?.name || '';
+        void this.router.navigate(['/lobby'], { state: { playerName } });
+      }
+    });
   }
+
+  readonly isRematchRequested = signal(false);
+  readonly isOpponentLeft = this.socketService.opponentLeft;
+  readonly opponentRequestedRematch = this.socketService.opponentRequestedRematch;
+  readonly isSessionExpired = this.socketService.sessionExpired;
+  readonly gameMode = this.socketService.gameMode;
+
+  readonly isPlayAgainDisabled = computed(() => {
+    if (this.gameMode() === 'FAST_GAME') return false;
+    return (
+      this.isRematchRequested() || this.isOpponentLeft() || this.isSessionExpired()
+    );
+  });
+
+  readonly playAgainText = computed(() => {
+    if (this.gameMode() === 'FAST_GAME') return 'Erneut Spielen';
+    if (this.isSessionExpired() || this.isOpponentLeft()) return 'Erneut Spielen';
+    if (this.isRematchRequested()) return 'Anfrage gesendet';
+    if (this.opponentRequestedRematch()) return 'Revanche annehmen!';
+    return 'Erneut Spielen';
+  });
+
+  readonly playAgainIcon = computed(() => {
+    if (this.gameMode() === 'FAST_GAME') return 'undo';
+    if (this.isSessionExpired() || this.isOpponentLeft()) return 'undo';
+    if (this.isRematchRequested()) return 'paper-plane';
+    if (this.opponentRequestedRematch()) return 'checkmark-circle';
+    return 'undo';
+  });
+
+  readonly playAgainStatusText = computed(() => {
+    if (this.gameMode() === 'FAST_GAME') return null;
+    if (this.isSessionExpired()) return 'Die Spielsitzung wurde beendet.';
+    if (this.isOpponentLeft()) return 'Dein Gegner hat das Spiel verlassen!';
+    if (this.isRematchRequested()) return 'Warte auf den Gegner...';
+    if (this.opponentRequestedRematch()) return 'Dein Gegner möchte eine Revanche.';
+    return null;
+  });
+
+  readonly showOpponentLeftFlyout = computed(() => {
+    return (
+      this.gameMode() !== 'FAST_GAME' &&
+      this.isOpponentLeft() &&
+      this.isRematchRequested() &&
+      !this.isSessionExpired()
+    );
+  });
+
+  readonly showSessionExpiredFlyout = computed(() => {
+    return this.gameMode() !== 'FAST_GAME' && this.isSessionExpired();
+  });
 
   readonly rawPlayers = computed(() => {
     const session = this.socketService.session();
@@ -88,7 +147,29 @@ export class ResultContainerComponent {
   });
 
   handleHome() {
+    const playerName = this.rawPlayers().find((p) => p.isMe)?.name || '';
     this.socketService.resetGame();
-    void this.router.navigate(['/']);
+    void this.router.navigate(['/lobby'], { state: { playerName } });
+  }
+
+  handlePlayAgain() {
+    const gameMode = this.socketService.gameMode();
+    const playerName = this.rawPlayers().find((p) => p.isMe)?.name || '';
+
+    if (gameMode === 'FAST_GAME') {
+      this.socketService.resetGame();
+      void this.router.navigate(['/lobby'], {
+        state: { playerName, fastGameRestart: true },
+      });
+    } else {
+      this.isRematchRequested.set(true);
+      this.socketService.requestRematch();
+    }
+  }
+
+  handleOpponentLeftAcknowledge() {
+    const playerName = this.rawPlayers().find((p) => p.isMe)?.name || '';
+    this.socketService.resetGame();
+    void this.router.navigate(['/lobby'], { state: { playerName } });
   }
 }

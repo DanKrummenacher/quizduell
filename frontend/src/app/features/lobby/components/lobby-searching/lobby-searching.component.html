@@ -6,7 +6,9 @@
 
 <calc-text textLarge textLead class="title-text">Suche Gegner...</calc-text>
 
-<calc-text textMedium class="subtitle-text">Warte auf einen weiteren Spieler</calc-text>
+<calc-text textMedium class="subtitle-text"
+  >Warte auf einen weiteren Spieler</calc-text
+>
 
 <div class="loading-animation-wrapper">
   <div class="loading-circle"></div>
@@ -15,7 +17,12 @@
 </div>
 
 <div class="cancel-wrapper">
-  <calc-button variant="primary" ariaLabel="Abbrechen" class="cancel-button" (click)="cancelSearch.emit()">
+  <calc-button
+    variant="primary"
+    ariaLabel="Abbrechen"
+    class="cancel-button"
+    (click)="cancelSearch.emit()"
+  >
     <calc-icon icon="delete" slot="icon"></calc-icon>
     Abbrechen
   </calc-button>

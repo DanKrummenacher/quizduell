@@ -21,12 +21,18 @@ export class LobbyContainerComponent {
   readonly connectionError = computed(
     () => this.socketService.connectionError() || '',
   );
+  readonly opponentLeft = this.socketService.opponentLeft;
 
   constructor() {
     const stateName = history.state?.playerName;
+    const isFastGameRestart = history.state?.fastGameRestart;
 
     if (stateName) {
       this.playerName.set(stateName);
+      if (isFastGameRestart) {
+        this.lobbyState.set('SEARCHING');
+        this.socketService.startMatchmaking(stateName);
+      }
     } else {
       void this.router.navigate(['/']);
     }
@@ -37,8 +43,9 @@ export class LobbyContainerComponent {
 
       this.roomCode.set(session.gameCode);
 
+      const myId = this.socketService.getSocketId();
       const players = Object.values(session.players);
-      const opponent = players.find((p) => p.name !== this.playerName());
+      const opponent = players.find((p) => p.socketId !== myId);
 
       if (opponent) {
         this.opponentName.set(opponent.name);
@@ -54,16 +61,12 @@ export class LobbyContainerComponent {
         void this.router.navigate(['/quiz']);
       }
     });
-
-    effect(() => {
-      if (this.socketService.opponentLeft()) {
-        window.alert('Dein Gegner hat die Lobby verlassen.');
-        this.socketService.resetGame();
-        void this.router.navigate(['/']);
-      }
-    });
   }
 
+  handleOpponentLeftAcknowledge() {
+    this.socketService.resetGame();
+    this.lobbyState.set('CHOOSE_MODE');
+  }
   handleBack() {
     const state = this.lobbyState();
     if (state === 'WAITING' || state === 'FOUND') {

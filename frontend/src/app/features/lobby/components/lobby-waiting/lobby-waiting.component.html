@@ -7,9 +7,17 @@
   <calc-text class="code-text">{{ roomCode() }}</calc-text>
 </div>
 
-<calc-button variant="transparent" class="copy-button" (click)="copyCode()">
-  <calc-icon icon="copy" slot="icon"></calc-icon>
-  Code kopieren
+<calc-button
+  variant="transparent"
+  class="copy-button"
+  [attr.disabled]="isCopied() ? true : null"
+  (click)="!isCopied() && copyCode()"
+>
+  <calc-icon
+    [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
+    slot="icon"
+  ></calc-icon>
+  {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
 </calc-button>
 
 <calc-text textSmall class="waiting-text">Warte auf den Gegner...</calc-text>

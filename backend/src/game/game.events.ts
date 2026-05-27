@@ -12,4 +12,7 @@ export const GameEvents = {
   ROUND_RESULT: 'roundResult',
   GAME_OVER: 'gameOver',
   ERROR: 'error',
+  REMATCH_REQUEST: 'rematchRequest',
+  OPPONENT_REQUESTED_REMATCH: 'opponentRequestedRematch',
+  SESSION_EXPIRED: 'sessionExpired',
 } as const;

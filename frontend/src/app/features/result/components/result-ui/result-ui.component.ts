@@ -4,6 +4,7 @@ import { PlayerResultView } from '../../result.types';
 import '@css-ch/calc-ui-text';
 import '@css-ch/calc-ui-icon';
 import '@css-ch/calc-ui-button';
+import '@css-ch/calc-ui-flyout';
 
 @Component({
   selector: 'app-result-ui',
@@ -18,6 +19,14 @@ export class ResultUiComponent {
   readonly statusIcon = input.required<string>();
 
   readonly players = input.required<PlayerResultView[]>();
+  readonly isPlayAgainDisabled = input.required<boolean>();
+  readonly playAgainText = input.required<string>();
+  readonly playAgainIcon = input.required<string>();
+  readonly playAgainStatusText = input<string | null>(null);
+  readonly showOpponentLeftFlyout = input.required<boolean>();
+  readonly showSessionExpiredFlyout = input.required<boolean>();
 
   readonly navigateHome = output<void>();
+  readonly playAgain = output<void>();
+  readonly opponentLeftAcknowledge = output<void>();
 }
