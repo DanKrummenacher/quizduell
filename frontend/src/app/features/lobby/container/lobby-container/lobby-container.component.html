@@ -1,0 +1,19 @@
+<app-lobby-ui
+  [state]="lobbyState()"
+  [playerName]="playerName()"
+  [roomCode]="roomCode()"
+  [opponentName]="opponentName()"
+  [countdownMs]="countdownMs()"
+  [joinError]="joinError()"
+  [opponentLeft]="opponentLeft()"
+  [notice]="notice()"
+  (navigateBack)="handleBack()"
+  (selectFastGame)="handleSelectFastGame()"
+  (selectChallenge)="handleSelectChallenge()"
+  (createGame)="handleCreate()"
+  (joinGame)="handleJoin($event)"
+  (cancelSearch)="handleCancelSearch()"
+  (acknowledgeOpponentLeft)="handleOpponentLeftAcknowledge()"
+  (acknowledgeNotice)="handleNoticeAcknowledge()"
+>
+</app-lobby-ui>

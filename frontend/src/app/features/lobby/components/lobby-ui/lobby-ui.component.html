@@ -1,0 +1,75 @@
+<div class="page-wrapper">
+  @if (
+    state() === 'CHOOSE_MODE' ||
+    state() === 'CHOOSE_ACTION' ||
+    state() === 'WAITING' ||
+    state() === 'SEARCHING'
+  ) {
+    <div class="header-area">
+      <app-lobby-header
+        [playerName]="playerName()"
+        (navigateBack)="navigateBack.emit()"
+      >
+      </app-lobby-header>
+    </div>
+  }
+
+  <main class="main-area">
+    <div class="centered-content">
+      @if (state() === 'CHOOSE_MODE') {
+        <app-lobby-mode
+          (selectFastGame)="selectFastGame.emit()"
+          (selectChallenge)="selectChallenge.emit()"
+        >
+        </app-lobby-mode>
+      } @else if (state() === 'CHOOSE_ACTION') {
+        <app-lobby-actions
+          [joinError]="joinError()"
+          (createGame)="createGame.emit()"
+          (joinGame)="joinGame.emit($event)"
+        >
+        </app-lobby-actions>
+      } @else if (state() === 'SEARCHING') {
+        <app-lobby-searching
+          (cancelSearch)="cancelSearch.emit()"
+        ></app-lobby-searching>
+      } @else if (state() === 'WAITING') {
+        <app-lobby-waiting [roomCode]="roomCode()"></app-lobby-waiting>
+      } @else if (state() === 'FOUND') {
+        <app-lobby-match-found
+          [opponentName]="opponentName()"
+          [durationMs]="countdownMs()"
+        ></app-lobby-match-found>
+      }
+    </div>
+  </main>
+</div>
+
+@if (opponentLeft()) {
+  <css-flyout
+    withoutCloseButton
+    size="small"
+    title="Schade! Lobby geschlossen"
+    main="Dein Gegner hat die Lobby verlassen. Du kannst nun ein neues Spiel starten oder einen neuen Gegner suchen."
+  >
+    <css-button
+      variant="primary"
+      slot="css-button"
+      (click)="acknowledgeOpponentLeft.emit()"
+    >
+      Zurück zur Lobby
+    </css-button>
+  </css-flyout>
+}
+
+@if (notice(); as message) {
+  <css-flyout withoutCloseButton size="small" title="Hinweis" [main]="message">
+    <css-button
+      variant="primary"
+      slot="css-button"
+      (click)="acknowledgeNotice.emit()"
+    >
+      OK
+    </css-button>
+  </css-flyout>
+}

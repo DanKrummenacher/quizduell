@@ -8,10 +8,9 @@ import {
 import {
   ADMIN_PASSWORD,
   answer,
-  createFriendGame,
   enterName,
   expectNoHorizontalOverflow,
-  joinByLink,
+  joinByCode,
   newPlayer,
   prepareBackend,
   waitForQuestion,
@@ -84,34 +83,40 @@ test.describe('responsive layout', () => {
       });
 
       await player.goto('/');
-      await expect(player.getByText('Wer ist schneller im Kopf?')).toBeVisible();
+      await expect(
+        player.getByText('Teste dein Wissen im direkten Duell'),
+      ).toBeVisible();
       await capture(player, device, '01-start');
 
       await enterName(player, 'Alexandra');
-      await capture(player, device, '02-lobby');
+      await capture(player, device, '02-lobby-mode');
 
-      const code = await createFriendGame(player);
-      await capture(player, device, '03-waiting');
+      await player.getByText('Freund herausfordern').first().click();
+      await capture(player, device, '03-lobby-actions');
+      await player.getByText('Spiel erstellen').first().click();
+      await expect(player.getByText('Spiel erstellt')).toBeVisible();
+      const code = (await player.locator('.code-text').innerText()).trim();
+      await capture(player, device, '04-waiting');
 
-      await joinByLink(opponent, code, 'Maximilian');
-      await expect(player.getByText('Gegner gefunden')).toBeVisible();
-      await capture(player, device, '04-countdown');
+      await joinByCode(opponent, code, 'Maximilian');
+      await expect(player.getByText('Gegner gefunden!')).toBeVisible();
+      await capture(player, device, '05-found');
 
-      await waitForQuestion(player, 1);
-      await capture(player, device, '05-question');
+      for (let number = 1; number <= 3; number++) {
+        await waitForQuestion(player, number);
+        if (number === 1) {
+          await capture(player, device, '06-question');
+        }
+        await answer(opponent, 1);
+        await answer(player, 0);
+        await expect(player.locator('.feedback-wrapper')).toHaveText(/Punkte/);
+        if (number === 1) {
+          await capture(player, device, '07-reveal');
+        }
+      }
 
-      await answer(opponent, 1);
-      await expect(player.locator('.answered')).toBeVisible();
-      await answer(player, 0);
-      await expect(player.locator('.feedback')).toHaveText(/Richtig|Leider falsch/);
-      await capture(player, device, '06-reveal');
-
-      await opponent.getByRole('button', { name: /Aufgeben/ }).click();
-      await opponent.getByRole('button', { name: 'Verlassen', exact: true }).click();
-      await expect(
-        player.getByText('Maximilian hat das Spiel verlassen.'),
-      ).toBeVisible();
-      await capture(player, device, '07-aborted');
+      await expect(player.locator('.result-title')).toBeVisible({ timeout: 20_000 });
+      await capture(player, device, '08-result');
 
       await player.context().close();
       await opponent.context().close();
@@ -129,15 +134,15 @@ test.describe('responsive layout', () => {
       await admin.goto('/admin/login');
       await capture(admin, device, '10-admin-login');
       await admin.locator('css-input-text input').fill(ADMIN_PASSWORD);
-      await admin.getByRole('button', { name: 'Anmelden' }).click();
-      await expect(admin.getByText('Alles bereit.')).toBeVisible();
+      await admin.locator('css-button', { hasText: 'Anmelden' }).click();
+      await expect(admin.getByText('Alles bereit')).toBeVisible();
       await capture(admin, device, '11-admin-dashboard');
 
       await admin.getByRole('link', { name: 'Fragen' }).click();
       await expect(admin.locator('.item').first()).toBeVisible();
       await capture(admin, device, '12-admin-questions');
 
-      await admin.getByRole('button', { name: 'Neue Frage' }).click();
+      await admin.locator('css-button', { hasText: 'Neue Frage' }).click();
       await expect(
         admin.getByText('Neue Frage', { exact: true }).last(),
       ).toBeVisible();
@@ -145,7 +150,9 @@ test.describe('responsive layout', () => {
         path: `e2e-results/screens/${slug(device.name)}/13-admin-editor.png`,
         animations: 'disabled',
       });
-      await admin.getByRole('button', { name: 'Abbrechen' }).click();
+      await admin
+        .locator('app-question-editor css-button', { hasText: 'Abbrechen' })
+        .click();
 
       await admin.getByRole('link', { name: 'Einstellungen' }).click();
       await expect(admin.getByText('Fragen pro Duell')).toBeVisible();

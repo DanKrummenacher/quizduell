@@ -8,7 +8,7 @@ import {
 import '@css-ch/components/button';
 import '@css-ch/components/icon';
 import '@css-ch/components/input-stepper';
-import '@css-ch/components/notification';
+import '@css-ch/calc-ui-text';
 import '@css-ch/components/spinner';
 import '@css-ch/components/switch';
 import type {

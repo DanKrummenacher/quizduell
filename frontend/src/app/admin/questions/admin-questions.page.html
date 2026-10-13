@@ -2,54 +2,43 @@
   <div>
     <h1 class="title">Fragen</h1>
     @if (questions()) {
-      <p class="summary">
+      <calc-text textMedium class="summary">
         {{ counts().total }} Fragen · {{ counts().active }} aktiv
-      </p>
+      </calc-text>
     }
   </div>
-  <div class="heading-actions">
-    <css-button variant="primary" (click)="create()">
-      <css-icon slot="prefix" icon="add" />
-      Neue Frage
-    </css-button>
-  </div>
+  <css-button variant="primary" class="new-button" (click)="create()">
+    <css-icon icon="add" slot="prefix"></css-icon>
+    Neue Frage
+  </css-button>
 </div>
 
 @if (message(); as m) {
-  <css-notification
-    class="message"
-    [variant]="m.variant"
-    size="sm"
-    [title]="m.text"
-    role="status"
-  />
+  <p class="message" [class.error]="m.variant === 'error'" role="status">
+    {{ m.text }}
+  </p>
 }
 
 @if (loadError()) {
-  <css-notification
-    class="message"
-    variant="error"
-    size="sm"
-    title="Die Fragen konnten nicht geladen werden."
-  />
-  <css-button (click)="load()">Erneut versuchen</css-button>
+  <p class="message error" role="alert">Die Fragen konnten nicht geladen werden.</p>
+  <css-button class="retry" (click)="load()">Erneut versuchen</css-button>
 } @else if (questions() === null) {
-  <div class="loading"><css-spinner size="lg" /></div>
+  <div class="loading"><css-spinner size="lg"></css-spinner></div>
 } @else if (counts().total === 0) {
   <div class="empty">
-    <css-icon icon="items-list" size="2xl" />
-    <h2>Noch keine Fragen</h2>
-    <p>
+    <div class="icon-box"><css-icon icon="items-list" size="xl"></css-icon></div>
+    <calc-text textLarge textLead class="empty-title">Noch keine Fragen</calc-text>
+    <calc-text textMedium class="empty-text">
       Erstelle die erste Frage oder lade ein Startpaket mit Beispielfragen, um das
-      Spiel auszuprobieren.
-    </p>
+      Quiz auszuprobieren.
+    </calc-text>
     <div class="empty-actions">
       <css-button variant="primary" (click)="create()">
-        <css-icon slot="prefix" icon="add" />
+        <css-icon icon="add" slot="prefix"></css-icon>
         Erste Frage erstellen
       </css-button>
       <css-button [loading]="busy()" (click)="importSamples()">
-        <css-icon slot="prefix" icon="download" />
+        <css-icon icon="download" slot="prefix"></css-icon>
         Beispielfragen importieren
       </css-button>
     </div>
@@ -62,23 +51,23 @@
       placeholder="Frage, Antwort oder Kategorie"
       [value]="search()"
       (change)="search.set(value($event))"
-    />
+    ></css-input-text>
     <css-input-select
       label="Kategorie"
       [options]="categoryOptions()"
       [value]="category()"
       (change)="category.set(value($event))"
-    />
+    ></css-input-select>
     <css-toggle-group
       label="Status"
       [options]="statusOptions"
       [value]="status()"
       (change)="setStatus($event)"
-    />
+    ></css-toggle-group>
   </div>
 
   @if (filtered().length === 0) {
-    <p class="no-results">Keine Fragen gefunden.</p>
+    <calc-text textMedium class="no-results">Keine Fragen gefunden.</calc-text>
   }
 
   <ul class="list">
@@ -87,10 +76,10 @@
         <div class="item-head">
           <div class="tags">
             @if (question.category) {
-              <css-badge>{{ question.category }}</css-badge>
+              <span class="tag">{{ question.category }}</span>
             }
             @if (!question.active) {
-              <css-badge variant="warning" without-default-icon>Inaktiv</css-badge>
+              <span class="tag inactive-tag">Inaktiv</span>
             }
           </div>
           <div class="item-actions">
@@ -99,14 +88,14 @@
               label="Aktiv"
               [checked]="question.active"
               (change)="toggleActive(question, $event)"
-            />
+            ></css-switch>
             <css-button
               iconOnly
               variant="plain"
               ariaLabel="Frage bearbeiten"
               (click)="edit(question)"
             >
-              <css-icon slot="prefix" icon="edit" />
+              <css-icon icon="edit" slot="prefix"></css-icon>
             </css-button>
             <css-button
               iconOnly
@@ -114,12 +103,12 @@
               ariaLabel="Frage löschen"
               (click)="confirm.set({ kind: 'delete', question })"
             >
-              <css-icon slot="prefix" icon="trash" />
+              <css-icon icon="trash" slot="prefix"></css-icon>
             </css-button>
           </div>
         </div>
 
-        <p class="question">{{ question.text }}</p>
+        <h2 class="question">{{ question.text }}</h2>
 
         <ol class="options">
           @for (option of question.options; track $index; let i = $index) {
@@ -127,27 +116,26 @@
               <span class="letter">{{ letters[i] }}</span>
               <span class="option-text">{{ option }}</span>
               @if (i === question.correctIndex) {
-                <css-icon icon="checkmark" size="sm" weight="medium" />
                 <span class="visually-hidden">(richtig)</span>
               }
             </li>
           }
         </ol>
 
-        <p class="stats">{{ successRate(question) }}</p>
+        <calc-text textSmall class="stats">{{ successRate(question) }}</calc-text>
       </li>
     }
   </ul>
 
   <div class="bulk">
-    <h2 class="bulk-title">Weitere Aktionen</h2>
+    <h2 class="section-title">Weitere Aktionen</h2>
     <div class="bulk-actions">
       <css-button [loading]="busy()" (click)="importSamples()">
-        <css-icon slot="prefix" icon="download" />
+        <css-icon icon="download" slot="prefix"></css-icon>
         Beispielfragen importieren
       </css-button>
       <css-button (click)="confirm.set({ kind: 'delete-all' })">
-        <css-icon slot="prefix" icon="trash" />
+        <css-icon icon="trash" slot="prefix"></css-icon>
         Alle Fragen löschen
       </css-button>
     </div>
@@ -168,8 +156,8 @@
 
 @if (confirm(); as c) {
   <css-flyout
-    open
     withoutCloseButton
+    size="small"
     [title]="c.kind === 'delete' ? 'Frage löschen?' : 'Alle Fragen löschen?'"
     [main]="
       c.kind === 'delete'
@@ -178,7 +166,6 @@
           counts().total +
           ' Fragen werden endgültig gelöscht. Das kann nicht rückgängig gemacht werden.'
     "
-    (close)="confirm.set(null)"
   >
     <css-button slot="css-button" (click)="confirm.set(null)">Abbrechen</css-button>
     <css-button

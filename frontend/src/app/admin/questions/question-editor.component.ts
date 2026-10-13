@@ -12,7 +12,6 @@ import '@css-ch/components/input-text';
 import '@css-ch/components/input-textarea';
 import '@css-ch/components/switch';
 import '@css-ch/components/toggle-group';
-import { ANSWER_LETTERS } from '../../features/game/game.models';
 import {
   type QuestionDraft,
   type QuestionErrors,
@@ -36,7 +35,7 @@ export class QuestionEditorComponent {
   readonly save = output<QuestionDraft>();
   readonly dismiss = output<void>();
 
-  protected readonly letters = ANSWER_LETTERS;
+  protected readonly letters = ['A', 'B', 'C', 'D'];
   protected readonly draft = signal<QuestionDraft | null>(null);
   protected readonly submitted = signal(false);
 

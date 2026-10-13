@@ -1,28 +1,35 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'admin';
+
 :host {
   display: block;
 }
 
 .title {
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  font-weight: var(--css-font-weight-bold);
+  @include admin.page-title;
 }
 
 .lead {
-  margin-top: var(--css-space-3xs);
-  color: var(--css-color-text-strong);
+  display: block;
+  margin-top: functions.rem(4);
 }
 
 .panel {
-  margin-top: var(--css-space-sm);
-  padding: var(--css-space-sm);
-  border-radius: var(--css-border-radius-md);
-  background: var(--css-color-surface-default);
-  box-shadow: var(--css-effects-shadows-md);
+  @include admin.card;
+  margin-top: functions.rem(25);
+  padding: functions.rem(22) functions.rem(19);
+}
+
+.section-title {
+  @include admin.section-title;
+  margin-bottom: functions.rem(20);
 }
 
 .grid {
   display: grid;
-  gap: var(--css-space-sm) var(--css-space-md);
+  gap: functions.rem(22) functions.rem(30);
 }
 
 @media (min-width: 48rem) {
@@ -32,34 +39,49 @@
 }
 
 .switch-row {
-  margin-top: var(--css-space-sm);
-  padding-top: var(--css-space-sm);
-  border-top: var(--css-border-width-standard) solid var(--css-color-border-muted);
+  margin-top: functions.rem(25);
+  padding-top: functions.rem(25);
+  border-top: functions.rem(1) solid admin.$border-color;
 }
 
 .duration {
   display: flex;
   align-items: center;
-  gap: var(--css-space-2xs);
-  margin-top: var(--css-space-sm);
-  color: var(--css-color-text-strong);
+  gap: functions.rem(8);
+  margin-top: functions.rem(25);
+  color: colors.$dt-color-darkblue-100;
 }
 
 .message {
-  display: block;
-  margin-top: var(--css-space-xs);
+  @include admin.message(admin.$success);
+  margin: functions.rem(15) 0 0;
+
+  &.error {
+    border-left-color: admin.$error;
+    color: admin.$error;
+  }
+}
+
+.retry {
+  display: inline-block;
+  margin-top: functions.rem(15);
+  width: auto;
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: var(--css-space-2xs);
-  margin-top: var(--css-space-sm);
+  gap: functions.rem(10);
+  margin-top: functions.rem(25);
+
+  css-button {
+    width: auto;
+  }
 }
 
 .loading {
-  display: grid;
-  place-items: center;
-  padding: var(--css-space-xl);
+  display: flex;
+  justify-content: center;
+  padding: functions.rem(60);
 }

@@ -70,44 +70,43 @@ export async function newPlayer(
 
 export async function enterName(page: Page, name: string): Promise<void> {
   await page.goto('/');
-  const input = page.locator('css-input-text input');
-  await input.fill(name);
-  await page.getByRole('button', { name: /Los geht/i }).click();
+  await page.locator('css-input-text input').fill(name);
+  await page.locator('css-button', { hasText: /Los Geht/i }).click();
   await expect(page).toHaveURL(/\/lobby$/);
 }
 
 /** Creates a friend game and returns its code. */
 export async function createFriendGame(page: Page): Promise<string> {
-  await page.getByRole('button', { name: /Freund herausfordern/ }).click();
-  await page.getByRole('button', { name: /Spiel erstellen/ }).click();
-  await expect(page).toHaveURL(/\/spiel$/);
-  const chars = page.locator('app-game-waiting .char');
-  await expect(chars).toHaveCount(4);
-  return (await chars.allTextContents()).map((c) => c.trim()).join('');
+  await page.getByText('Freund herausfordern').first().click();
+  await page.getByText('Spiel erstellen').first().click();
+  await expect(page.getByText('Spiel erstellt')).toBeVisible();
+  const code = page.locator('.code-text');
+  await expect(code).toHaveText(/[A-Z2-9]{4}/);
+  return (await code.innerText()).trim();
 }
 
-export async function joinByLink(
+export async function joinByCode(
   page: Page,
   code: string,
   name: string,
 ): Promise<void> {
-  await page.goto(`/?code=${code}`);
-  await expect(page.getByText('Du wurdest zum Duell eingeladen')).toBeVisible();
-  const input = page.locator('css-input-text input');
-  await input.fill(name);
-  await page.getByRole('button', { name: /Los geht/i }).click();
-  await expect(page).toHaveURL(/\/spiel$/);
+  await enterName(page, name);
+  await page.getByText('Freund herausfordern').first().click();
+  await page.locator('css-input-text#roomCode input').fill(code);
+  await page.locator('css-button.join-button').click();
 }
 
 export async function waitForQuestion(page: Page, number: number): Promise<void> {
   await expect(page.getByText(`Frage ${number} von`)).toBeVisible({
-    timeout: 20_000,
+    timeout: 25_000,
   });
-  await expect(page.locator('button.answer.state-idle').first()).toBeVisible();
+  await expect(
+    page.locator('button.answer-card:not([disabled])').first(),
+  ).toBeVisible();
 }
 
 export async function answer(page: Page, index: number): Promise<void> {
-  await page.locator('button.answer').nth(index).click();
+  await page.locator('button.answer-card').nth(index).click();
 }
 
 /** The page must never scroll horizontally, on any device. */

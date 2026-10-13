@@ -1,31 +1,33 @@
-<header class="header">
-  <div class="header-inner">
-    <a class="brand" routerLink="/" aria-label="Zum Spiel">
-      <app-brand />
-      <span class="tag">Admin</span>
-    </a>
-    <css-button variant="plain" (click)="logout()">
-      <css-icon slot="prefix" icon="logout" />
-      Abmelden
-    </css-button>
-  </div>
-  <nav class="nav" aria-label="Admin-Navigation">
-    <div class="nav-inner">
-      @for (link of links; track link.path) {
-        <a
-          class="nav-link"
-          [routerLink]="link.path"
-          routerLinkActive="active"
-          ariaCurrentWhenActive="page"
-        >
-          <css-icon [icon]="link.icon" size="sm" />
-          {{ link.label }}
-        </a>
-      }
+<div class="page">
+  <header class="header-container">
+    <div class="header-content">
+      <a class="brand" routerLink="/" aria-label="Zum Spiel">
+        <app-logo-mark class="logo" />
+        <calc-text textMedium textLead class="separator">|</calc-text>
+        <calc-text textMedium textLead>playduelio Admin</calc-text>
+      </a>
+      <css-button variant="plain" class="logout" (click)="logout()">
+        <css-icon icon="logout" slot="prefix"></css-icon>
+        Abmelden
+      </css-button>
     </div>
-  </nav>
-</header>
+  </header>
 
-<main class="main">
-  <router-outlet />
-</main>
+  <nav class="nav" aria-label="Admin-Navigation">
+    @for (link of links; track link.path) {
+      <a
+        class="nav-link"
+        [routerLink]="link.path"
+        routerLinkActive="active"
+        ariaCurrentWhenActive="page"
+      >
+        <css-icon [icon]="link.icon" size="sm"></css-icon>
+        <span>{{ link.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <main class="main">
+    <router-outlet />
+  </main>
+</div>

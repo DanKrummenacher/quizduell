@@ -1,0 +1,16 @@
+<app-result-ui
+  [statusTitle]="statusTitle()"
+  [statusSubtitle]="statusSubtitle()"
+  [statusIcon]="statusIcon()"
+  [players]="playersView()"
+  [isPlayAgainDisabled]="isPlayAgainDisabled()"
+  [playAgainText]="playAgainText()"
+  [playAgainIcon]="playAgainIcon()"
+  [playAgainStatusText]="playAgainStatusText()"
+  [showOpponentLeftFlyout]="showOpponentLeftFlyout()"
+  [showSessionExpiredFlyout]="showSessionExpiredFlyout()"
+  (navigateHome)="handleHome()"
+  (playAgain)="handlePlayAgain()"
+  (opponentLeftAcknowledge)="handleOpponentLeftAcknowledge()"
+>
+</app-result-ui>

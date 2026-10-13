@@ -1,0 +1,23 @@
+<h2 class="status-title">Spiel erstellt</h2>
+<calc-text textMedium class="status-subtitle"
+  >Teile diesen Code mit deinem Gegner</calc-text
+>
+
+<div class="code-box">
+  <calc-text class="code-text">{{ roomCode() }}</calc-text>
+</div>
+
+<css-button
+  variant="plain"
+  class="copy-button"
+  [attr.disabled]="isCopied() ? true : null"
+  (click)="!isCopied() && copyCode()"
+>
+  <css-icon
+    [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
+    slot="prefix"
+  ></css-icon>
+  {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
+</css-button>
+
+<calc-text textSmall class="waiting-text">Warte auf den Gegner...</calc-text>

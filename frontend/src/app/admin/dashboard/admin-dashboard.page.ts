@@ -9,7 +9,7 @@ import {
 import { RouterLink } from '@angular/router';
 import '@css-ch/components/button';
 import '@css-ch/components/icon';
-import '@css-ch/components/notification';
+import '@css-ch/calc-ui-text';
 import '@css-ch/components/spinner';
 import type { DashboardStats } from '../../core/contracts/admin.contract';
 import { AdminApi } from '../admin-api.service';

@@ -6,18 +6,16 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import '@css-ch/components/badge';
+import '@css-ch/calc-ui-text';
 import '@css-ch/components/button';
 import '@css-ch/components/flyout';
 import '@css-ch/components/icon';
 import '@css-ch/components/input-select';
 import '@css-ch/components/input-text';
-import '@css-ch/components/notification';
 import '@css-ch/components/spinner';
 import '@css-ch/components/switch';
 import '@css-ch/components/toggle-group';
 import type { AdminQuestion } from '../../core/contracts/admin.contract';
-import { ANSWER_LETTERS } from '../../features/game/game.models';
 import { AdminApi } from '../admin-api.service';
 import { type QuestionDraft, draftFrom, emptyDraft, toInput } from './question-form';
 import { QuestionEditorComponent } from './question-editor.component';
@@ -38,7 +36,7 @@ const ALL_CATEGORIES = '__all__';
 export class AdminQuestionsPage {
   private readonly api = inject(AdminApi);
 
-  protected readonly letters = ANSWER_LETTERS;
+  protected readonly letters = ['A', 'B', 'C', 'D'];
   protected readonly questions = signal<AdminQuestion[] | null>(null);
   protected readonly loadError = signal(false);
   protected readonly message = signal<{

@@ -1,0 +1,51 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-helpers/styles' as functions;
+
+:host {
+  display: block;
+}
+
+.timer-section {
+  margin-top: functions.rem(24);
+}
+
+.timer-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: functions.rem(8);
+
+  &.is-reveal {
+    justify-content: space-between;
+    padding-left: functions.rem(8);
+  }
+}
+
+.timer-right {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(6);
+}
+
+.timer-icon {
+  width: functions.rem(16);
+  height: functions.rem(16);
+  color: colors.$dt-color-darkblue-100;
+  stroke-width: functions.rem(2);
+}
+
+.timer-track {
+  width: 100%;
+  height: functions.rem(7);
+  background-color: #dadada;
+  border-radius: functions.rem(3);
+  margin-top: functions.rem(10);
+  overflow: hidden;
+}
+
+.timer-progress {
+  height: 100%;
+  background-color: #00327d;
+  border-radius: functions.rem(3);
+  transition: width 0.1s linear;
+}

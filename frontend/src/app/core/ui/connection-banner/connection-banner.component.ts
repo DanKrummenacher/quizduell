@@ -1,54 +1,39 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
+import '@css-ch/calc-ui-text';
 import { GameClient } from '../../game/game-client.service';
 
-/** Thin banner shown while the connection to the server is being restored. */
+/** Shown while the connection to the server is being restored. */
 @Component({
   selector: 'app-connection-banner',
   template: `
     @if (visible()) {
       <div class="banner" role="status" aria-live="polite">
-        <span class="dot" aria-hidden="true"></span>
-        Verbindung wird wiederhergestellt …
+        <calc-text textSmall colorWhite
+          >Verbindung wird wiederhergestellt...</calc-text
+        >
       </div>
     }
   `,
   styles: `
     :host {
       position: fixed;
-      inset: auto 0 0 0;
-      z-index: var(--css-z-index-toast);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 900;
       display: flex;
       justify-content: center;
-      padding: 0 var(--app-gutter) calc(var(--app-safe-bottom) + var(--css-space-xs));
+      padding: 0 1rem calc(env(safe-area-inset-bottom, 0px) + 1rem);
       pointer-events: none;
     }
     .banner {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--css-space-2xs);
-      padding: var(--css-space-2xs) var(--css-space-xs);
-      border-radius: var(--css-border-radius-full);
-      background: var(--css-color-surface-warning-strong);
-      color: var(--css-color-text-inverse);
-      font: var(--css-textstyle-label-md-bold);
-      box-shadow: var(--css-effects-shadows-lg);
-    }
-    .dot {
-      width: 0.5rem;
-      height: 0.5rem;
-      border-radius: 50%;
-      background: currentColor;
-      animation: pulse 1s ease-in-out infinite alternate;
-    }
-    @keyframes pulse {
-      from {
-        opacity: 0.3;
-      }
-      to {
-        opacity: 1;
-      }
+      padding: 0.5rem 1rem;
+      border-radius: 0.25rem;
+      background-color: #00327d;
+      box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.2);
     }
   `,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class ConnectionBannerComponent {
   private readonly gameClient = inject(GameClient);

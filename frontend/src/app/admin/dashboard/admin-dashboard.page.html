@@ -1,46 +1,60 @@
 <div class="heading">
   <h1 class="title">Übersicht</h1>
   @if (updatedAt(); as time) {
-    <p class="updated">Live · aktualisiert {{ time.toLocaleTimeString('de-CH') }}</p>
+    <calc-text textSmall class="updated">
+      Live · aktualisiert {{ time.toLocaleTimeString('de-CH') }}
+    </calc-text>
   }
 </div>
 
 @if (error()) {
-  <css-notification
-    class="notice"
-    variant="error"
-    size="sm"
-    title="Die Daten konnten nicht geladen werden. Neuer Versuch in wenigen Sekunden."
-  />
+  <p class="message error" role="alert">
+    Die Daten konnten nicht geladen werden. Neuer Versuch in wenigen Sekunden.
+  </p>
 }
 
 @if (stats(); as s) {
   @if (missingQuestions() > 0) {
-    <div class="alert" role="alert">
-      <css-icon icon="priority-warning" size="lg" />
-      <div class="alert-text">
-        <strong>Das Spiel ist noch nicht spielbar.</strong>
-        <span>
+    <div class="status-card warning" role="alert">
+      <div class="status-box">
+        <css-icon icon="priority-warning" size="xl"></css-icon>
+      </div>
+      <div class="status-text">
+        <calc-text textMedium textLead class="status-title">
+          Das Quiz ist noch nicht spielbar
+        </calc-text>
+        <calc-text textSmall>
           Es braucht mindestens {{ s.requiredQuestions }} aktive Fragen – es fehlen
           noch {{ missingQuestions() }}.
-        </span>
+        </calc-text>
       </div>
-      <a class="alert-link" routerLink="../fragen">Fragen verwalten</a>
+      <css-button variant="primary" class="status-action" routerLink="../fragen">
+        Fragen verwalten
+      </css-button>
     </div>
   } @else {
-    <div class="ready" role="status">
-      <css-icon icon="checkmark-circle" size="lg" />
-      <span><strong>Alles bereit.</strong> Das Spiel kann gespielt werden.</span>
+    <div class="status-card ready" role="status">
+      <div class="status-box">
+        <css-icon icon="checkmark-circle" size="xl"></css-icon>
+      </div>
+      <div class="status-text">
+        <calc-text textMedium textLead class="status-title">Alles bereit</calc-text>
+        <calc-text textSmall>Das Quiz kann gespielt werden.</calc-text>
+      </div>
     </div>
   }
 
   <h2 class="section-title">Jetzt gerade</h2>
   <div class="cards">
     @for (card of liveCards(); track card.label) {
-      <div class="card live">
-        <css-icon [icon]="card.icon" size="lg" />
-        <span class="value">{{ card.value }}</span>
-        <span class="label">{{ card.label }}</span>
+      <div class="card">
+        <div class="icon-box">
+          <css-icon [icon]="card.icon" size="xl"></css-icon>
+        </div>
+        <div>
+          <span class="value">{{ card.value }}</span>
+          <calc-text textSmall>{{ card.label }}</calc-text>
+        </div>
       </div>
     }
   </div>
@@ -49,12 +63,16 @@
   <div class="cards">
     @for (card of totalCards(); track card.label) {
       <div class="card">
-        <css-icon [icon]="card.icon" size="lg" />
-        <span class="value">{{ card.value }}</span>
-        <span class="label">{{ card.label }}</span>
+        <div class="icon-box">
+          <css-icon [icon]="card.icon" size="xl"></css-icon>
+        </div>
+        <div>
+          <span class="value">{{ card.value }}</span>
+          <calc-text textSmall>{{ card.label }}</calc-text>
+        </div>
       </div>
     }
   </div>
 } @else if (!error()) {
-  <div class="loading"><css-spinner size="lg" /></div>
+  <div class="loading"><css-spinner size="lg"></css-spinner></div>
 }

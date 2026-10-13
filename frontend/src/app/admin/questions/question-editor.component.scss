@@ -1,20 +1,27 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'admin';
+
 .form {
   display: grid;
-  gap: var(--css-space-sm);
-  padding-block: var(--css-space-sm);
+  gap: functions.rem(22);
+  padding-block: functions.rem(20);
   text-align: left;
 }
 
 .answers {
   display: grid;
-  gap: var(--css-space-xs);
+  gap: functions.rem(14);
   margin: 0;
   padding: 0;
   border: 0;
 
   legend {
-    margin-bottom: var(--css-space-2xs);
-    font: var(--css-textstyle-label-lg-medium);
+    margin-bottom: functions.rem(8);
+    font-size: functions.rem(16);
+    font-weight: miscs.$css-ui-font-weight-bold;
+    color: colors.$dt-color-darkblue-100;
   }
 }
 
@@ -32,53 +39,48 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: end;
-  gap: var(--css-space-2xs);
+  gap: functions.rem(10);
 }
 
 .letter {
-  display: grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 3rem;
-  border-radius: var(--css-border-radius-sm);
-  background: var(--css-color-surface-muted);
-  font: var(--css-textstyle-label-lg-medium);
+  @include admin.letter-box;
+  height: functions.rem(48);
+  width: functions.rem(36);
 
   .correct & {
-    background: var(--css-color-surface-success-strong);
-    color: var(--css-color-text-inverse);
+    background-color: admin.$success;
+    border-color: admin.$success;
+    color: colors.$dt-color-white-100;
   }
 }
 
 .category {
   display: grid;
-  gap: var(--css-space-2xs);
+  gap: functions.rem(10);
 }
 
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--css-space-2xs);
+  gap: functions.rem(6);
 }
 
 .chip {
-  padding: var(--css-space-3xs) var(--css-space-xs);
-  border: var(--css-border-width-standard) solid var(--css-color-border-default);
-  border-radius: var(--css-border-radius-full);
-  background: var(--css-color-surface-default);
-  font: var(--css-textstyle-label-md);
+  height: functions.rem(28);
+  padding: 0 functions.rem(10);
+  border: functions.rem(1) solid admin.$border-color;
+  border-radius: functions.rem(4);
+  background-color: colors.$dt-color-white-100;
+  font-size: functions.rem(14);
+  color: colors.$dt-color-darkblue-100;
   cursor: pointer;
 
   &:hover {
-    border-color: var(--css-color-border-hover);
-    color: var(--css-color-text-interactive-hover);
+    border-color: colors.$dt-color-darkblue-100;
   }
 }
 
 .server-error {
-  padding: var(--css-space-2xs) var(--css-space-xs);
-  border-radius: var(--css-border-radius-sm);
-  background: var(--css-color-surface-error);
-  color: var(--css-color-text-error);
-  font: var(--css-textstyle-label-md-bold);
+  @include admin.message(admin.$error);
+  margin: 0;
 }

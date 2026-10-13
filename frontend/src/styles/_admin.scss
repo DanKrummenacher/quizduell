@@ -1,0 +1,53 @@
+// Shared admin look, derived from the game's card style.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+
+$border-color: #8098be;
+$success: #00875e;
+$error: #d53419;
+
+@mixin card {
+  background-color: colors.$dt-color-white-100;
+  border: functions.rem(1) solid $border-color;
+  border-radius: functions.rem(4);
+}
+
+@mixin page-title {
+  font-size: functions.rem(28);
+  font-weight: miscs.$css-ui-font-weight-regular;
+  color: colors.$dt-color-darkblue-100;
+  margin: 0;
+}
+
+@mixin section-title {
+  font-size: functions.rem(20);
+  font-weight: miscs.$css-ui-font-weight-regular;
+  color: colors.$dt-color-darkblue-100;
+  margin: 0;
+}
+
+@mixin letter-box {
+  width: functions.rem(30);
+  height: functions.rem(30);
+  background-color: colors.$dt-color-white-100;
+  border: functions.rem(1) solid $border-color;
+  border-radius: functions.rem(4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: functions.rem(14);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: colors.$dt-color-darkblue-100;
+}
+
+@mixin message($color) {
+  display: block;
+  padding: functions.rem(10) functions.rem(14);
+  border-left: functions.rem(4) solid $color;
+  background-color: colors.$dt-color-white-100;
+  color: $color;
+  font-size: functions.rem(14);
+  font-weight: miscs.$css-ui-font-weight-medium;
+}

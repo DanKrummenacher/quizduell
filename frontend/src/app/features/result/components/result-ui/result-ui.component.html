@@ -1,0 +1,73 @@
+<main class="main-content">
+  <div class="center-content">
+    <div class="result-icon-box">
+      <css-icon [icon]="statusIcon()" class="result-icon" size="xl"></css-icon>
+    </div>
+
+    <h1 class="result-title">{{ statusTitle() }}</h1>
+    <calc-text textMedium class="result-subtitle">{{ statusSubtitle() }}</calc-text>
+
+    <app-result-players [players]="players()"></app-result-players>
+  </div>
+
+  <div class="actions-wrapper">
+    <css-button stretch variant="primary" (click)="navigateHome.emit()">
+      <css-icon icon="home" slot="prefix"></css-icon>
+      Zurück zur Lobby
+    </css-button>
+
+    <div class="play-again-wrapper">
+      <css-button
+        stretch
+        variant="primary"
+        class="play-again-button"
+        [attr.disabled]="isPlayAgainDisabled() ? true : null"
+        (click)="playAgain.emit()"
+      >
+        <css-icon [attr.icon]="playAgainIcon()" slot="prefix"></css-icon>
+        {{ playAgainText() }}
+      </css-button>
+
+      <div class="play-again-status" [class.is-visible]="!!playAgainStatusText()">
+        <css-icon icon="info" class="status-icon" size="sm"></css-icon>
+        <calc-text textMedium textLead class="status-text">{{
+          playAgainStatusText()
+        }}</calc-text>
+      </div>
+    </div>
+  </div>
+</main>
+
+@if (showOpponentLeftFlyout()) {
+  <css-flyout
+    withoutCloseButton
+    size="small"
+    title="Schade! Keine Revanche"
+    main="Dein Gegner hat das Spiel verlassen oder nicht rechtzeitig reagiert."
+  >
+    <css-button
+      variant="primary"
+      slot="css-button"
+      (click)="opponentLeftAcknowledge.emit()"
+    >
+      Zurück zur Lobby
+    </css-button>
+  </css-flyout>
+}
+
+@if (showSessionExpiredFlyout()) {
+  <css-flyout
+    withoutCloseButton
+    size="small"
+    title="Spiel beendet"
+    main="Diese Spielsitzung wurde beendet. Du kannst nun ein neues Spiel starten."
+  >
+    <css-button
+      variant="primary"
+      slot="css-button"
+      (click)="opponentLeftAcknowledge.emit()"
+    >
+      Zurück zur Lobby
+    </css-button>
+  </css-flyout>
+}

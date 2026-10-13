@@ -1,0 +1,18 @@
+<div class="success-box-wrapper">
+  <div class="success-box">
+    <css-icon icon="checkmark-circle" class="success-icon" size="xl"></css-icon>
+  </div>
+</div>
+
+<calc-text textLarge textLead class="title-text">Gegner gefunden!</calc-text>
+
+<calc-text textMedium class="opponent-label">Dein Gegner:</calc-text>
+<h2 class="opponent-name">{{ opponentName() }}</h2>
+
+@if (countdown() > 0) {
+  <calc-text class="countdown-text"
+    >Das Duell beginnt in {{ countdown() }}s...</calc-text
+  >
+} @else {
+  <calc-text textSmall class="countdown-text">Los geht's!</calc-text>
+}

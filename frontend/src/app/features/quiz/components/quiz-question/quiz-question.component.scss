@@ -1,0 +1,120 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+
+:host {
+  display: block;
+}
+
+.question-text {
+  font-size: functions.rem(24);
+  font-weight: miscs.$css-ui-font-weight-regular;
+  color: colors.$dt-color-darkblue-100;
+  line-height: 1.2;
+  margin: functions.rem(28) 0 0;
+  text-align: left;
+}
+
+.answers-wrapper {
+  position: relative;
+  margin-top: functions.rem(50);
+}
+
+.feedback-wrapper {
+  position: absolute;
+  top: functions.rem(-28);
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.feedback-default {
+  color: colors.$dt-color-darkblue-100;
+}
+.feedback-success {
+  color: #00875e;
+}
+.feedback-error {
+  color: #d53419;
+}
+
+.answers-list {
+  display: flex;
+  flex-direction: column;
+  gap: functions.rem(10);
+  margin-bottom: functions.rem(30);
+}
+
+.answer-card {
+  width: 100%;
+  height: functions.rem(62);
+  background-color: colors.$dt-color-white-100;
+  border: functions.rem(1) solid #8098be;
+  border-radius: functions.rem(4);
+  display: flex;
+  align-items: center;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  position: relative;
+  transition: all 0.2s ease-in-out;
+  font-weight: miscs.$css-ui-font-weight-bold;
+
+  &.state-selected {
+    background-color: #00327d;
+    border-color: #00327d;
+    .letter-box {
+      background-color: transparent;
+      border-color: colors.$dt-color-white-100;
+    }
+  }
+  &.state-correct {
+    background-color: #00875e;
+    border-color: #00875e;
+    .letter-box {
+      background-color: transparent;
+      border-color: colors.$dt-color-white-100;
+    }
+  }
+  &.state-wrong {
+    background-color: #d53419;
+    border-color: #d53419;
+    .letter-box {
+      background-color: transparent;
+      border-color: colors.$dt-color-white-100;
+    }
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.letter-box {
+  width: functions.rem(30);
+  height: functions.rem(30);
+  background-color: colors.$dt-color-white-100;
+  border: functions.rem(1) solid #8098be;
+  border-radius: functions.rem(4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 functions.rem(15);
+  flex-shrink: 0;
+  transition: all 0.2s ease-in-out;
+}
+
+.opponent-badge {
+  position: absolute;
+  right: functions.rem(15);
+  top: 50%;
+  transform: translateY(-50%);
+  width: functions.rem(30);
+  height: functions.rem(30);
+  background-color: #00327d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

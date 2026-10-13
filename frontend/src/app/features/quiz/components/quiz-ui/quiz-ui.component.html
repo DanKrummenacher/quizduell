@@ -1,0 +1,50 @@
+<main class="main-content">
+  <calc-text textSmall class="progress-text"
+    >Frage {{ currentQuestion() }} von {{ totalQuestions() }}</calc-text
+  >
+
+  <app-quiz-scoreboard
+    [playerName]="playerName()"
+    [playerScore]="playerScore()"
+    [opponentName]="opponentName()"
+    [opponentScore]="opponentScore()"
+  >
+  </app-quiz-scoreboard>
+
+  <app-quiz-timer
+    [timeLeft]="timeLeft()"
+    [timerPercent]="timerPercent()"
+    [isReveal]="quizPhase() === 'REVEAL'"
+  >
+  </app-quiz-timer>
+
+  <div class="question-wrapper">
+    <app-quiz-question
+      [phase]="quizPhase()"
+      [questionText]="questionText()"
+      [answers]="answers()"
+      [feedbackText]="feedbackText()"
+      [feedbackType]="feedbackType()"
+      [opponentInitial]="opponentName().charAt(0).toUpperCase()"
+      (answerSelected)="answerSelected.emit($event)"
+    >
+    </app-quiz-question>
+  </div>
+</main>
+
+@if (opponentLeft()) {
+  <css-flyout
+    withoutCloseButton
+    size="small"
+    title="Schade! Spiel abgebrochen"
+    main="Dein Gegner hat das Spiel vorzeitig verlassen. Das Duell kann deshalb leider nicht fortgesetzt werden."
+  >
+    <css-button
+      variant="primary"
+      slot="css-button"
+      (click)="acknowledgeOpponentLeft.emit()"
+    >
+      Zum Spielmodus
+    </css-button>
+  </css-flyout>
+}

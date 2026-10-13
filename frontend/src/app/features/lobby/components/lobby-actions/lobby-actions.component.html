@@ -1,0 +1,45 @@
+<h2 class="action-title">Freund herausfordern</h2>
+
+<button class="action-card create-game-card" (click)="createGame.emit()">
+  <css-icon icon="lightning-strike" class="card-icon" size="xl"></css-icon>
+  <div class="card-text-wrapper">
+    <calc-text textMedium textLead class="card-title">Spiel erstellen</calc-text>
+    <calc-text textSmall class="card-desc"
+      >Erstelle einen Code für deinen Gegner</calc-text
+    >
+  </div>
+</button>
+
+<div class="action-card join-game-card">
+  <div class="card-text-wrapper">
+    <calc-text textMedium textLead class="card-title">Mit Code beitreten</calc-text>
+    <calc-text textSmall class="card-desc"
+      >Gib den Code deines Gegners ein</calc-text
+    >
+  </div>
+
+  <div class="join-input-row">
+    <css-input-text
+      id="roomCode"
+      label="Code"
+      placeholder="z.B. 05CA"
+      class="code-input"
+      uppercase
+      maxlength="4"
+      autocomplete="off"
+      [errorMessage]="errorMessage || undefined"
+      (input)="onCodeInput($event)"
+      (keydown)="onCodeKeydown($event)"
+    >
+    </css-input-text>
+
+    <css-button
+      variant="primary"
+      ariaLabel="Beitreten"
+      class="join-button"
+      (click)="submitJoin()"
+    >
+      <css-icon icon="arrow-right-circle" slot="prefix"></css-icon>
+    </css-button>
+  </div>
+</div>

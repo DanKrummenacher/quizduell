@@ -1,0 +1,36 @@
+<app-start-header></app-start-header>
+
+<main class="main-content">
+  <div class="centered-wrapper">
+    <h1 class="main-title">Teste dein Wissen im direkten Duell</h1>
+
+    <calc-text textLarge class="subtitle">
+      Fordere dein logisches Denken heraus und zeige dein Können.
+    </calc-text>
+
+    <div class="features-row">
+      @for (feature of features(); track feature.text) {
+        <div class="feature-item">
+          <div class="feature-circle">
+            <css-icon
+              [icon]="feature.icon"
+              class="feature-icon"
+              size="xl"
+            ></css-icon>
+          </div>
+          <calc-text textMedium textLead class="feature-text">{{
+            feature.text
+          }}</calc-text>
+        </div>
+      }
+    </div>
+
+    <div class="form-wrapper">
+      <app-start-form
+        [initialName]="initialName()"
+        [notice]="notice()"
+        (nameSubmitted)="onNameSubmitted($event)"
+      ></app-start-form>
+    </div>
+  </div>
+</main>
