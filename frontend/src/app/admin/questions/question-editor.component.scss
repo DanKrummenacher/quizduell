@@ -1,0 +1,84 @@
+.form {
+  display: grid;
+  gap: var(--css-space-sm);
+  padding-block: var(--css-space-sm);
+  text-align: left;
+}
+
+.answers {
+  display: grid;
+  gap: var(--css-space-xs);
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    margin-bottom: var(--css-space-2xs);
+    font: var(--css-textstyle-label-lg-medium);
+  }
+}
+
+@media (min-width: 48rem) {
+  .answers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    legend {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.answer-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: var(--css-space-2xs);
+}
+
+.letter {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 3rem;
+  border-radius: var(--css-border-radius-sm);
+  background: var(--css-color-surface-muted);
+  font: var(--css-textstyle-label-lg-medium);
+
+  .correct & {
+    background: var(--css-color-surface-success-strong);
+    color: var(--css-color-text-inverse);
+  }
+}
+
+.category {
+  display: grid;
+  gap: var(--css-space-2xs);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--css-space-2xs);
+}
+
+.chip {
+  padding: var(--css-space-3xs) var(--css-space-xs);
+  border: var(--css-border-width-standard) solid var(--css-color-border-default);
+  border-radius: var(--css-border-radius-full);
+  background: var(--css-color-surface-default);
+  font: var(--css-textstyle-label-md);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--css-color-border-hover);
+    color: var(--css-color-text-interactive-hover);
+  }
+}
+
+.server-error {
+  padding: var(--css-space-2xs) var(--css-space-xs);
+  border-radius: var(--css-border-radius-sm);
+  background: var(--css-color-surface-error);
+  color: var(--css-color-text-error);
+  font: var(--css-textstyle-label-md-bold);
+}

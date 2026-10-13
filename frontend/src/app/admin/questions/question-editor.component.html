@@ -1,0 +1,90 @@
+@let d = current();
+@let e = errors();
+
+<css-flyout
+  open
+  size="large"
+  withoutCloseButton
+  footerSpaceBetween
+  [title]="isNew() ? 'Neue Frage' : 'Frage bearbeiten'"
+  (close)="dismiss.emit()"
+>
+  <div slot="content" class="form">
+    <css-input-textarea
+      label="Frage"
+      placeholder="z.B. Wie viele Kantone hat die Schweiz?"
+      rows="3"
+      maxlength="300"
+      character-counter
+      [value]="d.text"
+      [errorMessage]="e.text"
+      (change)="update({ text: text($event) })"
+    />
+
+    <fieldset class="answers">
+      <legend>Antworten</legend>
+      @for (option of d.options; track $index; let i = $index) {
+        <div class="answer-row" [class.correct]="d.correctIndex === i">
+          <span class="letter" aria-hidden="true">{{ letters[i] }}</span>
+          <css-input-text
+            class="answer-input"
+            [label]="
+              'Antwort ' + letters[i] + (d.correctIndex === i ? ' (richtig)' : '')
+            "
+            maxlength="100"
+            [value]="option"
+            [errorMessage]="e.optionErrors?.[i] ?? undefined"
+            (change)="updateOption(i, $event)"
+          />
+        </div>
+      }
+    </fieldset>
+
+    <css-toggle-group
+      label="Richtige Antwort"
+      [options]="correctOptions()"
+      [value]="'' + d.correctIndex"
+      (change)="update({ correctIndex: correctFrom($event) })"
+    />
+
+    <div class="category">
+      <css-input-text
+        label="Kategorie (optional)"
+        placeholder="z.B. Logik"
+        maxlength="50"
+        [value]="d.category"
+        [errorMessage]="e.category"
+        (change)="update({ category: text($event) })"
+      />
+      @if (suggestions().length > 0) {
+        <div class="chips" aria-label="Vorhandene Kategorien">
+          @for (category of suggestions(); track category) {
+            <button type="button" class="chip" (click)="update({ category })">
+              {{ category }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <css-switch
+      label="Aktiv – wird im Spiel verwendet"
+      [checked]="d.active"
+      (change)="update({ active: checked($event) })"
+    />
+
+    @if (serverError()) {
+      <p class="server-error" role="alert">{{ serverError() }}</p>
+    }
+  </div>
+
+  <css-button slot="css-button" (click)="dismiss.emit()">Abbrechen</css-button>
+  <css-button
+    slot="css-button"
+    variant="primary"
+    [loading]="saving()"
+    (click)="submit()"
+  >
+    {{ isNew() ? 'Frage erstellen' : 'Speichern' }}
+  </css-button>
+</css-flyout>

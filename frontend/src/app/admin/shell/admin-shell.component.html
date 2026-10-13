@@ -1,0 +1,31 @@
+<header class="header">
+  <div class="header-inner">
+    <a class="brand" routerLink="/" aria-label="Zum Spiel">
+      <app-brand />
+      <span class="tag">Admin</span>
+    </a>
+    <css-button variant="plain" (click)="logout()">
+      <css-icon slot="prefix" icon="logout" />
+      Abmelden
+    </css-button>
+  </div>
+  <nav class="nav" aria-label="Admin-Navigation">
+    <div class="nav-inner">
+      @for (link of links; track link.path) {
+        <a
+          class="nav-link"
+          [routerLink]="link.path"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+        >
+          <css-icon [icon]="link.icon" size="sm" />
+          {{ link.label }}
+        </a>
+      }
+    </div>
+  </nav>
+</header>
+
+<main class="main">
+  <router-outlet />
+</main>

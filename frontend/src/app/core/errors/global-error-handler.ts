@@ -1,16 +1,9 @@
-import { ErrorHandler, Injectable } from '@angular/core';
+import { type ErrorHandler, Injectable } from '@angular/core';
 
+/** Logs unexpected errors without breaking the running game. */
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
   handleError(error: unknown): void {
-    const timestamp = new Date().toISOString();
-    const err = error as Error;
-
-    const message = err.message ? err.message : String(error);
-
-    console.error(`[${timestamp}] Global frontend error intercepted:`, message);
-    if (err.stack) {
-      console.error('Stacktrace:', err.stack);
-    }
+    console.error('[playduelio] Unexpected error', error);
   }
 }

@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: var(--css-font-weight-bold);
+}
+
+.lead {
+  margin-top: var(--css-space-3xs);
+  color: var(--css-color-text-strong);
+}
+
+.panel {
+  margin-top: var(--css-space-sm);
+  padding: var(--css-space-sm);
+  border-radius: var(--css-border-radius-md);
+  background: var(--css-color-surface-default);
+  box-shadow: var(--css-effects-shadows-md);
+}
+
+.grid {
+  display: grid;
+  gap: var(--css-space-sm) var(--css-space-md);
+}
+
+@media (min-width: 48rem) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.switch-row {
+  margin-top: var(--css-space-sm);
+  padding-top: var(--css-space-sm);
+  border-top: var(--css-border-width-standard) solid var(--css-color-border-muted);
+}
+
+.duration {
+  display: flex;
+  align-items: center;
+  gap: var(--css-space-2xs);
+  margin-top: var(--css-space-sm);
+  color: var(--css-color-text-strong);
+}
+
+.message {
+  display: block;
+  margin-top: var(--css-space-xs);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--css-space-2xs);
+  margin-top: var(--css-space-sm);
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  padding: var(--css-space-xl);
+}

@@ -1,0 +1,81 @@
+<h1 class="title">Einstellungen</h1>
+<p class="lead">
+  Änderungen gelten ab dem nächsten Duell. Laufende Duelle werden nicht beeinflusst.
+</p>
+
+@if (loadError()) {
+  <css-notification
+    class="message"
+    variant="error"
+    size="sm"
+    title="Die Einstellungen konnten nicht geladen werden."
+  />
+  <css-button (click)="load()">Erneut versuchen</css-button>
+} @else if (form(); as f) {
+  <div class="panel">
+    <div class="grid">
+      @for (field of fields; track field.key) {
+        <css-input-stepper
+          [label]="field.label"
+          [hint]="field.hint"
+          [value]="'' + f[field.key]"
+          [attr.min-number]="limit(field.key).min"
+          [attr.max-number]="limit(field.key).max"
+          [attr.error-message]="errors()[field.key] ?? null"
+          (change)="setNumber(field.key, $event)"
+        />
+      }
+    </div>
+
+    <div class="switch-row">
+      <css-switch
+        label="Tempo-Bonus"
+        hint="Schnelle richtige Antworten geben bis zu 100 Zusatzpunkte. Ohne Bonus gibt es pro richtige Antwort 100 Punkte."
+        [checked]="f.speedBonusEnabled"
+        (change)="setSpeedBonus($event)"
+      />
+    </div>
+
+    <p class="duration">
+      <css-icon icon="time" size="sm" /> Ein Duell dauert damit höchstens
+      <strong>{{ gameDuration() }}</strong
+      >.
+    </p>
+
+    @if (questionWarning(); as warning) {
+      <css-notification
+        class="message"
+        variant="warning"
+        size="sm"
+        [title]="warning"
+      />
+    }
+
+    @if (message(); as m) {
+      <css-notification
+        class="message"
+        [variant]="m.variant"
+        size="sm"
+        [title]="m.text"
+        role="status"
+      />
+    }
+
+    <div class="actions">
+      <css-button [disabled]="!dirty() || saving()" (click)="reset()"
+        >Zurücksetzen</css-button
+      >
+      <css-button
+        variant="primary"
+        [disabled]="!dirty() || !valid()"
+        [loading]="saving()"
+        (click)="save()"
+      >
+        <css-icon slot="prefix" icon="checkmark" />
+        Speichern
+      </css-button>
+    </div>
+  </div>
+} @else {
+  <div class="loading"><css-spinner size="lg" /></div>
+}

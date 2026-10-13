@@ -1,0 +1,224 @@
+:host {
+  display: block;
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--css-space-xs);
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: var(--css-font-weight-bold);
+}
+
+.summary {
+  font: var(--css-textstyle-label-md);
+  color: var(--css-color-text-muted);
+}
+
+.message {
+  display: block;
+  margin-top: var(--css-space-xs);
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  padding: var(--css-space-xl);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--css-space-xs);
+  margin-top: var(--css-space-md);
+  padding: var(--css-space-xl) var(--css-space-sm);
+  border-radius: var(--css-border-radius-md);
+  background: var(--css-color-surface-default);
+  box-shadow: var(--css-effects-shadows-md);
+  text-align: center;
+
+  css-icon {
+    color: var(--css-color-text-muted);
+  }
+
+  h2 {
+    font-weight: var(--css-font-weight-bold);
+  }
+
+  p {
+    max-width: 30rem;
+    color: var(--css-color-text-strong);
+  }
+}
+
+.empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--css-space-2xs);
+  margin-top: var(--css-space-xs);
+}
+
+.filters {
+  display: grid;
+  gap: var(--css-space-xs);
+  margin-top: var(--css-space-sm);
+  padding: var(--css-space-xs) var(--css-space-sm);
+  border-radius: var(--css-border-radius-md);
+  background: var(--css-color-surface-default);
+  box-shadow: var(--css-effects-shadows-md);
+}
+
+@media (min-width: 56rem) {
+  .filters {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) auto;
+    align-items: start;
+  }
+}
+
+.no-results {
+  margin-top: var(--css-space-md);
+  text-align: center;
+  color: var(--css-color-text-muted);
+}
+
+.list {
+  display: grid;
+  gap: var(--css-space-xs);
+  margin: var(--css-space-sm) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 72rem) {
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--css-space-2xs);
+  padding: var(--css-space-xs) var(--css-space-sm);
+  border-radius: var(--css-border-radius-md);
+  background: var(--css-color-surface-default);
+  box-shadow: var(--css-effects-shadows-md);
+
+  &.inactive {
+    background: var(--css-color-surface-muted);
+
+    .question,
+    .options {
+      opacity: 0.7;
+    }
+  }
+}
+
+.item-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--css-space-2xs);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--css-space-3xs);
+  min-height: 1.5rem;
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--css-space-3xs);
+  margin-left: auto;
+}
+
+.active-switch {
+  margin-right: var(--css-space-2xs);
+}
+
+.question {
+  font: var(--css-textstyle-body-md-medium);
+  font-size: 1.0625rem;
+  overflow-wrap: anywhere;
+}
+
+.options {
+  display: grid;
+  gap: var(--css-space-3xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 40rem) {
+  .options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--css-space-2xs);
+  padding: var(--css-space-3xs) var(--css-space-2xs);
+  border-radius: var(--css-border-radius-sm);
+  font: var(--css-textstyle-body-sm);
+  color: var(--css-color-text-strong);
+
+  &.correct {
+    background: var(--css-color-surface-success);
+    color: var(--css-color-text-success);
+    font-weight: var(--css-font-weight-bold);
+  }
+}
+
+.letter {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--css-border-radius-sm);
+  background: var(--css-color-surface-muted);
+  font: var(--css-textstyle-label-sm-bold);
+  color: var(--css-color-text-default);
+}
+
+.option-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.stats {
+  font: var(--css-textstyle-label-sm);
+  color: var(--css-color-text-muted);
+}
+
+.bulk {
+  margin-top: var(--css-space-xl);
+  padding-top: var(--css-space-sm);
+  border-top: var(--css-border-width-standard) solid var(--css-color-border-strong);
+}
+
+.bulk-title {
+  font: var(--css-textstyle-headline-sm);
+}
+
+.bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--css-space-2xs);
+  margin-top: var(--css-space-xs);
+}

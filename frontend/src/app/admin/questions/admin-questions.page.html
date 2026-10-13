@@ -1,0 +1,193 @@
+<div class="heading">
+  <div>
+    <h1 class="title">Fragen</h1>
+    @if (questions()) {
+      <p class="summary">
+        {{ counts().total }} Fragen · {{ counts().active }} aktiv
+      </p>
+    }
+  </div>
+  <div class="heading-actions">
+    <css-button variant="primary" (click)="create()">
+      <css-icon slot="prefix" icon="add" />
+      Neue Frage
+    </css-button>
+  </div>
+</div>
+
+@if (message(); as m) {
+  <css-notification
+    class="message"
+    [variant]="m.variant"
+    size="sm"
+    [title]="m.text"
+    role="status"
+  />
+}
+
+@if (loadError()) {
+  <css-notification
+    class="message"
+    variant="error"
+    size="sm"
+    title="Die Fragen konnten nicht geladen werden."
+  />
+  <css-button (click)="load()">Erneut versuchen</css-button>
+} @else if (questions() === null) {
+  <div class="loading"><css-spinner size="lg" /></div>
+} @else if (counts().total === 0) {
+  <div class="empty">
+    <css-icon icon="items-list" size="2xl" />
+    <h2>Noch keine Fragen</h2>
+    <p>
+      Erstelle die erste Frage oder lade ein Startpaket mit Beispielfragen, um das
+      Spiel auszuprobieren.
+    </p>
+    <div class="empty-actions">
+      <css-button variant="primary" (click)="create()">
+        <css-icon slot="prefix" icon="add" />
+        Erste Frage erstellen
+      </css-button>
+      <css-button [loading]="busy()" (click)="importSamples()">
+        <css-icon slot="prefix" icon="download" />
+        Beispielfragen importieren
+      </css-button>
+    </div>
+  </div>
+} @else {
+  <div class="filters">
+    <css-input-text
+      class="search"
+      label="Suchen"
+      placeholder="Frage, Antwort oder Kategorie"
+      [value]="search()"
+      (change)="search.set(value($event))"
+    />
+    <css-input-select
+      label="Kategorie"
+      [options]="categoryOptions()"
+      [value]="category()"
+      (change)="category.set(value($event))"
+    />
+    <css-toggle-group
+      label="Status"
+      [options]="statusOptions"
+      [value]="status()"
+      (change)="setStatus($event)"
+    />
+  </div>
+
+  @if (filtered().length === 0) {
+    <p class="no-results">Keine Fragen gefunden.</p>
+  }
+
+  <ul class="list">
+    @for (question of filtered(); track question.id) {
+      <li class="item" [class.inactive]="!question.active">
+        <div class="item-head">
+          <div class="tags">
+            @if (question.category) {
+              <css-badge>{{ question.category }}</css-badge>
+            }
+            @if (!question.active) {
+              <css-badge variant="warning" without-default-icon>Inaktiv</css-badge>
+            }
+          </div>
+          <div class="item-actions">
+            <css-switch
+              class="active-switch"
+              label="Aktiv"
+              [checked]="question.active"
+              (change)="toggleActive(question, $event)"
+            />
+            <css-button
+              iconOnly
+              variant="plain"
+              ariaLabel="Frage bearbeiten"
+              (click)="edit(question)"
+            >
+              <css-icon slot="prefix" icon="edit" />
+            </css-button>
+            <css-button
+              iconOnly
+              variant="plain"
+              ariaLabel="Frage löschen"
+              (click)="confirm.set({ kind: 'delete', question })"
+            >
+              <css-icon slot="prefix" icon="trash" />
+            </css-button>
+          </div>
+        </div>
+
+        <p class="question">{{ question.text }}</p>
+
+        <ol class="options">
+          @for (option of question.options; track $index; let i = $index) {
+            <li class="option" [class.correct]="i === question.correctIndex">
+              <span class="letter">{{ letters[i] }}</span>
+              <span class="option-text">{{ option }}</span>
+              @if (i === question.correctIndex) {
+                <css-icon icon="checkmark" size="sm" weight="medium" />
+                <span class="visually-hidden">(richtig)</span>
+              }
+            </li>
+          }
+        </ol>
+
+        <p class="stats">{{ successRate(question) }}</p>
+      </li>
+    }
+  </ul>
+
+  <div class="bulk">
+    <h2 class="bulk-title">Weitere Aktionen</h2>
+    <div class="bulk-actions">
+      <css-button [loading]="busy()" (click)="importSamples()">
+        <css-icon slot="prefix" icon="download" />
+        Beispielfragen importieren
+      </css-button>
+      <css-button (click)="confirm.set({ kind: 'delete-all' })">
+        <css-icon slot="prefix" icon="trash" />
+        Alle Fragen löschen
+      </css-button>
+    </div>
+  </div>
+}
+
+@if (editing(); as e) {
+  <app-question-editor
+    [initial]="e.draft"
+    [isNew]="e.id === null"
+    [categories]="categories()"
+    [saving]="saving()"
+    [serverError]="editorError()"
+    (save)="saveDraft($event)"
+    (dismiss)="editing.set(null)"
+  />
+}
+
+@if (confirm(); as c) {
+  <css-flyout
+    open
+    withoutCloseButton
+    [title]="c.kind === 'delete' ? 'Frage löschen?' : 'Alle Fragen löschen?'"
+    [main]="
+      c.kind === 'delete'
+        ? 'Die Frage wird endgültig gelöscht.'
+        : 'Alle ' +
+          counts().total +
+          ' Fragen werden endgültig gelöscht. Das kann nicht rückgängig gemacht werden.'
+    "
+    (close)="confirm.set(null)"
+  >
+    <css-button slot="css-button" (click)="confirm.set(null)">Abbrechen</css-button>
+    <css-button
+      slot="css-button"
+      variant="primary"
+      [loading]="busy()"
+      (click)="confirmAction()"
+    >
+      Endgültig löschen
+    </css-button>
+  </css-flyout>
+}

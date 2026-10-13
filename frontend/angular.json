@@ -26,15 +26,21 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "*.woff2",
+                "input": "node_modules/@css-ch/fonts/assets",
+                "output": "fonts"
               }
             ],
             "styles": [
+              "node_modules/@css-ch/design-tokens/dist/css/main.css",
               "src/styles.scss"
             ],
             "scripts": [],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "node_modules"
+                "src/styles"
               ]
             }
           },
@@ -43,16 +49,17 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "600kB",
+                  "maximumError": "900kB"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "8kB",
+                  "maximumError": "12kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "subresourceIntegrity": false
             },
             "development": {
               "optimization": false,

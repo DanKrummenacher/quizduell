@@ -1,0 +1,64 @@
+@let s = state();
+
+<div class="hero" [class]="outcome()">
+  <span class="badge"
+    ><css-icon [icon]="heading().icon" size="2xl" weight="medium"
+  /></span>
+  <h1 class="title">{{ heading().title }}</h1>
+  <p class="text">{{ heading().text }}</p>
+</div>
+
+<ol class="ranking" aria-label="Endstand">
+  @for (player of players(); track player.isYou; let first = $first) {
+    <li
+      class="row"
+      [class.you]="player.isYou"
+      [class.leader]="first && outcome() !== 'draw'"
+    >
+      <span class="avatar">{{ player.initial }}</span>
+      <span class="name">
+        {{ player.name }}
+        @if (player.isYou) {
+          <span class="me">(Du)</span>
+        }
+      </span>
+      <span class="score">{{ player.score }} Pkt.</span>
+    </li>
+  }
+</ol>
+
+<div class="actions">
+  @if (isFriendGame()) {
+    @let status = rematchStatus();
+    <css-button
+      variant="primary"
+      stretch
+      [disabled]="!s.rematchAvailable || s.you.rematchRequested"
+      [loading]="busy()"
+      (click)="rematch.emit()"
+    >
+      <css-icon slot="prefix" icon="reload" />
+      {{
+        s.opponent?.rematchRequested && !s.you.rematchRequested
+          ? 'Revanche annehmen'
+          : 'Revanche'
+      }}
+    </css-button>
+    <p class="status" [class]="status?.tone ?? ''" aria-live="polite">
+      @if (status) {
+        {{ status.text }}
+      } @else if (s.rematchAvailable && s.phaseEndsAt) {
+        Revanche noch {{ rematchSeconds() }} s möglich
+      }
+    </p>
+  } @else {
+    <css-button variant="primary" stretch (click)="playAgain.emit()">
+      <css-icon slot="prefix" icon="lightning-strike" />
+      Neues Duell
+    </css-button>
+  }
+  <css-button stretch (click)="menu.emit()">
+    <css-icon slot="prefix" icon="home" />
+    Zum Menü
+  </css-button>
+</div>

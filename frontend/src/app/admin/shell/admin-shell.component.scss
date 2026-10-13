@@ -1,0 +1,88 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: 0 var(--app-safe-right) var(--app-safe-bottom) var(--app-safe-left);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--css-z-index-header);
+  padding-top: var(--app-safe-top);
+  background: var(--css-color-surface-default);
+  box-shadow: var(--css-effects-shadows-md);
+}
+
+.header-inner,
+.nav-inner {
+  max-width: var(--app-wide-width);
+  margin-inline: auto;
+  padding-inline: var(--app-gutter);
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--css-space-xs);
+  min-height: 3.5rem;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--css-space-2xs);
+  text-decoration: none;
+}
+
+.tag {
+  padding: 0.125rem var(--css-space-2xs);
+  border-radius: var(--css-border-radius-full);
+  background: var(--css-color-surface-accent);
+  color: var(--css-color-text-inverse);
+  font: var(--css-textstyle-label-sm-bold);
+  text-transform: uppercase;
+  letter-spacing: var(--css-letter-spacing-wide);
+}
+
+.nav {
+  border-top: var(--css-border-width-standard) solid var(--css-color-border-muted);
+}
+
+.nav-inner {
+  display: flex;
+  gap: var(--css-space-3xs);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--css-space-2xs);
+  min-height: 3rem;
+  padding: 0 var(--css-space-xs);
+  border-bottom: var(--css-border-width-focus) solid transparent;
+  font: var(--css-textstyle-label-lg-medium);
+  color: var(--css-color-text-muted);
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    color: var(--css-color-text-interactive-hover);
+  }
+
+  &.active {
+    color: var(--css-color-text-default);
+    border-bottom-color: var(--css-color-border-accent);
+  }
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: calc(var(--app-wide-width) + 2 * var(--app-gutter));
+  margin-inline: auto;
+  padding: var(--css-space-sm) var(--app-gutter) var(--css-space-xl);
+}

@@ -1,3 +1,4 @@
 export const environment = {
-  backendUrl: 'https://quizduell-backend.onrender.com',
+  production: true,
+  apiUrl: 'https://playduelio-api.onrender.com',
 };

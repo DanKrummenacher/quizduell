@@ -1,0 +1,116 @@
+@let s = state();
+
+<div class="scoreboard" aria-label="Punktestand">
+  <div class="player you">
+    <span class="avatar">{{ youInitial() }}</span>
+    <span class="player-text">
+      <span class="name">{{ s.you.name }} <span class="me">(Du)</span></span>
+      <span class="score">
+        {{ s.you.score }} Pkt.
+        @if (s.reveal && s.reveal.yourPoints > 0) {
+          <span class="delta">+{{ s.reveal.yourPoints }}</span>
+        }
+      </span>
+    </span>
+  </div>
+
+  <div class="player opponent">
+    <span class="player-text">
+      <span class="name">{{ s.opponent?.name }}</span>
+      <span class="score">
+        @if (s.reveal && s.reveal.opponentPoints > 0) {
+          <span class="delta">+{{ s.reveal.opponentPoints }}</span>
+        }
+        {{ s.opponent?.score ?? 0 }} Pkt.
+      </span>
+    </span>
+    <span class="avatar" [class.offline]="s.opponent && !s.opponent.connected">
+      {{ opponentInitial() }}
+      @if (!isReveal() && s.opponent?.hasAnswered) {
+        <span class="answered" title="Hat geantwortet">
+          <css-icon icon="checkmark" size="xs" weight="medium" />
+          <span class="visually-hidden">hat geantwortet</span>
+        </span>
+      }
+    </span>
+  </div>
+</div>
+
+@if (s.opponent && !s.opponent.connected) {
+  <p class="opponent-offline" role="status">
+    Verbindung zu {{ s.opponent.name }} unterbrochen – wir warten kurz …
+  </p>
+}
+
+<div class="meta">
+  <span class="progress-label"
+    >Frage {{ s.questionNumber }} von {{ s.totalQuestions }}</span
+  >
+  <span class="time" [class.urgent]="urgent()" role="timer">
+    @if (isReveal()) {
+      Weiter in {{ secondsLeft() }} s
+    } @else {
+      <css-icon icon="time-limit" size="sm" /> {{ secondsLeft() }} s
+    }
+  </span>
+</div>
+<div
+  class="timer"
+  [class.reveal]="isReveal()"
+  [class.urgent]="urgent()"
+  role="progressbar"
+  aria-label="Verbleibende Zeit"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  [attr.aria-valuenow]="(progress() * 100).toFixed(0)"
+>
+  <span class="timer-fill" [style.transform]="'scaleX(' + progress() + ')'"></span>
+</div>
+
+<h1 class="question" id="question-text">{{ s.question?.text }}</h1>
+
+<div class="answers" role="group" aria-labelledby="question-text">
+  @for (option of options(); track option.index) {
+    <button
+      type="button"
+      class="answer"
+      [class]="'state-' + option.state"
+      [attr.aria-pressed]="option.state === 'selected' || option.pickedByYou"
+      [attr.aria-disabled]="locked()"
+      (click)="select(option)"
+    >
+      <span class="letter" aria-hidden="true">{{ option.letter }}</span>
+      <span class="answer-text">{{ option.text }}</span>
+      <span class="markers">
+        @if (option.pickedByYou) {
+          <span class="marker you" title="Deine Antwort">{{ youInitial() }}</span>
+        }
+        @if (option.pickedByOpponent) {
+          <span
+            class="marker"
+            [title]="'Antwort von ' + (s.opponent?.name ?? 'Gegner')"
+          >
+            {{ opponentInitial() }}
+          </span>
+        }
+        @if (option.state === 'correct') {
+          <css-icon icon="checkmark-circle" size="md" weight="medium" />
+        }
+      </span>
+      @if (option.state === 'correct') {
+        <span class="visually-hidden">richtige Antwort</span>
+      }
+    </button>
+  }
+</div>
+
+<div class="feedback-slot" aria-live="polite">
+  @if (feedback(); as f) {
+    <p class="feedback" [class]="f.kind">
+      {{ f.text }}
+      @if (f.kind === 'success') {
+        <strong>+{{ f.points }} Punkte</strong>
+      }
+    </p>
+  }
+</div>

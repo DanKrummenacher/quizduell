@@ -1,0 +1,100 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: var(--app-safe-top) var(--app-safe-right) var(--app-safe-bottom)
+    var(--app-safe-left);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--css-space-2xs);
+  min-height: 3.5rem;
+  padding: var(--css-space-2xs) var(--app-gutter);
+}
+
+.header-start {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.header-end {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.brand-link {
+  display: inline-flex;
+  text-decoration: none;
+  border-radius: var(--css-border-radius-sm);
+
+  &.inactive {
+    pointer-events: none;
+  }
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: calc(var(--app-content-width) + 2 * var(--app-gutter));
+  margin-inline: auto;
+  padding: var(--css-space-2xs) var(--app-gutter) var(--css-space-md);
+
+  &.wide {
+    max-width: calc(var(--app-wide-width) + 2 * var(--app-gutter));
+  }
+
+  &.center {
+    justify-content: center;
+  }
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.center .panel {
+  flex: 0 0 auto;
+}
+
+// Tablets and larger: content floats on a white panel.
+@media (min-width: 40rem) and (min-height: 32rem) {
+  .main {
+    padding-bottom: var(--css-space-xl);
+  }
+
+  .panel:not(.plain) {
+    flex: 0 0 auto;
+    padding: var(--css-space-lg) var(--css-space-lg) var(--css-space-xl);
+    background: var(--css-color-surface-default);
+    border-radius: var(--css-border-radius-md);
+    box-shadow: var(--css-effects-shadows-md);
+  }
+
+  .main:not(.center) .panel:not(.plain) {
+    margin-top: var(--css-space-xs);
+  }
+}
+
+// Landscape phones: keep the header compact to leave room for the content.
+@media (max-height: 30rem) and (orientation: landscape) {
+  .header {
+    min-height: 2.75rem;
+    padding-block: var(--css-space-3xs);
+  }
+
+  .main {
+    padding-bottom: var(--css-space-xs);
+  }
+}
