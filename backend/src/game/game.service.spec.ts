@@ -342,6 +342,7 @@ describe('GameService', () => {
 
       expect(ctx.state('host').endReason).toBe('opponent-left');
       expect(ctx.state('host').rematchAvailable).toBe(false);
+      expect(ctx.state('host').opponent).toMatchObject({ name: 'Ben', score: 200 });
     });
 
     it('does not offer a rematch in quick games', async () => {
@@ -371,6 +372,10 @@ describe('GameService', () => {
 
       expect(ctx.state('host').phase).toBe('aborted');
       expect(ctx.state('host').endReason).toBe('opponent-left');
+      expect(ctx.state('host').opponent).toMatchObject({
+        name: 'Ben',
+        connected: false,
+      });
     });
 
     it('keeps the game running during a short disconnect and resumes', async () => {

@@ -9,7 +9,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import type { Server, Socket } from 'socket.io';
+import type { Namespace, Server, Socket } from 'socket.io';
 import {
   type Ack,
   ClientEvents,
@@ -55,8 +55,14 @@ export class GameGateway
     this.gameService.handleDisconnect(client.id);
   }
 
+  /** Number of connected sockets (devices with the app open). */
   get onlineCount(): number {
-    return this.server?.engine?.clientsCount ?? 0;
+    // Depending on the setup Nest injects the server or its default namespace.
+    const target = this.server as Server | Namespace | undefined;
+    if (!target) {
+      return 0;
+    }
+    return 'engine' in target ? target.engine.clientsCount : target.sockets.size;
   }
 
   @SubscribeMessage(ClientEvents.CREATE_GAME)

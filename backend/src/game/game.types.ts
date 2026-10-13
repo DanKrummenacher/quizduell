@@ -43,6 +43,8 @@ export interface Session {
   phase: GamePhase;
   endReason: EndReason | null;
   players: Player[];
+  /** Players who left; kept so the result screen can still show them. */
+  departed: Player[];
   settings: GameSettings;
   questions: GameQuestion[];
   questionIndex: number;

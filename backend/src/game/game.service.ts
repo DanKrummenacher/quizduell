@@ -226,7 +226,10 @@ export class GameService implements OnApplicationShutdown {
 
   /** Builds the personalised snapshot for one player. */
   buildView(session: Session, player: Player): GameStateView {
-    const opponent = session.players.find((p) => p.id !== player.id) ?? null;
+    const opponent =
+      session.players.find((p) => p.id !== player.id) ??
+      session.departed.find((p) => p.id !== player.id) ??
+      null;
     const question =
       session.phase === 'question' || session.phase === 'reveal'
         ? session.questions[session.questionIndex]
@@ -290,6 +293,7 @@ export class GameService implements OnApplicationShutdown {
     session.settings = this.settingsService.get();
     session.questions = [];
     session.questionIndex = 0;
+    session.departed = [];
     session.lastReveal = null;
     session.endReason = null;
     this.enterPhase(session, 'countdown', COUNTDOWN_MS, () =>
@@ -433,6 +437,7 @@ export class GameService implements OnApplicationShutdown {
       phase: 'waiting',
       endReason: null,
       players: [],
+      departed: [],
       settings,
       questions: [],
       questionIndex: 0,
@@ -472,6 +477,7 @@ export class GameService implements OnApplicationShutdown {
       clearTimeout(player.disconnectTimer);
     }
     session.players = session.players.filter((p) => p.id !== player.id);
+    session.departed.push({ ...player, socketId: null, disconnectTimer: null });
     this.forgetPlayer(player);
 
     if (session.players.length === 0 || session.phase === 'waiting') {

@@ -284,6 +284,9 @@ describe('playduelio backend (e2e)', () => {
         .get('/api/admin/dashboard')
         .set(auth())
         .expect(200);
+      expect(
+        (dashboard.body as DashboardStats).playersOnline,
+      ).toBeGreaterThanOrEqual(2);
       expect(dashboard.body as DashboardStats).toMatchObject({
         gamesToday: 1,
         gamesTotal: 1,
