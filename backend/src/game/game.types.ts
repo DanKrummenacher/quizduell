@@ -1,51 +1,71 @@
-import { Question } from '../questions/questions.types';
+import type {
+  EndReason,
+  ErrorCode,
+  GameMode,
+  GamePhase,
+  GameStateView,
+} from '../contracts/game.contract.js';
+import type { GameQuestion } from '../questions/questions.service.js';
+import type { GameSettings } from '../settings/game-settings.js';
 
-export const QUESTIONS_PER_GAME = 7;
-export const QUESTION_DURATION_MS = 20000;
-export const ROUND_RESULT_DURATION_MS = 4000;
-export const GAME_CLEANUP_DELAY_MS = 180000;
-export const REMATCH_TIMEOUT_MS = 45000;
+export const COUNTDOWN_MS = 3_000;
+/** How long a disconnected player may take to come back before forfeiting. */
+export const DISCONNECT_GRACE_MS = 20_000;
+/** How long finished or aborted games stay available for the result screen. */
+export const SESSION_RETENTION_MS = 10 * 60_000;
+/** Friend games nobody joins are removed after this time. */
+export const WAITING_TIMEOUT_MS = 30 * 60_000;
+export const BASE_POINTS = 100;
+export const MAX_SPEED_BONUS = 100;
 
 export interface Player {
-  socketId: string;
+  id: string;
+  sessionToken: string;
   name: string;
+  socketId: string | null;
   score: number;
-  currentAnswerIndex?: number | null;
-  answerTimeMs?: number | null;
+  answerIndex: number | null;
+  answerTimeMs: number | null;
+  lastPoints: number;
+  rematchRequested: boolean;
+  disconnectTimer: NodeJS.Timeout | null;
 }
 
-export type GameStatus = 'lobby' | 'pre-game' | 'in-game' | 'result';
-
-export interface GameSession {
-  gameCode: string;
-  players: Record<string, Player>;
-  questions: Question[];
-  currentQuestionIndex: number;
-  status: GameStatus;
-  questionStartTimeMs?: number;
-  roundTimer?: ReturnType<typeof setTimeout>;
-  rematchTimer?: ReturnType<typeof setTimeout>;
-  rematchRequests: string[];
+export interface LastReveal {
+  correctIndex: number;
+  answers: Map<string, number | null>;
+  points: Map<string, number>;
 }
 
-export interface ClientPlayer {
-  socketId: string;
-  name: string;
-  score: number;
+export interface Session {
+  code: string;
+  mode: GameMode;
+  phase: GamePhase;
+  endReason: EndReason | null;
+  players: Player[];
+  settings: GameSettings;
+  questions: GameQuestion[];
+  questionIndex: number;
+  phaseStartedAt: number;
+  phaseEndsAt: number | null;
+  timer: NodeJS.Timeout | null;
+  lastReveal: LastReveal | null;
+  /** Bumped whenever a new round of the game starts (rematch), guards async work. */
+  generation: number;
 }
 
-export interface ClientSession {
-  gameCode: string;
-  players: Record<string, ClientPlayer>;
-  currentQuestionIndex: number;
-  totalQuestions: number;
-  status: GameStatus;
+export interface GameNotifier {
+  sendState(socketId: string, state: GameStateView): void;
 }
 
-export interface RoundResultData {
-  session: ClientSession;
-  correctAnswer: number;
-  playerAnswers: Record<string, number | null>;
-  nextRoundStartTimeMs: number;
-  totalDurationMs: number;
+export class GameError extends Error {
+  constructor(readonly code: ErrorCode) {
+    super(code);
+  }
+}
+
+export interface LiveStats {
+  activeGames: number;
+  playersInGames: number;
+  playersSearching: number;
 }

@@ -1,11 +1,9 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import 'reflect-metadata';
+import { Logger } from '@nestjs/common';
+import { createApp } from './app.factory.js';
+import { APP_CONFIG, type AppConfig } from './config/app-config.js';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.useGlobalFilters(new AllExceptionsFilter());
-  app.enableCors();
-  await app.listen(process.env.PORT ?? 3000);
-}
-bootstrap();
+const app = await createApp();
+const config = app.get<AppConfig>(APP_CONFIG);
+await app.listen(config.port, '0.0.0.0');
+Logger.log(`playduelio backend listening on port ${config.port}`, 'Bootstrap');
