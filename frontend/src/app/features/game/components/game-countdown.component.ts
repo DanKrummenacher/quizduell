@@ -1,4 +1,11 @@
-import { Component, computed, input } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  type ElementRef,
+  input,
+  viewChild,
+} from '@angular/core';
 import { initial } from '../game.models';
 
 /** Short "match found" screen with a 3-2-1 countdown. */
@@ -19,10 +26,7 @@ import { initial } from '../game.models';
     </div>
     <p class="countdown" role="timer" aria-live="assertive">
       @if (seconds() > 0) {
-        <!-- Re-created every second so the pop animation restarts. -->
-        @for (value of [seconds()]; track value) {
-          <span class="number">{{ value }}</span>
-        }
+        <span #number class="number">{{ seconds() }}</span>
       } @else {
         <span class="go">Los!</span>
       }
@@ -38,6 +42,24 @@ export class GameCountdownComponent {
   readonly remainingMs = input.required<number>();
 
   protected readonly seconds = computed(() => Math.ceil(this.remainingMs() / 1000));
+  private readonly number = viewChild<ElementRef<HTMLElement>>('number');
+
+  constructor() {
+    // Replays the pop animation whenever the number changes.
+    effect(() => {
+      this.seconds();
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+      }
+      this.number()?.nativeElement.animate(
+        [
+          { transform: 'scale(1.4)', opacity: 0.2 },
+          { transform: 'scale(1)', opacity: 1 },
+        ],
+        { duration: 600, easing: 'ease-out' },
+      );
+    });
+  }
   protected readonly youInitial = computed(() => initial(this.you()));
   protected readonly opponentInitial = computed(() => initial(this.opponent()));
 }

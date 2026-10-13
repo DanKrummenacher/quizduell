@@ -21,7 +21,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:cov": "vitest run --coverage"
+    "test:cov": "vitest run --coverage",
+    "start:e2e": "nest build && node dist/main.js"
   },
   "dependencies": {
     "@nestjs/common": "^12.1.3",

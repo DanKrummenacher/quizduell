@@ -13,7 +13,7 @@ import type { GameStateView } from '../../../core/contracts/game.contract';
 @Component({
   selector: 'app-game-aborted',
   template: `
-    <span class="badge"><css-icon icon="unavailable" size="2xl" /></span>
+    <span class="badge"><css-icon icon="info" size="2xl" /></span>
     <h1 class="title">{{ message().title }}</h1>
     <p class="text">{{ message().text }}</p>
     <div class="actions">

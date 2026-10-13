@@ -52,6 +52,10 @@
     max-width: calc(var(--app-wide-width) + 2 * var(--app-gutter));
   }
 
+  &.game {
+    max-width: calc(var(--app-game-width) + 2 * var(--app-gutter));
+  }
+
   &.center {
     justify-content: center;
   }
@@ -84,6 +88,14 @@
 
   .main:not(.center) .panel:not(.plain) {
     margin-top: var(--css-space-xs);
+  }
+
+  .main.center-large {
+    justify-content: center;
+
+    .panel {
+      flex: 0 0 auto;
+    }
   }
 }
 

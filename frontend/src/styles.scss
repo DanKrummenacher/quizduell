@@ -28,6 +28,7 @@
   // App-level tokens built on top of the design system.
   --app-gutter: clamp(1rem, 4vw, 2rem);
   --app-content-width: 35rem;
+  --app-game-width: 50rem;
   --app-wide-width: 72rem;
   --app-radius: var(--css-border-radius-md);
   --app-tap-size: 3.5rem;
@@ -46,7 +47,7 @@
 
 html {
   // Grows the whole UI slightly on very large screens so it never looks lost.
-  font-size: clamp(100%, 0.6vw + 0.55rem, 125%);
+  font-size: clamp(100%, 0.5vw + 0.6875rem, 150%);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   height: 100%;

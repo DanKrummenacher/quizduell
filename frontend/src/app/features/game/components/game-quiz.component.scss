@@ -183,7 +183,7 @@
 
 .question {
   margin-top: var(--css-space-md);
-  hyphens: auto;
+  hyphens: manual;
   font-size: clamp(1.25rem, 4.5vw, 1.75rem);
   font-weight: var(--css-font-weight-medium);
   line-height: 1.3;
@@ -294,7 +294,7 @@
   font-weight: var(--css-font-weight-medium);
   line-height: 1.3;
   overflow-wrap: break-word;
-  hyphens: auto;
+  hyphens: manual;
 }
 
 .markers {
@@ -379,5 +379,59 @@
 
   .answer {
     min-height: 2.75rem;
+  }
+}
+
+// Tablets and desktops: larger touch targets and type for stand devices.
+@media (min-width: 48rem) and (min-height: 36rem) {
+  .avatar {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.25rem;
+  }
+
+  .score {
+    font-size: 1.375rem;
+  }
+
+  .name {
+    font-size: 1rem;
+  }
+
+  .meta {
+    font-size: 1rem;
+  }
+
+  .timer {
+    height: 0.625rem;
+  }
+
+  .question {
+    margin-top: var(--css-space-lg);
+    font-size: clamp(1.5rem, 1.5vw + 1rem, 2.25rem);
+  }
+
+  .answers {
+    gap: var(--css-space-xs);
+    margin-top: var(--css-space-md);
+  }
+
+  .answer {
+    min-height: 4.5rem;
+    padding: var(--css-space-xs) var(--css-space-sm);
+  }
+
+  .answer-text {
+    font-size: 1.1875rem;
+  }
+
+  .letter {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }
+
+  .feedback {
+    font-size: 1.125rem;
   }
 }

@@ -38,3 +38,8 @@ coverage/
 .cache
 # LOCAL TOOLING
 .claude/
+
+# PLAYWRIGHT
+/frontend/e2e-results
+/frontend/playwright-report
+/frontend/test-results

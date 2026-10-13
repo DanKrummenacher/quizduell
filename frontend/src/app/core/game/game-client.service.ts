@@ -34,6 +34,7 @@ export class GameClient implements OnDestroy {
   private readonly resumingSignal = signal(false);
   private clockOffsetMs = 0;
   private matchmakingName: string | null = null;
+  private connectedBefore = false;
 
   /** Latest snapshot of the current game, `null` when not in a game. */
   readonly state = this.stateSignal.asReadonly();
@@ -163,8 +164,10 @@ export class GameClient implements OnDestroy {
     });
 
     socket.on('connect', () => {
+      const isReconnect = this.connectedBefore;
+      this.connectedBefore = true;
       this.statusSignal.set('connected');
-      void this.resumeIfNeeded();
+      void this.resumeIfNeeded(isReconnect);
     });
     socket.on('disconnect', (reason) => {
       // Reconnect unless we closed the connection on purpose.
@@ -201,7 +204,7 @@ export class GameClient implements OnDestroy {
     }
   }
 
-  private async resumeIfNeeded(): Promise<void> {
+  private async resumeIfNeeded(isReconnect: boolean): Promise<void> {
     const current = this.stateSignal();
     const token =
       current && !FINAL_PHASES.has(current.phase)
@@ -209,7 +212,11 @@ export class GameClient implements OnDestroy {
         : sessionStore.get(TOKEN_KEY);
     if (!token || !this.socket) {
       this.resumingSignal.set(false);
-      this.requeueIfSearching();
+      if (isReconnect) {
+        // Only after a lost connection: the first connect is made by the
+        // matchmaking command itself, which would otherwise run twice.
+        this.requeueIfSearching();
+      }
       return;
     }
 
