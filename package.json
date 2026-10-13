@@ -1,16 +1,21 @@
 {
-  "name": "quizduell",
+  "name": "playduelio",
   "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "private": true,
+  "description": "playduelio – Echtzeit-Quiz-Duell im Browser (Angular + NestJS)",
+  "engines": {
+    "node": ">=24.15.0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    "eslint": "^9.39.4",
-    "prettier": "^3.8.3"
+  "scripts": {
+    "install:all": "npm --prefix backend ci && npm --prefix frontend ci",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "dev:backend": "npm --prefix backend run start:dev",
+    "dev:frontend": "npm --prefix frontend start",
+    "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
+    "test": "node scripts/check-contracts.mjs && npm --prefix backend test && npm --prefix frontend test",
+    "e2e": "npm --prefix frontend run e2e",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "check:contracts": "node scripts/check-contracts.mjs"
   }
 }

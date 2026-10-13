@@ -1,36 +1,75 @@
-# Quizduell - IPA Projekt
+# playduelio
 
-Dieses Repository enthält die Anwendung **"Quizduell"**, eine interaktive Echtzeit-Multiplayer-Quiz-Applikation. Das Projekt wurde im Rahmen der individuellen praktischen Arbeit (IPA) entwickelt.
+**Das Quiz-Duell im Browser.** Zwei Personen treten in Echtzeit gegeneinander an –
+wer schneller richtig antwortet, holt mehr Punkte. Ohne App, ohne Konto, auf jedem
+Gerät vom iPhone bis zum grossen Monitor.
 
-## Technologien
+Ursprünglich als IPA-Projekt entstanden, weiterentwickelt für den Einsatz an der
+Zentralschweizer Bildungsmesse (ZEBI).
 
-Das Projekt ist in zwei Hauptbereiche unterteilt und basiert auf einem modernen TypeScript-Stack:
+## Funktionen
 
-- **Frontend:** [Angular 21+](https://angular.io/) (Standalone Components, Signals, Smart/Dumb Container Pattern)
-- **Backend:** [NestJS](https://nestjs.com/) (Modular Architecture)
-- **Echtzeit-Kommunikation:** [Socket.io](https://socket.io/) (WebSockets)
-- **Styling:** SCSS / CSS-Tokens (Mobile-First Responsiveness)
+**Für Spielerinnen und Spieler**
 
-## Lokale Installation & Start
+- **Schnelles Duell:** automatische Gegnersuche
+- **Freund herausfordern:** Spiel-Code, Einladungslink oder QR-Code zum Scannen
+- Echtzeit-Duell mit Timer, Tempo-Bonus, Auflösung und Revanche
+- Läuft weiter nach Verbindungsabbrüchen oder einem Neuladen der Seite
+- Stand-Modus: Geräte am Messestand springen nach Inaktivität zur Startseite zurück
+- Optimiert für Handy (hoch/quer), Tablet und Desktop bis Ultrawide
 
-Stelle sicher, dass [Node.js](https://nodejs.org/) (LTS Version empfohlen) auf deinem System installiert ist.
+**Für Administratorinnen und Administratoren** (`/admin`)
 
-### 1. Backend starten
+- Live-Übersicht: verbundene Geräte, laufende Duelle, Statistik
+- Fragen erstellen, bearbeiten, (de)aktivieren, löschen – inkl. Trefferquote je Frage
+- Einstellungen: Fragen pro Duell, Zeit pro Frage, Tempo-Bonus, Stand-Modus u. a.
+- Optionales Startpaket mit Beispielfragen
+
+## Technik
+
+| Bereich      | Technologie                                                       |
+| ------------ | ----------------------------------------------------------------- |
+| Frontend     | Angular 22 (Standalone, Signals, zoneless), `@css-ch/components`  |
+| Backend      | NestJS 12, Socket.IO, Drizzle ORM                                 |
+| Datenbank    | PostgreSQL (lokal via Docker, Tests mit In-Memory-PGlite)         |
+| Tests        | Vitest (Unit/Integration), Playwright (End-to-End, 14 Geräte)     |
+| Hosting      | Render (Static Site + Web Service + Postgres)                     |
+
+Mehr Details: [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md)
+
+## Lokal starten
+
+Voraussetzungen: Node.js 24, Docker Desktop und ein GitHub-Token mit `read:packages`
+für die privaten `@css-ch`-Pakete (als Umgebungsvariable `GITHUB_TOKEN`).
+
 ```bash
-cd backend
-npm install
-npm run start:dev
+npm run install:all     # Abhängigkeiten installieren
+npm run db:up           # PostgreSQL in Docker starten
+cp backend/.env.example backend/.env
+npm run dev:backend     # http://localhost:3000
+npm run dev:frontend    # http://localhost:4200
 ```
-Das Backend läuft standardmässig auf `http://localhost:3000`.
 
-### 2. Frontend starten
-Öffne ein neues Terminalfenster:
+Ohne `DATABASE_URL` startet das Backend mit einer temporären In-Memory-Datenbank.
+Admin-Bereich: <http://localhost:4200/admin> (Passwort aus `backend/.env`).
+
+## Qualität
+
 ```bash
-cd frontend
-npm install
-npm run start
+npm run lint            # ESLint für Backend und Frontend
+npm test                # Vertragsprüfung + Unit- und Integrationstests
+npm run e2e             # End-to-End-Tests (startet Backend und Frontend selbst)
+npm run build           # Produktions-Builds
 ```
-Das Frontend ist nun unter `http://localhost:4200` erreichbar.
 
----
-*Dieses Projekt wurde als Prüfungsarbeit (IPA) umgesetzt.*
+Jeder Push auf `main` läuft durch die GitHub-Actions-CI (Lint, Tests, Build, E2E).
+
+Die Dateien in `backend/src/contracts` und `frontend/src/app/core/contracts`
+beschreiben die Schnittstelle zwischen Frontend und Backend und müssen identisch
+sein – `npm run check:contracts` prüft das.
+
+## Dokumentation
+
+- [Deployment auf Render](docs/DEPLOYMENT.md)
+- [Betrieb an der Messe](docs/MESSE-BETRIEB.md)
+- [Architektur](docs/ARCHITEKTUR.md)
