@@ -35,10 +35,48 @@
 }
 
 html {
-  /* Phones and tablets keep 16px; large monitors scale the whole UI up. */
-  font-size: clamp(100%, 0.5vw + 0.6875rem, 150%);
+  /*
+   * Phones and tablets keep 16px; large monitors scale the whole UI up in
+   * whole-pixel steps so components never render on fractional pixels.
+   */
+  font-size: 100%;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+}
+
+@media (min-width: 1280px) {
+  html {
+    font-size: 106.25%; /* 17px */
+  }
+}
+
+@media (min-width: 1600px) {
+  html {
+    font-size: 112.5%; /* 18px */
+  }
+}
+
+@media (min-width: 1920px) {
+  html {
+    font-size: 125%; /* 20px */
+  }
+}
+
+@media (min-width: 2560px) {
+  html {
+    font-size: 137.5%; /* 22px */
+  }
+}
+
+@media (min-width: 3200px) {
+  html {
+    font-size: 150%; /* 24px */
+  }
+}
+
+/* The admin area is a work tool: always at the default size. */
+html:has(app-admin-shell, app-admin-login-page) {
+  font-size: 100%;
 }
 
 html,

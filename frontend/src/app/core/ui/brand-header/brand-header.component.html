@@ -1,0 +1,39 @@
+<header class="header" role="banner">
+  @switch (variant()) {
+    @case (2) {
+      <div class="stack">
+        <app-logo-mark class="logo" [tile]="true" />
+        <span class="wordmark"><span class="light">play</span>duelio</span>
+        <span class="eyebrow">{{ subtitle() }}</span>
+      </div>
+    }
+    @case (3) {
+      <div class="bar">
+        <app-logo-mark class="logo" [tile]="true" />
+        <span class="bar-text">
+          <span class="wordmark"><span class="light">play</span>duelio</span>
+          <span class="caption">{{ subtitle() }}</span>
+        </span>
+      </div>
+    }
+    @case (4) {
+      <div class="minimal">
+        <span class="minimal-row">
+          <app-logo-mark class="logo" />
+          <span class="wordmark"><span class="light">play</span>duelio</span>
+        </span>
+        <span class="rule" aria-hidden="true"></span>
+        <span class="caption">{{ subtitle() }}</span>
+      </div>
+    }
+    @default {
+      <div class="card">
+        <app-logo-mark class="logo" />
+        <span class="wordmark"><span class="light">play</span>duelio</span>
+        <span class="divider" aria-hidden="true"></span>
+        <span class="caption">{{ subtitle() }}</span>
+      </div>
+    }
+  }
+  <div class="end"><ng-content select="[headerEnd]" /></div>
+</header>

@@ -1,0 +1,177 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+
+:host {
+  display: block;
+  padding: functions.rem(12) functions.rem(12) 0;
+}
+
+.header {
+  position: relative;
+}
+
+.end {
+  position: absolute;
+  top: 50%;
+  right: functions.rem(8);
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.wordmark {
+  font-size: functions.rem(20);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: colors.$dt-color-darkblue-100;
+  white-space: nowrap;
+
+  .light {
+    font-weight: miscs.$css-ui-font-weight-regular;
+  }
+}
+
+.caption {
+  font-size: functions.rem(15);
+  color: colors.$dt-color-darkblue-70;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Variant 1: white card with mark, wordmark and subtitle in one line.
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(10);
+  min-height: functions.rem(65);
+  padding: 0 functions.rem(16);
+  border-radius: functions.rem(4);
+  background-color: colors.$dt-color-white-100;
+
+  .logo {
+    width: functions.rem(30);
+    height: functions.rem(30);
+  }
+}
+
+.divider {
+  width: functions.rem(1);
+  height: functions.rem(22);
+  background-color: #c5cfdf;
+}
+
+// Variant 2: no card, app icon centered above the wordmark.
+:host(.variant-2) {
+  padding-top: functions.rem(24);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: functions.rem(8);
+
+  .logo {
+    width: functions.rem(56);
+    height: functions.rem(56);
+    margin-bottom: functions.rem(4);
+  }
+
+  .wordmark {
+    font-size: functions.rem(22);
+  }
+}
+
+.eyebrow {
+  font-size: functions.rem(12);
+  font-weight: miscs.$css-ui-font-weight-medium;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: colors.$dt-color-darkblue-70;
+}
+
+// Variant 3: app bar with icon left, wordmark and subtitle stacked.
+.bar {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(12);
+  min-height: functions.rem(68);
+  padding: 0 functions.rem(16);
+  border-radius: functions.rem(4);
+  background-color: colors.$dt-color-white-100;
+  border-bottom: functions.rem(2) solid #0078bb;
+
+  .logo {
+    width: functions.rem(40);
+    height: functions.rem(40);
+  }
+}
+
+.bar-text {
+  display: flex;
+  flex-direction: column;
+  gap: functions.rem(4);
+  min-width: 0;
+
+  .caption {
+    font-size: functions.rem(13);
+  }
+}
+
+// Variant 4: minimal, centered mark and wordmark with a fine accent line.
+:host(.variant-4) {
+  padding-top: functions.rem(22);
+}
+
+.minimal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: functions.rem(10);
+}
+
+.minimal-row {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(10);
+
+  .logo {
+    width: functions.rem(32);
+    height: functions.rem(32);
+  }
+
+  .wordmark {
+    font-size: functions.rem(24);
+  }
+}
+
+.rule {
+  width: functions.rem(32);
+  height: functions.rem(2);
+  border-radius: functions.rem(1);
+  background-color: #0078bb;
+}
+
+.minimal .caption {
+  font-size: functions.rem(14);
+}
+
+// Narrow phones: the card variant drops the divider when space is tight.
+@media (max-width: 22rem) {
+  .card {
+    gap: functions.rem(8);
+
+    .divider,
+    .caption {
+      display: none;
+    }
+  }
+}

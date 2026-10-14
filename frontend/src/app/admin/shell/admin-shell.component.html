@@ -1,31 +1,30 @@
 <div class="page">
-  <header class="header-container">
-    <div class="header-content">
-      <a class="brand" routerLink="/" aria-label="Zum Spiel">
-        <app-logo-mark class="logo" />
-        <calc-text textMedium textLead class="separator">|</calc-text>
-        <calc-text textMedium textLead>playduelio Admin</calc-text>
-      </a>
-      <css-button variant="plain" class="logout" (click)="logout()">
-        <css-icon icon="logout" slot="prefix"></css-icon>
-        Abmelden
-      </css-button>
-    </div>
-  </header>
+  <app-brand-header subtitle="Admin" />
 
-  <nav class="nav" aria-label="Admin-Navigation">
-    @for (link of links; track link.path) {
-      <a
-        class="nav-link"
-        [routerLink]="link.path"
-        routerLinkActive="active"
-        ariaCurrentWhenActive="page"
-      >
-        <css-icon [icon]="link.icon" size="sm"></css-icon>
-        <span>{{ link.label }}</span>
-      </a>
-    }
-  </nav>
+  <div class="nav-row">
+    <nav class="nav" aria-label="Admin-Navigation">
+      @for (link of links; track link.path) {
+        <a
+          class="nav-link"
+          [routerLink]="link.path"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+        >
+          <css-icon [icon]="link.icon" size="sm"></css-icon>
+          <span>{{ link.label }}</span>
+        </a>
+      }
+    </nav>
+    <css-button
+      variant="plain"
+      class="logout"
+      ariaLabel="Abmelden"
+      (click)="logout()"
+    >
+      <css-icon icon="logout" slot="prefix"></css-icon>
+      <span class="logout-label">Abmelden</span>
+    </css-button>
+  </div>
 
   <main class="main">
     <router-outlet />

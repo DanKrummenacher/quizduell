@@ -5,21 +5,15 @@ import '@css-ch/calc-ui-text';
 import '@css-ch/components/button';
 import '@css-ch/components/icon';
 import '@css-ch/components/input-text';
-import { LogoMarkComponent } from '../../core/ui/logo-mark/logo-mark.component';
+import { BrandHeaderComponent } from '../../core/ui/brand-header/brand-header.component';
 import { AdminAuthService } from '../admin-auth.service';
 
 @Component({
   selector: 'app-admin-login-page',
-  imports: [LogoMarkComponent, RouterLink],
+  imports: [BrandHeaderComponent, RouterLink],
   template: `
     <div class="page">
-      <header class="header-container">
-        <div class="header-content">
-          <app-logo-mark class="logo" />
-          <calc-text textMedium textLead class="separator">|</calc-text>
-          <calc-text textMedium textLead>playduelio Admin</calc-text>
-        </div>
-      </header>
+      <app-brand-header subtitle="Admin" />
 
       <main class="main-content">
         <h1 class="main-title">Admin-Bereich</h1>
@@ -68,24 +62,6 @@ import { AdminAuthService } from '../admin-auth.service';
       margin: 0 auto;
       padding: var(--app-safe-top) var(--app-safe-right) var(--app-safe-bottom)
         var(--app-safe-left);
-    }
-    .header-container {
-      padding: functions.rem(12) functions.rem(12) 0;
-    }
-    .header-content {
-      background-color: colors.$dt-color-white-100;
-      height: functions.rem(65);
-      border-radius: functions.rem(4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .logo {
-      width: functions.rem(28);
-      height: functions.rem(28);
-    }
-    .separator {
-      margin: 0 functions.rem(6);
     }
     .main-content {
       flex-grow: 1;

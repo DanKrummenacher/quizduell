@@ -38,18 +38,20 @@
 .answer-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  align-items: end;
+  align-items: start;
   gap: functions.rem(10);
 }
 
 .letter {
   @include admin.letter-box;
-  height: functions.rem(48);
-  width: functions.rem(36);
+  // Same height and position as the input field next to it (below its label),
+  // also when an error message is shown underneath.
+  height: functions.rem(44);
+  width: functions.rem(44);
+  margin-top: 1.3rem;
 
   .correct & {
     background-color: admin.$success;
-    border-color: admin.$success;
     color: colors.$dt-color-white-100;
   }
 }
