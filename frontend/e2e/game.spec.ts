@@ -9,10 +9,13 @@ import {
   prepareBackend,
   removeAllQuestions,
   waitForQuestion,
+  closePlayers,
 } from './helpers';
 
 const phone = { ...devices['iPhone 15'], defaultBrowserType: undefined };
 const tablet = { ...devices['iPad (gen 11)'], defaultBrowserType: undefined };
+
+test.afterEach(closePlayers);
 
 test.describe('playing duels', () => {
   test.beforeEach(async ({ request }) => {

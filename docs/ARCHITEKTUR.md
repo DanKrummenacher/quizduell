@@ -45,15 +45,19 @@ Punkte: 100 pro richtige Antwort, plus bis zu 100 Tempo-Bonus (linear nach Restz
 | ---------------------- | --------------------------------------------------------------- |
 | `core/game/`           | `GameClient` (Socket-Verbindung, Spielstand als Signal)         |
 | `core/platform/`       | Stand-Modus (Idle-Reset), Wake-Lock, sicherer Storage           |
-| `core/ui/`             | Seitenrahmen, Logo, QR-Code, Auswahlkarten, Verbindungsbanner   |
+| `core/ui/`             | Logo-Symbol, Verbindungsbanner                                  |
 | `features/start`       | Startseite mit Namenseingabe                                    |
-| `features/lobby`       | Spielmodus, Freundesspiel, Gegnersuche                          |
-| `features/game`        | Duell: Warten, Countdown, Frage, Auflösung, Ergebnis            |
+| `features/lobby`       | Spielmodus, Freund herausfordern, Suche, Warten, Gegner gefunden|
+| `features/quiz`        | Frage, Timer, Scoreboard, Auflösung                             |
+| `features/result`      | Endstand, Revanche, «Erneut Spielen»                            |
 | `admin/`               | Admin-Bereich (lazy geladen)                                    |
 
-UI-Komponenten stammen aus `@css-ch/components`; Farben, Abstände und Schrift aus
-`@css-ch/design-tokens`. Das Layout ist Mobile-first und wurde automatisiert auf 14
-Geräten getestet (`frontend/e2e/responsive.spec.ts`).
+Jedes Feature folgt dem Smart/Dumb-Pattern: ein Container verbindet den `GameClient`
+mit reinen Darstellungskomponenten. UI-Komponenten stammen aus `@css-ch/components`
+und `@css-ch/calc-ui-text`, Farben und Schrift aus den Design-Tokens der Shared Library.
+Auf Tablets und Desktops steht das Mobile-Design in einer zentrierten, mitwachsenden
+Spalte; der Admin-Bereich (`admin/`) nutzt denselben Kartenstil. Das Layout ist
+Mobile-first und wurde automatisiert auf 14 Geräten getestet (`frontend/e2e/responsive.spec.ts`).
 
 ## Sicherheit
 

@@ -14,6 +14,7 @@ import {
   newPlayer,
   prepareBackend,
   waitForQuestion,
+  closePlayers,
 } from './helpers';
 
 interface Device {
@@ -65,6 +66,8 @@ async function capture(page: Page, device: Device, step: string): Promise<void> 
   });
 }
 
+test.afterEach(closePlayers);
+
 test.describe('responsive layout', () => {
   test.beforeAll(async ({ request }) => {
     await prepareBackend(request, { questionDurationSec: 30 });
@@ -76,6 +79,8 @@ test.describe('responsive layout', () => {
         browserName === 'webkit' && !device.apple,
         'Non-Apple devices only in Chromium',
       );
+      // A full duel on every device; WebKit is noticeably slower.
+      test.setTimeout(180_000);
 
       const player = await newPlayer(browser, device.options);
       const opponent = await newPlayer(browser, {

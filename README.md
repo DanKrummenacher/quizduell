@@ -1,7 +1,7 @@
 # playduelio
 
-**Das Quiz-Duell im Browser.** Zwei Personen treten in Echtzeit gegeneinander an –
-wer schneller richtig antwortet, holt mehr Punkte. Ohne App, ohne Konto, auf jedem
+**Quizduell Challenge – das Quiz-Duell im Browser.** Zwei Personen treten in
+Echtzeit gegeneinander an – wer schneller richtig antwortet, holt mehr Punkte. Ohne App, ohne Konto, auf jedem
 Gerät vom iPhone bis zum grossen Monitor.
 
 Ursprünglich als IPA-Projekt entstanden, weiterentwickelt für den Einsatz an der
@@ -11,8 +11,8 @@ Zentralschweizer Bildungsmesse (ZEBI).
 
 **Für Spielerinnen und Spieler**
 
-- **Schnelles Duell:** automatische Gegnersuche
-- **Freund herausfordern:** Spiel-Code, Einladungslink oder QR-Code zum Scannen
+- **Schnellspiel 1vs1:** automatische Gegnersuche
+- **Freund herausfordern:** Spiel erstellen und Code teilen oder mit Code beitreten
 - Echtzeit-Duell mit Timer, Tempo-Bonus, Auflösung und Revanche
 - Läuft weiter nach Verbindungsabbrüchen oder einem Neuladen der Seite
 - Stand-Modus: Geräte am Messestand springen nach Inaktivität zur Startseite zurück
@@ -29,11 +29,14 @@ Zentralschweizer Bildungsmesse (ZEBI).
 
 | Bereich      | Technologie                                                       |
 | ------------ | ----------------------------------------------------------------- |
-| Frontend     | Angular 22 (Standalone, Signals, zoneless), `@css-ch/components`  |
+| Frontend     | Angular 22 (Standalone, Signals, zoneless), Shared Library `@css-ch` |
 | Backend      | NestJS 12, Socket.IO, Drizzle ORM                                 |
 | Datenbank    | PostgreSQL (lokal via Docker, Tests mit In-Memory-PGlite)         |
 | Tests        | Vitest (Unit/Integration), Playwright (End-to-End, 14 Geräte)     |
 | Hosting      | Render (Static Site + Web Service + Postgres)                     |
+
+Das Design stammt aus der IPA-Version und nutzt die aktuellen Komponenten der
+Shared Library (`@css-ch/components`, `@css-ch/calc-ui-text`, Design-Tokens).
 
 Mehr Details: [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md)
 

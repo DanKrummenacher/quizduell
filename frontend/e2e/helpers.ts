@@ -1,6 +1,7 @@
 import {
   type APIRequestContext,
   type Browser,
+  type BrowserContext,
   type BrowserContextOptions,
   expect,
   type Page,
@@ -60,12 +61,22 @@ export async function removeAllQuestions(request: APIRequestContext): Promise<vo
   });
 }
 
+const openContexts = new Set<BrowserContext>();
+
 export async function newPlayer(
   browser: Browser,
   options: BrowserContextOptions = {},
 ): Promise<Page> {
   const context = await browser.newContext(options);
+  openContexts.add(context);
+  context.on('close', () => openContexts.delete(context));
   return context.newPage();
+}
+
+/** Closes every player opened during a test so no sockets linger. */
+export async function closePlayers(): Promise<void> {
+  await Promise.all([...openContexts].map((context) => context.close()));
+  openContexts.clear();
 }
 
 export async function enterName(page: Page, name: string): Promise<void> {
