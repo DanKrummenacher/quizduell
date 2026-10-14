@@ -1,7 +1,20 @@
-/** Geometry helpers for the logo SVGs (viewBox 0 0 100 100). */
+/** Geometry of the playduelio logo mark (viewBox 0 0 100 100). */
 
-export const DARK = '#00327d';
-export const LIGHT = '#0078bb';
+/** Brand gradient: dark blue → blue → light blue. */
+const GRADIENT: [number, number, number][] = [
+  [0x00, 0x32, 0x7d],
+  [0x00, 0x78, 0xbb],
+  [0x00, 0xa4, 0xe0],
+];
+
+export interface Shape {
+  kind: 'circle' | 'polygon';
+  cx: number;
+  cy: number;
+  r: number;
+  points: string;
+  color: string;
+}
 
 export function polygon(
   cx: number,
@@ -16,16 +29,24 @@ export function polygon(
   }).join(' ');
 }
 
-export interface Shape {
-  kind: 'circle' | 'polygon';
-  cx: number;
-  cy: number;
-  r: number;
-  points: string;
-  color: string;
+/** Color at position t (0–1) along the brand gradient. */
+export function gradientColor(t: number): string {
+  const scaled = Math.min(Math.max(t, 0), 1) * (GRADIENT.length - 1);
+  const index = Math.min(Math.floor(scaled), GRADIENT.length - 2);
+  const local = scaled - index;
+  const from = GRADIENT[index]!;
+  const to = GRADIENT[index + 1]!;
+  const channel = (i: number) =>
+    Math.round(from[i]! + (to[i]! - from[i]!) * local)
+      .toString(16)
+      .padStart(2, '0');
+  return `#${channel(0)}${channel(1)}${channel(2)}`;
 }
 
-/** Eight geometric shapes on a ring – the two halves stand for the two players. */
+/**
+ * Eight geometric shapes on a ring. The colour flows clockwise through the
+ * brand gradient, like a spinning quiz wheel.
+ */
 export function shapeRing(): Shape[] {
   const kinds = ['hexagon', 'diamond', 'pentagon', 'circle'] as const;
   return Array.from({ length: 8 }, (_, i) => {
@@ -33,7 +54,7 @@ export function shapeRing(): Shape[] {
     const cx = 50 + 32 * Math.cos(angle);
     const cy = 50 + 32 * Math.sin(angle);
     const kind = kinds[i % 4]!;
-    const color = i < 4 ? LIGHT : DARK;
+    const color = gradientColor(i / 7);
     if (kind === 'circle') {
       return { kind: 'circle', cx, cy, r: 8.5, points: '', color };
     }
@@ -48,30 +69,4 @@ export function shapeRing(): Shape[] {
       color,
     };
   });
-}
-
-/** Six dots around a central hexagon. */
-export function dotWheel(): Shape[] {
-  const dots = Array.from({ length: 6 }, (_, i): Shape => {
-    const angle = ((-90 + 60 * i) * Math.PI) / 180;
-    return {
-      kind: 'circle',
-      cx: 50 + 32 * Math.cos(angle),
-      cy: 50 + 32 * Math.sin(angle),
-      r: 10,
-      points: '',
-      color: i % 2 === 0 ? DARK : LIGHT,
-    };
-  });
-  return [
-    ...dots,
-    {
-      kind: 'polygon',
-      cx: 50,
-      cy: 50,
-      r: 14,
-      points: polygon(50, 50, 16, 6, 0),
-      color: DARK,
-    },
-  ];
 }

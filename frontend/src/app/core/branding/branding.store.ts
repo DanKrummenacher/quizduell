@@ -1,36 +1,27 @@
 import { Injectable, signal } from '@angular/core';
 import { localStore } from '../platform/safe-storage';
 
-export type LogoVariant = 1 | 2 | 3 | 4;
-export type HeaderVariant = 1 | 2 | 3 | 4;
+export type HeaderVariant = 1 | 2 | 3 | 4 | 5 | 6;
 
-export const LOGO_NAMES: Record<LogoVariant, string> = {
-  1: 'Formenkreis',
-  2: 'Duell-Formen',
-  3: 'pd-Monogramm',
-  4: 'Quiz-Rad',
-};
+export const HEADER_VARIANTS: { id: HeaderVariant; name: string; idea: string }[] = [
+  {
+    id: 1,
+    name: 'Schwebende Pille',
+    idea: 'Kompakt, freistehend, wie eine App-Insel',
+  },
+  { id: 2, name: 'Farbband', idea: 'Markenverlauf als Bühne, Logo in Weiss' },
+  { id: 3, name: 'Live-Leiste', idea: 'App-Leiste mit pulsierendem Live-Status' },
+  { id: 4, name: 'Verlaufsrahmen', idea: 'Weisse Karte mit feinem Verlaufsrand' },
+  { id: 5, name: 'Editorial', idea: 'Linksbündig, Akzentlinie, viel Weissraum' },
+  { id: 6, name: 'Signet gross', idea: 'Grosses Logo mit Leuchten, wie ein Splash' },
+];
 
-export const HEADER_NAMES: Record<HeaderVariant, string> = {
-  1: 'Karte mit Wortmarke',
-  2: 'Zentriert gestapelt',
-  3: 'App-Leiste',
-  4: 'Minimal',
-};
-
-const LOGO_KEY = 'playduelio.preview.logo';
 const HEADER_KEY = 'playduelio.preview.header';
 
-/** Currently shown logo and header design (switchable while choosing a design). */
+/** Currently shown header design (switchable while choosing a design). */
 @Injectable({ providedIn: 'root' })
 export class BrandingStore {
-  readonly logo = signal<LogoVariant>(read(LOGO_KEY, 1));
-  readonly header = signal<HeaderVariant>(read(HEADER_KEY, 1));
-
-  setLogo(variant: LogoVariant): void {
-    this.logo.set(variant);
-    localStore.set(LOGO_KEY, String(variant));
-  }
+  readonly header = signal<HeaderVariant>(readVariant());
 
   setHeader(variant: HeaderVariant): void {
     this.header.set(variant);
@@ -38,7 +29,7 @@ export class BrandingStore {
   }
 }
 
-function read<T extends number>(key: string, fallback: T): T {
-  const value = Number(localStore.get(key));
-  return (value >= 1 && value <= 4 ? value : fallback) as T;
+function readVariant(): HeaderVariant {
+  const value = Number(localStore.get(HEADER_KEY));
+  return (value >= 1 && value <= 6 ? value : 1) as HeaderVariant;
 }

@@ -1,14 +1,11 @@
-import { Component, computed, inject, input } from '@angular/core';
-import { BrandingStore, type LogoVariant } from '../../branding/branding.store';
-import {
-  DARK,
-  dotWheel,
-  LIGHT,
-  polygon,
-  shapeRing,
-} from '../../branding/logo-shapes';
+import { Component, input } from '@angular/core';
+import { shapeRing } from '../../branding/logo-shapes';
 
-/** playduelio logo mark. With `tile` it is drawn as a white app-icon tile. */
+/**
+ * playduelio logo mark: eight geometric shapes on a ring in the brand gradient.
+ * With `tile` it is drawn on a white rounded tile like an app icon; with
+ * `inverse` the shapes are white (for dark backgrounds).
+ */
 @Component({
   selector: 'app-logo-mark',
   template: `
@@ -21,50 +18,19 @@ import {
           tile() ? 'translate(50 50) scale(0.74) translate(-50 -50)' : null
         "
       >
-        @switch (variant()) {
-          @case (1) {
-            @for (shape of ring; track $index) {
-              @if (shape.kind === 'circle') {
-                <circle
-                  [attr.cx]="shape.cx"
-                  [attr.cy]="shape.cy"
-                  [attr.r]="shape.r"
-                  [attr.fill]="shape.color"
-                />
-              } @else {
-                <polygon
-                  [attr.points]="shape.points"
-                  [attr.fill]="shape.color"
-                  stroke-linejoin="round"
-                />
-              }
-            }
-          }
-          @case (2) {
-            <circle cx="31" cy="50" r="19" [attr.fill]="dark" />
-            <polygon [attr.points]="diamond" [attr.fill]="light" />
-          }
-          @case (3) {
-            <g fill="none" stroke-width="9" stroke-linecap="round">
-              <circle cx="37" cy="42" r="13" [attr.stroke]="dark" />
-              <line x1="24" y1="42" x2="24" y2="82" [attr.stroke]="dark" />
-              <circle cx="63" cy="58" r="13" [attr.stroke]="light" />
-              <line x1="76" y1="18" x2="76" y2="58" [attr.stroke]="light" />
-            </g>
-          }
-          @default {
-            @for (shape of wheel; track $index) {
-              @if (shape.kind === 'circle') {
-                <circle
-                  [attr.cx]="shape.cx"
-                  [attr.cy]="shape.cy"
-                  [attr.r]="shape.r"
-                  [attr.fill]="shape.color"
-                />
-              } @else {
-                <polygon [attr.points]="shape.points" [attr.fill]="shape.color" />
-              }
-            }
+        @for (shape of ring; track $index) {
+          @if (shape.kind === 'circle') {
+            <circle
+              [attr.cx]="shape.cx"
+              [attr.cy]="shape.cy"
+              [attr.r]="shape.r"
+              [attr.fill]="inverse() ? '#fff' : shape.color"
+            />
+          } @else {
+            <polygon
+              [attr.points]="shape.points"
+              [attr.fill]="inverse() ? '#fff' : shape.color"
+            />
           }
         }
       </g>
@@ -92,17 +58,8 @@ import {
   `,
 })
 export class LogoMarkComponent {
-  private readonly branding = inject(BrandingStore);
-
-  /** Draws the mark on a white rounded tile like an app icon. */
   readonly tile = input(false);
-  /** Overrides the selected variant (used by the design preview). */
-  readonly design = input<LogoVariant | null>(null);
+  readonly inverse = input(false);
 
-  protected readonly variant = computed(() => this.design() ?? this.branding.logo());
-  protected readonly dark = DARK;
-  protected readonly light = LIGHT;
   protected readonly ring = shapeRing();
-  protected readonly wheel = dotWheel();
-  protected readonly diamond = polygon(71, 50, 21, 4);
 }

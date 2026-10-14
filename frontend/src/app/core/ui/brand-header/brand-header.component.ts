@@ -2,7 +2,7 @@ import { Component, computed, inject, input } from '@angular/core';
 import { BrandingStore, type HeaderVariant } from '../../branding/branding.store';
 import { LogoMarkComponent } from '../logo-mark/logo-mark.component';
 
-/** App header with logo, wordmark and subtitle. Content with [headerEnd] goes right. */
+/** App header with logo, wordmark and subtitle. */
 @Component({
   selector: 'app-brand-header',
   imports: [LogoMarkComponent],

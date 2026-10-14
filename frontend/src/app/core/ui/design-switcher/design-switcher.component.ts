@@ -1,12 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import {
-  BrandingStore,
-  HEADER_NAMES,
-  type HeaderVariant,
-  LOGO_NAMES,
-  type LogoVariant,
-} from '../../branding/branding.store';
-import { LogoMarkComponent } from '../logo-mark/logo-mark.component';
+import { BrandingStore, HEADER_VARIANTS } from '../../branding/branding.store';
 
 /**
  * Temporary helper to compare logo and header designs locally.
@@ -14,7 +7,6 @@ import { LogoMarkComponent } from '../logo-mark/logo-mark.component';
  */
 @Component({
   selector: 'app-design-switcher',
-  imports: [LogoMarkComponent],
   template: `
     @if (open()) {
       <div class="panel" role="dialog" aria-label="Design-Vorschau">
@@ -30,22 +22,7 @@ import { LogoMarkComponent } from '../logo-mark/logo-mark.component';
           </button>
         </div>
 
-        <p class="label">Logo</p>
-        <div class="options logos">
-          @for (option of logos; track option.id) {
-            <button
-              type="button"
-              class="option"
-              [class.active]="branding.logo() === option.id"
-              (click)="branding.setLogo(option.id)"
-            >
-              <app-logo-mark class="preview" [tile]="true" [design]="option.id" />
-              <span>{{ option.id }} · {{ option.name }}</span>
-            </button>
-          }
-        </div>
-
-        <p class="label">Header</p>
+        <p class="label">Header-Variante</p>
         <div class="options">
           @for (option of headers; track option.id) {
             <button
@@ -54,7 +31,8 @@ import { LogoMarkComponent } from '../logo-mark/logo-mark.component';
               [class.active]="branding.header() === option.id"
               (click)="branding.setHeader(option.id)"
             >
-              {{ option.id }} · {{ option.name }}
+              <span>{{ option.id }} · {{ option.name }}</span>
+              <small>{{ option.idea }}</small>
             </button>
           }
         </div>
@@ -118,9 +96,6 @@ import { LogoMarkComponent } from '../logo-mark/logo-mark.component';
       display: grid;
       gap: 6px;
     }
-    .logos {
-      grid-template-columns: 1fr 1fr;
-    }
     .option {
       display: flex;
       flex-direction: column;
@@ -136,6 +111,14 @@ import { LogoMarkComponent } from '../logo-mark/logo-mark.component';
 
       &.text {
         align-items: flex-start;
+        gap: 2px;
+        text-align: left;
+      }
+
+      small {
+        font-size: 12px;
+        font-weight: 300;
+        color: #4d70a4;
       }
 
       &.active {
@@ -144,22 +127,11 @@ import { LogoMarkComponent } from '../logo-mark/logo-mark.component';
         font-weight: 700;
       }
     }
-    .preview {
-      width: 48px;
-      height: 48px;
-    }
   `,
 })
 export class DesignSwitcherComponent {
   protected readonly branding = inject(BrandingStore);
   protected readonly open = signal(false);
 
-  protected readonly logos = ([1, 2, 3, 4] as LogoVariant[]).map((id) => ({
-    id,
-    name: LOGO_NAMES[id],
-  }));
-  protected readonly headers = ([1, 2, 3, 4] as HeaderVariant[]).map((id) => ({
-    id,
-    name: HEADER_NAMES[id],
-  }));
+  protected readonly headers = HEADER_VARIANTS;
 }

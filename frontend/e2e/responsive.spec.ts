@@ -57,11 +57,21 @@ const DEVICES: Device[] = [
 
 const slug = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-async function capture(page: Page, device: Device, step: string): Promise<void> {
+/**
+ * Checks for horizontal overflow and saves a screenshot. Long pages (e.g. the
+ * question list) are captured at viewport size: browsers cannot render
+ * screenshots taller than 32,767 px.
+ */
+async function capture(
+  page: Page,
+  device: Device,
+  step: string,
+  fullPage = true,
+): Promise<void> {
   await expectNoHorizontalOverflow(page);
   await page.screenshot({
     path: `e2e-results/screens/${slug(device.name)}/${step}.png`,
-    fullPage: true,
+    fullPage,
     animations: 'disabled',
   });
 }
@@ -145,7 +155,7 @@ test.describe('responsive layout', () => {
 
       await admin.getByRole('link', { name: 'Fragen' }).click();
       await expect(admin.locator('.item').first()).toBeVisible();
-      await capture(admin, device, '12-admin-questions');
+      await capture(admin, device, '12-admin-questions', false);
 
       await admin.locator('css-button', { hasText: 'Neue Frage' }).click();
       await expect(
