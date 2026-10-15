@@ -112,11 +112,6 @@ app-root {
   width: 100%;
 }
 
-/* The split-screen start page concept uses a wider area on large screens. */
-app-start-container:has(app-start-ui.concept-6) {
-  max-width: 64rem;
-}
-
 /*
  * Game screens keep the mobile layout and sit in a centered column on
  * tablets and desktops. Safe areas keep content clear of notches.

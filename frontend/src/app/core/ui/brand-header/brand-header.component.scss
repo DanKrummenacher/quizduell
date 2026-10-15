@@ -5,21 +5,21 @@
 $dark: #00327d;
 $blue: #0078bb;
 $light: #00a4e0;
-$gradient: linear-gradient(110deg, $dark 10%, $blue 62%, $light 100%);
 
 :host {
   display: block;
 }
 
 /*
- * The header sits flush with the top edge (including the notch area) and its
- * background spans the full screen width, while the content stays aligned
- * with the page column below.
+ * Dark blue bar with rounded lower corners and a gradient edge. It sits flush
+ * with the top edge (including the notch area); the background spans the full
+ * screen width while the content stays aligned with the page column below.
  */
 .header {
   position: relative;
   isolation: isolate;
   margin-top: calc(-1 * var(--app-safe-top));
+  margin-bottom: functions.rem(4);
   padding-top: var(--app-safe-top);
 
   &::before {
@@ -31,7 +31,12 @@ $gradient: linear-gradient(110deg, $dark 10%, $blue 62%, $light 100%);
     left: 50%;
     width: 100vw;
     transform: translateX(-50%);
-    background: $gradient;
+    border-bottom: functions.rem(4) solid transparent;
+    border-radius: 0 0 functions.rem(22) functions.rem(22);
+    background:
+      linear-gradient($dark, $dark) padding-box,
+      linear-gradient(90deg, $dark, $blue 45%, $light) border-box;
+    box-shadow: 0 functions.rem(6) functions.rem(18) rgba(0, 50, 125, 0.18);
   }
 }
 
@@ -41,9 +46,13 @@ $gradient: linear-gradient(110deg, $dark 10%, $blue 62%, $light 100%);
   justify-content: center;
   gap: functions.rem(12);
   max-width: var(--brand-inner-width, var(--app-column-width));
-  min-height: functions.rem(60);
+  min-height: functions.rem(62);
   margin: 0 auto;
   padding: 0 var(--brand-inner-padding, #{functions.rem(16)});
+}
+
+.with-label {
+  justify-content: space-between;
 }
 
 .lockup {
@@ -51,6 +60,11 @@ $gradient: linear-gradient(110deg, $dark 10%, $blue 62%, $light 100%);
   align-items: center;
   gap: functions.rem(10);
   min-width: 0;
+
+  .logo {
+    width: functions.rem(30);
+    height: functions.rem(30);
+  }
 }
 
 .wordmark {
@@ -64,15 +78,6 @@ $gradient: linear-gradient(110deg, $dark 10%, $blue 62%, $light 100%);
   .light {
     font-weight: miscs.$css-ui-font-weight-regular;
   }
-}
-
-.lockup .logo {
-  width: functions.rem(34);
-  height: functions.rem(34);
-}
-
-.with-label {
-  justify-content: space-between;
 }
 
 .chip {

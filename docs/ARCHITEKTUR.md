@@ -45,7 +45,7 @@ Punkte: 100 pro richtige Antwort, plus bis zu 100 Tempo-Bonus (linear nach Restz
 | ---------------------- | --------------------------------------------------------------- |
 | `core/game/`           | `GameClient` (Socket-Verbindung, Spielstand als Signal)         |
 | `core/platform/`       | Stand-Modus (Idle-Reset), Wake-Lock, sicherer Storage           |
-| `core/ui/`             | Logo-Symbol, Verbindungsbanner                                  |
+| `core/ui/`             | Header, Logo-Symbol, Verbindungsbanner                          |
 | `features/start`       | Startseite mit Namenseingabe                                    |
 | `features/lobby`       | Spielmodus, Freund herausfordern, Suche, Warten, Gegner gefunden|
 | `features/quiz`        | Frage, Timer, Scoreboard, Auflösung                             |

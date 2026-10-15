@@ -1,114 +1,36 @@
-<ng-template #intro>
-  <h1 class="main-title">Teste dein Wissen im direkten Duell</h1>
-  <calc-text textLarge class="subtitle">
-    Fordere deinen Gegner heraus, sammle Punkte und sichere dir den Sieg.
-  </calc-text>
-</ng-template>
+<app-start-header></app-start-header>
 
-<ng-template #featuresAndForm>
-  <div class="features-row">
-    @for (feature of features(); track feature.text) {
-      <div class="feature-item">
-        <div class="feature-circle">
-          <css-icon [icon]="feature.icon" class="feature-icon" size="xl"></css-icon>
+<main class="main-content">
+  <div class="centered-wrapper">
+    <h1 class="main-title">Teste dein Wissen im direkten Duell</h1>
+
+    <calc-text textLarge class="subtitle">
+      Fordere deinen Gegner heraus, sammle Punkte und sichere dir den Sieg.
+    </calc-text>
+
+    <div class="features-row">
+      @for (feature of features(); track feature.text) {
+        <div class="feature-item">
+          <div class="feature-circle">
+            <css-icon
+              [icon]="feature.icon"
+              class="feature-icon"
+              size="xl"
+            ></css-icon>
+          </div>
+          <calc-text textMedium textLead class="feature-text">{{
+            feature.text
+          }}</calc-text>
         </div>
-        <calc-text textMedium textLead class="feature-text">{{
-          feature.text
-        }}</calc-text>
-      </div>
-    }
-  </div>
-
-  <div class="form-wrapper">
-    <app-start-form
-      [initialName]="initialName()"
-      [notice]="notice()"
-      (nameSubmitted)="onNameSubmitted($event)"
-    ></app-start-form>
-  </div>
-</ng-template>
-
-<ng-template #wordmark>
-  <span class="wordmark"><span class="light">play</span>duelio</span>
-</ng-template>
-
-@switch (variant()) {
-  @case (2) {
-    <main class="main-content">
-      <div class="centered-wrapper">
-        <div class="hero-logo">
-          <app-logo-mark class="hero-mark" [animated]="true" />
-          <ng-container [ngTemplateOutlet]="wordmark" />
-        </div>
-        <ng-container [ngTemplateOutlet]="intro" />
-        <ng-container [ngTemplateOutlet]="featuresAndForm" />
-      </div>
-    </main>
-  }
-  @case (3) {
-    <section class="stage">
-      <span class="stage-brand">
-        <app-logo-mark class="stage-mark" [inverse]="true" />
-        <ng-container [ngTemplateOutlet]="wordmark" />
-      </span>
-      <ng-container [ngTemplateOutlet]="intro" />
-    </section>
-    <main class="main-content below-stage">
-      <div class="centered-wrapper">
-        <ng-container [ngTemplateOutlet]="featuresAndForm" />
-      </div>
-    </main>
-  }
-  @case (4) {
-    <div class="corner-brand">
-      <app-logo-mark class="corner-mark" />
-      <ng-container [ngTemplateOutlet]="wordmark" />
+      }
     </div>
-    <main class="main-content">
-      <div class="centered-wrapper watermark-wrapper">
-        <app-logo-mark class="watermark" [spin]="true" aria-hidden="true" />
-        <ng-container [ngTemplateOutlet]="intro" />
-        <ng-container [ngTemplateOutlet]="featuresAndForm" />
-      </div>
-    </main>
-  }
-  @case (5) {
-    <main class="main-content">
-      <div class="centered-wrapper">
-        <ng-container [ngTemplateOutlet]="intro" />
-        <ng-container [ngTemplateOutlet]="featuresAndForm" />
-      </div>
-    </main>
-    <footer class="foot-brand">
-      <app-logo-mark class="foot-mark" />
-      <ng-container [ngTemplateOutlet]="wordmark" />
-      <span class="foot-dot" aria-hidden="true"></span>
-      <span class="foot-caption">Quizduell Challenge</span>
-    </footer>
-  }
-  @case (6) {
-    <div class="split">
-      <section class="split-panel">
-        <span class="stage-brand">
-          <app-logo-mark class="stage-mark" [inverse]="true" />
-          <ng-container [ngTemplateOutlet]="wordmark" />
-        </span>
-        <ng-container [ngTemplateOutlet]="intro" />
-      </section>
-      <main class="main-content split-main">
-        <div class="centered-wrapper">
-          <ng-container [ngTemplateOutlet]="featuresAndForm" />
-        </div>
-      </main>
+
+    <div class="form-wrapper">
+      <app-start-form
+        [initialName]="initialName()"
+        [notice]="notice()"
+        (nameSubmitted)="onNameSubmitted($event)"
+      ></app-start-form>
     </div>
-  }
-  @default {
-    <app-start-header></app-start-header>
-    <main class="main-content">
-      <div class="centered-wrapper">
-        <ng-container [ngTemplateOutlet]="intro" />
-        <ng-container [ngTemplateOutlet]="featuresAndForm" />
-      </div>
-    </main>
-  }
-}
+  </div>
+</main>
