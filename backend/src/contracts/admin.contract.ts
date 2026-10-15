@@ -47,6 +47,8 @@ export interface SettingsLimit {
 
 export interface AdminSettingsResponse {
   settings: AdminSettings;
+  /** Recommended default values, used by "reset to defaults". */
+  defaults: AdminSettings;
   limits: Record<
     | 'questionsPerGame'
     | 'questionDurationSec'

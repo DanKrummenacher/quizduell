@@ -93,6 +93,30 @@ describe('playduelio backend (e2e)', () => {
       await request(http).get('/api/admin/auth/session').set(auth()).expect(200);
     });
 
+    it('ends a session immediately on logout', async () => {
+      const response = await request(http)
+        .post('/api/admin/auth/login')
+        .send({ password: ADMIN_PASSWORD })
+        .expect(200);
+      const shortLived = (response.body as LoginResponse).token;
+      const headers = { Authorization: `Bearer ${shortLived}` };
+
+      await request(http).get('/api/admin/auth/session').set(headers).expect(200);
+      await request(http).post('/api/admin/auth/logout').set(headers).expect(204);
+      await request(http).get('/api/admin/auth/session').set(headers).expect(401);
+      await request(http).get('/api/admin/auth/session').set(auth()).expect(200);
+    });
+
+    it('rejects tokens signed with a different secret', async () => {
+      const forged =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiJ9.' +
+        'c2lnbmF0dXJlLXdpdGgtd3Jvbmctc2VjcmV0';
+      await request(http)
+        .get('/api/admin/questions')
+        .set({ Authorization: `Bearer ${forged}` })
+        .expect(401);
+    });
+
     it('protects admin routes', async () => {
       await request(http).get('/api/admin/questions').expect(401);
       await request(http)
@@ -200,6 +224,10 @@ describe('playduelio backend (e2e)', () => {
         .expect(200);
       const body = current.body as AdminSettingsResponse;
       expect(body.limits.questionsPerGame).toEqual({ min: 3, max: 20 });
+      expect(body.defaults).toMatchObject({
+        questionsPerGame: 7,
+        questionDurationSec: 20,
+      });
 
       await request(http)
         .put('/api/admin/settings')

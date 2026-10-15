@@ -1,6 +1,8 @@
 <h1 class="title">Einstellungen</h1>
 <calc-text textMedium class="lead">
   Änderungen gelten ab dem nächsten Duell. Laufende Duelle werden nicht beeinflusst.
+  «Standardwerte» setzt alle Felder auf die empfohlenen Werte zurück – danach
+  speichern.
 </calc-text>
 
 @if (loadError()) {
@@ -53,9 +55,18 @@
     }
 
     <div class="actions">
-      <css-button [disabled]="!dirty() || saving()" (click)="reset()"
-        >Zurücksetzen</css-button
+      <css-button
+        variant="plain"
+        class="defaults"
+        [disabled]="isDefault() || saving()"
+        (click)="applyDefaults()"
       >
+        <css-icon icon="reload" slot="prefix"></css-icon>
+        Standardwerte
+      </css-button>
+      <css-button [disabled]="!dirty() || saving()" (click)="reset()">
+        Änderungen verwerfen
+      </css-button>
       <css-button
         variant="primary"
         [disabled]="!dirty() || !valid()"

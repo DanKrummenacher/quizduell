@@ -11,6 +11,12 @@
   >
   </app-quiz-scoreboard>
 
+  @if (opponentOffline()) {
+    <calc-text textSmall class="opponent-offline" role="status">
+      Verbindung zu {{ opponentName() }} unterbrochen – wir warten kurz …
+    </calc-text>
+  }
+
   <app-quiz-timer
     [timeLeft]="timeLeft()"
     [timerPercent]="timerPercent()"
@@ -36,8 +42,8 @@
   <css-flyout
     withoutCloseButton
     size="small"
-    title="Schade! Spiel abgebrochen"
-    main="Dein Gegner hat das Spiel vorzeitig verlassen. Das Duell kann deshalb leider nicht fortgesetzt werden."
+    [title]="abortTitle()"
+    [main]="abortText()"
   >
     <css-button
       variant="primary"

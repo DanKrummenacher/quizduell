@@ -30,6 +30,11 @@ export class QuizUiComponent {
   readonly feedbackText = input.required<string | null>();
   readonly feedbackType = input.required<'default' | 'success' | 'error' | null>();
   readonly opponentLeft = input<boolean>(false);
+  readonly opponentOffline = input<boolean>(false);
+  readonly abortTitle = input('Schade! Spiel abgebrochen');
+  readonly abortText = input(
+    'Dein Gegner hat das Spiel vorzeitig verlassen. Das Duell kann deshalb leider nicht fortgesetzt werden.',
+  );
 
   readonly answerSelected = output<string>();
   readonly acknowledgeOpponentLeft = output<void>();

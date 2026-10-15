@@ -88,11 +88,71 @@ test.describe('playing duels', () => {
 
     // Ben closes the app; after the grace period Anna is informed.
     await ben.context().close();
-    await expect(anna.getByText('Schade! Spiel abgebrochen')).toBeVisible({
+    await expect(anna.getByText('Verbindung zu Ben unterbrochen')).toBeVisible({
+      timeout: 25_000,
+    });
+    await expect(anna.getByText('Schade! Verbindung verloren')).toBeVisible({
       timeout: 40_000,
     });
     await anna.locator('css-button', { hasText: 'Zum Spielmodus' }).click();
     await expect(anna.getByText('Spielmodus')).toBeVisible();
+  });
+
+  for (const [label, target] of [
+    ['the start page', '/'],
+    ['the admin area', '/admin/login'],
+  ] as const) {
+    test(`typing the address of ${label} during a duel ends it for both`, async ({
+      browser,
+    }) => {
+      const anna = await newPlayer(browser, phone);
+      const ben = await newPlayer(browser, phone);
+      await enterName(anna, 'Anna');
+      const code = await createFriendGame(anna);
+      await joinByCode(ben, code, 'Ben');
+      await waitForQuestion(anna, 1);
+      await waitForQuestion(ben, 1);
+
+      await ben.goto(target);
+
+      // Immediately, not only after the reconnect grace period.
+      await expect(anna.getByText('Schade! Spiel abgebrochen')).toBeVisible({
+        timeout: 8_000,
+      });
+    });
+  }
+
+  test('browser back from a running duel ends it for both', async ({ browser }) => {
+    const anna = await newPlayer(browser, phone);
+    const ben = await newPlayer(browser, phone);
+    await enterName(anna, 'Anna');
+    const code = await createFriendGame(anna);
+    await joinByCode(ben, code, 'Ben');
+    await waitForQuestion(ben, 1);
+
+    // Back from the quiz leads to the lobby, which sends a running game back
+    // to the quiz; going back once more reaches the start page.
+    await ben.goto('/');
+    await expect(ben).toHaveURL(/\/$/);
+    await expect(anna.getByText('Schade! Spiel abgebrochen')).toBeVisible({
+      timeout: 8_000,
+    });
+    await expect(ben.getByText('Teste dein Wissen im direkten Duell')).toBeVisible();
+  });
+
+  test('leaving the waiting screen closes the created game', async ({ browser }) => {
+    const anna = await newPlayer(browser, phone);
+    const ben = await newPlayer(browser, phone);
+    await enterName(anna, 'Anna');
+    const code = await createFriendGame(anna);
+
+    await anna.goBack();
+    await expect(anna).toHaveURL(/\/$/);
+
+    await joinByCode(ben, code, 'Ben');
+    await expect(
+      ben.getByText('Zu diesem Code gibt es kein offenes Spiel.'),
+    ).toBeVisible();
   });
 
   test('cancelling the search returns to the game modes', async ({ browser }) => {

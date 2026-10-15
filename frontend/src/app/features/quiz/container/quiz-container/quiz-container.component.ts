@@ -40,6 +40,30 @@ export class QuizContainerComponent implements OnDestroy {
   readonly opponentName = computed(() => this.game()?.opponent?.name ?? 'Gegner');
   readonly opponentScore = computed(() => this.game()?.opponent?.score ?? 0);
   readonly opponentLeft = computed(() => this.game()?.phase === 'aborted');
+  /** The opponent lost the connection and has a short grace period to return. */
+  readonly opponentOffline = computed(() => {
+    const game = this.game();
+    return !!game?.opponent && !game.opponent.connected && game.phase !== 'aborted';
+  });
+  readonly abortMessage = computed(() => {
+    switch (this.game()?.endReason) {
+      case 'opponent-disconnected':
+        return {
+          title: 'Schade! Verbindung verloren',
+          text: 'Die Verbindung zu deinem Gegner ist abgebrochen. Das Duell kann deshalb leider nicht fortgesetzt werden.',
+        };
+      case 'expired':
+        return {
+          title: 'Spiel beendet',
+          text: 'Deine Verbindung war zu lange unterbrochen. Das Duell wurde deshalb beendet.',
+        };
+      default:
+        return {
+          title: 'Schade! Spiel abgebrochen',
+          text: 'Dein Gegner hat das Spiel vorzeitig verlassen. Das Duell kann deshalb leider nicht fortgesetzt werden.',
+        };
+    }
+  });
   readonly questionText = computed(
     () => this.game()?.question?.text ?? 'Warte auf Frage...',
   );

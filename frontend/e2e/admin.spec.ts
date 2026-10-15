@@ -98,6 +98,26 @@ test.describe('admin area', () => {
     await expect(page.getByText('15s / Frage')).toBeVisible();
   });
 
+  test('resets settings to the defaults', async ({ page }) => {
+    await login(page);
+    await page.getByRole('link', { name: 'Einstellungen' }).click();
+    const stepper = page.locator('css-input-stepper', {
+      hasText: 'Fragen pro Duell',
+    });
+    // The test backend runs with 3 questions per duel; the default is 7.
+    await expect(stepper.locator('input')).toHaveValue('3');
+
+    await page.locator('css-button', { hasText: 'Standardwerte' }).click();
+    await expect(stepper.locator('input')).toHaveValue('7');
+    await page.locator('css-button', { hasText: 'Speichern' }).click();
+    await expect(
+      page.getByText('Gespeichert. Gilt ab dem nächsten Duell.'),
+    ).toBeVisible();
+
+    await page.goto('/');
+    await expect(page.getByText('7 Fragen')).toBeVisible();
+  });
+
   test('logs out', async ({ page }) => {
     await login(page);
     await page.locator('css-button', { hasText: 'Abmelden' }).click();

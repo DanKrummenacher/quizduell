@@ -150,6 +150,19 @@ export class AdminSettingsPage {
     );
   }
 
+  protected readonly isDefault = computed(
+    () => JSON.stringify(this.form()) === JSON.stringify(this.response()?.defaults),
+  );
+
+  /** Fills in the recommended defaults; they apply once saved. */
+  protected applyDefaults(): void {
+    const defaults = this.response()?.defaults;
+    if (defaults) {
+      this.form.set({ ...defaults });
+      this.message.set(null);
+    }
+  }
+
   protected reset(): void {
     const settings = this.response()?.settings;
     if (settings) {

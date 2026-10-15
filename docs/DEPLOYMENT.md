@@ -66,6 +66,16 @@ Die Backend-Adresse steht in `frontend/src/environments/environment.ts`. Bekommt
 Backend auf Render eine andere URL als `https://playduelio-api.onrender.com`
 (z. B. mit Zufallssuffix), dort anpassen und pushen.
 
+Unter **Settings → Headers** für den Pfad `/*` diese Security-Header ergänzen
+(das Backend setzt sie über Helmet bereits selbst):
+
+| Header                   | Wert                                       |
+| ------------------------ | ------------------------------------------ |
+| `X-Frame-Options`        | `DENY`                                     |
+| `X-Content-Type-Options` | `nosniff`                                  |
+| `Referrer-Policy`        | `strict-origin-when-cross-origin`          |
+| `Permissions-Policy`     | `camera=(), microphone=(), geolocation=()` |
+
 ## 4. Automatische Deploys absichern
 
 - In beiden Diensten unter *Settings → Build & Deploy*: **Auto-Deploy: After CI Checks Pass**.

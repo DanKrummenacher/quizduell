@@ -40,6 +40,24 @@ export class AdminAuthService {
     this.session.set(session);
   }
 
+  /** Ends the session on the server (token becomes invalid) and locally. */
+  async signOut(): Promise<void> {
+    const token = this.token();
+    this.logout();
+    if (token) {
+      try {
+        await firstValueFrom(
+          this.http.post<void>(`${environment.apiUrl}/api/admin/auth/logout`, null, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        );
+      } catch {
+        // The session expires on its own; nothing else to do.
+      }
+    }
+  }
+
+  /** Forgets the session locally (e.g. after it expired). */
   logout(): void {
     sessionStore.remove(STORAGE_KEY);
     this.session.set(null);

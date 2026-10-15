@@ -78,6 +78,11 @@
   css-button {
     width: auto;
   }
+
+  // The defaults button sits on the left, apart from save/discard.
+  .defaults {
+    margin-right: auto;
+  }
 }
 
 .loading {

@@ -17,7 +17,10 @@ Browser (Angular)  ──HTTP /api──▶  NestJS-Backend  ──▶  PostgreS
   Verpasste Nachrichten spielen deshalb keine Rolle.
 - **Wiederaufnahme:** Jeder Spieler erhält einen geheimen `sessionToken`. Nach einem
   Verbindungsabbruch oder Neuladen meldet sich der Client damit zurück. Der Server wartet
-  20 Sekunden, bevor ein getrennter Spieler das Duell verliert.
+  20 Sekunden, bevor ein getrennter Spieler das Duell verliert; der Gegner sieht in dieser
+  Zeit einen Hinweis. Wer die Spielseiten (`/lobby`, `/quiz`, `/result`) verlässt – per
+  Link, Zurück-Taste oder eingetippter Adresse –, verlässt das Duell sofort, damit
+  niemand allein weiterspielt.
 - **Gemeinsamer Vertrag:** `contracts/game.contract.ts` (Socket-Events, Spielstand) und
   `contracts/admin.contract.ts` (Admin-API) existieren identisch in Backend und Frontend.
 
@@ -64,5 +67,6 @@ Mobile-first und wurde automatisiert auf 14 Geräten getestet (`frontend/e2e/res
 - Eingaben werden im Backend validiert (DTOs bzw. eigene Parser für Socket-Events)
 - Rate-Limits: HTTP global, Admin-Login 5 Versuche/Minute, Socket-Events 30/10 s
 - Helmet-Security-Header, CORS nur für die konfigurierte Frontend-Domain
-- Admin-Passwort und JWT-Secret nur als Umgebungsvariablen, nie im Code
+- Admin-Passwort und JWT-Secret nur als Umgebungsvariablen, nie im Code; Passwortvergleich
+  zeitkonstant, JWT nur HS256, 12 h gültig und beim Abmelden serverseitig widerrufen
 - Keine Personendaten in der Datenbank

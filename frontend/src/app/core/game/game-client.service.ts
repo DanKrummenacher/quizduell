@@ -1,4 +1,6 @@
-import { computed, Injectable, type OnDestroy, signal } from '@angular/core';
+import { computed, inject, Injectable, type OnDestroy, signal } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
 import { io, type Socket } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
 import {
@@ -20,6 +22,13 @@ const TOKEN_KEY = 'playduelio.sessionToken';
 const CONNECT_TIMEOUT_MS = 20_000;
 const ACK_TIMEOUT_MS = 10_000;
 const FINAL_PHASES = new Set(['finished', 'aborted']);
+/** Routes on which a running game or search may continue. */
+const GAME_ROUTES = ['/lobby', '/quiz', '/result'];
+
+function isGameRoute(url: string): boolean {
+  const path = url.split(/[?#]/)[0] ?? '';
+  return GAME_ROUTES.some((route) => path === route || path.startsWith(`${route}/`));
+}
 
 /**
  * Single connection to the game server. Holds the latest game snapshot as a
@@ -46,11 +55,32 @@ export class GameClient implements OnDestroy {
   readonly inGame = computed(() => this.stateSignal() !== null);
 
   constructor() {
-    if (sessionStore.get(TOKEN_KEY)) {
-      // A game was running in this tab before a reload: try to get back into it.
-      this.resumingSignal.set(true);
-      this.ensureSocket().connect();
+    const token = sessionStore.get(TOKEN_KEY);
+    if (token) {
+      if (isGameRoute(window.location.pathname)) {
+        // Reload on a game screen: get back into the running game.
+        this.resumingSignal.set(true);
+        this.ensureSocket().connect();
+      } else {
+        // The page was opened elsewhere (start page, admin, …): the player
+        // left the game, so end it properly and inform the opponent at once.
+        sessionStore.remove(TOKEN_KEY);
+        void this.abandon(token);
+      }
     }
+
+    // Leaving the game screens in the app (browser back, typed URL, links)
+    // ends a running game or search instead of leaving the opponent alone.
+    inject(Router)
+      .events.pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        if (
+          !isGameRoute(event.urlAfterRedirects) &&
+          (this.inGame() || this.searching())
+        ) {
+          this.leave();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -232,6 +262,25 @@ export class GameClient implements OnDestroy {
     } finally {
       this.resumingSignal.set(false);
     }
+  }
+
+  /** Resumes a game only to leave it, so the opponent is informed immediately. */
+  private async abandon(token: string): Promise<void> {
+    const connected = await this.connect();
+    if (!connected || !this.socket) {
+      return;
+    }
+    try {
+      const ack = (await this.socket
+        .timeout(ACK_TIMEOUT_MS)
+        .emitWithAck(ClientEvents.RESUME, { sessionToken: token })) as Ack;
+      if (ack.ok) {
+        this.socket.emit(ClientEvents.LEAVE_GAME);
+      }
+    } catch {
+      // The server ends the game on its own after the grace period.
+    }
+    this.forgetGame();
   }
 
   /** The server forgets queued players on disconnect; join the queue again. */

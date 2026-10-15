@@ -15,7 +15,8 @@ import { SettingsModule } from './settings/settings.module.js';
   imports: [
     ConfigModule,
     DatabaseModule,
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 300 }]),
+    // Generous per-IP limit: at the fair many devices share one public IP.
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 2_000 }]),
     QuestionsModule,
     SettingsModule,
     GameModule,

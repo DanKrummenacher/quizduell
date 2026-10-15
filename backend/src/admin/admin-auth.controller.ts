@@ -1,4 +1,12 @@
-import { Body, Controller, Get, HttpCode, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  HttpCode,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { IsString, Length } from 'class-validator';
 import { AdminGuard } from '../auth/admin.guard.js';
@@ -27,6 +35,13 @@ export class AdminAuthController {
   @HttpCode(200)
   login(@Body() body: LoginDto): Promise<LoginResponse> {
     return this.authService.login(body.password);
+  }
+
+  @UseGuards(AdminGuard)
+  @Post('logout')
+  @HttpCode(204)
+  async logout(@Headers('authorization') authorization: string): Promise<void> {
+    await this.authService.logout(authorization.replace(/^Bearer /, ''));
   }
 
   @UseGuards(AdminGuard)

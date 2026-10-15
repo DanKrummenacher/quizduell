@@ -22,8 +22,8 @@ export class AdminShellComponent {
     { path: 'einstellungen', label: 'Einstellungen', icon: 'settings' },
   ];
 
-  protected logout(): void {
-    this.auth.logout();
-    void this.router.navigate(['/admin/login']);
+  protected async logout(): Promise<void> {
+    await this.auth.signOut();
+    await this.router.navigate(['/admin/login']);
   }
 }

@@ -13,6 +13,9 @@
   [feedbackText]="feedbackText()"
   [feedbackType]="feedbackType()"
   [opponentLeft]="opponentLeft()"
+  [opponentOffline]="opponentOffline()"
+  [abortTitle]="abortMessage().title"
+  [abortText]="abortMessage().text"
   (answerSelected)="handleAnswer($event)"
   (acknowledgeOpponentLeft)="handleOpponentLeftAcknowledge()"
 >
