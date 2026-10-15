@@ -16,11 +16,18 @@ Browser (Angular)  ──HTTP /api──▶  NestJS-Backend  ──▶  PostgreS
   persönlichen Spielstand (`GameStateView`). Das Frontend stellt diesen nur dar.
   Verpasste Nachrichten spielen deshalb keine Rolle.
 - **Wiederaufnahme:** Jeder Spieler erhält einen geheimen `sessionToken`. Nach einem
-  Verbindungsabbruch oder Neuladen meldet sich der Client damit zurück. Der Server wartet
-  20 Sekunden, bevor ein getrennter Spieler das Duell verliert; der Gegner sieht in dieser
-  Zeit einen Hinweis. Wer die Spielseiten (`/lobby`, `/quiz`, `/result`) verlässt – per
-  Link, Zurück-Taste oder eingetippter Adresse –, verlässt das Duell sofort, damit
-  niemand allein weiterspielt.
+  Verbindungsabbruch oder Neuladen meldet sich der Client damit zurück. Bei Netzproblemen
+  wartet der Server 20 Sekunden, bevor ein getrennter Spieler das Duell verliert; schliesst
+  die Seite die Verbindung selbst (Tab zu, andere Website, Neuladen), nur 5 Sekunden. Der
+  Gegner sieht in dieser Zeit einen Hinweis.
+- **Spiel verlassen:** Wer die Spielseiten (`/lobby`, `/quiz`, `/result`) verlässt – per
+  Link, Zurück-Taste oder eingetippter Adresse –, verlässt das Duell sofort, damit niemand
+  allein weiterspielt. Lobby, Quiz und Resultat ersetzen sich im Browserverlauf, ein Duell
+  ist also ein einziger Eintrag. Vom Browser im Hintergrund vorgeladene Seiten (Prerendering
+  beim Tippen in der Adresszeile) werden erst beim tatsächlichen Öffnen aktiv.
+- **Revanche:** In beiden Modi können beide Spieler nach dem Duell innerhalb der
+  eingestellten Zeit eine Revanche gegen denselben Gegner starten. Danach bietet der
+  Ergebnis-Screen «Neuen Gegner suchen» bzw. «Neues Spiel erstellen» an.
 - **Gemeinsamer Vertrag:** `contracts/game.contract.ts` (Socket-Events, Spielstand) und
   `contracts/admin.contract.ts` (Admin-API) existieren identisch in Backend und Frontend.
 
@@ -52,7 +59,7 @@ Punkte: 100 pro richtige Antwort, plus bis zu 100 Tempo-Bonus (linear nach Restz
 | `features/start`       | Startseite mit Namenseingabe                                    |
 | `features/lobby`       | Spielmodus, Freund herausfordern, Suche, Warten, Gegner gefunden|
 | `features/quiz`        | Frage, Timer, Scoreboard, Auflösung                             |
-| `features/result`      | Endstand, Revanche, «Erneut Spielen»                            |
+| `features/result`      | Endstand, Revanche, neues Spiel                                 |
 | `admin/`               | Admin-Bereich (lazy geladen)                                    |
 
 Jedes Feature folgt dem Smart/Dumb-Pattern: ein Container verbindet den `GameClient`

@@ -1,6 +1,14 @@
-import { Component, computed, effect, inject, type OnDestroy } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  type OnDestroy,
+  signal,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { errorMessage } from '../../../../core/game/error-messages';
+import { GAME_SCREEN } from '../../../../core/game/game-screen';
 import { GameClient } from '../../../../core/game/game-client.service';
 import { IdleResetService } from '../../../../core/platform/idle-reset.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
@@ -21,79 +29,134 @@ export class ResultContainerComponent implements OnDestroy {
   private readonly game = this.gameClient.state;
 
   readonly isFastGame = computed(() => this.game()?.mode === 'quick');
-  readonly isRematchRequested = computed(
-    () => this.game()?.you.rematchRequested ?? false,
+  private readonly opponentName = computed(
+    () => this.game()?.opponent?.name ?? 'Dein Gegner',
   );
-  readonly opponentRequestedRematch = computed(
-    () => this.game()?.opponent?.rematchRequested ?? false,
-  );
-  readonly isOpponentLeft = computed(() => {
-    const reason = this.game()?.endReason;
-    return reason === 'opponent-left' || reason === 'opponent-disconnected';
-  });
-  /** The rematch window has closed without both players agreeing. */
-  readonly isSessionExpired = computed(() => {
+
+  /** Ticks every second so the rematch countdown stays current. */
+  private readonly now = signal(Date.now());
+  private readonly timer = setInterval(() => this.now.set(Date.now()), 1_000);
+  /** The "no rematch" notice was confirmed and stays closed. */
+  private readonly noticeClosed = signal(false);
+
+  /**
+   * Where the rematch stands, from this player's point of view:
+   * - `open`: nobody asked yet
+   * - `sent` / `received`: one player asked, the other can accept
+   * - `paused`: the opponent's connection is interrupted, we wait for them
+   * - `left`: the opponent left the result screen
+   * - `declined`: the time ran out after a request
+   * - `closed`: the time ran out without any request
+   */
+  readonly rematch = computed<
+    'open' | 'sent' | 'received' | 'paused' | 'left' | 'declined' | 'closed'
+  >(() => {
     const game = this.game();
-    return !!game && !this.isOpponentLeft() && !game.rematchAvailable;
+    if (!game) {
+      return 'closed';
+    }
+    if (
+      game.endReason === 'opponent-left' ||
+      game.endReason === 'opponent-disconnected'
+    ) {
+      return 'left';
+    }
+    if (game.endReason === 'rematch-declined') {
+      return 'declined';
+    }
+    if (!game.rematchAvailable) {
+      const waiting =
+        game.phaseEndsAt !== null && game.opponent?.connected === false;
+      return waiting ? 'paused' : 'closed';
+    }
+    if (game.you.rematchRequested) {
+      return 'sent';
+    }
+    return game.opponent?.rematchRequested ? 'received' : 'open';
   });
 
-  readonly isPlayAgainDisabled = computed(() => {
-    if (this.isFastGame()) {
-      return false;
+  /** Seconds left to agree on a rematch, `null` once the window is closed. */
+  private readonly secondsLeft = computed(() => {
+    this.now();
+    const endsAt = this.game()?.phaseEndsAt;
+    if (!endsAt) {
+      return null;
     }
-    return (
-      this.isRematchRequested() || this.isOpponentLeft() || this.isSessionExpired()
-    );
+    return Math.max(0, Math.ceil((endsAt - this.gameClient.serverNow()) / 1_000));
   });
+
+  private readonly rematchOver = computed(() =>
+    ['left', 'declined', 'closed'].includes(this.rematch()),
+  );
+
+  readonly isPlayAgainDisabled = computed(() =>
+    ['sent', 'paused'].includes(this.rematch()),
+  );
 
   readonly playAgainText = computed(() => {
-    if (this.isFastGame() || this.isSessionExpired() || this.isOpponentLeft()) {
-      return 'Erneut Spielen';
+    if (this.rematchOver()) {
+      return this.isFastGame() ? 'Neuen Gegner suchen' : 'Neues Spiel erstellen';
     }
-    if (this.isRematchRequested()) {
-      return 'Anfrage gesendet';
+    switch (this.rematch()) {
+      case 'sent':
+        return 'Anfrage gesendet';
+      case 'received':
+        return 'Revanche annehmen!';
+      default:
+        return 'Revanche fordern';
     }
-    if (this.opponentRequestedRematch()) {
-      return 'Revanche annehmen!';
-    }
-    return 'Erneut Spielen';
   });
 
   readonly playAgainIcon = computed(() => {
-    if (this.isFastGame() || this.isSessionExpired() || this.isOpponentLeft()) {
-      return 'undo';
+    if (this.rematchOver()) {
+      return this.isFastGame() ? 'search' : 'add';
     }
-    if (this.isRematchRequested()) {
-      return 'paper-plane';
+    switch (this.rematch()) {
+      case 'sent':
+        return 'paper-plane';
+      case 'received':
+        return 'checkmark-circle';
+      default:
+        return 'undo';
     }
-    return this.opponentRequestedRematch() ? 'checkmark-circle' : 'undo';
   });
 
   readonly playAgainStatusText = computed(() => {
-    if (this.isFastGame()) {
-      return null;
+    const name = this.opponentName();
+    const seconds = this.secondsLeft();
+    const time = seconds !== null ? ` (noch ${seconds} s)` : '';
+    switch (this.rematch()) {
+      case 'sent':
+        return `Warte auf ${name} …${time}`;
+      case 'received':
+        return `${name} möchte eine Revanche!${time}`;
+      case 'paused':
+        return `Verbindung zu ${name} unterbrochen – wir warten kurz …`;
+      case 'left':
+        return `${name} hat das Spiel verlassen.`;
+      case 'declined':
+        return this.game()?.you.rematchRequested
+          ? `${name} hat nicht rechtzeitig reagiert.`
+          : 'Die Zeit für die Revanche ist abgelaufen.';
+      case 'closed':
+        return 'Die Zeit für eine Revanche ist abgelaufen.';
+      default:
+        return null;
     }
-    if (this.isOpponentLeft()) {
-      return 'Dein Gegner hat das Spiel verlassen!';
-    }
-    if (this.isSessionExpired()) {
-      return 'Die Spielsitzung wurde beendet.';
-    }
-    if (this.isRematchRequested()) {
-      return 'Warte auf den Gegner...';
-    }
-    if (this.opponentRequestedRematch()) {
-      return 'Dein Gegner möchte eine Revanche.';
-    }
-    return null;
   });
 
-  readonly showOpponentLeftFlyout = computed(
-    () => !this.isFastGame() && this.isOpponentLeft() && this.isRematchRequested(),
+  /** Tells a player who asked for a rematch that it will not happen. */
+  readonly showNoRematchFlyout = computed(
+    () =>
+      !this.noticeClosed() &&
+      ['left', 'declined'].includes(this.rematch()) &&
+      (this.game()?.you.rematchRequested ?? false),
   );
 
-  readonly showSessionExpiredFlyout = computed(
-    () => !this.isFastGame() && this.isSessionExpired() && this.isRematchRequested(),
+  readonly noRematchText = computed(() =>
+    this.rematch() === 'left'
+      ? `${this.opponentName()} hat das Spiel verlassen.`
+      : `${this.opponentName()} hat nicht rechtzeitig reagiert.`,
   );
 
   readonly rawPlayers = computed(() => {
@@ -166,33 +229,42 @@ export class ResultContainerComponent implements OnDestroy {
       const game = this.game();
       if (!game) {
         if (!this.gameClient.resuming()) {
-          void this.router.navigate([this.playerNameStore.name() ? '/lobby' : '/']);
+          void this.router.navigate(
+            [this.playerNameStore.name() ? '/lobby' : '/'],
+            GAME_SCREEN,
+          );
         }
         return;
       }
       if (game.phase === 'countdown') {
         // Rematch accepted: the lobby shows "Gegner gefunden" with the countdown.
-        void this.router.navigate(['/lobby']);
+        void this.router.navigate(['/lobby'], GAME_SCREEN);
       } else if (game.phase === 'question' || game.phase === 'reveal') {
-        void this.router.navigate(['/quiz']);
+        void this.router.navigate(['/quiz'], GAME_SCREEN);
       }
     });
     this.idleReset.arm();
   }
 
   ngOnDestroy(): void {
+    clearInterval(this.timer);
     this.idleReset.disarm();
   }
 
   handleHome(): void {
     this.gameClient.leave();
-    void this.router.navigate(['/lobby']);
+    void this.router.navigate(['/lobby'], GAME_SCREEN);
   }
 
   async handlePlayAgain(): Promise<void> {
-    if (this.isFastGame()) {
+    if (this.rematchOver()) {
+      // No rematch anymore: start a fresh game of the same kind.
+      const restart = this.isFastGame() ? 'fastGameRestart' : 'friendGameRestart';
       this.gameClient.leave();
-      void this.router.navigate(['/lobby'], { state: { fastGameRestart: true } });
+      void this.router.navigate(['/lobby'], {
+        ...GAME_SCREEN,
+        state: { [restart]: true },
+      });
       return;
     }
     const result = await this.gameClient.requestRematch();
@@ -201,7 +273,7 @@ export class ResultContainerComponent implements OnDestroy {
     }
   }
 
-  handleOpponentLeftAcknowledge(): void {
-    this.handleHome();
+  handleNoRematchAcknowledge(): void {
+    this.noticeClosed.set(true);
   }
 }

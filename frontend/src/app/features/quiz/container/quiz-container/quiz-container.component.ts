@@ -9,6 +9,7 @@ import {
   untracked,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { GAME_SCREEN } from '../../../../core/game/game-screen';
 import { GameClient } from '../../../../core/game/game-client.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
 import { WakeLockService } from '../../../../core/platform/wake-lock.service';
@@ -152,14 +153,17 @@ export class QuizContainerComponent implements OnDestroy {
       const game = this.game();
       if (!game) {
         if (!this.gameClient.resuming()) {
-          void this.router.navigate([this.playerNameStore.name() ? '/lobby' : '/']);
+          void this.router.navigate(
+            [this.playerNameStore.name() ? '/lobby' : '/'],
+            GAME_SCREEN,
+          );
         }
         return;
       }
       if (game.phase === 'finished') {
-        void this.router.navigate(['/result']);
+        void this.router.navigate(['/result'], GAME_SCREEN);
       } else if (game.phase === 'waiting' || game.phase === 'countdown') {
-        void this.router.navigate(['/lobby']);
+        void this.router.navigate(['/lobby'], GAME_SCREEN);
       }
     });
 
@@ -192,6 +196,6 @@ export class QuizContainerComponent implements OnDestroy {
 
   handleOpponentLeftAcknowledge(): void {
     this.gameClient.leave();
-    void this.router.navigate(['/lobby']);
+    void this.router.navigate(['/lobby'], GAME_SCREEN);
   }
 }

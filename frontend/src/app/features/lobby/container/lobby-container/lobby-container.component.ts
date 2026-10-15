@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { errorMessage } from '../../../../core/game/error-messages';
+import { GAME_SCREEN } from '../../../../core/game/game-screen';
 import { GameClient } from '../../../../core/game/game-client.service';
 import { IdleResetService } from '../../../../core/platform/idle-reset.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
@@ -52,18 +53,31 @@ export class LobbyContainerComponent implements OnDestroy {
   readonly opponentLeft = computed(() => this.game()?.phase === 'aborted');
 
   constructor() {
-    const autoStart = (history.state as { fastGameRestart?: boolean } | null)
-      ?.fastGameRestart;
-    if (autoStart) {
+    // "Neuen Gegner suchen" / "Neues Spiel erstellen" on the result screen.
+    const restart = history.state as {
+      fastGameRestart?: boolean;
+      friendGameRestart?: boolean;
+    } | null;
+    if (restart?.fastGameRestart || restart?.friendGameRestart) {
+      // Only once: a reload of the lobby must not start another game.
+      history.replaceState(
+        { ...restart, fastGameRestart: false, friendGameRestart: false },
+        '',
+      );
+    }
+    if (restart?.fastGameRestart) {
       void this.handleSelectFastGame();
+    } else if (restart?.friendGameRestart) {
+      this.menuState.set('CHOOSE_ACTION');
+      void this.handleCreate();
     }
 
     effect(() => {
       const phase = this.game()?.phase;
       if (phase === 'question' || phase === 'reveal') {
-        void this.router.navigate(['/quiz']);
+        void this.router.navigate(['/quiz'], GAME_SCREEN);
       } else if (phase === 'finished') {
-        void this.router.navigate(['/result']);
+        void this.router.navigate(['/result'], GAME_SCREEN);
       }
     });
 

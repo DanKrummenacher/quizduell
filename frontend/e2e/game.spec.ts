@@ -1,4 +1,4 @@
-import { devices, expect, test } from '@playwright/test';
+import { type Browser, devices, expect, type Page, test } from '@playwright/test';
 import {
   answer,
   createFriendGame,
@@ -13,6 +13,32 @@ import {
 } from './helpers';
 
 const phone = { ...devices['iPhone 15'], defaultBrowserType: undefined };
+
+/** Anna and Ben in a running friend duel, both at the first question. */
+async function startDuel(browser: Browser): Promise<[Page, Page]> {
+  const anna = await newPlayer(browser, phone);
+  const ben = await newPlayer(browser, phone);
+  await enterName(anna, 'Anna');
+  const code = await createFriendGame(anna);
+  await joinByCode(ben, code, 'Ben');
+  await waitForQuestion(anna, 1);
+  await waitForQuestion(ben, 1);
+  return [anna, ben];
+}
+
+/** Answers all three questions so both players reach the result screen. */
+async function playToResult(anna: Page, ben: Page): Promise<void> {
+  for (let number = 1; number <= 3; number++) {
+    await waitForQuestion(anna, number);
+    await waitForQuestion(ben, number);
+    await answer(anna, 0);
+    await answer(ben, 1);
+  }
+  await expect(anna.locator('.result-title')).toBeVisible({ timeout: 20_000 });
+  await expect(ben.locator('.result-title')).toBeVisible({ timeout: 20_000 });
+}
+
+const aborted = 'Schade! Spiel abgebrochen';
 const tablet = { ...devices['iPad (gen 11)'], defaultBrowserType: undefined };
 
 test.afterEach(closePlayers);
@@ -60,9 +86,9 @@ test.describe('playing duels', () => {
     await expect(anna.locator('.player-result-card')).toHaveCount(2);
     await expectNoHorizontalOverflow(anna);
 
-    await anna.locator('css-button', { hasText: 'Erneut Spielen' }).click();
-    await expect(anna.getByText('Warte auf den Gegner...')).toBeVisible();
-    await expect(ben.getByText('Dein Gegner möchte eine Revanche.')).toBeVisible();
+    await anna.locator('css-button', { hasText: 'Revanche fordern' }).click();
+    await expect(anna.getByText('Warte auf Ben …')).toBeVisible();
+    await expect(ben.getByText('Anna möchte eine Revanche!')).toBeVisible();
     await ben.locator('css-button', { hasText: 'Revanche annehmen!' }).click();
     await expect(anna.getByText('Gegner gefunden!')).toBeVisible();
     await expect(ben.getByText('Gegner gefunden!')).toBeVisible();
@@ -91,7 +117,10 @@ test.describe('playing duels', () => {
     await expect(anna.getByText('Verbindung zu Ben unterbrochen')).toBeVisible({
       timeout: 25_000,
     });
-    await expect(anna.getByText('Schade! Verbindung verloren')).toBeVisible({
+    // Depending on the browser the closed tab says goodbye (left) or not (lost).
+    await expect(
+      anna.getByText(/Schade! (Verbindung verloren|Spiel abgebrochen)/),
+    ).toBeVisible({
       timeout: 40_000,
     });
     await anna.locator('css-button', { hasText: 'Zum Spielmodus' }).click();
@@ -101,43 +130,120 @@ test.describe('playing duels', () => {
   for (const [label, target] of [
     ['the start page', '/'],
     ['the admin area', '/admin/login'],
+    ['an unknown game path', '/quiz/sdfsdfd'],
   ] as const) {
     test(`typing the address of ${label} during a duel ends it for both`, async ({
       browser,
     }) => {
-      const anna = await newPlayer(browser, phone);
-      const ben = await newPlayer(browser, phone);
-      await enterName(anna, 'Anna');
-      const code = await createFriendGame(anna);
-      await joinByCode(ben, code, 'Ben');
-      await waitForQuestion(anna, 1);
-      await waitForQuestion(ben, 1);
+      const [anna, ben] = await startDuel(browser);
 
       await ben.goto(target);
 
       // Immediately, not only after the reconnect grace period.
-      await expect(anna.getByText('Schade! Spiel abgebrochen')).toBeVisible({
-        timeout: 8_000,
-      });
+      await expect(anna.getByText(aborted)).toBeVisible({ timeout: 4_000 });
     });
   }
 
+  test('opening another website ends the duel within seconds', async ({
+    browser,
+  }) => {
+    const [anna, ben] = await startDuel(browser);
+
+    await ben.goto('about:blank');
+
+    await expect(anna.getByText('Verbindung zu Ben unterbrochen')).toBeVisible();
+    await expect(anna.getByText(aborted)).toBeVisible({ timeout: 9_000 });
+  });
+
+  test('a page preloaded while typing an address does not end the duel', async ({
+    browser,
+  }) => {
+    const [anna, ben] = await startDuel(browser);
+
+    // Chrome prerenders pages from the address bar while the visitor is still
+    // typing. DevTools (and thus Playwright) disable real prerendering, so the
+    // page reports the same state the browser would: prerendering until shown.
+    await ben.context().addInitScript(() => {
+      let prerendering = true;
+      Object.defineProperty(Document.prototype, 'prerendering', {
+        configurable: true,
+        get: () => prerendering,
+      });
+      (window as Window & { activate?: () => void }).activate = () => {
+        prerendering = false;
+        document.dispatchEvent(new Event('prerenderingchange'));
+      };
+    });
+    // A new tab opened by the game tab shares its stored game, like a
+    // prerendered page in the same tab does.
+    const [preloaded] = await Promise.all([
+      ben.waitForEvent('popup'),
+      ben.evaluate(() => window.open('/admin/login')),
+    ]);
+    await expect(preloaded.getByText('Admin-Bereich')).toBeVisible();
+    await anna.waitForTimeout(3_000);
+    await expect(anna.getByText(aborted)).toHaveCount(0);
+    await expect(anna.locator('.question-text')).toBeVisible();
+
+    // Pressing Enter shows the page: only now the duel ends.
+    await preloaded.evaluate(() =>
+      (window as Window & { activate?: () => void }).activate?.(),
+    );
+    await expect(anna.getByText(aborted)).toBeVisible({ timeout: 4_000 });
+  });
+
   test('browser back from a running duel ends it for both', async ({ browser }) => {
+    const [anna, ben] = await startDuel(browser);
+
+    await ben.goBack();
+    await expect(anna.getByText(aborted)).toBeVisible({ timeout: 8_000 });
+  });
+
+  test('quick duel: rematch against the same opponent', async ({ browser }) => {
     const anna = await newPlayer(browser, phone);
     const ben = await newPlayer(browser, phone);
     await enterName(anna, 'Anna');
-    const code = await createFriendGame(anna);
-    await joinByCode(ben, code, 'Ben');
-    await waitForQuestion(ben, 1);
+    await anna.getByText('Schnellspiel 1vs1').click();
+    await enterName(ben, 'Ben');
+    await ben.getByText('Schnellspiel 1vs1').click();
+    await playToResult(anna, ben);
 
-    // Back from the quiz leads to the lobby, which sends a running game back
-    // to the quiz; going back once more reaches the start page.
-    await ben.goto('/');
-    await expect(ben).toHaveURL(/\/$/);
-    await expect(anna.getByText('Schade! Spiel abgebrochen')).toBeVisible({
-      timeout: 8_000,
-    });
-    await expect(ben.getByText('Teste dein Wissen im direkten Duell')).toBeVisible();
+    await ben.locator('css-button', { hasText: 'Revanche fordern' }).click();
+    await expect(
+      anna.getByText(/Ben möchte eine Revanche! \(noch \d+ s\)/),
+    ).toBeVisible();
+    await anna.locator('css-button', { hasText: 'Revanche annehmen!' }).click();
+    await expect(anna.getByText('Gegner gefunden!')).toBeVisible();
+    await waitForQuestion(ben, 1);
+  });
+
+  test('no rematch when the opponent leaves the result screen', async ({
+    browser,
+  }) => {
+    const [anna, ben] = await startDuel(browser);
+    await playToResult(anna, ben);
+
+    await anna.locator('css-button', { hasText: 'Revanche fordern' }).click();
+    await ben.locator('css-button', { hasText: 'Zurück zur Lobby' }).click();
+
+    await expect(anna.getByText('Schade! Keine Revanche')).toBeVisible();
+    await anna.locator('css-flyout css-button', { hasText: 'OK' }).click();
+    await expect(anna.locator('.status-text')).toHaveText(
+      'Ben hat das Spiel verlassen.',
+    );
+    await anna.locator('css-button', { hasText: 'Neues Spiel erstellen' }).click();
+    await expect(anna.getByText('Spiel erstellt')).toBeVisible();
+  });
+
+  test('a reload on the result screen keeps the rematch', async ({ browser }) => {
+    const [anna, ben] = await startDuel(browser);
+    await playToResult(anna, ben);
+
+    await ben.reload();
+    await expect(ben.locator('.result-title')).toBeVisible();
+    await ben.locator('css-button', { hasText: 'Revanche fordern' }).click();
+    await anna.locator('css-button', { hasText: 'Revanche annehmen!' }).click();
+    await waitForQuestion(anna, 1);
   });
 
   test('leaving the waiting screen closes the created game', async ({ browser }) => {
@@ -176,6 +282,9 @@ test.describe('playing duels', () => {
     await ben.reload();
     await waitForQuestion(ben, 1);
     await expect(ben.getByText('Ben (Du)')).toBeVisible();
+    // Still running after the short grace for closed pages.
+    await ben.waitForTimeout(6_000);
+    await expect(ben.getByText(aborted)).toHaveCount(0);
     await answer(ben, 2);
     await expect(ben.getByText('Warte auf den Gegner...')).toBeVisible();
   });

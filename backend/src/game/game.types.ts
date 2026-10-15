@@ -11,6 +11,12 @@ import type { GameSettings } from '../settings/game-settings.js';
 export const COUNTDOWN_MS = 3_000;
 /** How long a disconnected player may take to come back before forfeiting. */
 export const DISCONNECT_GRACE_MS = 20_000;
+/**
+ * Shorter grace when the page itself closed the connection (tab closed, other
+ * page opened): long enough for a reload, short enough to inform the opponent
+ * almost at once.
+ */
+export const LEAVE_GRACE_MS = 5_000;
 /** How long finished or aborted games stay available for the result screen. */
 export const SESSION_RETENTION_MS = 10 * 60_000;
 /** Friend games nobody joins are removed after this time. */

@@ -21,13 +21,26 @@ export type CommandResult<T = undefined> =
 const TOKEN_KEY = 'playduelio.sessionToken';
 const CONNECT_TIMEOUT_MS = 20_000;
 const ACK_TIMEOUT_MS = 10_000;
-const FINAL_PHASES = new Set(['finished', 'aborted']);
-/** Routes on which a running game or search may continue. */
-const GAME_ROUTES = ['/lobby', '/quiz', '/result'];
+/** Routes on which a running game or search may continue (exact paths only). */
+const GAME_ROUTES = new Set(['/lobby', '/quiz', '/result']);
 
 function isGameRoute(url: string): boolean {
-  const path = url.split(/[?#]/)[0] ?? '';
-  return GAME_ROUTES.some((route) => path === route || path.startsWith(`${route}/`));
+  const path = (url.split(/[?#]/)[0] ?? '').replace(/\/+$/, '');
+  return GAME_ROUTES.has(path);
+}
+
+/**
+ * Runs `start` once the page is really shown. Browsers may prerender a page
+ * in the background while its address is still being typed; a game must not
+ * be resumed or left before the visitor actually opens that page.
+ */
+function whenPageActive(start: () => void): void {
+  const doc = document as Document & { prerendering?: boolean };
+  if (doc.prerendering) {
+    doc.addEventListener('prerenderingchange', start, { once: true });
+  } else {
+    start();
+  }
 }
 
 /**
@@ -55,19 +68,22 @@ export class GameClient implements OnDestroy {
   readonly inGame = computed(() => this.stateSignal() !== null);
 
   constructor() {
-    const token = sessionStore.get(TOKEN_KEY);
-    if (token) {
-      if (isGameRoute(window.location.pathname)) {
-        // Reload on a game screen: get back into the running game.
-        this.resumingSignal.set(true);
-        this.ensureSocket().connect();
-      } else {
-        // The page was opened elsewhere (start page, admin, …): the player
-        // left the game, so end it properly and inform the opponent at once.
-        sessionStore.remove(TOKEN_KEY);
-        void this.abandon(token);
+    whenPageActive(() => this.restoreGame());
+
+    // Unloading the page (tab closed, other page opened, reload) closes the
+    // connection on purpose, so the server only waits briefly for a reload
+    // instead of the full grace period for network problems.
+    window.addEventListener('pagehide', () => {
+      if (this.socket?.connected) {
+        this.socket.disconnect();
       }
-    }
+    });
+    // Back from the browser's page cache: reconnect and resume.
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted && sessionStore.get(TOKEN_KEY)) {
+        this.ensureSocket().connect();
+      }
+    });
 
     // Leaving the game screens in the app (browser back, typed URL, links)
     // ends a running game or search instead of leaving the opponent alone.
@@ -81,6 +97,24 @@ export class GameClient implements OnDestroy {
           this.leave();
         }
       });
+  }
+
+  /** Picks up a game stored in this tab when the app starts. */
+  private restoreGame(): void {
+    const token = sessionStore.get(TOKEN_KEY);
+    if (!token) {
+      return;
+    }
+    if (isGameRoute(window.location.pathname)) {
+      // Reload on a game screen: get back into the running game.
+      this.resumingSignal.set(true);
+      this.ensureSocket().connect();
+    } else {
+      // The page was opened elsewhere (start page, admin, unknown path): the
+      // player left the game, so end it and inform the opponent at once.
+      sessionStore.remove(TOKEN_KEY);
+      void this.abandon(token);
+    }
   }
 
   ngOnDestroy(): void {
@@ -226,8 +260,9 @@ export class GameClient implements OnDestroy {
     this.searchingSignal.set(false);
     this.resumingSignal.set(false);
     this.stateSignal.set(state);
-    if (FINAL_PHASES.has(state.phase)) {
-      // Nothing to resume once the game is over.
+    if (state.phase === 'aborted') {
+      // Nothing to resume once the game was aborted. Finished games stay
+      // resumable for the rematch.
       sessionStore.remove(TOKEN_KEY);
     } else {
       sessionStore.set(TOKEN_KEY, state.sessionToken);
@@ -237,7 +272,7 @@ export class GameClient implements OnDestroy {
   private async resumeIfNeeded(isReconnect: boolean): Promise<void> {
     const current = this.stateSignal();
     const token =
-      current && !FINAL_PHASES.has(current.phase)
+      current && current.phase !== 'aborted'
         ? current.sessionToken
         : sessionStore.get(TOKEN_KEY);
     if (!token || !this.socket) {
@@ -296,7 +331,14 @@ export class GameClient implements OnDestroy {
   private handleLostGame(): void {
     const current = this.stateSignal();
     sessionStore.remove(TOKEN_KEY);
-    if (current && !FINAL_PHASES.has(current.phase)) {
+    if (current?.phase === 'finished') {
+      // The result stays visible, only the rematch is gone.
+      this.stateSignal.set({
+        ...current,
+        phaseEndsAt: null,
+        rematchAvailable: false,
+      });
+    } else if (current && current.phase !== 'aborted') {
       this.stateSignal.set({
         ...current,
         phase: 'aborted',

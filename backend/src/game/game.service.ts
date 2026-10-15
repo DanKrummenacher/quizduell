@@ -17,6 +17,7 @@ import {
   BASE_POINTS,
   COUNTDOWN_MS,
   DISCONNECT_GRACE_MS,
+  LEAVE_GRACE_MS,
   GameError,
   MAX_SPEED_BONUS,
   SESSION_RETENTION_MS,
@@ -190,7 +191,12 @@ export class GameService implements OnApplicationShutdown {
     this.broadcast(session);
   }
 
-  handleDisconnect(socketId: string): void {
+  /**
+   * A lost connection keeps the player in the game for a grace period so a
+   * reload or a short network gap does not end the duel. `closedByPage` marks
+   * a connection the page closed itself while unloading.
+   */
+  handleDisconnect(socketId: string, closedByPage = false): void {
     this.cancelMatchmaking(socketId);
     const playerId = this.socketToPlayer.get(socketId);
     this.socketToPlayer.delete(socketId);
@@ -201,10 +207,17 @@ export class GameService implements OnApplicationShutdown {
 
     const { player, session } = entry;
     player.socketId = null;
-    player.disconnectTimer = setTimeout(() => {
-      player.disconnectTimer = null;
-      this.removePlayer(session, player, 'opponent-disconnected');
-    }, DISCONNECT_GRACE_MS);
+    player.disconnectTimer = setTimeout(
+      () => {
+        player.disconnectTimer = null;
+        this.removePlayer(
+          session,
+          player,
+          closedByPage ? 'opponent-left' : 'opponent-disconnected',
+        );
+      },
+      closedByPage ? LEAVE_GRACE_MS : DISCONNECT_GRACE_MS,
+    );
     this.broadcast(session);
   }
 
@@ -369,17 +382,11 @@ export class GameService implements OnApplicationShutdown {
 
   private finish(session: Session): void {
     void this.statsService.recordGame(session.mode, session.questions.length);
-    if (session.mode === 'friend') {
-      const rematchMs = session.settings.rematchTimeoutSec * 1000;
-      this.enterPhase(session, 'finished', rematchMs, () =>
-        this.expireRematch(session),
-      );
-    } else {
-      this.enterPhase(session, 'finished', null, null);
-      this.setTimer(session, SESSION_RETENTION_MS, () =>
-        this.removeSession(session),
-      );
-    }
+    // Both modes offer a rematch against the same opponent for a while.
+    const rematchMs = session.settings.rematchTimeoutSec * 1000;
+    this.enterPhase(session, 'finished', rematchMs, () =>
+      this.expireRematch(session),
+    );
   }
 
   private expireRematch(session: Session): void {
@@ -416,7 +423,6 @@ export class GameService implements OnApplicationShutdown {
 
   private isRematchAvailable(session: Session): boolean {
     return (
-      session.mode === 'friend' &&
       session.phase === 'finished' &&
       session.phaseEndsAt !== null &&
       session.endReason === null &&

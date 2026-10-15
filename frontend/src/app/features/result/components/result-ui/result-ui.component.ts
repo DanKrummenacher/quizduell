@@ -23,10 +23,10 @@ export class ResultUiComponent {
   readonly playAgainText = input.required<string>();
   readonly playAgainIcon = input.required<string>();
   readonly playAgainStatusText = input<string | null>(null);
-  readonly showOpponentLeftFlyout = input.required<boolean>();
-  readonly showSessionExpiredFlyout = input.required<boolean>();
+  readonly showNoRematchFlyout = input.required<boolean>();
+  readonly noRematchText = input('');
 
   readonly navigateHome = output<void>();
   readonly playAgain = output<void>();
-  readonly opponentLeftAcknowledge = output<void>();
+  readonly noRematchAcknowledge = output<void>();
 }

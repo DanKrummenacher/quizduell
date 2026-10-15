@@ -7,7 +7,12 @@ import { DEFAULT_SETTINGS, type GameSettings } from '../settings/game-settings.j
 import type { SettingsService } from '../settings/settings.service.js';
 import type { StatsService } from '../stats/stats.service.js';
 import { GameService } from './game.service.js';
-import { COUNTDOWN_MS, DISCONNECT_GRACE_MS, GameError } from './game.types.js';
+import {
+  COUNTDOWN_MS,
+  DISCONNECT_GRACE_MS,
+  GameError,
+  LEAVE_GRACE_MS,
+} from './game.types.js';
 
 const QUESTIONS: GameQuestion[] = [
   { id: 1, text: 'Q1', options: ['a', 'b', 'c', 'd'], correctIndex: 0 },
@@ -345,7 +350,7 @@ describe('GameService', () => {
       expect(ctx.state('host').opponent).toMatchObject({ name: 'Ben', score: 200 });
     });
 
-    it('does not offer a rematch in quick games', async () => {
+    it('offers a rematch in quick games too', async () => {
       const ctx = setup();
       await ctx.service.startMatchmaking('a', 'Anna');
       await ctx.service.startMatchmaking('b', 'Ben');
@@ -357,10 +362,24 @@ describe('GameService', () => {
       }
 
       expect(ctx.state('a').phase).toBe('finished');
-      expect(ctx.state('a').rematchAvailable).toBe(false);
-      expect(() => ctx.service.requestRematch('a')).toThrow(
-        new GameError('REMATCH_UNAVAILABLE'),
-      );
+      expect(ctx.state('a').rematchAvailable).toBe(true);
+      ctx.service.requestRematch('a');
+      ctx.service.requestRematch('b');
+      expect(ctx.state('a').phase).toBe('countdown');
+      expect(ctx.state('a').mode).toBe('quick');
+    });
+
+    it('pauses the rematch while the opponent reconnects', async () => {
+      const ctx = setup();
+      await finishGame(ctx);
+      const token = ctx.state('guest').sessionToken;
+
+      ctx.service.handleDisconnect('guest');
+      expect(ctx.state('host').rematchAvailable).toBe(false);
+      expect(ctx.state('host').endReason).toBeNull();
+
+      ctx.service.resume('guest-new', token);
+      expect(ctx.state('host').rematchAvailable).toBe(true);
     });
   });
 
@@ -412,6 +431,33 @@ describe('GameService', () => {
       expect(() => ctx.service.resume('guest-new', token)).toThrow(
         new GameError('SESSION_NOT_FOUND'),
       );
+    });
+
+    it('ends the game quickly when the page closed the connection', async () => {
+      const ctx = setup();
+      await toFirstQuestion(ctx);
+
+      ctx.service.handleDisconnect('guest', true);
+      await vi.advanceTimersByTimeAsync(LEAVE_GRACE_MS - 1_000);
+      expect(ctx.state('host').phase).toBe('question');
+
+      await vi.advanceTimersByTimeAsync(1_000);
+      expect(ctx.state('host').phase).toBe('aborted');
+      expect(ctx.state('host').endReason).toBe('opponent-left');
+    });
+
+    it('still resumes after a reload that closed the connection', async () => {
+      const ctx = setup();
+      await toFirstQuestion(ctx);
+      const token = ctx.state('guest').sessionToken;
+
+      ctx.service.handleDisconnect('guest', true);
+      await vi.advanceTimersByTimeAsync(2_000);
+      ctx.service.resume('guest-new', token);
+      await vi.advanceTimersByTimeAsync(LEAVE_GRACE_MS);
+
+      expect(ctx.state('host').phase).toBe('question');
+      expect(ctx.state('host').opponent?.connected).toBe(true);
     });
 
     it('leaves the previous game when starting a new one', async () => {

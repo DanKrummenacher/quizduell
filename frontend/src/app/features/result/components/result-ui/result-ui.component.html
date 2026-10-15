@@ -38,36 +38,19 @@
   </div>
 </main>
 
-@if (showOpponentLeftFlyout()) {
+@if (showNoRematchFlyout()) {
   <css-flyout
     withoutCloseButton
     size="small"
     title="Schade! Keine Revanche"
-    main="Dein Gegner hat das Spiel verlassen oder nicht rechtzeitig reagiert."
+    [main]="noRematchText()"
   >
     <css-button
       variant="primary"
       slot="css-button"
-      (click)="opponentLeftAcknowledge.emit()"
+      (click)="noRematchAcknowledge.emit()"
     >
-      Zurück zur Lobby
-    </css-button>
-  </css-flyout>
-}
-
-@if (showSessionExpiredFlyout()) {
-  <css-flyout
-    withoutCloseButton
-    size="small"
-    title="Spiel beendet"
-    main="Diese Spielsitzung wurde beendet. Du kannst nun ein neues Spiel starten."
-  >
-    <css-button
-      variant="primary"
-      slot="css-button"
-      (click)="opponentLeftAcknowledge.emit()"
-    >
-      Zurück zur Lobby
+      OK
     </css-button>
   </css-flyout>
 }

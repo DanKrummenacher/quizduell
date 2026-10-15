@@ -50,9 +50,13 @@ export class GameGateway
     // Connections are tracked by socket.io itself (see `onlineCount`).
   }
 
-  handleDisconnect(client: Socket): void {
+  handleDisconnect(client: Socket, reason?: string): void {
     this.limiter.forget(client.id);
-    this.gameService.handleDisconnect(client.id);
+    // The client closes the connection itself when its page is unloaded.
+    this.gameService.handleDisconnect(
+      client.id,
+      reason === 'client namespace disconnect',
+    );
   }
 
   /** Number of connected sockets (devices with the app open). */
