@@ -35,6 +35,8 @@
 }
 
 html {
+  /* Full-width header backgrounds must never cause horizontal scrolling. */
+  overflow-x: clip;
   /*
    * Phones and tablets keep 16px; large monitors scale the whole UI up in
    * whole-pixel steps so components never render on fractional pixels.

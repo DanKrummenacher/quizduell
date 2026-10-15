@@ -5,136 +5,48 @@
 $dark: #00327d;
 $blue: #0078bb;
 $light: #00a4e0;
-$gradient: linear-gradient(125deg, $dark 15%, $blue 65%, $light 100%);
+$gradient: linear-gradient(110deg, $dark 10%, $blue 62%, $light 100%);
+
+// Logo shapes as a faint repeating pattern (variant 4).
+$pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='%23fff' fill-opacity='0.09'%3E%3Ccircle cx='12' cy='12' r='5'/%3E%3Cpolygon points='48,4 55,12 48,20 41,12'/%3E%3Cpolygon points='12,40 18.9,44 18.9,52 12,56 5.1,52 5.1,44'/%3E%3Cpolygon points='48,40 55.6,45.5 52.7,54.5 43.3,54.5 40.4,45.5'/%3E%3C/g%3E%3C/svg%3E");
 
 :host {
   display: block;
-  padding: functions.rem(12) functions.rem(12) 0;
 }
 
-.wordmark {
-  font-size: functions.rem(20);
-  font-weight: miscs.$css-ui-font-weight-bold;
-  letter-spacing: -0.01em;
-  line-height: 1;
-  color: $dark;
-  white-space: nowrap;
-
-  .light {
-    font-weight: miscs.$css-ui-font-weight-regular;
-  }
-}
-
-.caption {
-  font-size: functions.rem(14);
-  line-height: 1.2;
-  color: colors.$dt-color-darkblue-70;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.eyebrow {
-  font-size: functions.rem(12);
-  font-weight: miscs.$css-ui-font-weight-medium;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-// ---------------------------------------------------------------------------
-// 1 · Schwebende Pille: a compact floating island with a soft shadow.
-// ---------------------------------------------------------------------------
-:host(.variant-1) {
-  padding-top: functions.rem(18);
-}
-
-.pill-wrap {
-  display: flex;
-  justify-content: center;
-}
-
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: functions.rem(10);
-  max-width: 100%;
-  padding: functions.rem(8) functions.rem(20) functions.rem(8) functions.rem(10);
-  border-radius: 999px;
-  background-color: colors.$dt-color-white-100;
-  box-shadow:
-    0 1px 2px rgba(0, 50, 125, 0.08),
-    0 8px 24px rgba(0, 50, 125, 0.1);
-
-  .logo {
-    width: functions.rem(32);
-    height: functions.rem(32);
-  }
-}
-
-.dot {
-  width: functions.rem(4);
-  height: functions.rem(4);
-  border-radius: 50%;
-  background-color: #b8c4d8;
-  flex-shrink: 0;
-}
-
-// ---------------------------------------------------------------------------
-// 2 · Farbband: the brand gradient as a stage, logo and wordmark in white.
-// ---------------------------------------------------------------------------
-.band {
+/*
+ * The header sits flush with the top edge (including the notch area) and its
+ * background spans the full screen width, while the content stays aligned
+ * with the page column below.
+ */
+.header {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: functions.rem(10);
-  padding: functions.rem(26) functions.rem(16) functions.rem(22);
-  border-radius: functions.rem(16);
-  background: $gradient;
-  overflow: hidden;
   isolation: isolate;
-  box-shadow: 0 10px 30px rgba(0, 50, 125, 0.25);
+  margin-top: calc(-1 * var(--app-safe-top));
+  padding-top: var(--app-safe-top);
 
-  .logo {
-    width: functions.rem(44);
-    height: functions.rem(44);
-  }
-
-  .wordmark {
-    font-size: functions.rem(24);
-    color: colors.$dt-color-white-100;
-  }
-
-  .eyebrow {
-    color: rgba(255, 255, 255, 0.75);
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    background: $gradient;
   }
 }
 
-// Large, faint rings in the background echo the logo.
-.band-shapes {
-  position: absolute;
-  z-index: -1;
-  width: functions.rem(220);
-  height: functions.rem(220);
-  right: functions.rem(-70);
-  top: functions.rem(-90);
-  border-radius: 50%;
-  border: functions.rem(28) solid rgba(255, 255, 255, 0.07);
-}
-
-// ---------------------------------------------------------------------------
-// 3 · Live-Leiste: app bar with a pulsing live status.
-// ---------------------------------------------------------------------------
-.live-bar {
+.inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: functions.rem(12);
-  min-height: functions.rem(64);
-  padding: 0 functions.rem(14) 0 functions.rem(16);
-  border-radius: functions.rem(12);
-  background-color: colors.$dt-color-white-100;
-  box-shadow: 0 1px 2px rgba(0, 50, 125, 0.08);
+  max-width: var(--brand-inner-width, var(--app-column-width));
+  min-height: functions.rem(60);
+  margin: 0 auto;
+  padding: 0 var(--brand-inner-padding, #{functions.rem(16)});
 }
 
 .lockup {
@@ -144,183 +56,120 @@ $gradient: linear-gradient(125deg, $dark 15%, $blue 65%, $light 100%);
   min-width: 0;
 
   .logo {
-    width: functions.rem(32);
-    height: functions.rem(32);
+    width: functions.rem(30);
+    height: functions.rem(30);
   }
 }
 
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: functions.rem(8);
-  min-width: 0;
+.wordmark {
+  font-size: functions.rem(21);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: colors.$dt-color-white-100;
+  white-space: nowrap;
+
+  .light {
+    font-weight: miscs.$css-ui-font-weight-regular;
+  }
+}
+
+// 1 · Verlauf zentriert: app icon tile and name centered on the gradient.
+.v1 .lockup .logo,
+.v3 .lockup .logo,
+.v4 .lockup .logo {
+  width: functions.rem(34);
+  height: functions.rem(34);
+}
+
+// 2 · Verlauf mit Chip: name left, subtitle as a translucent chip right.
+.v2 .inner {
+  justify-content: space-between;
+}
+
+.chip {
   padding: functions.rem(6) functions.rem(12);
+  border: functions.rem(1) solid rgba(255, 255, 255, 0.35);
   border-radius: 999px;
-  background-color: #eef3fa;
+  background-color: rgba(255, 255, 255, 0.12);
   font-size: functions.rem(13);
   font-weight: miscs.$css-ui-font-weight-medium;
-  color: $dark;
+  color: colors.$dt-color-white-100;
   white-space: nowrap;
 }
 
-.pulse {
-  position: relative;
-  width: functions.rem(8);
-  height: functions.rem(8);
-  border-radius: 50%;
-  background-color: #00875e;
-  flex-shrink: 0;
+// 3 · Verlauf mit Bogen: softly curved lower edge.
+.v3 {
+  padding-bottom: functions.rem(10);
+
+  &::before {
+    border-radius: 0 0 50% 50% / 0 0 functions.rem(28) functions.rem(28);
+  }
+
+  .inner {
+    min-height: functions.rem(66);
+  }
+}
+
+// 4 · Verlauf mit Muster: the logo shapes as a faint pattern.
+.v4::before {
+  background: $pattern, $gradient;
+}
+
+// 5 · Dunkelblau mit Linie: calm solid bar, gradient only as accent line.
+.v5 {
+  &::before {
+    background: $dark;
+  }
 
   &::after {
     content: '';
     position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background-color: #00875e;
-    animation: pulse 1.8s ease-out infinite;
+    z-index: -1;
+    bottom: 0;
+    left: 50%;
+    width: 100vw;
+    height: functions.rem(3);
+    transform: translateX(-50%);
+    background: linear-gradient(90deg, $blue, $light);
   }
 }
 
-@keyframes pulse {
-  from {
-    transform: scale(1);
-    opacity: 0.6;
+// 6 · Hell mit Verlaufskante: white bar, coloured logo, gradient top edge.
+.v6 {
+  &::before {
+    background: colors.$dt-color-white-100;
+    box-shadow: 0 functions.rem(1) 0 #e3e7ee;
+    border-top: functions.rem(3) solid transparent;
+    border-image: $gradient 1;
   }
-  to {
-    transform: scale(2.6);
-    opacity: 0;
-  }
-}
 
-// ---------------------------------------------------------------------------
-// 4 · Verlaufsrahmen: white card with a fine gradient outline.
-// ---------------------------------------------------------------------------
-.outline-card {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: functions.rem(12);
-  min-height: functions.rem(64);
-  padding: 0 functions.rem(18);
-  border: functions.rem(2) solid transparent;
-  border-radius: functions.rem(14);
-  background:
-    linear-gradient(colors.$dt-color-white-100, colors.$dt-color-white-100)
-      padding-box,
-    $gradient border-box;
-
-  .logo {
-    width: functions.rem(32);
-    height: functions.rem(32);
-  }
-}
-
-.divider {
-  width: functions.rem(1);
-  height: functions.rem(22);
-  background-color: #c5cfdf;
-}
-
-// ---------------------------------------------------------------------------
-// 5 · Editorial: left-aligned lockup under a short gradient accent line.
-// ---------------------------------------------------------------------------
-:host(.variant-5) {
-  padding: functions.rem(20) functions.rem(20) 0;
-}
-
-.editorial {
-  display: flex;
-  flex-direction: column;
-  gap: functions.rem(16);
-
-  .logo {
-    width: functions.rem(40);
-    height: functions.rem(40);
+  .inner {
+    justify-content: space-between;
   }
 
   .wordmark {
-    font-size: functions.rem(22);
-  }
-
-  .lockup {
-    gap: functions.rem(12);
+    color: $dark;
   }
 }
 
-.accent {
-  width: functions.rem(48);
-  height: functions.rem(4);
-  border-radius: functions.rem(2);
-  background: $gradient;
+.caption {
+  font-size: functions.rem(14);
+  color: colors.$dt-color-darkblue-70;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.stack {
-  display: flex;
-  flex-direction: column;
-  gap: functions.rem(5);
-  min-width: 0;
-}
-
-// ---------------------------------------------------------------------------
-// 6 · Signet gross: large logo with a soft glow, like an app splash.
-// ---------------------------------------------------------------------------
-:host(.variant-6) {
-  padding-top: functions.rem(28);
-}
-
-.signet {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: functions.rem(10);
-  isolation: isolate;
-
-  .logo {
-    width: functions.rem(72);
-    height: functions.rem(72);
-    margin-bottom: functions.rem(6);
-  }
-
-  .wordmark {
-    font-size: functions.rem(26);
-  }
-
-  .eyebrow {
-    color: colors.$dt-color-darkblue-70;
-  }
-}
-
-.glow {
-  position: absolute;
-  z-index: -1;
-  top: functions.rem(-24);
-  width: functions.rem(160);
-  height: functions.rem(160);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(0, 164, 224, 0.22) 0%,
-    rgba(0, 164, 224, 0) 70%
-  );
-}
-
-// Very narrow phones: keep every header on one clean line.
+// Very narrow phones: only logo and name.
 @media (max-width: 22rem) {
-  .pill .dot,
-  .pill .caption,
-  .outline-card .divider,
-  .outline-card .caption {
+  .chip,
+  .caption {
     display: none;
   }
 
-  .status {
-    padding-inline: functions.rem(8);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .pulse::after {
-    animation: none;
+  .v2 .inner,
+  .v6 .inner {
+    justify-content: center;
   }
 }

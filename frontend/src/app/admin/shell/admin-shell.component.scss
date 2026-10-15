@@ -5,6 +5,9 @@
 
 :host {
   display: block;
+  // Header content aligns with the admin page width.
+  --brand-inner-width: #{functions.rem(1100)};
+  --brand-inner-padding: #{functions.rem(12)};
   min-height: 100dvh;
   padding: var(--app-safe-top) var(--app-safe-right) var(--app-safe-bottom)
     var(--app-safe-left);

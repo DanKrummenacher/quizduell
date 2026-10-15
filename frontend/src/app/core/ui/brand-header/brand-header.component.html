@@ -1,62 +1,32 @@
-<header class="header">
-  @switch (variant()) {
-    @case (2) {
-      <div class="band">
-        <span class="band-shapes" aria-hidden="true"></span>
-        <app-logo-mark class="logo" [inverse]="true" />
-        <span class="wordmark"><span class="light">play</span>duelio</span>
-        <span class="eyebrow">{{ subtitle() }}</span>
-      </div>
-    }
-    @case (3) {
-      <div class="live-bar">
+<header class="header" [class]="'header v' + variant()">
+  <div class="inner">
+    @switch (variant()) {
+      @case (2) {
+        <span class="lockup">
+          <app-logo-mark class="logo" [inverse]="true" />
+          <span class="wordmark"><span class="light">play</span>duelio</span>
+        </span>
+        <span class="chip">{{ subtitle() }}</span>
+      }
+      @case (5) {
+        <span class="lockup">
+          <app-logo-mark class="logo" [inverse]="true" />
+          <span class="wordmark"><span class="light">play</span>duelio</span>
+        </span>
+      }
+      @case (6) {
         <span class="lockup">
           <app-logo-mark class="logo" />
           <span class="wordmark"><span class="light">play</span>duelio</span>
         </span>
-        <span class="status">
-          <span class="pulse" aria-hidden="true"></span>
-          {{ subtitle() }}
-        </span>
-      </div>
-    }
-    @case (4) {
-      <div class="outline-card">
-        <app-logo-mark class="logo" />
-        <span class="wordmark"><span class="light">play</span>duelio</span>
-        <span class="divider" aria-hidden="true"></span>
         <span class="caption">{{ subtitle() }}</span>
-      </div>
-    }
-    @case (5) {
-      <div class="editorial">
-        <span class="accent" aria-hidden="true"></span>
+      }
+      @default {
         <span class="lockup">
-          <app-logo-mark class="logo" />
-          <span class="stack">
-            <span class="wordmark"><span class="light">play</span>duelio</span>
-            <span class="caption">{{ subtitle() }}</span>
-          </span>
-        </span>
-      </div>
-    }
-    @case (6) {
-      <div class="signet">
-        <span class="glow" aria-hidden="true"></span>
-        <app-logo-mark class="logo" />
-        <span class="wordmark"><span class="light">play</span>duelio</span>
-        <span class="eyebrow">{{ subtitle() }}</span>
-      </div>
-    }
-    @default {
-      <div class="pill-wrap">
-        <div class="pill">
-          <app-logo-mark class="logo" />
+          <app-logo-mark class="logo" [tile]="true" />
           <span class="wordmark"><span class="light">play</span>duelio</span>
-          <span class="dot" aria-hidden="true"></span>
-          <span class="caption">{{ subtitle() }}</span>
-        </div>
-      </div>
+        </span>
+      }
     }
-  }
+  </div>
 </header>
