@@ -48,7 +48,8 @@ import { BrandingStore, HEADER_VARIANTS } from '../../branding/branding.store';
       position: fixed;
       left: 12px;
       bottom: 12px;
-      z-index: 1000;
+      // Below dialogs, so it never covers their buttons.
+      z-index: 600;
       font-family: 'Museo Sans', helvetica, arial, sans-serif;
       color: #00327d;
     }

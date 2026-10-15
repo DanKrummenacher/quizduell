@@ -10,6 +10,7 @@ const FALLBACK: PublicInfo = {
   speedBonusEnabled: true,
   idleResetSec: 120,
   playable: true,
+  playersOnline: 0,
 };
 
 /** Public game configuration (number of questions, time per question, …). */

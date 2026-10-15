@@ -61,6 +61,7 @@ describe('playduelio backend (e2e)', () => {
         speedBonusEnabled: true,
         idleResetSec: 120,
         playable: false,
+        playersOnline: 0,
       });
     });
 

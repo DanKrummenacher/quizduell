@@ -1,25 +1,56 @@
 <header class="header" [class]="'header v' + variant()">
   <div class="inner">
     @switch (variant()) {
-      @case (2) {
+      @case (3) {
         <span class="lockup">
           <app-logo-mark class="logo" [inverse]="true" />
           <span class="wordmark"><span class="light">play</span>duelio</span>
         </span>
-        <span class="chip">{{ subtitle() }}</span>
+      }
+      @case (4) {
+        <span class="lockup">
+          <app-logo-mark class="logo" [inverse]="true" />
+          <span class="wordmark"><span class="light">play</span>duelio</span>
+        </span>
       }
       @case (5) {
         <span class="lockup">
           <app-logo-mark class="logo" [inverse]="true" />
           <span class="wordmark"><span class="light">play</span>duelio</span>
         </span>
+        <span class="live" role="status" aria-live="polite">
+          <span class="pulse" aria-hidden="true"></span>
+          {{ onlineText() }}
+        </span>
       }
       @case (6) {
+        <span class="lockup">
+          <app-logo-mark class="logo" [inverse]="true" />
+          <span class="wordmark"><span class="light">play</span>duelio</span>
+        </span>
+        <button
+          type="button"
+          class="help"
+          aria-label="Spielregeln"
+          (click)="showRules.set(true)"
+        >
+          ?
+        </button>
+      }
+      @case (7) {
+        <span class="lockup">
+          <app-logo-mark class="logo" [tile]="true" />
+          <span class="two-line">
+            <span class="wordmark"><span class="light">play</span>duelio</span>
+            <span class="sub">{{ subtitle() }}</span>
+          </span>
+        </span>
+      }
+      @case (8) {
         <span class="lockup">
           <app-logo-mark class="logo" />
           <span class="wordmark"><span class="light">play</span>duelio</span>
         </span>
-        <span class="caption">{{ subtitle() }}</span>
       }
       @default {
         <span class="lockup">
@@ -30,3 +61,23 @@
     }
   </div>
 </header>
+
+@if (showRules()) {
+  <css-flyout withoutCloseButton size="small" title="So funktioniert's">
+    <div slot="content" class="rules">
+      <calc-text textMedium>
+        <strong>1.</strong> Spiel ein Schnellspiel gegen eine zufällige Person oder
+        fordere jemanden mit einem Code heraus.
+      </calc-text>
+      <calc-text textMedium>
+        <strong>2.</strong> Ihr bekommt dieselben
+        {{ info.info().questionsPerGame }} Fragen und habt je
+        {{ info.info().questionDurationSec }} Sekunden Zeit.
+      </calc-text>
+      <calc-text textMedium><strong>3.</strong> {{ scoringRule() }}</calc-text>
+    </div>
+    <css-button variant="primary" slot="css-button" (click)="showRules.set(false)">
+      Alles klar
+    </css-button>
+  </css-flyout>
+}

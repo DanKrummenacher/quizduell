@@ -74,50 +74,22 @@ $pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' widt
   }
 }
 
-// 1 · Verlauf zentriert: app icon tile and name centered on the gradient.
+// Shared: centered app icon tile.
 .v1 .lockup .logo,
-.v3 .lockup .logo,
-.v4 .lockup .logo {
+.v2 .lockup .logo,
+.v7 .lockup .logo {
   width: functions.rem(34);
   height: functions.rem(34);
 }
 
-// 2 · Verlauf mit Chip: name left, subtitle as a translucent chip right.
-.v2 .inner {
-  justify-content: space-between;
-}
-
-.chip {
-  padding: functions.rem(6) functions.rem(12);
-  border: functions.rem(1) solid rgba(255, 255, 255, 0.35);
-  border-radius: 999px;
-  background-color: rgba(255, 255, 255, 0.12);
-  font-size: functions.rem(13);
-  font-weight: miscs.$css-ui-font-weight-medium;
-  color: colors.$dt-color-white-100;
-  white-space: nowrap;
-}
-
-// 3 · Verlauf mit Bogen: softly curved lower edge.
-.v3 {
-  padding-bottom: functions.rem(10);
-
-  &::before {
-    border-radius: 0 0 50% 50% / 0 0 functions.rem(28) functions.rem(28);
-  }
-
-  .inner {
-    min-height: functions.rem(66);
-  }
-}
-
-// 4 · Verlauf mit Muster: the logo shapes as a faint pattern.
-.v4::before {
+// 2 · Verlauf mit Muster: the logo shapes as a faint pattern.
+.v2::before,
+.v7::before {
   background: $pattern, $gradient;
 }
 
-// 5 · Dunkelblau mit Linie: calm solid bar, gradient only as accent line.
-.v5 {
+// 3 · Dunkelblau mit Linie: calm solid bar, gradient only as accent line.
+.v3 {
   &::before {
     background: $dark;
   }
@@ -135,17 +107,135 @@ $pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' widt
   }
 }
 
-// 6 · Hell mit Verlaufskante: white bar, coloured logo, gradient top edge.
-.v6 {
+// 4 · Dunkelblau abgerundet: rounded lower corners with a gradient edge.
+.v4 {
+  margin-bottom: functions.rem(4);
+
   &::before {
-    background: colors.$dt-color-white-100;
-    box-shadow: 0 functions.rem(1) 0 #e3e7ee;
-    border-top: functions.rem(3) solid transparent;
-    border-image: $gradient 1;
+    border-bottom: functions.rem(4) solid transparent;
+    border-radius: 0 0 functions.rem(22) functions.rem(22);
+    background:
+      linear-gradient($dark, $dark) padding-box,
+      linear-gradient(90deg, $dark, $blue 45%, $light) border-box;
+    box-shadow: 0 functions.rem(6) functions.rem(18) rgba(0, 50, 125, 0.18);
   }
 
   .inner {
-    justify-content: space-between;
+    min-height: functions.rem(62);
+  }
+}
+
+// 5 · Live-Zähler and 6 · Spielregeln: name left, action or status right.
+.v5 .inner,
+.v6 .inner {
+  justify-content: space-between;
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(8);
+  padding: functions.rem(6) functions.rem(12);
+  border: functions.rem(1) solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.12);
+  font-size: functions.rem(13);
+  font-weight: miscs.$css-ui-font-weight-medium;
+  color: colors.$dt-color-white-100;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.pulse {
+  position: relative;
+  width: functions.rem(8);
+  height: functions.rem(8);
+  border-radius: 50%;
+  background-color: #3ddc97;
+  flex-shrink: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background-color: #3ddc97;
+    animation: pulse 1.8s ease-out infinite;
+  }
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+.help {
+  display: grid;
+  place-items: center;
+  width: functions.rem(36);
+  height: functions.rem(36);
+  padding: 0;
+  border: functions.rem(1) solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.12);
+  font-size: functions.rem(18);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: colors.$dt-color-white-100;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.24);
+  }
+}
+
+.rules {
+  display: grid;
+  gap: functions.rem(14);
+  padding-block: functions.rem(12);
+  text-align: left;
+}
+
+// 7 · Zweizeilig: name with the subtitle underneath, left aligned.
+.v7 .inner {
+  justify-content: flex-start;
+  min-height: functions.rem(66);
+}
+
+.two-line {
+  display: flex;
+  flex-direction: column;
+  gap: functions.rem(4);
+  min-width: 0;
+}
+
+.sub {
+  font-size: functions.rem(13);
+  color: rgba(255, 255, 255, 0.78);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// 8 · Glas fixiert: stays on top while scrolling, frosted glass.
+:host(.variant-8) {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.v8 {
+  &::before {
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: saturate(160%) blur(14px);
+    -webkit-backdrop-filter: saturate(160%) blur(14px);
+    box-shadow: 0 functions.rem(1) 0 rgba(0, 50, 125, 0.1);
   }
 
   .wordmark {
@@ -153,23 +243,8 @@ $pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' widt
   }
 }
 
-.caption {
-  font-size: functions.rem(14);
-  color: colors.$dt-color-darkblue-70;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-// Very narrow phones: only logo and name.
-@media (max-width: 22rem) {
-  .chip,
-  .caption {
-    display: none;
-  }
-
-  .v2 .inner,
-  .v6 .inner {
-    justify-content: center;
+@media (prefers-reduced-motion: reduce) {
+  .pulse::after {
+    animation: none;
   }
 }

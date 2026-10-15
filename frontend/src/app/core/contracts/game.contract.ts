@@ -138,4 +138,6 @@ export interface PublicInfo {
   speedBonusEnabled: boolean;
   idleResetSec: number;
   playable: boolean;
+  /** Devices currently connected to the game server. */
+  playersOnline: number;
 }
