@@ -13,7 +13,7 @@ import { AdminAuthService } from '../admin-auth.service';
   imports: [BrandHeaderComponent, RouterLink],
   template: `
     <div class="page">
-      <app-brand-header subtitle="Admin" />
+      <app-brand-header label="Admin" />
 
       <main class="main-content">
         <h1 class="main-title">Admin-Bereich</h1>
