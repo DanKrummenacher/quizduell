@@ -7,7 +7,7 @@
 .page-wrapper {
   display: flex;
   flex-direction: column;
-  min-height: var(--app-screen-height);
+  min-height: 100dvh;
 }
 
 .header-area {

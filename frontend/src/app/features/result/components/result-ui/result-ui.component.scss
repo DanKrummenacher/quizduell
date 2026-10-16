@@ -4,13 +4,13 @@
 
 :host {
   display: block;
-  min-height: var(--app-screen-height);
+  min-height: 100dvh;
 }
 
 .main-content {
   display: flex;
   flex-direction: column;
-  min-height: var(--app-screen-height);
+  min-height: 100dvh;
   padding: functions.rem(40) functions.rem(20) functions.rem(90);
   width: 100%;
   box-sizing: border-box;
@@ -93,26 +93,5 @@
     height: functions.rem(16);
     color: colors.$dt-color-darkblue-100;
     stroke-width: functions.rem(4);
-  }
-}
-
-// Concept D (Adaptiv): larger title, actions side by side.
-@container screen (min-width: 52rem) {
-  .result-title {
-    font-size: functions.rem(40);
-  }
-
-  .actions-wrapper {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: functions.rem(14);
-    max-width: functions.rem(736);
-    margin-inline: auto;
-    padding: 0;
-
-    > css-button,
-    .play-again-wrapper {
-      flex: 1 1 0;
-    }
   }
 }

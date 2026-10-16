@@ -83,33 +83,3 @@
   display: block;
   width: functions.rem(75);
 }
-
-// Concept D (Adaptiv): create and join side by side.
-@container screen (min-width: 52rem) {
-  :host {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: functions.rem(22);
-  }
-
-  .action-title {
-    grid-column: 1 / -1;
-    margin-bottom: functions.rem(13);
-  }
-
-  .create-game-card {
-    flex-direction: column;
-    justify-content: center;
-    min-height: functions.rem(159);
-    margin-bottom: 0;
-
-    .card-icon {
-      margin: 0 0 functions.rem(16);
-    }
-
-    .card-title,
-    .card-desc {
-      text-align: center;
-    }
-  }
-}

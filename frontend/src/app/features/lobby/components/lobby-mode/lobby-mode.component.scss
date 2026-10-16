@@ -56,36 +56,3 @@
   margin-right: functions.rem(19);
   flex-shrink: 0;
 }
-
-// Concept D (Adaptiv): both modes side by side as large tiles.
-@container screen (min-width: 52rem) {
-  :host {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: functions.rem(22);
-  }
-
-  .action-title {
-    grid-column: 1 / -1;
-    margin-bottom: functions.rem(13);
-  }
-
-  .mode-card {
-    flex-direction: column;
-    justify-content: center;
-    min-height: functions.rem(200);
-
-    &:not(:last-child) {
-      margin-bottom: 0;
-    }
-  }
-
-  .card-icon {
-    margin: 0 0 functions.rem(16);
-  }
-
-  .card-title,
-  .card-desc {
-    text-align: center;
-  }
-}

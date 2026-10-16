@@ -1,4 +1,3 @@
-@use 'sass:string';
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 
@@ -29,8 +28,6 @@
 :root {
   /* Width of the game column on tablets and desktops. */
   --app-column-width: 40rem;
-  /* Height a game screen fills (less inside a card, see layout concepts). */
-  --app-screen-height: 100dvh;
   --app-safe-top: env(safe-area-inset-top, 0px);
   --app-safe-bottom: env(safe-area-inset-bottom, 0px);
   --app-safe-left: env(safe-area-inset-left, 0px);
@@ -126,7 +123,7 @@ app-result-container {
   display: block;
   width: 100%;
   max-width: var(--app-column-width);
-  min-height: var(--app-screen-height);
+  min-height: 100dvh;
   margin: 0 auto;
   padding: var(--app-safe-top) var(--app-safe-right) var(--app-safe-bottom)
     var(--app-safe-left);
@@ -156,88 +153,5 @@ app-result-container {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-}
-
-/*
- * ---------------------------------------------------------------------------
- * Temporary: large-screen layout concepts, switched in development via the
- * «Layout-Vorschau» (html[data-layout]). Without the attribute the current
- * layout (A) applies. Only the chosen concept stays after the decision.
- * ---------------------------------------------------------------------------
- */
-
-$game-screens: 'app-start-container, app-lobby-container, app-quiz-container, app-result-container';
-$fluid-font: 'clamp(16px, 0.3676vw + 12.24px, 24px)';
-
-/* B and D: the root font grows continuously, rounded to whole pixels. */
-html:is([data-layout='fluid'], [data-layout='adaptive']):not(
-    :has(app-admin-shell, app-admin-login-page)
-  ) {
-  font-size: string.unquote($fluid-font);
-  font-size: string.unquote('round(nearest, #{$fluid-font}, 1px)');
-}
-
-/* C · Bühne: the app as a card on a branded surface. */
-@media (min-width: 1024px) {
-  html[data-layout='stage']:has(#{$game-screens}) {
-    --stage-gap: clamp(24px, 3vw, 64px);
-    --app-screen-height: calc(100dvh - 2 * var(--stage-gap));
-
-    /* On <html>, so the card's margin never reveals the page colour. */
-    body {
-      background: transparent;
-    }
-
-    & {
-      background:
-        radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px) 0 0 / 24px
-          24px,
-        radial-gradient(circle at 12% 15%, rgba(0, 164, 224, 0.45), transparent 40%),
-        radial-gradient(circle at 88% 90%, rgba(0, 120, 187, 0.55), transparent 45%),
-        #00327d;
-      background-attachment: fixed;
-    }
-
-    :is(#{$game-screens}) {
-      max-width: calc(var(--app-column-width) + 4rem);
-      margin: var(--stage-gap) auto;
-      border-radius: 1.75rem;
-      background-color: colors.$dt-color-pepper-bright;
-      box-shadow: 0 1.5rem 5rem rgba(0, 16, 48, 0.45);
-      overflow: clip;
-    }
-  }
-}
-
-/* D · Adaptiv: a wider column whose screens adapt via container queries. */
-html[data-layout='adaptive'] :is(#{$game-screens}) {
-  container: screen / inline-size;
-}
-
-@media (min-width: 1024px) {
-  html[data-layout='adaptive'] {
-    --app-column-width: 64rem;
-  }
-}
-
-/* E · Geteilt: brand area on the left, the game on the right. */
-@media (min-width: 1200px) {
-  html[data-layout='split']:has(#{$game-screens}) {
-    --layout-aside-width: clamp(380px, 36vw, 640px);
-
-    app-root {
-      padding-left: var(--layout-aside-width);
-    }
-
-    app-layout-aside {
-      display: block;
-    }
-
-    /* The aside already shows the brand and the game facts. */
-    app-start-header,
-    app-start-ui .features-row {
-      display: none;
-    }
   }
 }

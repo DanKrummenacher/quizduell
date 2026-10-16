@@ -72,17 +72,3 @@
     background-color: transparent;
   }
 }
-
-// Concept D (Adaptiv): both players side by side.
-@container screen (min-width: 52rem) {
-  .results-list {
-    flex-direction: row;
-    gap: functions.rem(14);
-    max-width: functions.rem(736);
-    margin-inline: auto;
-  }
-
-  .player-result-card {
-    height: functions.rem(84);
-  }
-}
