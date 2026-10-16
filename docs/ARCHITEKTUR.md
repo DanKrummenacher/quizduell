@@ -103,12 +103,13 @@ Code hinterlegt; der Import im Admin speichert sie nur in die Datenbank.
   eigenständig, deshalb ohne diese Trennung.
 - UI-Komponenten aus `@css-ch/components` und `@css-ch/calc-ui-text`, Farben und Schrift aus
   den Design-Tokens der Shared Library.
-- Mobile-first: Auf Tablets und Desktops steht das Mobile-Design in einer zentrierten
-  Spalte, die auf grossen Monitoren in ganzen Pixel-Schritten mitwächst (16 bis höchstens
-  20 px Grundschrift). Der Header ist auf allen Spielseiten gleich.
-- Grosse Bildschirme (ab 1024 px): Quiz und Resultat bleiben als Block in der Mitte
-  zusammen, statt sich über die ganze Höhe zu verteilen; die freien Seitenflächen tragen
-  dezent die Markenfarben. Der Admin-Bereich bleibt schlicht und immer bei 16 px.
+- Ein Layout-System für alle Seiten, Spiel und Admin gleich: dieselbe Grössen-Skala
+  (16 px auf Handy und Tablet, auf grossen Monitoren in ganzen Pixel-Schritten bis
+  höchstens 20 px), derselbe Header (Logo mittig, im Admin zusätzlich «Admin» rechts) und
+  dieselbe Inhaltsspalte (`styles/_layout.scss`, Spiel 40rem, Admin 1100px breit).
+- Grosse Bildschirme (ab 1024 px): Die freien Seitenflächen tragen dezent die Markenfarben,
+  die Inhaltsspalte geht weich darin über. Quiz und Resultat bleiben als Block in der Mitte
+  zusammen, statt sich über die ganze Höhe zu verteilen.
 - Automatisiert getestet auf 14 Geräten vom iPhone SE bis Ultrawide
   (`e2e/responsive.spec.ts`).
 

@@ -1,0 +1,15 @@
+// Shared page layout for all screens (game and admin).
+@use '@css-ch/web-design-tokens/colors';
+
+// From this width the page background shows the brand surface (styles.scss)
+// and every page draws its content column on top of it.
+$large-screen: 1024px;
+
+/// The column that holds a page's content. On large screens it is drawn in
+/// the page colour and fades softly into the decorated background.
+@mixin page-column {
+  @media (min-width: $large-screen) {
+    background-color: colors.$dt-color-pepper-bright;
+    box-shadow: 0 0 3rem 2rem colors.$dt-color-pepper-bright;
+  }
+}

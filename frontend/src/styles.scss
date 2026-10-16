@@ -1,8 +1,6 @@
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
-
-/* The four game screens (start, lobby, quiz, result). */
-$game-screens: 'app-start-container, app-lobby-container, app-quiz-container, app-result-container';
+@use 'layout';
 
 @font-face {
   font-weight: 300;
@@ -68,11 +66,6 @@ html {
   }
 }
 
-/* The admin area is a work tool: always at the default size. */
-html:has(app-admin-shell, app-admin-login-page) {
-  font-size: 100%;
-}
-
 html,
 body {
   margin: 0;
@@ -108,7 +101,10 @@ app-root {
  * Game screens keep the mobile layout and sit in a centered column on
  * tablets and desktops. Safe areas keep content clear of notches.
  */
-#{$game-screens} {
+app-start-container,
+app-lobby-container,
+app-quiz-container,
+app-result-container {
   display: block;
   width: 100%;
   max-width: var(--app-column-width);
@@ -116,6 +112,7 @@ app-root {
   margin: 0 auto;
   padding: var(--app-safe-top) var(--app-safe-right) var(--app-safe-bottom)
     var(--app-safe-left);
+  @include layout.page-column;
 }
 
 :focus-visible {
@@ -146,26 +143,21 @@ app-root {
 }
 
 /*
- * Large screens: the empty sides next to the game column get the brand
- * colours and a fine dot grid; the column fades softly into it. Only on the
- * game screens, the admin area stays plain.
+ * Large screens: the free sides next to the content column show the brand
+ * colours and a fine dot grid. Each page draws its column on top of it
+ * (`layout.page-column`), on game and admin pages alike.
  */
-@media (min-width: 1024px) {
-  html:has(#{$game-screens}) {
+@media (min-width: layout.$large-screen) {
+  html {
     background:
       radial-gradient(rgba(0, 50, 125, 0.1) 1.2px, transparent 1.4px) 0 0 / 22px 22px,
       radial-gradient(60% 80% at 0% 35%, rgba(0, 164, 224, 0.16), transparent 70%),
       radial-gradient(60% 80% at 100% 75%, rgba(0, 120, 187, 0.16), transparent 70%),
       colors.$dt-color-pepper-bright;
     background-attachment: fixed;
+  }
 
-    body {
-      background: transparent;
-    }
-
-    :is(#{$game-screens}) {
-      background-color: colors.$dt-color-pepper-bright;
-      box-shadow: 0 0 3rem 2rem colors.$dt-color-pepper-bright;
-    }
+  body {
+    background: transparent;
   }
 }

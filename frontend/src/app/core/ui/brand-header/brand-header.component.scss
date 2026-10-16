@@ -40,10 +40,11 @@ $light: #00a4e0;
   }
 }
 
+// Logo always in the middle; an optional label sits on the right.
 .inner {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: center;
   gap: functions.rem(12);
   max-width: var(--brand-inner-width, var(--app-column-width));
   min-height: functions.rem(62);
@@ -51,11 +52,8 @@ $light: #00a4e0;
   padding: 0 var(--brand-inner-padding, #{functions.rem(16)});
 }
 
-.with-label {
-  justify-content: space-between;
-}
-
 .lockup {
+  grid-column: 2;
   display: flex;
   align-items: center;
   gap: functions.rem(10);
@@ -81,6 +79,8 @@ $light: #00a4e0;
 }
 
 .chip {
+  grid-column: 3;
+  justify-self: end;
   padding: functions.rem(5) functions.rem(12);
   border: functions.rem(1) solid rgba(255, 255, 255, 0.35);
   border-radius: 999px;

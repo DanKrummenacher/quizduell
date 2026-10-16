@@ -1,6 +1,7 @@
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
+@use 'layout';
 
 :host {
   display: block;
@@ -13,6 +14,7 @@
   margin: 0 auto;
   padding: var(--app-safe-top) var(--app-safe-right) var(--app-safe-bottom)
     var(--app-safe-left);
+  @include layout.page-column;
 }
 .main-content {
   flex-grow: 1;
