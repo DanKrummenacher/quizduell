@@ -108,9 +108,11 @@ export async function joinByCode(
 }
 
 export async function waitForQuestion(page: Page, number: number): Promise<void> {
-  await expect(page.getByText(`Frage ${number} von`)).toBeVisible({
-    timeout: 25_000,
-  });
+  // The quiz header shows the question number as «3/7» in its diamond.
+  await expect(page.locator('app-quiz-status .clock-value')).toHaveText(
+    new RegExp(`^${number}/`),
+    { timeout: 25_000 },
+  );
   await expect(
     page.locator('button.answer-card:not([disabled])').first(),
   ).toBeVisible();

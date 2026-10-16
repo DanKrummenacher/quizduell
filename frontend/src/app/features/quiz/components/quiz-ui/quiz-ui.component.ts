@@ -1,9 +1,5 @@
 import { Component, input, output, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrandHeaderComponent } from '../../../../core/ui/brand-header/brand-header.component';
-import {
-  FACEOFF_DEFAULTS,
-  type FaceoffOptions,
-} from '../../../../core/preview/quiz-header.store';
 import { QuizQuestionComponent } from '../quiz-question/quiz-question.component';
 import { QuizStatusComponent } from '../quiz-status/quiz-status.component';
 import type { QuizPhase, AnswerViewData, FeedbackType } from '../../quiz.types';
@@ -18,7 +14,6 @@ import '@css-ch/components/flyout';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class QuizUiComponent {
-  readonly headerOptions = input<FaceoffOptions>(FACEOFF_DEFAULTS);
   readonly currentQuestion = input.required<number>();
   readonly totalQuestions = input.required<number>();
   readonly playerName = input.required<string>();

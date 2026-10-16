@@ -2,41 +2,46 @@
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 
-$border: #8098be;
 $muted: #4d70a4;
 $opponent: #00a4e0;
 $opponent-surface: #e5ecf5;
 $warning: #d53419;
-$brand-gradient: linear-gradient(90deg, #00327d, #0078bb 45%, #00a4e0);
 
 // Geometry of the two halves: the dividing line leans by $slant and runs
 // exactly through the middle; $gap keeps a thin line of page colour.
 $height: functions.rem(80);
 $slant: functions.rem(32);
 $gap: functions.rem(4);
+// Distance from the outer edges to the content.
+$outer: functions.rem(20);
 // Keeps names and points clear of the diamond in the middle.
 $inner: functions.rem(56);
-$clock: functions.rem(46);
+$clock: functions.rem(48);
 
 :host {
   display: block;
 }
 
 .status {
-  // Distance from the halves' outer edge to their content.
-  --outer: #{functions.rem(20)};
-
   margin-top: functions.rem(16);
 }
 
 // ---------------------------------------------------------------------------
-// The two halves
+// The two halves: edge to edge on phones, a rounded band from tablets on.
 // ---------------------------------------------------------------------------
 .faceoff {
   position: relative;
   height: $height;
-  // Default: reaches the edges of the quiz column (its side padding is 20px).
+  // Reaches the edges of the quiz column (its side padding is 20px).
   margin-inline: functions.rem(-20);
+}
+
+@media (min-width: 640px) {
+  .faceoff {
+    margin-inline: 0;
+    overflow: hidden;
+    border-radius: functions.rem(8);
+  }
 }
 
 .side {
@@ -51,8 +56,8 @@ $clock: functions.rem(46);
 
   &.me {
     left: 0;
-    padding: 0 $inner 0 var(--outer);
-    background: colors.$dt-color-darkblue-100;
+    padding: 0 $inner 0 $outer;
+    background-color: colors.$dt-color-darkblue-100;
     color: colors.$dt-color-white-100;
     clip-path: polygon(0 0, 100% 0, calc(100% - #{$slant}) 100%, 0 100%);
 
@@ -72,8 +77,8 @@ $clock: functions.rem(46);
 
   &.opponent {
     right: 0;
-    padding: 0 var(--outer) 0 $inner;
-    background: $opponent-surface;
+    padding: 0 $outer 0 $inner;
+    background-color: $opponent-surface;
     color: colors.$dt-color-darkblue-100;
     text-align: right;
     clip-path: polygon(#{$slant} 0, 100% 0, 100% 100%, 0 100%);
@@ -126,6 +131,8 @@ $clock: functions.rem(46);
   text-overflow: ellipsis;
 }
 
+// The leading space is for screen readers; as a flex item it collapses,
+// so the margin keeps the visual gap.
 .you {
   flex: none;
   margin-left: 0.25em;
@@ -138,6 +145,7 @@ $clock: functions.rem(46);
   line-height: 1.15;
   white-space: nowrap;
 
+  // Points that just increased light up briefly.
   &.pop {
     animation: points-pop 0.7s ease-out;
   }
@@ -149,7 +157,7 @@ $clock: functions.rem(46);
 }
 
 // ---------------------------------------------------------------------------
-// The diamond on the dividing line
+// The question number in a diamond on the dividing line
 // ---------------------------------------------------------------------------
 .clock {
   position: absolute;
@@ -161,76 +169,25 @@ $clock: functions.rem(46);
   height: $clock;
   transform: translate(-50%, -50%) rotate(45deg);
   border: functions.rem(3) solid colors.$dt-color-pepper-bright;
-  background: $opponent;
-  transition: background-color 0.3s ease;
+  background-color: $opponent;
 }
 
 .clock-value {
   transform: rotate(-45deg);
-  font-size: functions.rem(17);
+  font-size: functions.rem(14);
   font-weight: miscs.$css-ui-font-weight-bold;
   font-variant-numeric: tabular-nums;
   color: colors.$dt-color-white-100;
-
-  &.small {
-    font-size: functions.rem(13);
-  }
-}
-
-// «Raute als Uhr»: the outline runs down instead of a separate bar.
-.clock-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: functions.rem(68);
-  height: functions.rem(68);
-  transform: translate(-50%, -50%);
-  overflow: visible;
-}
-
-.ring-fill {
-  fill: $opponent;
-  stroke: colors.$dt-color-pepper-bright;
-  stroke-width: 4;
-  stroke-linejoin: round;
-  transition: fill 0.3s ease;
-}
-
-.ring-progress {
-  fill: none;
-  stroke: colors.$dt-color-white-100;
-  stroke-width: 3;
-  stroke-linejoin: round;
-  stroke-dasharray: 100;
-  transform: scale(0.8);
-  transform-origin: 50% 50%;
-}
-
-.ring-value {
-  fill: colors.$dt-color-white-100;
-  font-size: 17px;
-  font-weight: miscs.$css-ui-font-weight-bold;
-  font-variant-numeric: tabular-nums;
-  text-anchor: middle;
-  dominant-baseline: central;
+  white-space: nowrap;
 }
 
 // ---------------------------------------------------------------------------
-// Question number, time and time bar
+// Remaining time and time bar
 // ---------------------------------------------------------------------------
 .meta {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: functions.rem(12);
   margin-top: functions.rem(14);
   font-size: functions.rem(13);
-  color: $muted;
-
-  strong {
-    font-weight: miscs.$css-ui-font-weight-bold;
-    color: colors.$dt-color-darkblue-100;
-  }
 }
 
 .time {
@@ -254,127 +211,14 @@ $clock: functions.rem(46);
   background-color: colors.$dt-color-darkblue-100;
 }
 
-// ---------------------------------------------------------------------------
-// Width on screens wider than a phone
-// ---------------------------------------------------------------------------
-// «Randlos»: the halves reach the screen edges, the content stays aligned
-// with the quiz column.
-.width-bleed {
-  --outer: max(
-    #{functions.rem(20)},
-    calc((100vw - var(--app-column-width)) / 2 + #{functions.rem(20)})
-  );
-
-  .faceoff {
-    margin-inline: calc(50% - 50vw);
-  }
-}
-
-// «Band»: edge to edge on phones, a rounded band inside the column above.
-@media (min-width: 640px) {
-  .width-card {
-    --outer: #{functions.rem(16)};
-
-    .faceoff {
-      margin-inline: 0;
-      overflow: hidden;
-      border-radius: functions.rem(8);
-      box-shadow: 0 functions.rem(6) functions.rem(16) rgba(0, 50, 125, 0.14);
-    }
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Looks
-// ---------------------------------------------------------------------------
-// «Kontrast»: the opponent's half in colour as well.
-.look-contrast {
-  .side.opponent {
-    background: $opponent;
-    color: colors.$dt-color-white-100;
-
-    .name {
-      color: colors.$dt-color-white-100;
-      opacity: 0.85;
-    }
-
-    .avatar {
-      background-color: colors.$dt-color-white-100;
-      color: #0078bb;
-    }
-  }
-
-  .clock {
-    background: colors.$dt-color-white-100;
-  }
-
-  .clock-value {
-    color: colors.$dt-color-darkblue-100;
-  }
-
-  .ring-fill {
-    fill: colors.$dt-color-white-100;
-  }
-
-  .ring-progress {
-    stroke: colors.$dt-color-darkblue-100;
-  }
-
-  .ring-value {
-    fill: colors.$dt-color-darkblue-100;
-  }
-}
-
-// «Verlauf»: soft gradients and the brand line of the header below.
-.look-gradient {
-  .faceoff::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: functions.rem(3);
-    background: $brand-gradient;
-  }
-
-  .side.me {
-    background: linear-gradient(135deg, #00327d, #0b4a9c);
-  }
-
-  .side.opponent {
-    background: linear-gradient(135deg, #f1f5fa, #dde7f3);
-  }
-
-  .clock {
-    background: linear-gradient(135deg, #0078bb, #00a4e0);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// The last seconds of a question
-// ---------------------------------------------------------------------------
+// The last seconds of a question.
 .is-low {
   .time {
     color: $warning;
   }
 
-  .progress,
-  .clock {
-    background: $warning;
-  }
-
-  .clock-value,
-  .ring-value {
-    color: colors.$dt-color-white-100;
-    fill: colors.$dt-color-white-100;
-  }
-
-  .ring-fill {
-    fill: $warning;
-  }
-
-  .ring-progress {
-    stroke: colors.$dt-color-white-100;
+  .progress {
+    background-color: $warning;
   }
 }
 

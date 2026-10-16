@@ -9,7 +9,6 @@ import {
   untracked,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { QuizHeaderStore } from '../../../../core/preview/quiz-header.store';
 import { ANSWER_LETTERS } from '../../../../core/game/answer-letters';
 import { GAME_SCREEN_NAVIGATION } from '../../../../core/game/game-screen';
 import { GameClient } from '../../../../core/game/game-client.service';
@@ -30,8 +29,6 @@ export class QuizContainerComponent implements OnDestroy {
   private readonly playerNameStore = inject(PlayerNameStore);
 
   private readonly game = this.gameClient.state;
-  /** Temporary: the quiz header options being compared. */
-  readonly headerOptions = inject(QuizHeaderStore).options;
   private readonly now = signal(this.gameClient.serverNow());
   /** Answer chosen locally, shown immediately before the server confirms it. */
   private readonly selectedIndex = signal<number | null>(null);
