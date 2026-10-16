@@ -1,4 +1,11 @@
-import { Component, input, output, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  Component,
+  computed,
+  CUSTOM_ELEMENTS_SCHEMA,
+  input,
+  output,
+} from '@angular/core';
+import { BrandHeaderComponent } from '../../../../core/ui/brand-header/brand-header.component';
 import { LobbyState } from '../../lobby.types';
 import { LobbyHeaderComponent } from '../lobby-header/lobby-header.component';
 import { LobbyActionsComponent } from '../lobby-actions/lobby-actions.component';
@@ -8,10 +15,12 @@ import { LobbyModeComponent } from '../lobby-mode/lobby-mode.component';
 import { LobbySearchingComponent } from '../lobby-searching/lobby-searching.component';
 import '@css-ch/components/button';
 import '@css-ch/components/flyout';
+import '@css-ch/components/icon';
 
 @Component({
   selector: 'app-lobby-ui',
   imports: [
+    BrandHeaderComponent,
     LobbyHeaderComponent,
     LobbyModeComponent,
     LobbyActionsComponent,
@@ -32,6 +41,9 @@ export class LobbyUiComponent {
   readonly opponentLeft = input<boolean>(false);
   readonly countdownMs = input<number>(3000);
   readonly notice = input<string | null>(null);
+
+  /** Greeting and back navigation, hidden while the duel is about to start. */
+  protected readonly hasNavigation = computed(() => this.state() !== 'FOUND');
 
   readonly navigateBack = output<void>();
   readonly selectQuickGame = output<void>();

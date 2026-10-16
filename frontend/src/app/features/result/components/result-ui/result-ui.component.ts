@@ -1,4 +1,5 @@
 import { Component, input, output, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { BrandHeaderComponent } from '../../../../core/ui/brand-header/brand-header.component';
 import { ResultPlayersComponent } from '../result-players/result-players.component';
 import { PlayerResultView } from '../../result.types';
 import '@css-ch/calc-ui-text';
@@ -8,7 +9,7 @@ import '@css-ch/components/flyout';
 
 @Component({
   selector: 'app-result-ui',
-  imports: [ResultPlayersComponent],
+  imports: [BrandHeaderComponent, ResultPlayersComponent],
   templateUrl: './result-ui.component.html',
   styleUrl: './result-ui.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

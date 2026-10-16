@@ -1,7 +1,10 @@
 import { Component, input } from '@angular/core';
 import { LogoMarkComponent } from '../logo-mark/logo-mark.component';
 
-/** Full-width gradient bar with app icon and wordmark, flush with the top edge. */
+/**
+ * Full-width dark bar with app icon and wordmark, flush with the top edge.
+ * Page context can be placed on the sides via `headerStart` / `headerEnd`.
+ */
 @Component({
   selector: 'app-brand-header',
   imports: [LogoMarkComponent],

@@ -1,10 +1,19 @@
 <div class="page-wrapper">
-  @if (
-    state() === 'CHOOSE_MODE' ||
-    state() === 'CHOOSE_ACTION' ||
-    state() === 'WAITING' ||
-    state() === 'SEARCHING'
-  ) {
+  <app-brand-header class="game-header">
+    @if (hasNavigation()) {
+      <button
+        headerStart
+        type="button"
+        class="header-nav header-back"
+        (click)="navigateBack.emit()"
+      >
+        <css-icon icon="angle-left-circle" size="sm"></css-icon>
+        Zurück
+      </button>
+    }
+  </app-brand-header>
+
+  @if (hasNavigation()) {
     <div class="header-area">
       <app-lobby-header
         [playerName]="playerName()"
