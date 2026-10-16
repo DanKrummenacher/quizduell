@@ -116,3 +116,22 @@
   align-items: center;
   justify-content: center;
 }
+
+// Concept D (Adaptiv): larger question, answers in a 2×2 grid.
+@container screen (min-width: 52rem) {
+  .question-text {
+    font-size: functions.rem(32);
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  .answers-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: functions.rem(14);
+  }
+
+  .answer-card {
+    height: functions.rem(84);
+  }
+}

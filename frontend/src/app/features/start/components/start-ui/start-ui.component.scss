@@ -5,7 +5,7 @@
 :host {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  min-height: var(--app-screen-height);
 }
 
 .main-content {
@@ -80,4 +80,24 @@
 .form-wrapper {
   margin-top: functions.rem(55);
   width: 100%;
+}
+
+// Concept D (Adaptiv): more presence on wide screens.
+@container screen (min-width: 52rem) {
+  .main-title {
+    font-size: functions.rem(40);
+  }
+
+  .features-row {
+    gap: functions.rem(72);
+  }
+
+  .feature-circle {
+    width: functions.rem(76);
+    height: functions.rem(76);
+  }
+
+  .form-wrapper {
+    max-width: functions.rem(420);
+  }
 }
