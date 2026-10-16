@@ -54,14 +54,20 @@ test.describe('playing duels', () => {
     const anna = await newPlayer(browser, phone);
     const ben = await newPlayer(browser, tablet);
 
+    await anna.goto('/');
+    await expect(anna.locator('app-start-ui app-brand-header')).toBeVisible();
     await enterName(anna, 'Anna');
     await expect(anna.getByText('Hallo Anna')).toBeVisible();
+    await expect(anna.locator('app-lobby-ui app-brand-header')).toBeVisible();
     const code = await createFriendGame(anna);
     await expectNoHorizontalOverflow(anna);
 
     await joinByCode(ben, code, 'Ben');
     await expect(anna.getByText('Gegner gefunden!')).toBeVisible();
     await expect(anna.locator('.opponent-name')).toHaveText('Ben');
+
+    await waitForQuestion(anna, 1);
+    await expect(anna.locator('app-quiz-ui app-brand-header')).toBeVisible();
 
     for (let number = 1; number <= 3; number++) {
       await waitForQuestion(anna, number);
@@ -84,6 +90,7 @@ test.describe('playing duels', () => {
     await expect(anna.locator('.result-title')).toHaveText(outcome);
     await expect(ben.locator('.result-title')).toHaveText(outcome);
     await expect(anna.locator('.player-result-card')).toHaveCount(2);
+    await expect(anna.locator('app-result-ui app-brand-header')).toBeVisible();
     await expectNoHorizontalOverflow(anna);
 
     await anna.locator('css-button', { hasText: 'Revanche fordern' }).click();

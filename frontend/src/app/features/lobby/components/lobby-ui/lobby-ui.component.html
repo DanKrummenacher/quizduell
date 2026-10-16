@@ -1,17 +1,5 @@
 <div class="page-wrapper">
-  <app-brand-header class="game-header">
-    @if (hasNavigation()) {
-      <button
-        headerStart
-        type="button"
-        class="header-nav header-back"
-        (click)="navigateBack.emit()"
-      >
-        <css-icon icon="angle-left-circle" size="sm"></css-icon>
-        Zurück
-      </button>
-    }
-  </app-brand-header>
+  <app-brand-header />
 
   @if (hasNavigation()) {
     <div class="header-area">

@@ -40,11 +40,10 @@ $light: #00a4e0;
   }
 }
 
-// Logo in the middle, optional page context (back, progress) on the sides.
 .inner {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
+  justify-content: center;
   gap: functions.rem(12);
   max-width: var(--brand-inner-width, var(--app-column-width));
   min-height: functions.rem(62);
@@ -52,24 +51,8 @@ $light: #00a4e0;
   padding: 0 var(--brand-inner-padding, #{functions.rem(16)});
 }
 
-.side {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-
-.end {
-  justify-content: flex-end;
-}
-
-// Admin: logo on the left, label chip on the right.
 .with-label {
-  display: flex;
   justify-content: space-between;
-
-  .start {
-    display: none;
-  }
 }
 
 .lockup {

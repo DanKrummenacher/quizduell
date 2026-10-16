@@ -103,8 +103,14 @@ Code hinterlegt; der Import im Admin speichert sie nur in die Datenbank.
   eigenständig, deshalb ohne diese Trennung.
 - UI-Komponenten aus `@css-ch/components` und `@css-ch/calc-ui-text`, Farben und Schrift aus
   den Design-Tokens der Shared Library.
-- Mobile-first: Auf Tablets und Desktops steht das Mobile-Design in einer zentrierten,
-  mitwachsenden Spalte. Automatisiert getestet auf 14 Geräten (`e2e/responsive.spec.ts`).
+- Mobile-first: Auf Tablets und Desktops steht das Mobile-Design in einer zentrierten
+  Spalte, die auf grossen Monitoren in ganzen Pixel-Schritten mitwächst (16 bis höchstens
+  20 px Grundschrift). Der Header ist auf allen Spielseiten gleich.
+- Grosse Bildschirme (ab 1024 px): Quiz und Resultat bleiben als Block in der Mitte
+  zusammen, statt sich über die ganze Höhe zu verteilen; die freien Seitenflächen tragen
+  dezent die Markenfarben. Der Admin-Bereich bleibt schlicht und immer bei 16 px.
+- Automatisiert getestet auf 14 Geräten vom iPhone SE bis Ultrawide
+  (`e2e/responsive.spec.ts`).
 
 ## Qualität
 

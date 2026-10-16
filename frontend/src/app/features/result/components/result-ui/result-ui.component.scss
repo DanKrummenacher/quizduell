@@ -96,3 +96,16 @@
     stroke-width: functions.rem(4);
   }
 }
+
+// Large screens: the buttons stay right below the result instead of at the
+// bottom edge of the screen.
+@media (min-width: 1024px) {
+  .main-content {
+    justify-content: center;
+  }
+
+  .center-content {
+    flex-grow: 0;
+    padding-bottom: functions.rem(48);
+  }
+}

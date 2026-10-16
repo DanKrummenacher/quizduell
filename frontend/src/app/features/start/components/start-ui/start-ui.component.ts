@@ -2,11 +2,11 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, input, output } from '@angular/core'
 import '@css-ch/calc-ui-text';
 import '@css-ch/components/icon';
 import { StartFormComponent } from '../start-form/start-form.component';
-import { StartHeaderComponent } from '../start-header/start-header.component';
+import { BrandHeaderComponent } from '../../../../core/ui/brand-header/brand-header.component';
 
 @Component({
   selector: 'app-start-ui',
-  imports: [StartHeaderComponent, StartFormComponent],
+  imports: [BrandHeaderComponent, StartFormComponent],
   templateUrl: './start-ui.component.html',
   styleUrl: './start-ui.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

@@ -15,18 +15,6 @@
   box-sizing: border-box;
 }
 
-// Question progress inside the dark header (header variant «Mit Navigation»).
-.header-progress {
-  padding: functions.rem(4) functions.rem(12);
-  border: functions.rem(1) solid rgba(255, 255, 255, 0.35);
-  border-radius: 999px;
-  background-color: rgba(255, 255, 255, 0.12);
-  font-size: functions.rem(13);
-  font-weight: 500;
-  color: #fff;
-  white-space: nowrap;
-}
-
 .progress-text {
   display: block;
   text-align: center;
@@ -45,4 +33,18 @@
   margin-top: functions.rem(10);
   text-align: center;
   color: #bb4d00;
+}
+
+// Large screens: scoreboard, timer and question stay together as one block
+// in the middle instead of spreading over the whole height.
+@media (min-width: 1024px) {
+  .main-content {
+    justify-content: center;
+    padding-bottom: 8vh;
+  }
+
+  .question-wrapper {
+    flex-grow: 0;
+    margin-top: functions.rem(48);
+  }
 }

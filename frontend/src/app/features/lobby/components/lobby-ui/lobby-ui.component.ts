@@ -15,7 +15,6 @@ import { LobbyModeComponent } from '../lobby-mode/lobby-mode.component';
 import { LobbySearchingComponent } from '../lobby-searching/lobby-searching.component';
 import '@css-ch/components/button';
 import '@css-ch/components/flyout';
-import '@css-ch/components/icon';
 
 @Component({
   selector: 'app-lobby-ui',

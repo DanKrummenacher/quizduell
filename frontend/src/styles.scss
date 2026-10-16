@@ -1,6 +1,9 @@
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 
+/* The four game screens (start, lobby, quiz, result). */
+$game-screens: 'app-start-container, app-lobby-container, app-quiz-container, app-result-container';
+
 @font-face {
   font-weight: 300;
   font-family: 'Museo Sans';
@@ -40,6 +43,7 @@ html {
   /*
    * Phones and tablets keep 16px; large monitors scale the whole UI up in
    * whole-pixel steps so components never render on fractional pixels.
+   * Growth stops at 20px, so ultrawide and 4K screens do not look oversized.
    */
   font-size: 100%;
   -webkit-text-size-adjust: 100%;
@@ -61,18 +65,6 @@ html {
 @media (min-width: 1920px) {
   html {
     font-size: 125%; /* 20px */
-  }
-}
-
-@media (min-width: 2560px) {
-  html {
-    font-size: 137.5%; /* 22px */
-  }
-}
-
-@media (min-width: 3200px) {
-  html {
-    font-size: 150%; /* 24px */
   }
 }
 
@@ -116,10 +108,7 @@ app-root {
  * Game screens keep the mobile layout and sit in a centered column on
  * tablets and desktops. Safe areas keep content clear of notches.
  */
-app-start-container,
-app-lobby-container,
-app-quiz-container,
-app-result-container {
+#{$game-screens} {
   display: block;
   width: 100%;
   max-width: var(--app-column-width);
@@ -157,94 +146,12 @@ app-result-container {
 }
 
 /*
- * ---------------------------------------------------------------------------
- * Temporary: design preview, switched in development via «Design-Vorschau»
- * (html[data-header], html[data-large]). Without the attributes the current
- * design applies. Only the chosen variants stay after the decision.
- * ---------------------------------------------------------------------------
+ * Large screens: the empty sides next to the game column get the brand
+ * colours and a fine dot grid; the column fades softly into it. Only on the
+ * game screens, the admin area stays plain.
  */
-
-$game-screens: 'app-start-container, app-lobby-container, app-quiz-container, app-result-container';
-
-/* Header on lobby, quiz and result (H1–H3); hidden in today's design (H0). */
-app-brand-header.game-header,
-.header-nav {
-  display: none;
-}
-
-html[data-header] app-brand-header.game-header {
-  display: block;
-}
-
-/* H2 · Mit Navigation: back and progress move into the header. */
-html[data-header='navigation'] {
-  .header-nav {
-    display: inline-flex;
-  }
-
-  app-lobby-header .top-bar,
-  app-quiz-ui .progress-text {
-    display: none;
-  }
-}
-
-/* H3 · Schlank im Duell: a slim header during the questions. */
-html[data-header='slim'] app-quiz-ui .game-header {
-  .inner {
-    min-height: 2.75rem;
-  }
-
-  .logo {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-
-  .wordmark {
-    font-size: 1rem;
-  }
-}
-
 @media (min-width: 1024px) {
-  /* G1 · Inhalt zusammenhalten: no large gaps between content and buttons. */
-  html[data-large~='cohesive'] {
-    app-quiz-ui .main-content {
-      justify-content: center;
-      padding-bottom: 8vh;
-    }
-
-    app-quiz-ui .question-wrapper {
-      flex-grow: 0;
-      margin-top: 3rem;
-    }
-
-    app-result-ui .main-content {
-      justify-content: center;
-    }
-
-    app-result-ui .center-content {
-      flex-grow: 0;
-      padding-bottom: 3rem;
-    }
-  }
-
-  /* G3 · Spalte als Fläche: the game column stands out from the edges. */
-  html[data-large~='surface'] {
-    background-color: #e9edf3;
-
-    body {
-      background: transparent;
-    }
-
-    :is(#{$game-screens}) {
-      background-color: colors.$dt-color-pepper-bright;
-      box-shadow:
-        0 0 0 1px rgba(0, 50, 125, 0.07),
-        0 0 3rem rgba(0, 50, 125, 0.08);
-    }
-  }
-
-  /* G2 · Seitenflächen gestalten: brand colours and dots on the sides. */
-  html[data-large~='sides'] {
+  html:has(#{$game-screens}) {
     background:
       radial-gradient(rgba(0, 50, 125, 0.1) 1.2px, transparent 1.4px) 0 0 / 22px 22px,
       radial-gradient(60% 80% at 0% 35%, rgba(0, 164, 224, 0.16), transparent 70%),
@@ -255,18 +162,10 @@ html[data-header='slim'] app-quiz-ui .game-header {
     body {
       background: transparent;
     }
-  }
 
-  /* The column fades softly into the pattern (unless G3 draws a surface). */
-  html[data-large~='sides']:not([data-large~='surface']) :is(#{$game-screens}) {
-    background-color: colors.$dt-color-pepper-bright;
-    box-shadow: 0 0 3rem 2rem colors.$dt-color-pepper-bright;
-  }
-}
-
-/* G4 · Grössenlimit: stop growing at 20 px (ultrawide and 4K). */
-@media (min-width: 2560px) {
-  html[data-large~='cap']:not(:has(app-admin-shell, app-admin-login-page)) {
-    font-size: 125%;
+    :is(#{$game-screens}) {
+      background-color: colors.$dt-color-pepper-bright;
+      box-shadow: 0 0 3rem 2rem colors.$dt-color-pepper-bright;
+    }
   }
 }
