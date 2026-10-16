@@ -1,0 +1,82 @@
+<section class="status" [class.is-low]="isLow()" aria-label="Spielstand">
+  @if (variant() === 'cards') {
+    <div class="cards">
+      <div class="card me">
+        <span class="avatar" aria-hidden="true">{{ playerInitial() }}</span>
+        <span class="who">
+          <span class="name"
+            ><span class="name-text">{{ playerName() }}</span> (Du)</span
+          >
+          <span class="points"
+            >{{ playerScore() }}<span class="unit"> Pkt.</span></span
+          >
+        </span>
+      </div>
+
+      <span class="versus" aria-hidden="true">VS</span>
+
+      <div class="card opponent">
+        <span class="who">
+          <span class="name"
+            ><span class="name-text">{{ opponentName() }}</span></span
+          >
+          <span class="points"
+            >{{ opponentScore() }}<span class="unit"> Pkt.</span></span
+          >
+        </span>
+        <span class="avatar" aria-hidden="true">{{ opponentInitial() }}</span>
+      </div>
+    </div>
+  } @else {
+    <div class="faceoff">
+      <div class="side me">
+        <span class="avatar" aria-hidden="true">{{ playerInitial() }}</span>
+        <span class="who">
+          <span class="name"
+            ><span class="name-text">{{ playerName() }}</span> (Du)</span
+          >
+          <span class="points"
+            >{{ playerScore() }}<span class="unit"> Pkt.</span></span
+          >
+        </span>
+      </div>
+
+      <div class="side opponent">
+        <span class="who">
+          <span class="name"
+            ><span class="name-text">{{ opponentName() }}</span></span
+          >
+          <span class="points"
+            >{{ opponentScore() }}<span class="unit"> Pkt.</span></span
+          >
+        </span>
+        <span class="avatar" aria-hidden="true">{{ opponentInitial() }}</span>
+      </div>
+
+      <!-- The time sits in a diamond, one of the logo's shapes. -->
+      <span class="clock" aria-hidden="true"
+        ><span class="clock-value">{{ timeLeft() }}</span></span
+      >
+    </div>
+  }
+
+  <div class="meta">
+    <span class="question">
+      <strong>Frage {{ currentQuestion() }}</strong> von {{ totalQuestions() }}
+    </span>
+    <span
+      class="time"
+      [class.time-faceoff]="variant() === 'faceoff' && !isReveal()"
+      role="timer"
+      >{{ timeText() }}</span
+    >
+  </div>
+
+  <div class="track" aria-hidden="true">
+    <div
+      class="progress"
+      [style.width.%]="timerPercent()"
+      [style.transition]="barTransition()"
+    ></div>
+  </div>
+</section>

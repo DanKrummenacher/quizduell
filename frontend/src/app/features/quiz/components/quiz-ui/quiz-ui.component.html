@@ -1,30 +1,24 @@
 <app-brand-header />
 
 <main class="main-content">
-  <calc-text textSmall class="progress-text"
-    >Frage {{ currentQuestion() }} von {{ totalQuestions() }}</calc-text
-  >
-
-  <app-quiz-scoreboard
+  <app-quiz-status
+    [variant]="headerVariant()"
     [playerName]="playerName()"
     [playerScore]="playerScore()"
     [opponentName]="opponentName()"
     [opponentScore]="opponentScore()"
-  >
-  </app-quiz-scoreboard>
+    [currentQuestion]="currentQuestion()"
+    [totalQuestions]="totalQuestions()"
+    [timeLeft]="timeLeft()"
+    [timerPercent]="timerPercent()"
+    [isReveal]="quizPhase() === 'REVEAL'"
+  />
 
   @if (opponentOffline()) {
     <calc-text textSmall class="opponent-offline" role="status">
       Verbindung zu {{ opponentName() }} unterbrochen – wir warten kurz …
     </calc-text>
   }
-
-  <app-quiz-timer
-    [timeLeft]="timeLeft()"
-    [timerPercent]="timerPercent()"
-    [isReveal]="quizPhase() === 'REVEAL'"
-  >
-  </app-quiz-timer>
 
   <div class="question-wrapper">
     <app-quiz-question

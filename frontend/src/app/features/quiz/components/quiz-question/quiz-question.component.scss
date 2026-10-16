@@ -47,40 +47,37 @@
 }
 
 .answer-card {
-  width: 100%;
-  height: functions.rem(62);
-  background-color: colors.$dt-color-white-100;
-  border: functions.rem(1) solid #8098be;
-  border-radius: functions.rem(4);
   display: flex;
   align-items: center;
-  padding: 0;
-  text-align: left;
+  gap: functions.rem(16);
   position: relative;
+  width: 100%;
+  height: functions.rem(62);
+  // Room on the right for the opponent badge.
+  padding: 0 functions.rem(52) 0 0;
+  overflow: hidden;
+  border: functions.rem(1) solid #8098be;
+  border-radius: functions.rem(4);
+  background-color: colors.$dt-color-white-100;
   font-weight: miscs.$css-ui-font-weight-bold;
+  text-align: left;
   @include interaction.card;
 
   // Only the fill changes; the card border always stays the same.
   &.state-selected {
-    background-color: #00327d;
-    .letter-box {
-      background-color: transparent;
-      border-color: colors.$dt-color-white-100;
-    }
+    background-color: colors.$dt-color-darkblue-100;
   }
+
   &.state-correct {
     background-color: #00875e;
-    .letter-box {
-      background-color: transparent;
-      border-color: colors.$dt-color-white-100;
-    }
   }
+
   &.state-wrong {
     background-color: #d53419;
-    .letter-box {
-      background-color: transparent;
-      border-color: colors.$dt-color-white-100;
-    }
+  }
+
+  &:is(.state-selected, .state-correct, .state-wrong) .letter-box {
+    background-color: rgba(255, 255, 255, 0.16);
   }
 
   &:disabled {
@@ -88,28 +85,33 @@
   }
 }
 
+// «Buchstaben-Block»: the letter in a dark block over the full card height.
 .letter-box {
-  width: functions.rem(30);
-  height: functions.rem(30);
-  background-color: colors.$dt-color-white-100;
-  border: functions.rem(1) solid #8098be;
-  border-radius: functions.rem(4);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 functions.rem(15);
   flex-shrink: 0;
-  transition: all 0.2s ease-in-out;
+  align-self: stretch;
+  width: functions.rem(56);
+  background-color: colors.$dt-color-darkblue-100;
+  transition: background-color 0.2s ease;
+
+  calc-text {
+    font-size: functions.rem(17);
+    font-weight: miscs.$css-ui-font-weight-bold;
+  }
 }
 
 .opponent-badge {
   position: absolute;
-  right: functions.rem(15);
+  right: functions.rem(14);
   top: 50%;
   transform: translateY(-50%);
   width: functions.rem(30);
   height: functions.rem(30);
-  background-color: #00327d;
+  // Same colour as the opponent in the quiz header.
+  background-color: #00a4e0;
+  border: functions.rem(2) solid colors.$dt-color-white-100;
   border-radius: 50%;
   display: flex;
   align-items: center;

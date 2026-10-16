@@ -22,13 +22,8 @@
         (click)="answerSelected.emit(answer.letter)"
         [disabled]="phase() !== 'PLAYING'"
       >
-        <div class="letter-box">
-          <calc-text
-            textSmall
-            [attr.colorWhite]="answer.state !== 'default' ? '' : null"
-          >
-            {{ answer.letter }}
-          </calc-text>
+        <div class="letter-box" aria-hidden="true">
+          <calc-text colorWhite>{{ answer.letter }}</calc-text>
         </div>
 
         <calc-text

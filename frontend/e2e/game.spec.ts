@@ -82,7 +82,7 @@ test.describe('playing duels', () => {
       const feedback = /Richtig! \+\d+ Punkte|Falsch! \+0 Punkte/;
       await expect(anna.locator('.feedback-wrapper')).toHaveText(feedback);
       await expect(ben.locator('.feedback-wrapper')).toHaveText(feedback);
-      await expect(anna.getByText('Es geht weiter in:')).toBeVisible();
+      await expect(anna.getByText(/Es geht weiter in \d+ s/)).toBeVisible();
     }
 
     const outcome = /Gewonnen!|Verloren!|Unentschieden!/;

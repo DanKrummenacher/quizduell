@@ -15,12 +15,6 @@
   box-sizing: border-box;
 }
 
-.progress-text {
-  display: block;
-  text-align: center;
-  margin-top: functions.rem(15);
-}
-
 .question-wrapper {
   flex-grow: 1;
   display: flex;
@@ -35,7 +29,7 @@
   color: #bb4d00;
 }
 
-// Large screens: scoreboard, timer and question stay together as one block
+// Large screens: the status and the question stay together as one block
 // in the middle instead of spreading over the whole height.
 @media (min-width: 1024px) {
   .main-content {
