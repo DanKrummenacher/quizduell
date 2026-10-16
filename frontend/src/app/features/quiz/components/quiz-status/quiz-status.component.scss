@@ -3,23 +3,97 @@
 @use '@css-ch/calc-helpers/styles' as functions;
 
 $border: #8098be;
+$muted: #4d70a4;
 $opponent: #00a4e0;
 $opponent-surface: #e5ecf5;
 $warning: #d53419;
-// The horizontal offset of the slanted dividing line in «Gegenüber».
+$brand-gradient: linear-gradient(90deg, #00327d, #0078bb 45%, #00a4e0);
+
+// Geometry of the two halves: the dividing line leans by $slant and runs
+// exactly through the middle; $gap keeps a thin line of page colour.
+$height: functions.rem(80);
 $slant: functions.rem(32);
+$gap: functions.rem(4);
+// Keeps names and points clear of the diamond in the middle.
+$inner: functions.rem(56);
+$clock: functions.rem(46);
 
 :host {
   display: block;
 }
 
 .status {
+  // Distance from the halves' outer edge to their content.
+  --outer: #{functions.rem(20)};
+
   margin-top: functions.rem(16);
 }
 
 // ---------------------------------------------------------------------------
-// Shared player parts
+// The two halves
 // ---------------------------------------------------------------------------
+.faceoff {
+  position: relative;
+  height: $height;
+  // Default: reaches the edges of the quiz column (its side padding is 20px).
+  margin-inline: functions.rem(-20);
+}
+
+.side {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: functions.rem(10);
+  width: calc(50% + #{$slant} / 2 - #{$gap} / 2);
+  min-width: 0;
+
+  &.me {
+    left: 0;
+    padding: 0 $inner 0 var(--outer);
+    background: colors.$dt-color-darkblue-100;
+    color: colors.$dt-color-white-100;
+    clip-path: polygon(0 0, 100% 0, calc(100% - #{$slant}) 100%, 0 100%);
+
+    .avatar {
+      background-color: colors.$dt-color-white-100;
+      color: colors.$dt-color-darkblue-100;
+    }
+
+    .name {
+      opacity: 0.85;
+    }
+
+    .points {
+      transform-origin: left center;
+    }
+  }
+
+  &.opponent {
+    right: 0;
+    padding: 0 var(--outer) 0 $inner;
+    background: $opponent-surface;
+    color: colors.$dt-color-darkblue-100;
+    text-align: right;
+    clip-path: polygon(#{$slant} 0, 100% 0, 100% 100%, 0 100%);
+
+    .name {
+      justify-content: flex-end;
+      color: $muted;
+    }
+
+    .avatar {
+      background-color: $opponent;
+      color: colors.$dt-color-white-100;
+    }
+
+    .points {
+      transform-origin: right center;
+    }
+  }
+}
+
 .avatar {
   display: grid;
   place-items: center;
@@ -52,12 +126,21 @@ $slant: functions.rem(32);
   text-overflow: ellipsis;
 }
 
+.you {
+  flex: none;
+  margin-left: 0.25em;
+}
+
 .points {
-  white-space: nowrap;
   font-size: functions.rem(24);
   font-weight: miscs.$css-ui-font-weight-bold;
   font-variant-numeric: tabular-nums;
   line-height: 1.15;
+  white-space: nowrap;
+
+  &.pop {
+    animation: points-pop 0.7s ease-out;
+  }
 }
 
 .unit {
@@ -66,148 +149,19 @@ $slant: functions.rem(32);
 }
 
 // ---------------------------------------------------------------------------
-// T2 · Duell-Karten
+// The diamond on the dividing line
 // ---------------------------------------------------------------------------
-.cards {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: functions.rem(10);
-}
-
-.card {
-  display: flex;
-  align-items: center;
-  gap: functions.rem(10);
-  min-width: 0;
-  padding: functions.rem(12);
-  border: functions.rem(1) solid $border;
-  border-radius: functions.rem(4);
-  background-color: colors.$dt-color-white-100;
-  color: colors.$dt-color-darkblue-100;
-
-  &.me {
-    border-color: colors.$dt-color-darkblue-100;
-    background-color: colors.$dt-color-darkblue-100;
-    color: colors.$dt-color-white-100;
-
-    .avatar {
-      background-color: colors.$dt-color-white-100;
-      color: colors.$dt-color-darkblue-100;
-    }
-
-    .name {
-      opacity: 0.85;
-    }
-  }
-
-  &.opponent {
-    text-align: right;
-
-    .name {
-      justify-content: flex-end;
-    }
-
-    .avatar {
-      background-color: $opponent;
-      color: colors.$dt-color-white-100;
-    }
-
-    .name {
-      color: #4d70a4;
-    }
-  }
-}
-
-.versus {
+.clock {
   position: absolute;
   top: 50%;
   left: 50%;
   display: grid;
   place-items: center;
-  width: functions.rem(32);
-  height: functions.rem(32);
-  transform: translate(-50%, -50%);
-  border: functions.rem(1) solid $border;
-  border-radius: 50%;
-  background-color: colors.$dt-color-pepper-bright;
-  font-size: functions.rem(10);
-  font-weight: miscs.$css-ui-font-weight-bold;
-  letter-spacing: 0.04em;
-  color: colors.$dt-color-darkblue-100;
-}
-
-// ---------------------------------------------------------------------------
-// T7 · Gegenüber: full column width, two slanted halves.
-// ---------------------------------------------------------------------------
-.faceoff {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: functions.rem(80);
-  // Reaches the edges of the quiz column (its side padding is 20px).
-  margin-inline: functions.rem(-20);
-}
-
-.side {
-  display: flex;
-  align-items: center;
-  gap: functions.rem(10);
-  min-width: 0;
-
-  &.me {
-    padding: 0 calc(#{$slant} + #{functions.rem(12)}) 0 functions.rem(20);
-    background-color: colors.$dt-color-darkblue-100;
-    color: colors.$dt-color-white-100;
-    clip-path: polygon(0 0, 100% 0, calc(100% - #{$slant}) 100%, 0 100%);
-
-    .avatar {
-      background-color: colors.$dt-color-white-100;
-      color: colors.$dt-color-darkblue-100;
-    }
-
-    .name {
-      opacity: 0.85;
-    }
-  }
-
-  &.opponent {
-    justify-content: flex-end;
-    // Overlaps the slant, leaving a thin gap along the dividing line.
-    margin-left: calc(-1 * #{$slant} + #{functions.rem(4)});
-    padding: 0 functions.rem(20) 0 calc(#{$slant} + #{functions.rem(12)});
-    background-color: $opponent-surface;
-    color: colors.$dt-color-darkblue-100;
-    text-align: right;
-    clip-path: polygon(#{$slant} 0, 100% 0, 100% 100%, 0 100%);
-
-    .name {
-      justify-content: flex-end;
-    }
-
-    .avatar {
-      background-color: $opponent;
-      color: colors.$dt-color-white-100;
-    }
-
-    .name {
-      color: #4d70a4;
-    }
-  }
-}
-
-// Centred on the dividing line, which runs from 50 % (top) to 50 % - slant.
-.clock {
-  position: absolute;
-  top: 50%;
-  left: calc(50% - #{$slant} / 2);
-  display: grid;
-  place-items: center;
-  width: functions.rem(46);
-  height: functions.rem(46);
+  width: $clock;
+  height: $clock;
   transform: translate(-50%, -50%) rotate(45deg);
   border: functions.rem(3) solid colors.$dt-color-pepper-bright;
-  background-color: $opponent;
+  background: $opponent;
   transition: background-color 0.3s ease;
 }
 
@@ -217,10 +171,52 @@ $slant: functions.rem(32);
   font-weight: miscs.$css-ui-font-weight-bold;
   font-variant-numeric: tabular-nums;
   color: colors.$dt-color-white-100;
+
+  &.small {
+    font-size: functions.rem(13);
+  }
+}
+
+// «Raute als Uhr»: the outline runs down instead of a separate bar.
+.clock-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: functions.rem(68);
+  height: functions.rem(68);
+  transform: translate(-50%, -50%);
+  overflow: visible;
+}
+
+.ring-fill {
+  fill: $opponent;
+  stroke: colors.$dt-color-pepper-bright;
+  stroke-width: 4;
+  stroke-linejoin: round;
+  transition: fill 0.3s ease;
+}
+
+.ring-progress {
+  fill: none;
+  stroke: colors.$dt-color-white-100;
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-dasharray: 100;
+  transform: scale(0.8);
+  transform-origin: 50% 50%;
+}
+
+.ring-value {
+  fill: colors.$dt-color-white-100;
+  font-size: 17px;
+  font-weight: miscs.$css-ui-font-weight-bold;
+  font-variant-numeric: tabular-nums;
+  text-anchor: middle;
+  dominant-baseline: central;
 }
 
 // ---------------------------------------------------------------------------
-// Question number, time and time bar (both variants)
+// Question number, time and time bar
 // ---------------------------------------------------------------------------
 .meta {
   display: flex;
@@ -229,7 +225,7 @@ $slant: functions.rem(32);
   gap: functions.rem(12);
   margin-top: functions.rem(14);
   font-size: functions.rem(13);
-  color: #4d70a4;
+  color: $muted;
 
   strong {
     font-weight: miscs.$css-ui-font-weight-bold;
@@ -242,16 +238,6 @@ $slant: functions.rem(32);
   font-variant-numeric: tabular-nums;
   color: colors.$dt-color-darkblue-100;
   transition: color 0.3s ease;
-}
-
-// In «Gegenüber» the diamond shows the time; the text stays for screen readers.
-.time-faceoff {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
 }
 
 .track {
@@ -268,7 +254,131 @@ $slant: functions.rem(32);
   background-color: colors.$dt-color-darkblue-100;
 }
 
-// Very narrow phones (e.g. iPhone SE): a little more room for names and points.
+// ---------------------------------------------------------------------------
+// Width on screens wider than a phone
+// ---------------------------------------------------------------------------
+// «Randlos»: the halves reach the screen edges, the content stays aligned
+// with the quiz column.
+.width-bleed {
+  --outer: max(
+    #{functions.rem(20)},
+    calc((100vw - var(--app-column-width)) / 2 + #{functions.rem(20)})
+  );
+
+  .faceoff {
+    margin-inline: calc(50% - 50vw);
+  }
+}
+
+// «Band»: edge to edge on phones, a rounded band inside the column above.
+@media (min-width: 640px) {
+  .width-card {
+    --outer: #{functions.rem(16)};
+
+    .faceoff {
+      margin-inline: 0;
+      overflow: hidden;
+      border-radius: functions.rem(8);
+      box-shadow: 0 functions.rem(6) functions.rem(16) rgba(0, 50, 125, 0.14);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Looks
+// ---------------------------------------------------------------------------
+// «Kontrast»: the opponent's half in colour as well.
+.look-contrast {
+  .side.opponent {
+    background: $opponent;
+    color: colors.$dt-color-white-100;
+
+    .name {
+      color: colors.$dt-color-white-100;
+      opacity: 0.85;
+    }
+
+    .avatar {
+      background-color: colors.$dt-color-white-100;
+      color: #0078bb;
+    }
+  }
+
+  .clock {
+    background: colors.$dt-color-white-100;
+  }
+
+  .clock-value {
+    color: colors.$dt-color-darkblue-100;
+  }
+
+  .ring-fill {
+    fill: colors.$dt-color-white-100;
+  }
+
+  .ring-progress {
+    stroke: colors.$dt-color-darkblue-100;
+  }
+
+  .ring-value {
+    fill: colors.$dt-color-darkblue-100;
+  }
+}
+
+// «Verlauf»: soft gradients and the brand line of the header below.
+.look-gradient {
+  .faceoff::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: functions.rem(3);
+    background: $brand-gradient;
+  }
+
+  .side.me {
+    background: linear-gradient(135deg, #00327d, #0b4a9c);
+  }
+
+  .side.opponent {
+    background: linear-gradient(135deg, #f1f5fa, #dde7f3);
+  }
+
+  .clock {
+    background: linear-gradient(135deg, #0078bb, #00a4e0);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The last seconds of a question
+// ---------------------------------------------------------------------------
+.is-low {
+  .time {
+    color: $warning;
+  }
+
+  .progress,
+  .clock {
+    background: $warning;
+  }
+
+  .clock-value,
+  .ring-value {
+    color: colors.$dt-color-white-100;
+    fill: colors.$dt-color-white-100;
+  }
+
+  .ring-fill {
+    fill: $warning;
+  }
+
+  .ring-progress {
+    stroke: colors.$dt-color-white-100;
+  }
+}
+
+// Very narrow phones (e.g. iPhone SE): more room for names and points.
 @media (max-width: 359px) {
   .avatar {
     width: functions.rem(30);
@@ -276,7 +386,6 @@ $slant: functions.rem(32);
     font-size: functions.rem(13);
   }
 
-  .card,
   .side {
     gap: functions.rem(8);
   }
@@ -286,14 +395,9 @@ $slant: functions.rem(32);
   }
 }
 
-// The last seconds of a question.
-.is-low {
-  .time {
-    color: $warning;
-  }
-
-  .progress,
-  .clock {
-    background-color: $warning;
+@keyframes points-pop {
+  30% {
+    transform: scale(1.18);
+    text-shadow: 0 0 functions.rem(12) rgba(0, 164, 224, 0.8);
   }
 }

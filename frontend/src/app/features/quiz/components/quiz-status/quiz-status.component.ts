@@ -1,13 +1,24 @@
-import { Component, computed, input } from '@angular/core';
-import type { QuizHeaderVariant } from '../../../../core/preview/quiz-header.store';
+import {
+  Component,
+  computed,
+  effect,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
+import {
+  FACEOFF_DEFAULTS,
+  type FaceoffOptions,
+} from '../../../../core/preview/quiz-header.store';
 
 /** From this many seconds on, the remaining time is shown as a warning. */
 const LOW_TIME_SEC = 5;
+const POP_MS = 700;
 
 /**
- * Head of the quiz screen: both players with their points, the question
- * number and the time. Two layouts: «Duell-Karten» (two cards side by side)
- * and «Gegenüber» (two slanted halves with the time on the dividing line).
+ * Head of the quiz screen «Gegenüber»: both players on two slanted halves,
+ * the time in a diamond (one of the logo's shapes) on the dividing line, and
+ * the question number below.
  */
 @Component({
   selector: 'app-quiz-status',
@@ -15,7 +26,7 @@ const LOW_TIME_SEC = 5;
   styleUrl: './quiz-status.component.scss',
 })
 export class QuizStatusComponent {
-  readonly variant = input<QuizHeaderVariant>('cards');
+  readonly options = input<FaceoffOptions>(FACEOFF_DEFAULTS);
   readonly playerName = input.required<string>();
   readonly playerScore = input.required<number>();
   readonly opponentName = input.required<string>();
@@ -31,15 +42,44 @@ export class QuizStatusComponent {
   protected readonly isLow = computed(
     () => !this.isReveal() && this.timeLeft() <= LOW_TIME_SEC,
   );
+  protected readonly questionText = computed(
+    () => `Frage ${this.currentQuestion()} von ${this.totalQuestions()}`,
+  );
   protected readonly timeText = computed(() =>
     this.isReveal()
       ? `Es geht weiter in ${this.timeLeft()} s`
       : `noch ${this.timeLeft()} s`,
   );
-  /** The bar restarts at 100 % without animating back. */
+  /** The bar and the diamond outline restart at 100 % without animating back. */
+  private readonly restarting = computed(() => this.timerPercent() >= 99.5);
   protected readonly barTransition = computed(() =>
-    this.timerPercent() >= 99.5 ? 'none' : 'width 0.1s linear',
+    this.restarting() ? 'none' : 'width 0.1s linear',
   );
+  protected readonly ringTransition = computed(() =>
+    this.restarting() ? 'none' : 'stroke-dashoffset 0.1s linear',
+  );
+
+  /** Briefly highlights points that just increased. */
+  protected readonly playerPop = this.popOn(this.playerScore);
+  protected readonly opponentPop = this.popOn(this.opponentScore);
+
+  private popOn(score: () => number) {
+    const pop = signal(false);
+    let previous: number | null = null;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    effect((onCleanup) => {
+      const value = score();
+      const increased = previous !== null && value > previous;
+      previous = value;
+      if (increased && untracked(this.options).pop) {
+        pop.set(true);
+        clearTimeout(timer);
+        timer = setTimeout(() => pop.set(false), POP_MS);
+      }
+      onCleanup(() => clearTimeout(timer));
+    });
+    return pop.asReadonly();
+  }
 }
 
 function initial(name: string): string {

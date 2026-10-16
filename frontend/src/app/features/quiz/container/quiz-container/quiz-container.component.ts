@@ -30,8 +30,8 @@ export class QuizContainerComponent implements OnDestroy {
   private readonly playerNameStore = inject(PlayerNameStore);
 
   private readonly game = this.gameClient.state;
-  /** Temporary: the quiz header variant being compared. */
-  readonly headerVariant = inject(QuizHeaderStore).variant;
+  /** Temporary: the quiz header options being compared. */
+  readonly headerOptions = inject(QuizHeaderStore).options;
   private readonly now = signal(this.gameClient.serverNow());
   /** Answer chosen locally, shown immediately before the server confirms it. */
   private readonly selectedIndex = signal<number | null>(null);
