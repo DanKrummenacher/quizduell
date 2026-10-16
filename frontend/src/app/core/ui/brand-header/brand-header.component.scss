@@ -40,7 +40,7 @@ $light: #00a4e0;
   }
 }
 
-// Logo always in the middle; an optional label sits on the right.
+// Logo in the middle (or at the start); an optional label sits on the right.
 .inner {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -89,4 +89,16 @@ $light: #00a4e0;
   font-weight: miscs.$css-ui-font-weight-medium;
   color: colors.$dt-color-white-100;
   white-space: nowrap;
+}
+
+.align-start {
+  grid-template-columns: auto 1fr;
+
+  .lockup {
+    grid-column: 1;
+  }
+
+  .chip {
+    grid-column: 2;
+  }
 }

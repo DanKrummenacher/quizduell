@@ -3,14 +3,15 @@
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'admin';
 @use 'layout';
+@use 'interaction';
 
 :host {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
-  // Header content aligns with the admin page width.
-  --brand-inner-width: #{functions.rem(1100)};
-  --brand-inner-padding: #{functions.rem(12)};
+  // The header logo starts exactly at the left edge of the admin content.
+  --brand-inner-width: none;
+  --brand-inner-padding: 0;
 }
 
 // The admin column: wider than the game column, same surface on large screens.
@@ -53,9 +54,15 @@
   color: colors.$dt-color-darkblue-70;
   text-decoration: none;
   white-space: nowrap;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
 
-  &:hover {
-    color: colors.$dt-color-darkblue-100;
+  @media (hover: hover) {
+    &:hover {
+      color: colors.$dt-color-darkblue-100;
+      border-bottom-color: rgba(0, 50, 125, 0.25);
+    }
   }
 
   &.active {
@@ -65,27 +72,48 @@
   }
 }
 
-.logout {
+.nav-actions {
+  display: flex;
   flex-shrink: 0;
-  width: auto;
+  gap: functions.rem(4);
   margin-bottom: functions.rem(4);
+}
+
+.nav-action {
+  width: auto;
 }
 
 .main {
   padding-top: functions.rem(25);
 }
 
+// Phones: the actions get their own row above the tabs, which share the
+// full width evenly.
 @media (max-width: 36rem) {
+  .nav-row {
+    flex-wrap: wrap;
+    row-gap: functions.rem(8);
+  }
+
+  .nav-actions {
+    order: -1;
+    width: 100%;
+    justify-content: flex-end;
+    gap: functions.rem(16);
+    margin-bottom: 0;
+  }
+
+  .nav {
+    width: 100%;
+  }
+
   .nav-link {
-    padding-inline: functions.rem(8);
+    flex: 1;
+    justify-content: center;
+    padding-inline: functions.rem(4);
   }
 
   .nav-link span {
     font-size: functions.rem(14);
-  }
-
-  // On phones the logout button shows its icon only.
-  .logout-label {
-    display: none;
   }
 }

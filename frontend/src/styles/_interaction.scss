@@ -1,0 +1,66 @@
+// Interaction states for the self-built clickable elements (cards, chips,
+// links), matching the buttons of the shared library:
+// - hover only on devices with a mouse, so nothing sticks after a tap
+// - a short pressed state
+// - the global keyboard focus ring (styles.scss), never removed
+// Borders never change, only the fill and the shadow.
+@use '@css-ch/web-design-tokens/colors';
+
+$hover-fill: #eef3f9;
+$pressed-fill: #dfe8f3;
+$hover-shadow: 0 0.25rem 0.75rem rgba(0, 50, 125, 0.12);
+$duration: 0.15s;
+
+/// Large clickable cards (game modes, answers).
+@mixin card {
+  cursor: pointer;
+  transition:
+    background-color $duration ease,
+    box-shadow $duration ease,
+    transform 0.1s ease;
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background-color: $hover-fill;
+      box-shadow: $hover-shadow;
+    }
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.985);
+  }
+}
+
+/// Small clickable chips and tags.
+@mixin chip {
+  cursor: pointer;
+  transition: background-color $duration ease;
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: $hover-fill;
+    }
+  }
+
+  &:active {
+    background-color: $pressed-fill;
+  }
+}
+
+/// Text links.
+@mixin link {
+  color: colors.$dt-color-darkblue-70;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.2em;
+  transition:
+    color $duration ease,
+    text-decoration-color $duration ease;
+
+  @media (hover: hover) {
+    &:hover {
+      color: colors.$dt-color-darkblue-100;
+      text-decoration-color: currentColor;
+    }
+  }
+}

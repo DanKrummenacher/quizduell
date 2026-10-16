@@ -1,6 +1,10 @@
 <h2 class="action-title">Freund herausfordern</h2>
 
-<button class="action-card create-game-card" (click)="createGame.emit()">
+<button
+  type="button"
+  class="action-card create-game-card"
+  (click)="createGame.emit()"
+>
   <css-icon icon="lightning-strike" class="card-icon" size="xl"></css-icon>
   <div class="card-text-wrapper">
     <calc-text textMedium textLead class="card-title">Spiel erstellen</calc-text>

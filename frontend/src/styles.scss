@@ -41,17 +41,13 @@ html {
   /*
    * Phones and tablets keep 16px; large monitors scale the whole UI up in
    * whole-pixel steps so components never render on fractional pixels.
+   * Only 16, 18 and 20px: at these sizes the shared library's controls
+   * (e.g. the switch, sized 1.5rem) land on whole pixels; 17px would not.
    * Growth stops at 20px, so ultrawide and 4K screens do not look oversized.
    */
   font-size: 100%;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-}
-
-@media (min-width: 1280px) {
-  html {
-    font-size: 106.25%; /* 17px */
-  }
 }
 
 @media (min-width: 1600px) {

@@ -1,6 +1,7 @@
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
 
 :host {
   display: block;
@@ -41,8 +42,7 @@
   min-height: functions.rem(94);
   padding: functions.rem(16) functions.rem(19);
   margin-bottom: functions.rem(22);
-  cursor: pointer;
-  outline: none;
+  @include interaction.card;
 }
 
 .card-icon {

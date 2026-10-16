@@ -11,4 +11,6 @@ import { LogoMarkComponent } from '../logo-mark/logo-mark.component';
 export class BrandHeaderComponent {
   /** Optional label shown as a chip on the right (e.g. "Admin"). */
   readonly label = input<string | null>(null);
+  /** Logo in the middle (game) or at the start of the content column (admin). */
+  readonly align = input<'center' | 'start'>('center');
 }

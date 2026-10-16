@@ -2,6 +2,7 @@
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'admin';
+@use 'interaction';
 
 .form {
   display: grid;
@@ -75,11 +76,7 @@
   background-color: colors.$dt-color-white-100;
   font-size: functions.rem(14);
   color: colors.$dt-color-darkblue-100;
-  cursor: pointer;
-
-  &:hover {
-    border-color: colors.$dt-color-darkblue-100;
-  }
+  @include interaction.chip;
 }
 
 .server-error {

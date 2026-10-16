@@ -22,6 +22,11 @@ export class AdminShellComponent {
     { path: 'einstellungen', label: 'Einstellungen', icon: 'settings' },
   ];
 
+  /** Back to the game; the admin session stays active in this tab. */
+  protected openGame(): void {
+    void this.router.navigate(['/']);
+  }
+
   protected async logout(): Promise<void> {
     await this.auth.logout();
     await this.router.navigate(['/admin/login']);

@@ -2,9 +2,12 @@
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'layout';
+@use 'interaction';
 
 :host {
   display: block;
+  // The header logo lines up with the login form.
+  --brand-inner-padding: #{functions.rem(30)};
 }
 .page {
   display: flex;
@@ -51,5 +54,5 @@
   align-self: center;
   margin-top: functions.rem(5);
   font-size: functions.rem(16);
-  color: colors.$dt-color-darkblue-70;
+  @include interaction.link;
 }

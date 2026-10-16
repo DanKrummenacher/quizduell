@@ -1,5 +1,5 @@
 <div class="page">
-  <app-brand-header label="Admin" />
+  <app-brand-header label="Admin" align="start" />
 
   <div class="nav-row">
     <nav class="nav" aria-label="Admin-Navigation">
@@ -15,15 +15,26 @@
         </a>
       }
     </nav>
-    <css-button
-      variant="plain"
-      class="logout"
-      ariaLabel="Abmelden"
-      (click)="logout()"
-    >
-      <css-icon icon="logout" slot="prefix"></css-icon>
-      <span class="logout-label">Abmelden</span>
-    </css-button>
+    <div class="nav-actions">
+      <css-button
+        variant="plain"
+        class="nav-action"
+        ariaLabel="Zum Spiel"
+        (click)="openGame()"
+      >
+        <css-icon icon="home" slot="prefix"></css-icon>
+        Zum Spiel
+      </css-button>
+      <css-button
+        variant="plain"
+        class="nav-action"
+        ariaLabel="Abmelden"
+        (click)="logout()"
+      >
+        <css-icon icon="logout" slot="prefix"></css-icon>
+        Abmelden
+      </css-button>
+    </div>
   </div>
 
   <main class="main">

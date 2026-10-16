@@ -1,6 +1,7 @@
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
 
 :host {
   display: block;
@@ -40,8 +41,7 @@
   align-items: center;
   min-height: functions.rem(94);
   padding: functions.rem(16) functions.rem(19);
-  cursor: pointer;
-  outline: none;
+  @include interaction.card;
 
   &:not(:last-child) {
     margin-bottom: functions.rem(22);

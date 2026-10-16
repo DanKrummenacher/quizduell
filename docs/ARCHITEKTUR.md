@@ -104,9 +104,13 @@ Code hinterlegt; der Import im Admin speichert sie nur in die Datenbank.
 - UI-Komponenten aus `@css-ch/components` und `@css-ch/calc-ui-text`, Farben und Schrift aus
   den Design-Tokens der Shared Library.
 - Ein Layout-System für alle Seiten, Spiel und Admin gleich: dieselbe Grössen-Skala
-  (16 px auf Handy und Tablet, auf grossen Monitoren in ganzen Pixel-Schritten bis
-  höchstens 20 px), derselbe Header (Logo mittig, im Admin zusätzlich «Admin» rechts) und
-  dieselbe Inhaltsspalte (`styles/_layout.scss`, Spiel 40rem, Admin 1100px breit).
+  (16 px, ab 1600 px Breite 18 px, ab 1920 px 20 px – nur Grössen, bei denen die
+  Bedienelemente der Shared Library auf ganzen Pixeln liegen), derselbe Header und dieselbe
+  Inhaltsspalte (`styles/_layout.scss`, Spiel 40rem, Admin 1100px breit). Im Spiel steht
+  das Logo mittig, im Admin am linken Rand des Inhalts mit «Admin» rechts.
+- Ein Interaktionskonzept für alle selbst gebauten klickbaren Elemente
+  (`styles/_interaction.scss`): Hover nur bei Maus-Bedienung (helle Fläche und Schatten,
+  Rahmen bleiben gleich), kurzer Klick-Zustand, überall derselbe sichtbare Tastatur-Fokus.
 - Grosse Bildschirme (ab 1024 px): Die freien Seitenflächen tragen dezent die Markenfarben,
   die Inhaltsspalte geht weich darin über. Quiz und Resultat bleiben als Block in der Mitte
   zusammen, statt sich über die ganze Höhe zu verteilen.

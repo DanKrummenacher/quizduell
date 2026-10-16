@@ -118,6 +118,15 @@ test.describe('admin area', () => {
     await expect(page.getByText('7 Fragen')).toBeVisible();
   });
 
+  test('leads back to the game and keeps the session', async ({ page }) => {
+    await login(page);
+    await page.locator('css-button', { hasText: 'Zum Spiel' }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.locator('h1.main-title')).toBeVisible();
+    await page.goto('/admin/fragen');
+    await expect(page).toHaveURL(/\/admin\/fragen$/);
+  });
+
   test('logs out', async ({ page }) => {
     await login(page);
     await page.locator('css-button', { hasText: 'Abmelden' }).click();

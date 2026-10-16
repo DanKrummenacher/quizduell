@@ -1,6 +1,7 @@
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
 
 :host {
   display: block;
@@ -54,12 +55,10 @@
   display: flex;
   align-items: center;
   padding: 0;
-  cursor: pointer;
   text-align: left;
-  outline: none;
   position: relative;
-  transition: all 0.2s ease-in-out;
   font-weight: miscs.$css-ui-font-weight-bold;
+  @include interaction.card;
 
   // Only the fill changes; the card border always stays the same.
   &.state-selected {
