@@ -3,6 +3,7 @@ import {
   computed,
   effect,
   inject,
+  isDevMode,
   type OnDestroy,
   signal,
 } from '@angular/core';
@@ -19,7 +20,13 @@ import { GameClient } from '../../../../core/game/game-client.service';
 import { IdleResetService } from '../../../../core/platform/idle-reset.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
 import { ResultUiComponent } from '../../components/result-ui/result-ui.component';
-import type { PlayerResultView } from '../../result.types';
+import { ResultUiLegacyComponent } from '../../components/legacy/result-ui-legacy.component';
+import { DesignPreviewPanelComponent } from '../../components/legacy/design-preview-panel.component';
+import type {
+  ResultIconStyle,
+  ResultNoticeStyle,
+} from '../../components/legacy/design-preview';
+import type { PlayerResultView, RematchCountdownView } from '../../result.types';
 
 interface PlayAgainButton {
   label: string;
@@ -39,6 +46,17 @@ const REMATCH_BUTTONS: Partial<Record<RematchStatus, PlayAgainButton>> = {
   paused: { label: 'Revanche fordern', icon: 'undo', disabled: true },
 };
 
+/** Symbol next to each rematch message. */
+const REMATCH_ICONS: Record<RematchStatus, string | null> = {
+  open: null,
+  requested: 'hourglass',
+  offered: 'undo',
+  paused: 'priority-warning',
+  'opponent-left': 'logout',
+  unanswered: 'time-limit',
+  expired: 'time',
+};
+
 const NEW_GAME_BUTTONS: Record<GameMode, PlayAgainButton> = {
   quick: { label: 'Neuen Gegner suchen', icon: 'search', disabled: false },
   friend: { label: 'Neues Spiel erstellen', icon: 'add', disabled: false },
@@ -46,7 +64,7 @@ const NEW_GAME_BUTTONS: Record<GameMode, PlayAgainButton> = {
 
 @Component({
   selector: 'app-result-container',
-  imports: [ResultUiComponent],
+  imports: [ResultUiComponent, ResultUiLegacyComponent, DesignPreviewPanelComponent],
   templateUrl: './result-container.component.html',
 })
 export class ResultContainerComponent implements OnDestroy {
@@ -60,9 +78,17 @@ export class ResultContainerComponent implements OnDestroy {
   private readonly opponentName = computed(
     () => this.game()?.opponent?.name ?? 'Dein Gegner',
   );
+  // TEMPORARY: design preview while the facelift is being reviewed
+  // (development builds only).
+  readonly showDesignPreview = isDevMode();
+  readonly legacyDesign = signal(false);
+  readonly iconStyle = signal<ResultIconStyle>('diamond');
+  readonly noticeStyle = signal<ResultNoticeStyle>('line');
+  readonly previewRematch = signal<RematchStatus | null>(null);
+
   /** Rematch state as reported by the server. */
   readonly rematch = computed<RematchStatus>(
-    () => this.game()?.rematch ?? 'expired',
+    () => this.previewRematch() ?? this.game()?.rematch ?? 'expired',
   );
 
   /** Ticks every second so the rematch countdown stays current. */
@@ -74,12 +100,10 @@ export class ResultContainerComponent implements OnDestroy {
   /** No rematch possible anymore: the button starts a fresh game instead. */
   private readonly rematchOver = computed(() => !REMATCH_BUTTONS[this.rematch()]);
 
-  private readonly secondsLeft = computed(() => {
+  private readonly msLeft = computed(() => {
     this.now();
     const endsAt = this.game()?.phaseEndsAt;
-    return endsAt
-      ? Math.max(0, Math.ceil((endsAt - this.gameClient.serverNow()) / 1_000))
-      : null;
+    return endsAt ? Math.max(0, endsAt - this.gameClient.serverNow()) : null;
   });
 
   readonly playAgainButton = computed(
@@ -88,15 +112,14 @@ export class ResultContainerComponent implements OnDestroy {
       NEW_GAME_BUTTONS[this.game()?.mode ?? 'quick'],
   );
 
-  readonly playAgainHint = computed(() => {
+  /** Explains the rematch state; the remaining time is shown separately. */
+  readonly rematchMessage = computed(() => {
     const name = this.opponentName();
-    const seconds = this.secondsLeft();
-    const time = seconds !== null ? ` (noch ${seconds} s)` : '';
     switch (this.rematch()) {
       case 'requested':
-        return `Warte auf ${name} …${time}`;
+        return `Warte auf ${name} …`;
       case 'offered':
-        return `${name} möchte eine Revanche!${time}`;
+        return `${name} möchte eine Revanche!`;
       case 'paused':
         return `Verbindung zu ${name} unterbrochen – wir warten kurz …`;
       case 'opponent-left':
@@ -108,6 +131,38 @@ export class ResultContainerComponent implements OnDestroy {
       case 'open':
         return null;
     }
+  });
+
+  /** Remaining time while a rematch request is running. */
+  readonly rematchCountdown = computed<RematchCountdownView | null>(() => {
+    const status = this.rematch();
+    const ms = this.msLeft();
+    const total = this.game()?.phaseDurationMs ?? 0;
+    if (status !== 'requested' && status !== 'offered') {
+      return null;
+    }
+    if (this.previewRematch()) {
+      return { secondsLeft: 18, percent: 60, isOffer: status === 'offered' };
+    }
+    if (ms === null) {
+      return null;
+    }
+    return {
+      secondsLeft: Math.ceil(ms / 1_000),
+      percent: total > 0 ? Math.min(100, (ms / total) * 100) : 0,
+      isOffer: status === 'offered',
+    };
+  });
+
+  readonly rematchIcon = computed(() => REMATCH_ICONS[this.rematch()]);
+
+  /** TEMPORARY: the hint of the previous design, with the time in brackets. */
+  readonly legacyHint = computed(() => {
+    const message = this.rematchMessage();
+    const seconds = this.rematchCountdown()?.secondsLeft;
+    return message && seconds !== undefined
+      ? `${message} (noch ${seconds} s)`
+      : message;
   });
 
   /** Tells a player who asked for a rematch that it will not happen. */

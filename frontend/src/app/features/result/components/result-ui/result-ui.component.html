@@ -1,42 +1,66 @@
 <app-brand-header />
 
 <main class="main-content">
-  <div class="center-content">
-    <div class="result-icon-box">
-      <css-icon [icon]="statusIcon()" class="result-icon" size="xl"></css-icon>
-    </div>
+  <section class="outcome">
+    <span class="result-icon" aria-hidden="true">
+      <css-icon
+        [attr.icon]="statusIcon()"
+        size="lg"
+        class="result-icon-glyph"
+      ></css-icon>
+    </span>
 
     <h1 class="result-title">{{ statusTitle() }}</h1>
-    <calc-text textMedium class="result-subtitle">{{ statusSubtitle() }}</calc-text>
+    <p class="result-subtitle">{{ statusSubtitle() }}</p>
 
-    <app-result-players [players]="players()"></app-result-players>
-  </div>
+    <app-result-players [players]="players()" />
+  </section>
 
-  <div class="actions-wrapper">
-    <css-button stretch variant="primary" (click)="navigateHome.emit()">
+  <div class="actions">
+    @let countdown = rematchCountdown();
+    @if (rematchMessage(); as message) {
+      <div
+        class="rematch-status"
+        [class.is-offer]="countdown?.isOffer"
+        role="status"
+      >
+        <p class="rematch-line">
+          @if (rematchIcon(); as icon) {
+            <css-icon
+              [attr.icon]="icon"
+              size="sm"
+              class="rematch-icon"
+              aria-hidden="true"
+            ></css-icon>
+          }
+          <span class="rematch-message">{{ message }}</span>
+          @if (countdown) {
+            <span class="rematch-time">noch {{ countdown.secondsLeft }} s</span>
+          }
+        </p>
+        @if (countdown) {
+          <div class="track" aria-hidden="true">
+            <div class="progress" [style.width.%]="countdown.percent"></div>
+          </div>
+        }
+      </div>
+    }
+
+    <css-button
+      stretch
+      variant="primary"
+      class="play-again-button"
+      [attr.disabled]="isPlayAgainDisabled() ? true : null"
+      (click)="playAgain.emit()"
+    >
+      <css-icon [attr.icon]="playAgainIcon()" slot="prefix"></css-icon>
+      {{ playAgainText() }}
+    </css-button>
+
+    <css-button stretch class="home-button" (click)="navigateHome.emit()">
       <css-icon icon="home" slot="prefix"></css-icon>
       Zurück zur Lobby
     </css-button>
-
-    <div class="play-again-wrapper">
-      <css-button
-        stretch
-        variant="primary"
-        class="play-again-button"
-        [attr.disabled]="isPlayAgainDisabled() ? true : null"
-        (click)="playAgain.emit()"
-      >
-        <css-icon [attr.icon]="playAgainIcon()" slot="prefix"></css-icon>
-        {{ playAgainText() }}
-      </css-button>
-
-      <div class="play-again-status" [class.is-visible]="!!playAgainStatusText()">
-        <css-icon icon="info" class="status-icon" size="sm"></css-icon>
-        <calc-text textMedium textLead class="status-text">{{
-          playAgainStatusText()
-        }}</calc-text>
-      </div>
-    </div>
   </div>
 </main>
 

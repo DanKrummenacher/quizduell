@@ -217,7 +217,9 @@ test.describe('playing duels', () => {
 
     await ben.locator('css-button', { hasText: 'Revanche fordern' }).click();
     await expect(
-      anna.getByText(/Ben möchte eine Revanche! \(noch \d+ s\)/),
+      anna.locator('.rematch-status', {
+        hasText: /Ben möchte eine Revanche!\s*noch \d+ s/,
+      }),
     ).toBeVisible();
     await anna.locator('css-button', { hasText: 'Revanche annehmen!' }).click();
     await expect(anna.getByText('Gegner gefunden!')).toBeVisible();
@@ -235,7 +237,7 @@ test.describe('playing duels', () => {
 
     await expect(anna.getByText('Schade! Keine Revanche')).toBeVisible();
     await anna.locator('css-flyout css-button', { hasText: 'OK' }).click();
-    await expect(anna.locator('.status-text')).toHaveText(
+    await expect(anna.locator('.rematch-message')).toHaveText(
       'Ben hat das Spiel verlassen.',
     );
     await anna.locator('css-button', { hasText: 'Neues Spiel erstellen' }).click();

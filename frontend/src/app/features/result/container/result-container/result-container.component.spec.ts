@@ -63,24 +63,32 @@ describe('ResultContainerComponent', () => {
       icon: 'undo',
       disabled: false,
     });
-    expect(result.playAgainHint()).toBeNull();
+    expect(result.rematchMessage()).toBeNull();
+    expect(result.rematchCountdown()).toBeNull();
 
     client.state.set(finished({ rematch: 'offered' }));
     expect(result.playAgainButton().label).toBe('Revanche annehmen!');
-    expect(result.playAgainHint()).toBe('Ben möchte eine Revanche! (noch 20 s)');
+    expect(result.rematchMessage()).toBe('Ben möchte eine Revanche!');
+    expect(result.rematchCountdown()).toEqual({
+      secondsLeft: 20,
+      percent: 100,
+      isOffer: true,
+    });
 
     client.state.set(finished({ rematch: 'requested' }));
     expect(result.playAgainButton()).toMatchObject({
       label: 'Anfrage gesendet',
       disabled: true,
     });
-    expect(result.playAgainHint()).toBe('Warte auf Ben … (noch 20 s)');
+    expect(result.rematchMessage()).toBe('Warte auf Ben …');
+    expect(result.rematchCountdown()?.isOffer).toBe(false);
   });
 
   it('waits while a connection is interrupted', () => {
     client.state.set(finished({ rematch: 'paused' }));
     expect(result.playAgainButton().disabled).toBe(true);
-    expect(result.playAgainHint()).toContain('Verbindung zu Ben unterbrochen');
+    expect(result.rematchMessage()).toContain('Verbindung zu Ben unterbrochen');
+    expect(result.rematchCountdown()).toBeNull();
   });
 
   it('informs when the opponent left after a rematch request', () => {
@@ -90,7 +98,7 @@ describe('ResultContainerComponent', () => {
         you: player('Anna', 0, { rematchRequested: true }),
       }),
     );
-    expect(result.playAgainHint()).toBe('Ben hat das Spiel verlassen.');
+    expect(result.rematchMessage()).toBe('Ben hat das Spiel verlassen.');
     expect(result.showNoRematchNotice()).toBe(true);
     expect(result.playAgainButton().label).toBe('Neues Spiel erstellen');
 
@@ -100,7 +108,7 @@ describe('ResultContainerComponent', () => {
 
   it('explains a request that was not answered in time', () => {
     client.state.set(finished({ rematch: 'unanswered', phaseEndsAt: null }));
-    expect(result.playAgainHint()).toBe('Ben hat nicht rechtzeitig reagiert.');
+    expect(result.rematchMessage()).toBe('Ben hat nicht rechtzeitig reagiert.');
     expect(result.showNoRematchNotice()).toBe(true);
   });
 

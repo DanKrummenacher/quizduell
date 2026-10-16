@@ -1,22 +1,20 @@
-<div class="results-list">
-  @for (player of players(); track player.name) {
-    <div
+<ul class="results-list" aria-label="Endstand">
+  @for (player of players(); track player.isMe) {
+    <li
       class="player-result-card"
       [class.state-win]="player.cardState === 'win'"
       [class.state-loss]="player.cardState === 'loss'"
     >
-      <div class="player-name-box">
-        <calc-text textMedium class="player-name-text" [title]="player.name">{{
-          player.name
-        }}</calc-text>
+      <span class="avatar" [class.is-me]="player.isMe" aria-hidden="true">{{
+        initial(player.name)
+      }}</span>
+      <span class="name">
+        <span class="name-text" [title]="player.name">{{ player.name }}</span>
         @if (player.isMe) {
-          <calc-text textMedium class="is-me-badge">&nbsp;(Du)</calc-text>
+          <span class="you"> (Du)</span>
         }
-      </div>
-
-      <calc-text textLarge textLead class="player-score-text"
-        >{{ player.score }} Pkt.</calc-text
-      >
-    </div>
+      </span>
+      <span class="points">{{ player.score }}<span class="unit"> Pkt.</span></span>
+    </li>
   }
-</div>
+</ul>

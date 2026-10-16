@@ -1,16 +1,47 @@
-<app-result-ui
-  [statusTitle]="statusTitle()"
-  [statusSubtitle]="statusSubtitle()"
-  [statusIcon]="statusIcon()"
-  [players]="playersView()"
-  [isPlayAgainDisabled]="playAgainButton().disabled"
-  [playAgainText]="playAgainButton().label"
-  [playAgainIcon]="playAgainButton().icon"
-  [playAgainStatusText]="playAgainHint()"
-  [showNoRematchFlyout]="showNoRematchNotice()"
-  [noRematchText]="playAgainHint() ?? ''"
-  (navigateHome)="handleHome()"
-  (playAgain)="handlePlayAgain()"
-  (noRematchAcknowledge)="handleNoRematchAcknowledge()"
->
-</app-result-ui>
+@if (legacyDesign()) {
+  <app-result-ui-legacy
+    [statusTitle]="statusTitle()"
+    [statusSubtitle]="statusSubtitle()"
+    [statusIcon]="statusIcon()"
+    [players]="playersView()"
+    [isPlayAgainDisabled]="playAgainButton().disabled"
+    [playAgainText]="playAgainButton().label"
+    [playAgainIcon]="playAgainButton().icon"
+    [playAgainStatusText]="legacyHint()"
+    [showNoRematchFlyout]="showNoRematchNotice()"
+    [noRematchText]="rematchMessage() ?? ''"
+    (navigateHome)="handleHome()"
+    (playAgain)="handlePlayAgain()"
+    (noRematchAcknowledge)="handleNoRematchAcknowledge()"
+  />
+} @else {
+  <app-result-ui
+    [statusTitle]="statusTitle()"
+    [statusSubtitle]="statusSubtitle()"
+    [statusIcon]="statusIcon()"
+    [players]="playersView()"
+    [isPlayAgainDisabled]="playAgainButton().disabled"
+    [playAgainText]="playAgainButton().label"
+    [playAgainIcon]="playAgainButton().icon"
+    [rematchMessage]="rematchMessage()"
+    [rematchCountdown]="rematchCountdown()"
+    [rematchIcon]="rematchIcon()"
+    [iconStyle]="iconStyle()"
+    [noticeStyle]="noticeStyle()"
+    [showNoRematchFlyout]="showNoRematchNotice()"
+    [noRematchText]="rematchMessage() ?? ''"
+    (navigateHome)="handleHome()"
+    (playAgain)="handlePlayAgain()"
+    (noRematchAcknowledge)="handleNoRematchAcknowledge()"
+  />
+}
+
+<!-- TEMPORARY: compare result page designs (development only). -->
+@if (showDesignPreview) {
+  <app-design-preview-panel
+    [(legacy)]="legacyDesign"
+    [(iconStyle)]="iconStyle"
+    [(noticeStyle)]="noticeStyle"
+    [(state)]="previewRematch"
+  />
+}
