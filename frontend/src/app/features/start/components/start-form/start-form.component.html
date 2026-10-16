@@ -5,8 +5,8 @@
     placeholder="z.B. Max Mustermann"
     autocomplete="nickname"
     [attr.maxlength]="maxLength"
-    [value]="playerName"
-    [errorMessage]="errorMessage || undefined"
+    [value]="playerName()"
+    [errorMessage]="errorMessage() || undefined"
     (input)="onNameInput($event)"
     (keydown)="onKeydown($event)"
   >

@@ -34,8 +34,8 @@ export class LobbyUiComponent {
   readonly notice = input<string | null>(null);
 
   readonly navigateBack = output<void>();
-  readonly selectFastGame = output<void>();
-  readonly selectChallenge = output<void>();
+  readonly selectQuickGame = output<void>();
+  readonly selectFriendGame = output<void>();
   readonly createGame = output<void>();
   readonly joinGame = output<string>();
   readonly cancelSearch = output<void>();

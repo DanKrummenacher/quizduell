@@ -16,7 +16,10 @@ import '@css-ch/components/spinner';
 import '@css-ch/components/switch';
 import '@css-ch/components/toggle-group';
 import type { AdminQuestion } from '../../core/contracts/admin.contract';
+import { ANSWER_LETTERS } from '../../core/game/answer-letters';
+import { eventChecked, eventText } from '../../core/ui/component-events';
 import { AdminApi } from '../admin-api.service';
+import type { AdminMessage } from '../admin-message';
 import { type QuestionDraft, draftFrom, emptyDraft, toInput } from './question-form';
 import { QuestionEditorComponent } from './question-editor.component';
 
@@ -36,13 +39,10 @@ const ALL_CATEGORIES = '__all__';
 export class AdminQuestionsPage {
   private readonly api = inject(AdminApi);
 
-  protected readonly letters = ['A', 'B', 'C', 'D'];
+  protected readonly letters = ANSWER_LETTERS;
   protected readonly questions = signal<AdminQuestion[] | null>(null);
   protected readonly loadError = signal(false);
-  protected readonly message = signal<{
-    variant: 'success' | 'error';
-    text: string;
-  } | null>(null);
+  protected readonly message = signal<AdminMessage | null>(null);
 
   protected readonly search = signal('');
   protected readonly status = signal<StatusFilter>('all');
@@ -119,9 +119,7 @@ export class AdminQuestionsPage {
     }
   }
 
-  protected value(event: Event): string {
-    return String((event as CustomEvent<unknown>).detail ?? '');
-  }
+  protected readonly value = eventText;
 
   protected setStatus(event: Event): void {
     this.status.set(this.value(event) as StatusFilter);
@@ -175,7 +173,7 @@ export class AdminQuestionsPage {
     question: AdminQuestion,
     event: Event,
   ): Promise<void> {
-    const active = Boolean((event as CustomEvent<boolean>).detail);
+    const active = eventChecked(event);
     try {
       this.upsert(await this.api.setQuestionActive(question.id, active));
     } catch (error) {
@@ -233,7 +231,7 @@ export class AdminQuestionsPage {
     });
   }
 
-  private flash(variant: 'success' | 'error', text: string): void {
+  private flash(variant: AdminMessage['variant'], text: string): void {
     this.message.set({ variant, text });
     setTimeout(() => {
       if (this.message()?.text === text) {

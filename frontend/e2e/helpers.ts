@@ -7,7 +7,7 @@ import {
   type Page,
 } from '@playwright/test';
 
-export const API_URL = 'http://localhost:3100';
+const API_URL = 'http://localhost:3100';
 export const ADMIN_PASSWORD = 'e2e-admin-password';
 
 export const FAST_SETTINGS = {
@@ -22,7 +22,7 @@ export const FAST_SETTINGS = {
 let cachedToken: string | null = null;
 
 /** Logs in once per test worker; the login endpoint is rate limited. */
-export async function adminToken(request: APIRequestContext): Promise<string> {
+async function adminToken(request: APIRequestContext): Promise<string> {
   if (cachedToken) {
     return cachedToken;
   }

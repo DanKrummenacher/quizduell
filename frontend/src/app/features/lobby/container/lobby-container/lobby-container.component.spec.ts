@@ -23,7 +23,7 @@ describe('LobbyContainerComponent', () => {
 
   it('starts with the game mode choice', () => {
     expect(lobby.lobbyState()).toBe('CHOOSE_MODE');
-    lobby.handleSelectChallenge();
+    lobby.handleSelectFriendGame();
     expect(lobby.lobbyState()).toBe('CHOOSE_ACTION');
     lobby.handleBack();
     expect(lobby.lobbyState()).toBe('CHOOSE_MODE');

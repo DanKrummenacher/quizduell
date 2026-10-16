@@ -9,6 +9,6 @@ import '@css-ch/calc-ui-text';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LobbyModeComponent {
-  readonly selectFastGame = output<void>();
-  readonly selectChallenge = output<void>();
+  readonly selectQuickGame = output<void>();
+  readonly selectFriendGame = output<void>();
 }

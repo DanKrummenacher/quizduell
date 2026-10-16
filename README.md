@@ -13,8 +13,9 @@ Zentralschweizer Bildungsmesse (ZEBI).
 
 - **Schnellspiel 1vs1:** automatische Gegnersuche
 - **Freund herausfordern:** Spiel erstellen und Code teilen oder mit Code beitreten
-- Echtzeit-Duell mit Timer, Tempo-Bonus, Auflösung und Revanche
-- Läuft weiter nach Verbindungsabbrüchen oder einem Neuladen der Seite
+- Echtzeit-Duell mit Timer, Tempo-Bonus, Auflösung und Revanche gegen denselben Gegner
+- Läuft weiter nach Verbindungsabbrüchen oder einem Neuladen der Seite; wer das Spiel
+  verlässt, beendet es sofort für beide
 - Stand-Modus: Geräte am Messestand springen nach Inaktivität zur Startseite zurück
 - Optimiert für Handy (hoch/quer), Tablet und Desktop bis Ultrawide
 
@@ -59,10 +60,18 @@ Admin-Bereich: <http://localhost:4200/admin> (Passwort aus `backend/.env`).
 ## Qualität
 
 ```bash
-npm run lint            # ESLint für Backend und Frontend
+npm run format:check    # Prettier
+npm run lint            # ESLint (typgeprüft) für Backend, Frontend und E2E-Tests
+npm run typecheck       # TypeScript im strengen Modus
 npm test                # Vertragsprüfung + Unit- und Integrationstests
 npm run e2e             # End-to-End-Tests (startet Backend und Frontend selbst)
 npm run build           # Produktions-Builds
+```
+
+Lasttest gegen ein laufendes Backend (Duelle gleichzeitig):
+
+```bash
+npm --prefix backend run load-test -- http://localhost:3000 500
 ```
 
 Jeder Push auf `main` läuft durch die GitHub-Actions-CI (Lint, Tests, Build, E2E).

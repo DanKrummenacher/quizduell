@@ -14,7 +14,7 @@
       label="Frage"
       placeholder="z.B. Wie viele Kantone hat die Schweiz?"
       rows="3"
-      maxlength="300"
+      [maxlength]="limits.text.max"
       character-counter
       [value]="d.text"
       [errorMessage]="e.text"
@@ -31,7 +31,7 @@
             [label]="
               'Antwort ' + letters[i] + (d.correctIndex === i ? ' (richtig)' : '')
             "
-            maxlength="100"
+            [maxlength]="limits.option.max"
             [value]="option"
             [errorMessage]="e.optionErrors?.[i] ?? undefined"
             (change)="updateOption(i, $event)"
@@ -51,7 +51,7 @@
       <css-input-text
         label="Kategorie (optional)"
         placeholder="z.B. Logik"
-        maxlength="50"
+        [maxlength]="limits.category.max"
         [value]="d.category"
         [errorMessage]="e.category"
         (change)="update({ category: text($event) })"

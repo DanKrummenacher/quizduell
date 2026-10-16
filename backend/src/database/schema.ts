@@ -14,6 +14,7 @@ export const questions = pgTable(
   'questions',
   {
     id: serial('id').primaryKey(),
+    // Lengths match QUESTION_LIMITS in the admin contract.
     text: varchar('text', { length: 300 }).notNull(),
     options: text('options').array().notNull(),
     correctIndex: smallint('correct_index').notNull(),

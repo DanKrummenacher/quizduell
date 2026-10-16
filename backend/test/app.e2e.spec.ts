@@ -58,10 +58,8 @@ describe('playduelio backend (e2e)', () => {
       expect(response.body).toEqual<PublicInfo>({
         questionsPerGame: 7,
         questionDurationSec: 20,
-        speedBonusEnabled: true,
         idleResetSec: 120,
         playable: false,
-        playersOnline: 0,
       });
     });
 
@@ -300,11 +298,11 @@ describe('playduelio backend (e2e)', () => {
       }
 
       const finished = await anna.waitFor((s) => s.phase === 'finished');
-      expect(finished.rematchAvailable).toBe(true);
+      expect(finished.rematch).toBe('open');
       expect(finished.you.score).toBe(expectedScore);
 
       await anna.emit(ClientEvents.REQUEST_REMATCH);
-      await ben.waitFor((s) => s.opponent?.rematchRequested === true);
+      await ben.waitFor((s) => s.rematch === 'offered');
       await ben.emit(ClientEvents.REQUEST_REMATCH);
       const restarted = await anna.waitFor((s) => s.phase === 'countdown');
       expect(restarted.you.score).toBe(0);

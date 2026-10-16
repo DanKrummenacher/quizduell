@@ -18,7 +18,7 @@ export class StartUiComponent {
 
   readonly startGame = output<string>();
 
-  onNameSubmitted(name: string) {
+  protected onNameSubmitted(name: string): void {
     this.startGame.emit(name);
   }
 }

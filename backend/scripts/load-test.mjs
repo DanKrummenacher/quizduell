@@ -1,11 +1,15 @@
-// Simulates many simultaneous duels: node scripts/load-test.mjs <url> <duels>
+// Simulates many simultaneous quick duels against a running backend and
+// reports how fast answers are acknowledged.
+//
+//   npm run load-test -- <url> <duels>
+//   npm run load-test -- https://playduelio-api.onrender.com 100
 import { io } from 'socket.io-client';
 
 const url = process.argv[2] ?? 'http://localhost:3000';
 const duels = Number(process.argv[3] ?? 100);
 const stats = { finished: 0, aborted: 0, errors: 0, ackMs: [] };
 
-function player(name) {
+function player() {
   const socket = io(url, { transports: ['websocket'], forceNew: true });
   let answered = -1;
   socket.on('game:state', (state) => {
@@ -18,11 +22,6 @@ function player(name) {
       // Answer after a human-like delay.
       setTimeout(
         async () => {
-          const connected = (socket) =>
-            socket.connected
-              ? Promise.resolve()
-              : new Promise((r) => socket.once('connect', r));
-
           const started = Date.now();
           const ack = await socket.emitWithAck('game:answer', {
             questionIndex: state.question.index,
@@ -55,8 +54,8 @@ const connected = (socket) =>
 
 const started = Date.now();
 for (let i = 0; i < duels; i++) {
-  const a = player(`A${i}`);
-  const b = player(`B${i}`);
+  const a = player();
+  const b = player();
   await connected(a);
   await connected(b);
   const queued = await a.emitWithAck('matchmaking:start', {

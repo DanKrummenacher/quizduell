@@ -42,8 +42,24 @@ export type GamePhase =
   /** The game ended early, see `endReason`. */
   | 'aborted';
 
-export type EndReason =
-  'opponent-left' | 'opponent-disconnected' | 'rematch-declined' | 'expired';
+export type EndReason = 'opponent-left' | 'opponent-disconnected' | 'expired';
+
+/** Where the rematch stands after a finished game, from this player's view. */
+export type RematchStatus =
+  /** Nobody asked yet, both can ask. */
+  | 'open'
+  /** You asked and wait for the opponent. */
+  | 'requested'
+  /** The opponent asked, you can accept. */
+  | 'offered'
+  /** A connection is interrupted; the rematch waits for the reconnect. */
+  | 'paused'
+  /** The opponent left, no rematch possible. */
+  | 'opponent-left'
+  /** You asked, but the opponent did not answer in time. */
+  | 'unanswered'
+  /** The time for a rematch is over. */
+  | 'expired';
 
 export type ErrorCode =
   | 'INVALID_INPUT'
@@ -51,7 +67,6 @@ export type ErrorCode =
   | 'GAME_NOT_FOUND'
   | 'GAME_FULL'
   | 'OWN_GAME'
-  | 'ALREADY_IN_GAME'
   | 'NOT_IN_GAME'
   | 'NOT_ENOUGH_QUESTIONS'
   | 'ANSWER_REJECTED'
@@ -85,6 +100,14 @@ export interface SubmitAnswerRequest {
 
 export interface ResumeRequest {
   sessionToken: string;
+}
+
+export interface LeaveGameRequest {
+  /**
+   * Leaves the game of this token instead of the socket's current game, e.g.
+   * a game stored by an earlier page load that the player navigated away from.
+   */
+  sessionToken?: string;
 }
 
 export interface PlayerView {
@@ -128,16 +151,16 @@ export interface GameStateView {
   phaseDurationMs: number | null;
   /** Server timestamp (epoch ms) when this snapshot was created. */
   serverNow: number;
-  rematchAvailable: boolean;
+  /** Rematch state while the game is `finished`, otherwise `null`. */
+  rematch: RematchStatus | null;
 }
 
-/** Public game configuration, served by `GET /api/info`. */
+/** Public game configuration for the start page, served by `GET /api/info`. */
 export interface PublicInfo {
   questionsPerGame: number;
   questionDurationSec: number;
-  speedBonusEnabled: boolean;
+  /** Seconds of inactivity before stand devices return to the start screen. */
   idleResetSec: number;
+  /** Enough active questions exist to start a duel. */
   playable: boolean;
-  /** Devices currently connected to the game server. */
-  playersOnline: number;
 }

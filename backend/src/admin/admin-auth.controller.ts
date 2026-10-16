@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { IsString, Length } from 'class-validator';
-import { AdminGuard } from '../auth/admin.guard.js';
+import { AdminGuard, bearerToken } from '../auth/admin.guard.js';
 import { AuthService } from '../auth/auth.service.js';
 import type { LoginRequest, LoginResponse } from '../contracts/admin.contract.js';
 
@@ -41,7 +41,10 @@ export class AdminAuthController {
   @Post('logout')
   @HttpCode(204)
   async logout(@Headers('authorization') authorization: string): Promise<void> {
-    await this.authService.logout(authorization.replace(/^Bearer /, ''));
+    const token = bearerToken(authorization);
+    if (token) {
+      await this.authService.logout(token);
+    }
   }
 
   @UseGuards(AdminGuard)

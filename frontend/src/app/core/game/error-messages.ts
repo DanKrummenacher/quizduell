@@ -8,7 +8,6 @@ const MESSAGES: Record<ClientErrorCode, string> = {
   GAME_NOT_FOUND: 'Zu diesem Code gibt es kein offenes Spiel.',
   GAME_FULL: 'Dieses Spiel hat bereits begonnen.',
   OWN_GAME: 'Das ist dein eigenes Spiel. Teile den Code mit deinem Gegner.',
-  ALREADY_IN_GAME: 'Du bist bereits in einem Spiel.',
   NOT_IN_GAME: 'Du bist in keinem Spiel.',
   NOT_ENOUGH_QUESTIONS:
     'Im Moment sind nicht genügend Fragen verfügbar. Bitte versuche es später.',

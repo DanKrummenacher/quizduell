@@ -1,7 +1,9 @@
-import type {
-  AdminQuestion,
-  QuestionInput,
+import {
+  type AdminQuestion,
+  QUESTION_LIMITS,
+  type QuestionInput,
 } from '../../core/contracts/admin.contract';
+import { ANSWER_OPTION_COUNT } from '../../core/contracts/game.contract';
 
 export interface QuestionDraft {
   text: string;
@@ -20,7 +22,7 @@ export type QuestionErrors = Partial<
 export function emptyDraft(): QuestionDraft {
   return {
     text: '',
-    options: ['', '', '', ''],
+    options: Array.from({ length: ANSWER_OPTION_COUNT }, () => ''),
     correctIndex: 0,
     category: '',
     active: true,
@@ -41,10 +43,11 @@ export function draftFrom(question: AdminQuestion): QuestionDraft {
 export function validateDraft(draft: QuestionDraft): QuestionErrors {
   const errors: QuestionErrors = {};
   const text = draft.text.trim();
-  if (text.length < 5) {
-    errors.text = 'Die Frage braucht mindestens 5 Zeichen.';
-  } else if (text.length > 300) {
-    errors.text = 'Die Frage darf höchstens 300 Zeichen lang sein.';
+  const limits = QUESTION_LIMITS;
+  if (text.length < limits.text.min) {
+    errors.text = `Die Frage braucht mindestens ${limits.text.min} Zeichen.`;
+  } else if (text.length > limits.text.max) {
+    errors.text = `Die Frage darf höchstens ${limits.text.max} Zeichen lang sein.`;
   }
 
   const seen = new Set<string>();
@@ -53,8 +56,8 @@ export function validateDraft(draft: QuestionDraft): QuestionErrors {
     if (!value) {
       return 'Bitte ausfüllen.';
     }
-    if (value.length > 100) {
-      return 'Höchstens 100 Zeichen.';
+    if (value.length > limits.option.max) {
+      return `Höchstens ${limits.option.max} Zeichen.`;
     }
     const key = value.toLowerCase();
     if (seen.has(key)) {
@@ -68,14 +71,14 @@ export function validateDraft(draft: QuestionDraft): QuestionErrors {
     errors.options = 'Bitte prüfe die Antworten.';
   }
 
-  if (draft.category.trim().length > 50) {
-    errors.category = 'Die Kategorie darf höchstens 50 Zeichen lang sein.';
+  if (draft.category.trim().length > limits.category.max) {
+    errors.category = `Die Kategorie darf höchstens ${limits.category.max} Zeichen lang sein.`;
   }
   return errors;
 }
 
 export function hasErrors(errors: QuestionErrors): boolean {
-  return Boolean(errors.text || errors.options || errors.category);
+  return [errors.text, errors.options, errors.category].some(Boolean);
 }
 
 export function toInput(draft: QuestionDraft): QuestionInput {

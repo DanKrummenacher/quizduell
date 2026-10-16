@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
-import type { LoginResponse } from '../core/contracts/admin.contract';
+import type { LoginRequest, LoginResponse } from '../core/contracts/admin.contract';
 import { sessionStore } from '../core/platform/safe-storage';
 
 const STORAGE_KEY = 'playduelio.adminSession';
@@ -23,17 +23,19 @@ export class AdminAuthService {
   isLoggedIn(): boolean {
     const session = this.session();
     if (session && session.expiresAt <= Date.now()) {
-      this.logout();
+      this.forgetSession();
       return false;
     }
     return session !== null;
   }
 
   async login(password: string): Promise<void> {
+    const request: LoginRequest = { password };
     const response = await firstValueFrom(
-      this.http.post<LoginResponse>(`${environment.apiUrl}/api/admin/auth/login`, {
-        password,
-      }),
+      this.http.post<LoginResponse>(
+        `${environment.apiUrl}/api/admin/auth/login`,
+        request,
+      ),
     );
     const session = { token: response.token, expiresAt: response.expiresAt };
     sessionStore.set(STORAGE_KEY, JSON.stringify(session));
@@ -41,9 +43,9 @@ export class AdminAuthService {
   }
 
   /** Ends the session on the server (token becomes invalid) and locally. */
-  async signOut(): Promise<void> {
+  async logout(): Promise<void> {
     const token = this.token();
-    this.logout();
+    this.forgetSession();
     if (token) {
       try {
         await firstValueFrom(
@@ -58,7 +60,7 @@ export class AdminAuthService {
   }
 
   /** Forgets the session locally (e.g. after it expired). */
-  logout(): void {
+  forgetSession(): void {
     sessionStore.remove(STORAGE_KEY);
     this.session.set(null);
   }

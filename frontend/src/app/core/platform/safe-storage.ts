@@ -2,7 +2,7 @@
  * Storage access that never throws (private mode, blocked cookies, quota).
  * Everything stored here is a convenience; the app works without it.
  */
-export class SafeStorage {
+class SafeStorage {
   constructor(private readonly kind: 'local' | 'session') {}
 
   get(key: string): string | null {

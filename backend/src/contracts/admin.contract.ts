@@ -15,6 +15,13 @@ export interface LoginResponse {
   expiresAt: number;
 }
 
+/** Length limits of a question, checked by the admin form and the backend. */
+export const QUESTION_LIMITS = {
+  text: { min: 5, max: 300 },
+  option: { min: 1, max: 100 },
+  category: { min: 1, max: 50 },
+} as const;
+
 export interface QuestionInput {
   text: string;
   options: string[];
@@ -31,12 +38,17 @@ export interface AdminQuestion extends QuestionInput {
   updatedAt: string;
 }
 
+/** Game settings, editable in the admin area. */
 export interface AdminSettings {
   questionsPerGame: number;
   questionDurationSec: number;
+  /** How long the correct answer is shown after each question. */
   revealDurationSec: number;
+  /** Faster correct answers earn up to 100 extra points. */
   speedBonusEnabled: boolean;
+  /** Time both players have to agree on a rematch. */
   rematchTimeoutSec: number;
+  /** Seconds of inactivity before stand devices return to the start screen. 0 = off. */
   idleResetSec: number;
 }
 

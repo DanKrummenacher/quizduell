@@ -7,10 +7,8 @@ import type { PublicInfo } from '../contracts/game.contract';
 const FALLBACK: PublicInfo = {
   questionsPerGame: 7,
   questionDurationSec: 20,
-  speedBonusEnabled: true,
   idleResetSec: 120,
   playable: true,
-  playersOnline: 0,
 };
 
 /** Public game configuration (number of questions, time per question, …). */

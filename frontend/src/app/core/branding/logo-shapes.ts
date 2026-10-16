@@ -7,7 +7,7 @@ const GRADIENT: [number, number, number][] = [
   [0x00, 0xa4, 0xe0],
 ];
 
-export interface Shape {
+interface Shape {
   kind: 'circle' | 'polygon';
   cx: number;
   cy: number;
@@ -16,7 +16,7 @@ export interface Shape {
   color: string;
 }
 
-export function polygon(
+function polygon(
   cx: number,
   cy: number,
   radius: number,
@@ -30,7 +30,7 @@ export function polygon(
 }
 
 /** Color at position t (0–1) along the brand gradient. */
-export function gradientColor(t: number): string {
+function gradientColor(t: number): string {
   const scaled = Math.min(Math.max(t, 0), 1) * (GRADIENT.length - 1);
   const index = Math.min(Math.floor(scaled), GRADIENT.length - 2);
   const local = scaled - index;

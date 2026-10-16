@@ -1,14 +1,18 @@
-import { computed, inject, Injectable, type OnDestroy, signal } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import { computed, Injectable, type OnDestroy, signal } from '@angular/core';
 import { io, type Socket } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
 import {
   type Ack,
   ClientEvents,
+  type CreateGameRequest,
   type GameStateView,
+  type JoinGameRequest,
+  type LeaveGameRequest,
   type MatchmakingStatus,
+  type ResumeRequest,
   ServerEvents,
+  type StartMatchmakingRequest,
+  type SubmitAnswerRequest,
 } from '../contracts/game.contract';
 import { sessionStore } from '../platform/safe-storage';
 import type { ClientErrorCode } from './error-messages';
@@ -18,34 +22,15 @@ export type ConnectionStatus = 'idle' | 'connecting' | 'connected' | 'reconnecti
 export type CommandResult<T = undefined> =
   { ok: true; data: T } | { ok: false; error: ClientErrorCode };
 
+/** The game of this browser tab, kept across reloads (session storage). */
 const TOKEN_KEY = 'playduelio.sessionToken';
 const CONNECT_TIMEOUT_MS = 20_000;
 const ACK_TIMEOUT_MS = 10_000;
-/** Routes on which a running game or search may continue (exact paths only). */
-const GAME_ROUTES = new Set(['/lobby', '/quiz', '/result']);
-
-function isGameRoute(url: string): boolean {
-  const path = (url.split(/[?#]/)[0] ?? '').replace(/\/+$/, '');
-  return GAME_ROUTES.has(path);
-}
 
 /**
- * Runs `start` once the page is really shown. Browsers may prerender a page
- * in the background while its address is still being typed; a game must not
- * be resumed or left before the visitor actually opens that page.
- */
-function whenPageActive(start: () => void): void {
-  const doc = document as Document & { prerendering?: boolean };
-  if (doc.prerendering) {
-    doc.addEventListener('prerenderingchange', start, { once: true });
-  } else {
-    start();
-  }
-}
-
-/**
- * Single connection to the game server. Holds the latest game snapshot as a
- * signal and resumes a running game automatically after reconnects or reloads.
+ * Single connection to the game server. Sends commands, holds the latest game
+ * snapshot as a signal and resumes the game after a lost connection. When a
+ * game is resumed or left is decided by `GameLifecycleService`.
  */
 @Injectable({ providedIn: 'root' })
 export class GameClient implements OnDestroy {
@@ -53,7 +38,9 @@ export class GameClient implements OnDestroy {
   private readonly stateSignal = signal<GameStateView | null>(null);
   private readonly statusSignal = signal<ConnectionStatus>('idle');
   private readonly searchingSignal = signal(false);
-  private readonly resumingSignal = signal(false);
+  // A stored game is pending until the lifecycle resumes or leaves it, so
+  // game screens wait instead of redirecting away.
+  private readonly resumingSignal = signal(this.hasStoredGame());
   private clockOffsetMs = 0;
   private matchmakingName: string | null = null;
   private connectedBefore = false;
@@ -63,59 +50,9 @@ export class GameClient implements OnDestroy {
   readonly status = this.statusSignal.asReadonly();
   /** True while waiting in the quick game queue. */
   readonly searching = this.searchingSignal.asReadonly();
-  /** True while trying to resume a game after a reload. */
+  /** True while a game from an earlier page load is being resumed. */
   readonly resuming = this.resumingSignal.asReadonly();
   readonly inGame = computed(() => this.stateSignal() !== null);
-
-  constructor() {
-    whenPageActive(() => this.restoreGame());
-
-    // Unloading the page (tab closed, other page opened, reload) closes the
-    // connection on purpose, so the server only waits briefly for a reload
-    // instead of the full grace period for network problems.
-    window.addEventListener('pagehide', () => {
-      if (this.socket?.connected) {
-        this.socket.disconnect();
-      }
-    });
-    // Back from the browser's page cache: reconnect and resume.
-    window.addEventListener('pageshow', (event) => {
-      if (event.persisted && sessionStore.get(TOKEN_KEY)) {
-        this.ensureSocket().connect();
-      }
-    });
-
-    // Leaving the game screens in the app (browser back, typed URL, links)
-    // ends a running game or search instead of leaving the opponent alone.
-    inject(Router)
-      .events.pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((event) => {
-        if (
-          !isGameRoute(event.urlAfterRedirects) &&
-          (this.inGame() || this.searching())
-        ) {
-          this.leave();
-        }
-      });
-  }
-
-  /** Picks up a game stored in this tab when the app starts. */
-  private restoreGame(): void {
-    const token = sessionStore.get(TOKEN_KEY);
-    if (!token) {
-      return;
-    }
-    if (isGameRoute(window.location.pathname)) {
-      // Reload on a game screen: get back into the running game.
-      this.resumingSignal.set(true);
-      this.ensureSocket().connect();
-    } else {
-      // The page was opened elsewhere (start page, admin, unknown path): the
-      // player left the game, so end it and inform the opponent at once.
-      sessionStore.remove(TOKEN_KEY);
-      void this.abandon(token);
-    }
-  }
 
   ngOnDestroy(): void {
     this.socket?.disconnect();
@@ -127,11 +64,13 @@ export class GameClient implements OnDestroy {
   }
 
   createGame(playerName: string): Promise<CommandResult> {
-    return this.command(ClientEvents.CREATE_GAME, { playerName });
+    const request: CreateGameRequest = { playerName };
+    return this.command(ClientEvents.CREATE_GAME, request);
   }
 
   joinGame(gameCode: string, playerName: string): Promise<CommandResult> {
-    return this.command(ClientEvents.JOIN_GAME, { gameCode, playerName });
+    const request: JoinGameRequest = { gameCode, playerName };
+    return this.command(ClientEvents.JOIN_GAME, request);
   }
 
   async startMatchmaking(
@@ -139,11 +78,10 @@ export class GameClient implements OnDestroy {
   ): Promise<CommandResult<MatchmakingStatus>> {
     this.searchingSignal.set(true);
     this.matchmakingName = playerName;
+    const request: StartMatchmakingRequest = { playerName };
     const result = await this.command<MatchmakingStatus>(
       ClientEvents.START_MATCHMAKING,
-      {
-        playerName,
-      },
+      request,
     );
     if (!result.ok || result.data === 'matched') {
       this.searchingSignal.set(false);
@@ -160,7 +98,8 @@ export class GameClient implements OnDestroy {
   }
 
   submitAnswer(questionIndex: number, answerIndex: number): Promise<CommandResult> {
-    return this.command(ClientEvents.SUBMIT_ANSWER, { questionIndex, answerIndex });
+    const request: SubmitAnswerRequest = { questionIndex, answerIndex };
+    return this.command(ClientEvents.SUBMIT_ANSWER, request);
   }
 
   requestRematch(): Promise<CommandResult> {
@@ -177,9 +116,48 @@ export class GameClient implements OnDestroy {
     this.forgetGame();
   }
 
+  /** Whether this tab holds a game from an earlier page load. */
+  hasStoredGame(): boolean {
+    return sessionStore.get(TOKEN_KEY) !== null;
+  }
+
+  /** Gets back into the stored game; the connect handler sends the resume. */
+  resumeStoredGame(): void {
+    this.resumingSignal.set(true);
+    this.ensureSocket().connect();
+  }
+
+  /** Leaves the stored game without resuming it, so the opponent is informed. */
+  async leaveStoredGame(): Promise<void> {
+    const sessionToken = sessionStore.get(TOKEN_KEY);
+    sessionStore.remove(TOKEN_KEY);
+    this.resumingSignal.set(false);
+    if (sessionToken !== null) {
+      const request: LeaveGameRequest = { sessionToken };
+      await this.command(ClientEvents.LEAVE_GAME, request);
+    }
+  }
+
+  /**
+   * Closes the connection on purpose while the page unloads. The server then
+   * keeps the game only briefly, long enough for a reload.
+   */
+  suspend(): void {
+    if (this.socket?.connected) {
+      this.socket.disconnect();
+    }
+  }
+
+  /** Reconnects after `suspend` when the page is shown again (page cache). */
+  reconnect(): void {
+    if (this.hasStoredGame() || this.searchingSignal()) {
+      this.ensureSocket().connect();
+    }
+  }
+
   private async command<T = undefined>(
     event: string,
-    payload?: unknown,
+    payload?: object,
   ): Promise<CommandResult<T>> {
     const connected = await this.connect();
     if (!connected || !this.socket) {
@@ -270,12 +248,8 @@ export class GameClient implements OnDestroy {
   }
 
   private async resumeIfNeeded(isReconnect: boolean): Promise<void> {
-    const current = this.stateSignal();
-    const token =
-      current && current.phase !== 'aborted'
-        ? current.sessionToken
-        : sessionStore.get(TOKEN_KEY);
-    if (!token || !this.socket) {
+    const sessionToken = sessionStore.get(TOKEN_KEY);
+    if (!sessionToken || !this.socket) {
       this.resumingSignal.set(false);
       if (isReconnect) {
         // Only after a lost connection: the first connect is made by the
@@ -286,9 +260,10 @@ export class GameClient implements OnDestroy {
     }
 
     try {
+      const request: ResumeRequest = { sessionToken };
       const ack = (await this.socket
         .timeout(ACK_TIMEOUT_MS)
-        .emitWithAck(ClientEvents.RESUME, { sessionToken: token })) as Ack;
+        .emitWithAck(ClientEvents.RESUME, request)) as Ack;
       if (!ack.ok) {
         this.handleLostGame();
       }
@@ -299,31 +274,11 @@ export class GameClient implements OnDestroy {
     }
   }
 
-  /** Resumes a game only to leave it, so the opponent is informed immediately. */
-  private async abandon(token: string): Promise<void> {
-    const connected = await this.connect();
-    if (!connected || !this.socket) {
-      return;
-    }
-    try {
-      const ack = (await this.socket
-        .timeout(ACK_TIMEOUT_MS)
-        .emitWithAck(ClientEvents.RESUME, { sessionToken: token })) as Ack;
-      if (ack.ok) {
-        this.socket.emit(ClientEvents.LEAVE_GAME);
-      }
-    } catch {
-      // The server ends the game on its own after the grace period.
-    }
-    this.forgetGame();
-  }
-
   /** The server forgets queued players on disconnect; join the queue again. */
   private requeueIfSearching(): void {
     if (this.searchingSignal() && this.matchmakingName && this.socket) {
-      this.socket.emit(ClientEvents.START_MATCHMAKING, {
-        playerName: this.matchmakingName,
-      });
+      const request: StartMatchmakingRequest = { playerName: this.matchmakingName };
+      this.socket.emit(ClientEvents.START_MATCHMAKING, request);
     }
   }
 
@@ -333,18 +288,13 @@ export class GameClient implements OnDestroy {
     sessionStore.remove(TOKEN_KEY);
     if (current?.phase === 'finished') {
       // The result stays visible, only the rematch is gone.
-      this.stateSignal.set({
-        ...current,
-        phaseEndsAt: null,
-        rematchAvailable: false,
-      });
+      this.stateSignal.set({ ...current, phaseEndsAt: null, rematch: 'expired' });
     } else if (current && current.phase !== 'aborted') {
       this.stateSignal.set({
         ...current,
         phase: 'aborted',
         endReason: 'expired',
         phaseEndsAt: null,
-        rematchAvailable: false,
       });
     }
   }

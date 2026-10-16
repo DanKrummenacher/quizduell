@@ -24,7 +24,7 @@ export const adminAuthInterceptor: HttpInterceptorFn = (request, next) => {
   return next(authorized).pipe(
     catchError((error: unknown) => {
       if (error instanceof HttpErrorResponse && error.status === 401) {
-        auth.logout();
+        auth.forgetSession();
         void router.navigate(['/admin/login'], { queryParams: { abgelaufen: 1 } });
       }
       return throwError(() => error);

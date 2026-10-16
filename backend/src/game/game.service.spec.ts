@@ -296,7 +296,7 @@ describe('GameService', () => {
       expect(state.phase).toBe('finished');
       expect(state.you.score).toBe(600);
       expect(state.opponent?.score).toBe(0);
-      expect(state.rematchAvailable).toBe(true);
+      expect(state.rematch).toBe('open');
       expect(ctx.statsService.recordGame).toHaveBeenCalledWith('friend', 3);
       expect(ctx.questionsService.recordResults).toHaveBeenCalledTimes(3);
     });
@@ -317,7 +317,8 @@ describe('GameService', () => {
       await finishGame(ctx);
 
       ctx.service.requestRematch('host');
-      expect(ctx.state('guest').opponent?.rematchRequested).toBe(true);
+      expect(ctx.state('host').rematch).toBe('requested');
+      expect(ctx.state('guest').rematch).toBe('offered');
       expect(ctx.state('guest').phase).toBe('finished');
 
       ctx.service.requestRematch('guest');
@@ -333,8 +334,8 @@ describe('GameService', () => {
       ctx.service.requestRematch('host');
       await vi.advanceTimersByTimeAsync(30_000);
 
-      expect(ctx.state('host').rematchAvailable).toBe(false);
-      expect(ctx.state('host').endReason).toBe('rematch-declined');
+      expect(ctx.state('host').rematch).toBe('unanswered');
+      expect(ctx.state('guest').rematch).toBe('expired');
       expect(() => ctx.service.requestRematch('guest')).toThrow(
         new GameError('REMATCH_UNAVAILABLE'),
       );
@@ -346,7 +347,7 @@ describe('GameService', () => {
       ctx.service.leave('guest');
 
       expect(ctx.state('host').endReason).toBe('opponent-left');
-      expect(ctx.state('host').rematchAvailable).toBe(false);
+      expect(ctx.state('host').rematch).toBe('opponent-left');
       expect(ctx.state('host').opponent).toMatchObject({ name: 'Ben', score: 200 });
     });
 
@@ -362,7 +363,7 @@ describe('GameService', () => {
       }
 
       expect(ctx.state('a').phase).toBe('finished');
-      expect(ctx.state('a').rematchAvailable).toBe(true);
+      expect(ctx.state('a').rematch).toBe('open');
       ctx.service.requestRematch('a');
       ctx.service.requestRematch('b');
       expect(ctx.state('a').phase).toBe('countdown');
@@ -375,11 +376,13 @@ describe('GameService', () => {
       const token = ctx.state('guest').sessionToken;
 
       ctx.service.handleDisconnect('guest');
-      expect(ctx.state('host').rematchAvailable).toBe(false);
-      expect(ctx.state('host').endReason).toBeNull();
+      expect(ctx.state('host').rematch).toBe('paused');
+      expect(() => ctx.service.requestRematch('host')).toThrow(
+        new GameError('REMATCH_UNAVAILABLE'),
+      );
 
       ctx.service.resume('guest-new', token);
-      expect(ctx.state('host').rematchAvailable).toBe(true);
+      expect(ctx.state('host').rematch).toBe('open');
     });
   });
 
@@ -458,6 +461,29 @@ describe('GameService', () => {
 
       expect(ctx.state('host').phase).toBe('question');
       expect(ctx.state('host').opponent?.connected).toBe(true);
+    });
+
+    it('leaves a game by its session token from a new connection', async () => {
+      const ctx = setup();
+      await toFirstQuestion(ctx);
+      const token = ctx.state('guest').sessionToken;
+
+      ctx.service.handleDisconnect('guest');
+      ctx.service.leave('guest-new', token);
+
+      expect(ctx.state('host').phase).toBe('aborted');
+      expect(ctx.state('host').endReason).toBe('opponent-left');
+      expect(() => ctx.service.resume('guest-new', token)).toThrow(
+        new GameError('SESSION_NOT_FOUND'),
+      );
+    });
+
+    it('ignores leaving with an unknown session token', async () => {
+      const ctx = setup();
+      await toFirstQuestion(ctx);
+
+      ctx.service.leave('stranger', 'unknown');
+      expect(ctx.state('host').phase).toBe('question');
     });
 
     it('leaves the previous game when starting a new one', async () => {

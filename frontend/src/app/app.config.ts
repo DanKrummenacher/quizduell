@@ -6,6 +6,8 @@ import {
 import {
   type ApplicationConfig,
   ErrorHandler,
+  inject,
+  provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
@@ -17,6 +19,7 @@ import {
 import { routes } from './app.routes';
 import { adminAuthInterceptor } from './admin/admin-auth.interceptor';
 import { GlobalErrorHandler } from './core/errors/global-error-handler';
+import { GameLifecycleService } from './core/game/game-lifecycle.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -29,5 +32,6 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(withFetch(), withInterceptors([adminAuthInterceptor])),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    provideAppInitializer(() => inject(GameLifecycleService).start()),
   ],
 };

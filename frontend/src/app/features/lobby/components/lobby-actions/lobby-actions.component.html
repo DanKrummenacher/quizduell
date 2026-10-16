@@ -25,9 +25,9 @@
       placeholder="z.B. 05CA"
       class="code-input"
       uppercase
-      maxlength="4"
+      [maxlength]="codeLength"
       autocomplete="off"
-      [errorMessage]="errorMessage || undefined"
+      [errorMessage]="errorMessage() || undefined"
       (input)="onCodeInput($event)"
       (keydown)="onCodeKeydown($event)"
     >

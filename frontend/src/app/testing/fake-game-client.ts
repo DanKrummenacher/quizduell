@@ -34,6 +34,17 @@ export class FakeGameClient {
     this.calls.push('leave');
     this.state.set(null);
   };
+
+  /** Whether a game from an earlier page load is stored. */
+  storedGame = false;
+  hasStoredGame = () => this.storedGame;
+  resumeStoredGame = () => this.calls.push('resumeStoredGame');
+  leaveStoredGame = () => {
+    this.calls.push('leaveStoredGame');
+    return Promise.resolve();
+  };
+  suspend = () => this.calls.push('suspend');
+  reconnect = () => this.calls.push('reconnect');
 }
 
 export function player(
@@ -71,7 +82,7 @@ export function gameState(overrides: Partial<GameStateView> = {}): GameStateView
     phaseEndsAt: 20_000,
     phaseDurationMs: 20_000,
     serverNow: 0,
-    rematchAvailable: false,
+    rematch: null,
     ...overrides,
   };
 }

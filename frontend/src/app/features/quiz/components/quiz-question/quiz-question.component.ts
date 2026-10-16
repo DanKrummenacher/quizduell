@@ -1,5 +1,5 @@
 import { Component, input, output, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { QuizPhase, AnswerViewData } from '../../quiz.types';
+import type { QuizPhase, AnswerViewData, FeedbackType } from '../../quiz.types';
 import '@css-ch/calc-ui-text';
 
 @Component({
@@ -14,7 +14,7 @@ export class QuizQuestionComponent {
   readonly answers = input.required<AnswerViewData[]>();
 
   readonly feedbackText = input.required<string | null>();
-  readonly feedbackType = input.required<'default' | 'success' | 'error' | null>();
+  readonly feedbackType = input.required<FeedbackType | null>();
   readonly opponentInitial = input.required<string>();
 
   readonly answerSelected = output<string>();

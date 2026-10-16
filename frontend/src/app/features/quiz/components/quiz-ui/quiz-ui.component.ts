@@ -2,7 +2,7 @@ import { Component, input, output, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { QuizScoreboardComponent } from '../quiz-scoreboard/quiz-scoreboard.component';
 import { QuizTimerComponent } from '../quiz-timer/quiz-timer.component';
 import { QuizQuestionComponent } from '../quiz-question/quiz-question.component';
-import { QuizPhase, AnswerViewData } from '../../quiz.types';
+import type { QuizPhase, AnswerViewData, FeedbackType } from '../../quiz.types';
 import '@css-ch/calc-ui-text';
 import '@css-ch/components/flyout';
 
@@ -28,13 +28,11 @@ export class QuizUiComponent {
   readonly questionText = input.required<string>();
   readonly answers = input.required<AnswerViewData[]>();
   readonly feedbackText = input.required<string | null>();
-  readonly feedbackType = input.required<'default' | 'success' | 'error' | null>();
+  readonly feedbackType = input.required<FeedbackType | null>();
   readonly opponentLeft = input<boolean>(false);
   readonly opponentOffline = input<boolean>(false);
-  readonly abortTitle = input('Schade! Spiel abgebrochen');
-  readonly abortText = input(
-    'Dein Gegner hat das Spiel vorzeitig verlassen. Das Duell kann deshalb leider nicht fortgesetzt werden.',
-  );
+  readonly abortTitle = input.required<string>();
+  readonly abortText = input.required<string>();
 
   readonly answerSelected = output<string>();
   readonly acknowledgeOpponentLeft = output<void>();

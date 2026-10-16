@@ -9,14 +9,13 @@ import {
   untracked,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { GAME_SCREEN } from '../../../../core/game/game-screen';
+import { ANSWER_LETTERS } from '../../../../core/game/answer-letters';
+import { GAME_SCREEN_NAVIGATION } from '../../../../core/game/game-screen';
 import { GameClient } from '../../../../core/game/game-client.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
 import { WakeLockService } from '../../../../core/platform/wake-lock.service';
 import { QuizUiComponent } from '../../components/quiz-ui/quiz-ui.component';
-import type { AnswerViewData, QuizPhase } from '../../quiz.types';
-
-const LETTERS = ['A', 'B', 'C', 'D'];
+import type { AnswerViewData, FeedbackType, QuizPhase } from '../../quiz.types';
 
 @Component({
   selector: 'app-quiz-container',
@@ -107,7 +106,7 @@ export class QuizContainerComponent implements OnDestroy {
         }
       }
       return {
-        letter: LETTERS[index] ?? '?',
+        letter: ANSWER_LETTERS[index] ?? '?',
         text,
         state,
         hasOpponent: phase === 'REVEAL' && reveal?.opponentAnswerIndex === index,
@@ -124,7 +123,7 @@ export class QuizContainerComponent implements OnDestroy {
       return 'Warte auf den Gegner...';
     }
     const reveal = this.game()?.reveal;
-    if (!reveal || reveal.yourAnswerIndex === null) {
+    if (reveal?.yourAnswerIndex === undefined || reveal.yourAnswerIndex === null) {
       return 'Zeit abgelaufen! +0 Punkte';
     }
     if (reveal.yourAnswerIndex === reveal.correctIndex) {
@@ -133,7 +132,7 @@ export class QuizContainerComponent implements OnDestroy {
     return 'Falsch! +0 Punkte';
   });
 
-  readonly feedbackType = computed<'default' | 'success' | 'error'>(() => {
+  readonly feedbackType = computed<FeedbackType>(() => {
     const phase = this.quizPhase();
     if (phase === 'WAITING') {
       return 'default';
@@ -155,15 +154,15 @@ export class QuizContainerComponent implements OnDestroy {
         if (!this.gameClient.resuming()) {
           void this.router.navigate(
             [this.playerNameStore.name() ? '/lobby' : '/'],
-            GAME_SCREEN,
+            GAME_SCREEN_NAVIGATION,
           );
         }
         return;
       }
       if (game.phase === 'finished') {
-        void this.router.navigate(['/result'], GAME_SCREEN);
+        void this.router.navigate(['/result'], GAME_SCREEN_NAVIGATION);
       } else if (game.phase === 'waiting' || game.phase === 'countdown') {
-        void this.router.navigate(['/lobby'], GAME_SCREEN);
+        void this.router.navigate(['/lobby'], GAME_SCREEN_NAVIGATION);
       }
     });
 
@@ -189,13 +188,13 @@ export class QuizContainerComponent implements OnDestroy {
     if (this.quizPhase() !== 'PLAYING' || !question) {
       return;
     }
-    const answerIndex = LETTERS.indexOf(letter);
+    const answerIndex = ANSWER_LETTERS.indexOf(letter);
     this.selectedIndex.set(answerIndex);
     void this.gameClient.submitAnswer(question.index, answerIndex);
   }
 
   handleOpponentLeftAcknowledge(): void {
     this.gameClient.leave();
-    void this.router.navigate(['/lobby'], GAME_SCREEN);
+    void this.router.navigate(['/lobby'], GAME_SCREEN_NAVIGATION);
   }
 }

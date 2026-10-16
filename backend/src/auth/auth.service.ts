@@ -9,7 +9,7 @@ import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
 import { APP_CONFIG, type AppConfig } from '../config/app-config.js';
 import type { LoginResponse } from '../contracts/admin.contract.js';
 
-export const ADMIN_SESSION_HOURS = 12;
+const ADMIN_SESSION_HOURS = 12;
 const ALGORITHM = 'HS256';
 
 interface AdminTokenPayload {

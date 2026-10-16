@@ -9,7 +9,10 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { errorMessage } from '../../../../core/game/error-messages';
-import { GAME_SCREEN } from '../../../../core/game/game-screen';
+import {
+  GAME_SCREEN_NAVIGATION,
+  type LobbyStartState,
+} from '../../../../core/game/game-screen';
 import { GameClient } from '../../../../core/game/game-client.service';
 import { IdleResetService } from '../../../../core/platform/idle-reset.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
@@ -54,30 +57,24 @@ export class LobbyContainerComponent implements OnDestroy {
 
   constructor() {
     // "Neuen Gegner suchen" / "Neues Spiel erstellen" on the result screen.
-    const restart = history.state as {
-      fastGameRestart?: boolean;
-      friendGameRestart?: boolean;
-    } | null;
-    if (restart?.fastGameRestart || restart?.friendGameRestart) {
+    const { autoStart } = (history.state ?? {}) as LobbyStartState;
+    if (autoStart) {
       // Only once: a reload of the lobby must not start another game.
-      history.replaceState(
-        { ...restart, fastGameRestart: false, friendGameRestart: false },
-        '',
-      );
-    }
-    if (restart?.fastGameRestart) {
-      void this.handleSelectFastGame();
-    } else if (restart?.friendGameRestart) {
-      this.menuState.set('CHOOSE_ACTION');
-      void this.handleCreate();
+      history.replaceState({ ...history.state, autoStart: undefined }, '');
+      if (autoStart === 'quick') {
+        void this.handleSelectQuickGame();
+      } else {
+        this.menuState.set('CHOOSE_ACTION');
+        void this.handleCreate();
+      }
     }
 
     effect(() => {
       const phase = this.game()?.phase;
       if (phase === 'question' || phase === 'reveal') {
-        void this.router.navigate(['/quiz'], GAME_SCREEN);
+        void this.router.navigate(['/quiz'], GAME_SCREEN_NAVIGATION);
       } else if (phase === 'finished') {
-        void this.router.navigate(['/result'], GAME_SCREEN);
+        void this.router.navigate(['/result'], GAME_SCREEN_NAVIGATION);
       }
     });
 
@@ -114,7 +111,7 @@ export class LobbyContainerComponent implements OnDestroy {
     }
   }
 
-  async handleSelectFastGame(): Promise<void> {
+  async handleSelectQuickGame(): Promise<void> {
     const result = await this.gameClient.startMatchmaking(this.playerName());
     if (!result.ok) {
       this.notice.set(errorMessage(result.error));
@@ -126,7 +123,7 @@ export class LobbyContainerComponent implements OnDestroy {
     this.menuState.set('CHOOSE_MODE');
   }
 
-  handleSelectChallenge(): void {
+  handleSelectFriendGame(): void {
     this.menuState.set('CHOOSE_ACTION');
   }
 

@@ -1,0 +1,9 @@
+/* End-to-end tests (Playwright) run in Node.js, not in the browser. */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/e2e",
+    "types": ["node"]
+  },
+  "include": ["e2e/**/*.ts", "playwright.config.ts"]
+}

@@ -13,6 +13,8 @@
     "dev:backend": "npm --prefix backend run start:dev",
     "dev:frontend": "npm --prefix frontend start",
     "lint": "npm --prefix backend run lint && npm --prefix frontend run lint",
+    "typecheck": "npm --prefix backend run typecheck && npm --prefix frontend run typecheck",
+    "format:check": "npm --prefix backend run format:check && npm --prefix frontend run format:check",
     "test": "node scripts/check-contracts.mjs && npm --prefix backend test && npm --prefix frontend test",
     "e2e": "npm --prefix frontend run e2e",
     "build": "npm --prefix backend run build && npm --prefix frontend run build",

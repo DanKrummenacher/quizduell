@@ -13,7 +13,7 @@ import {
   Min,
   ValidateIf,
 } from 'class-validator';
-import type { QuestionInput } from '../contracts/admin.contract.js';
+import { QUESTION_LIMITS, type QuestionInput } from '../contracts/admin.contract.js';
 import { ANSWER_OPTION_COUNT } from '../contracts/game.contract.js';
 
 const trim = ({ value }: { value: unknown }): unknown =>
@@ -35,7 +35,7 @@ const emptyToNull = ({ value }: { value: unknown }): unknown => {
 export class QuestionDto implements QuestionInput {
   @Transform(trim)
   @IsString()
-  @Length(5, 300)
+  @Length(QUESTION_LIMITS.text.min, QUESTION_LIMITS.text.max)
   text: string;
 
   @Transform(trimAll)
@@ -43,7 +43,7 @@ export class QuestionDto implements QuestionInput {
   @ArrayMinSize(ANSWER_OPTION_COUNT)
   @ArrayMaxSize(ANSWER_OPTION_COUNT)
   @IsString({ each: true })
-  @Length(1, 100, { each: true })
+  @Length(QUESTION_LIMITS.option.min, QUESTION_LIMITS.option.max, { each: true })
   @ArrayUnique((option: string) => option.toLowerCase(), {
     message: 'options must be unique',
   })
@@ -58,7 +58,7 @@ export class QuestionDto implements QuestionInput {
   @IsOptional()
   @ValidateIf((_, value) => value !== null)
   @IsString()
-  @Length(1, 50)
+  @Length(QUESTION_LIMITS.category.min, QUESTION_LIMITS.category.max)
   category: string | null;
 
   @IsBoolean()

@@ -5,6 +5,7 @@ import type {
   GameMode,
   GameStateView,
   PlayerView,
+  RematchStatus,
 } from '../contracts/game.contract.js';
 import {
   QuestionsService,
@@ -167,14 +168,24 @@ export class GameService implements OnApplicationShutdown {
     }
   }
 
-  leave(socketId: string): void {
-    this.leaveEverything(socketId);
+  /**
+   * Leaves the socket's game and queue. With a session token it leaves that
+   * player's game instead, e.g. one stored by an earlier page load.
+   */
+  leave(socketId: string, sessionToken?: string): void {
+    if (sessionToken === undefined) {
+      this.leaveEverything(socketId);
+      return;
+    }
+    const entry = this.findByToken(sessionToken);
+    if (entry) {
+      this.removePlayer(entry.session, entry.player, 'opponent-left');
+    }
   }
 
   resume(socketId: string, sessionToken: string): void {
-    const playerId = this.tokens.get(sessionToken);
-    const entry = playerId ? this.players.get(playerId) : undefined;
-    if (!entry || !this.sessions.has(entry.session.code)) {
+    const entry = this.findByToken(sessionToken);
+    if (!entry) {
       throw new GameError('SESSION_NOT_FOUND');
     }
 
@@ -286,8 +297,32 @@ export class GameService implements OnApplicationShutdown {
           ? session.phaseEndsAt - session.phaseStartedAt
           : null,
       serverNow: Date.now(),
-      rematchAvailable: this.isRematchAvailable(session),
+      rematch: this.rematchStatus(session, player),
     };
+  }
+
+  private rematchStatus(session: Session, player: Player): RematchStatus | null {
+    if (session.phase !== 'finished') {
+      return null;
+    }
+    if (
+      session.endReason === 'opponent-left' ||
+      session.endReason === 'opponent-disconnected'
+    ) {
+      return 'opponent-left';
+    }
+    if (session.phaseEndsAt === null) {
+      // The rematch window has closed.
+      return player.rematchRequested ? 'unanswered' : 'expired';
+    }
+    const opponent = session.players.find((p) => p.id !== player.id);
+    if (!opponent?.socketId || !player.socketId) {
+      return 'paused';
+    }
+    if (player.rematchRequested) {
+      return 'requested';
+    }
+    return opponent.rematchRequested ? 'offered' : 'open';
   }
 
   // ---------------------------------------------------------------------------
@@ -390,9 +425,6 @@ export class GameService implements OnApplicationShutdown {
   }
 
   private expireRematch(session: Session): void {
-    if (session.players.some((player) => player.rematchRequested)) {
-      session.endReason = 'rematch-declined';
-    }
     session.phaseEndsAt = null;
     this.setTimer(session, SESSION_RETENTION_MS, () => this.removeSession(session));
     this.broadcast(session);
@@ -532,6 +564,14 @@ export class GameService implements OnApplicationShutdown {
     if (entry) {
       this.removePlayer(entry.session, entry.player, 'opponent-left');
     }
+  }
+
+  private findByToken(
+    sessionToken: string,
+  ): { session: Session; player: Player } | undefined {
+    const playerId = this.tokens.get(sessionToken);
+    const entry = playerId ? this.players.get(playerId) : undefined;
+    return entry && this.sessions.has(entry.session.code) ? entry : undefined;
   }
 
   private requirePlayer(socketId: string): { session: Session; player: Player } {

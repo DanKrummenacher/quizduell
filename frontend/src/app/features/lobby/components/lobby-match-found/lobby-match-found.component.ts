@@ -1,10 +1,11 @@
 import {
   Component,
-  input,
-  signal,
-  OnInit,
-  OnDestroy,
   CUSTOM_ELEMENTS_SCHEMA,
+  DestroyRef,
+  inject,
+  input,
+  type OnInit,
+  signal,
 } from '@angular/core';
 import '@css-ch/calc-ui-text';
 import '@css-ch/components/icon';
@@ -15,23 +16,20 @@ import '@css-ch/components/icon';
   styleUrl: './lobby-match-found.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class LobbyMatchFoundComponent implements OnInit, OnDestroy {
+export class LobbyMatchFoundComponent implements OnInit {
   readonly opponentName = input.required<string>();
   readonly durationMs = input<number>(3000);
 
-  countdown = signal<number>(3);
-  private intervalId: ReturnType<typeof setInterval> | null = null;
+  /** Seconds until the first question, counted down locally. */
+  protected readonly countdown = signal(3);
+  private readonly destroyRef = inject(DestroyRef);
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.countdown.set(Math.max(1, Math.ceil(this.durationMs() / 1000)));
-    this.intervalId = setInterval(() => {
-      this.countdown.update((c) => Math.max(0, c - 1));
-    }, 1000);
-  }
-
-  ngOnDestroy() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
+    const timer = setInterval(
+      () => this.countdown.update((seconds) => Math.max(0, seconds - 1)),
+      1000,
+    );
+    this.destroyRef.onDestroy(() => clearInterval(timer));
   }
 }

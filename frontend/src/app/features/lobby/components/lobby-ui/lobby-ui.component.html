@@ -18,8 +18,8 @@
     <div class="centered-content">
       @if (state() === 'CHOOSE_MODE') {
         <app-lobby-mode
-          (selectFastGame)="selectFastGame.emit()"
-          (selectChallenge)="selectChallenge.emit()"
+          (selectQuickGame)="selectQuickGame.emit()"
+          (selectFriendGame)="selectFriendGame.emit()"
         >
         </app-lobby-mode>
       } @else if (state() === 'CHOOSE_ACTION') {

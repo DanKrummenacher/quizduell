@@ -16,7 +16,12 @@ import type {
   AdminSettingsResponse,
   SettingsLimit,
 } from '../../core/contracts/admin.contract';
+import { eventChecked, eventText } from '../../core/ui/component-events';
 import { AdminApi } from '../admin-api.service';
+import type { AdminMessage } from '../admin-message';
+
+/** Countdown before the first question, see the game engine. */
+const COUNTDOWN_SEC = 3;
 
 type NumericKey = Exclude<keyof AdminSettings, 'speedBonusEnabled'>;
 
@@ -69,10 +74,7 @@ export class AdminSettingsPage {
   protected readonly activeQuestions = signal<number | null>(null);
   protected readonly loadError = signal(false);
   protected readonly saving = signal(false);
-  protected readonly message = signal<{
-    variant: 'success' | 'error';
-    text: string;
-  } | null>(null);
+  protected readonly message = signal<AdminMessage | null>(null);
 
   protected readonly errors = computed(() => {
     const form = this.form();
@@ -95,6 +97,9 @@ export class AdminSettingsPage {
   protected readonly dirty = computed(
     () => JSON.stringify(this.form()) !== JSON.stringify(this.response()?.settings),
   );
+  protected readonly isDefault = computed(
+    () => JSON.stringify(this.form()) === JSON.stringify(this.response()?.defaults),
+  );
   protected readonly questionWarning = computed(() => {
     const active = this.activeQuestions();
     const required = this.form()?.questionsPerGame;
@@ -108,7 +113,8 @@ export class AdminSettingsPage {
       return '';
     }
     const seconds =
-      3 + f.questionsPerGame * (f.questionDurationSec + f.revealDurationSec);
+      COUNTDOWN_SEC +
+      f.questionsPerGame * (f.questionDurationSec + f.revealDurationSec);
     const minutes = Math.floor(seconds / 60);
     const rest = seconds % 60;
     return minutes > 0 ? `${minutes} Min. ${rest} Sek.` : `${rest} Sek.`;
@@ -138,21 +144,17 @@ export class AdminSettingsPage {
   }
 
   protected setNumber(key: NumericKey, event: Event): void {
-    const raw = String((event as CustomEvent<unknown>).detail ?? '').trim();
+    const raw = eventText(event).trim();
     const value = raw === '' ? Number.NaN : Number(raw);
     this.form.update((form) => (form ? { ...form, [key]: value } : form));
   }
 
   protected setSpeedBonus(event: Event): void {
-    const enabled = Boolean((event as CustomEvent<boolean>).detail);
+    const enabled = eventChecked(event);
     this.form.update((form) =>
       form ? { ...form, speedBonusEnabled: enabled } : form,
     );
   }
-
-  protected readonly isDefault = computed(
-    () => JSON.stringify(this.form()) === JSON.stringify(this.response()?.defaults),
-  );
 
   /** Fills in the recommended defaults; they apply once saved. */
   protected applyDefaults(): void {
@@ -163,7 +165,7 @@ export class AdminSettingsPage {
     }
   }
 
-  protected reset(): void {
+  protected discardChanges(): void {
     const settings = this.response()?.settings;
     if (settings) {
       this.form.set({ ...settings });

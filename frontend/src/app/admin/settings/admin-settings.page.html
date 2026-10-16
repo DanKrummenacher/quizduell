@@ -64,7 +64,7 @@
         <css-icon icon="reload" slot="prefix"></css-icon>
         Standardwerte
       </css-button>
-      <css-button [disabled]="!dirty() || saving()" (click)="reset()">
+      <css-button [disabled]="!dirty() || saving()" (click)="discardChanges()">
         Änderungen verwerfen
       </css-button>
       <css-button

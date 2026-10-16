@@ -133,9 +133,13 @@ export class GameGateway
   }
 
   @SubscribeMessage(ClientEvents.LEAVE_GAME)
-  leaveGame(@ConnectedSocket() client: Socket) {
+  leaveGame(@ConnectedSocket() client: Socket, @MessageBody() body: unknown) {
     return this.run(client, () => {
-      this.gameService.leave(client.id);
+      const token = field(body, 'sessionToken');
+      this.gameService.leave(
+        client.id,
+        token === undefined ? undefined : parseToken(token),
+      );
       return undefined;
     });
   }
@@ -143,11 +147,7 @@ export class GameGateway
   @SubscribeMessage(ClientEvents.RESUME)
   resume(@ConnectedSocket() client: Socket, @MessageBody() body: unknown) {
     return this.run(client, () => {
-      const token = field(body, 'sessionToken');
-      if (typeof token !== 'string' || token.length === 0 || token.length > 100) {
-        throw new GameError('INVALID_INPUT');
-      }
-      this.gameService.resume(client.id, token);
+      this.gameService.resume(client.id, parseToken(field(body, 'sessionToken')));
       return undefined;
     });
   }
@@ -185,4 +185,11 @@ function field(body: unknown, key: string): unknown {
   return typeof body === 'object' && body !== null
     ? (body as Record<string, unknown>)[key]
     : undefined;
+}
+
+function parseToken(value: unknown): string {
+  if (typeof value !== 'string' || value.length === 0 || value.length > 100) {
+    throw new GameError('INVALID_INPUT');
+  }
+  return value;
 }

@@ -39,7 +39,7 @@ const LEET: Record<string, string> = {
   $: 's',
 };
 
-export type NameCheck =
+type NameCheck =
   { ok: true; name: string } | { ok: false; reason: 'invalid' | 'blocked' };
 
 /** Normalises a player name and rejects empty or offensive names. */

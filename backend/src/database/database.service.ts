@@ -9,7 +9,7 @@ import type { PgDatabase, PgQueryResultHKT } from 'drizzle-orm/pg-core';
 import { APP_CONFIG, type AppConfig } from '../config/app-config.js';
 import * as schema from './schema.js';
 
-export type Database = PgDatabase<PgQueryResultHKT, typeof schema>;
+type Database = PgDatabase<PgQueryResultHKT, typeof schema>;
 
 /** Both `src/database` and `dist/database` sit two levels below the backend root. */
 const MIGRATIONS_FOLDER = resolve(import.meta.dirname, '../../drizzle');

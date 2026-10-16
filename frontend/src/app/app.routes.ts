@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { type CanActivateFn, Router, type Routes } from '@angular/router';
+import { GAME_SCREEN_DATA } from './core/game/game-screen';
 import { PlayerNameStore } from './core/player/player-name.store';
 import { StartContainerComponent } from './features/start/container/start-container/start-container.component';
 
@@ -18,6 +19,7 @@ export const routes: Routes = [
       import('./features/lobby/container/lobby-container/lobby-container.component').then(
         (m) => m.LobbyContainerComponent,
       ),
+    data: GAME_SCREEN_DATA,
     title: TITLE,
   },
   {
@@ -26,6 +28,7 @@ export const routes: Routes = [
       import('./features/quiz/container/quiz-container/quiz-container.component').then(
         (m) => m.QuizContainerComponent,
       ),
+    data: GAME_SCREEN_DATA,
     title: TITLE,
   },
   {
@@ -34,6 +37,7 @@ export const routes: Routes = [
       import('./features/result/container/result-container/result-container.component').then(
         (m) => m.ResultContainerComponent,
       ),
+    data: GAME_SCREEN_DATA,
     title: TITLE,
   },
   {

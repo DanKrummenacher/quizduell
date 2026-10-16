@@ -1,6 +1,6 @@
 <h2 class="action-title">Spielmodus</h2>
 
-<button class="action-card mode-card" (click)="selectFastGame.emit()">
+<button class="action-card mode-card" (click)="selectQuickGame.emit()">
   <css-icon icon="lightning-strike" class="card-icon" size="xl"></css-icon>
   <div class="card-text-wrapper">
     <calc-text textMedium textLead class="card-title">Schnellspiel 1vs1</calc-text>
@@ -10,7 +10,7 @@
   </div>
 </button>
 
-<button class="action-card mode-card" (click)="selectChallenge.emit()">
+<button class="action-card mode-card" (click)="selectFriendGame.emit()">
   <css-icon icon="conference" class="card-icon" size="xl"></css-icon>
   <div class="card-text-wrapper">
     <calc-text textMedium textLead class="card-title"

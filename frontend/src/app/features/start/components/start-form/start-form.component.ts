@@ -4,6 +4,7 @@ import {
   input,
   type OnInit,
   output,
+  signal,
 } from '@angular/core';
 import '@css-ch/components/button';
 import '@css-ch/components/icon';
@@ -23,40 +24,34 @@ export class StartFormComponent implements OnInit {
   readonly nameSubmitted = output<string>();
 
   protected readonly maxLength = PLAYER_NAME_MAX_LENGTH;
-  protected playerName = '';
-  errorMessage = '';
+  protected readonly playerName = signal('');
+  protected readonly errorMessage = signal('');
 
   ngOnInit(): void {
-    this.playerName = this.initialName();
+    this.playerName.set(this.initialName());
   }
 
-  onNameInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    let value = input.value || '';
-
-    if (value.length > PLAYER_NAME_MAX_LENGTH) {
-      value = value.substring(0, PLAYER_NAME_MAX_LENGTH);
-      input.value = value;
-    }
-
-    this.playerName = value;
-    this.errorMessage = '';
+  protected onNameInput(event: Event): void {
+    const field = event.target as HTMLInputElement;
+    const value = (field.value || '').slice(0, PLAYER_NAME_MAX_LENGTH);
+    field.value = value;
+    this.playerName.set(value);
+    this.errorMessage.set('');
   }
 
-  onKeydown(event: KeyboardEvent) {
+  protected onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
       event.preventDefault();
       this.submitForm();
     }
   }
 
-  submitForm() {
-    const trimmed = this.playerName.replace(/\s+/g, ' ').trim();
-    if (!trimmed) {
-      this.errorMessage = 'Bitte gib einen Namen ein.';
+  protected submitForm(): void {
+    const name = this.playerName().replace(/\s+/g, ' ').trim();
+    if (!name) {
+      this.errorMessage.set('Bitte gib einen Namen ein.');
       return;
     }
-
-    this.nameSubmitted.emit(trimmed);
+    this.nameSubmitted.emit(name);
   }
 }

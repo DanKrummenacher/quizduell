@@ -12,6 +12,9 @@ import '@css-ch/components/input-text';
 import '@css-ch/components/input-textarea';
 import '@css-ch/components/switch';
 import '@css-ch/components/toggle-group';
+import { QUESTION_LIMITS } from '../../core/contracts/admin.contract';
+import { ANSWER_LETTERS } from '../../core/game/answer-letters';
+import { eventChecked, eventText } from '../../core/ui/component-events';
 import {
   type QuestionDraft,
   type QuestionErrors,
@@ -35,7 +38,8 @@ export class QuestionEditorComponent {
   readonly save = output<QuestionDraft>();
   readonly dismiss = output<void>();
 
-  protected readonly letters = ['A', 'B', 'C', 'D'];
+  protected readonly letters = ANSWER_LETTERS;
+  protected readonly limits = QUESTION_LIMITS;
   protected readonly draft = signal<QuestionDraft | null>(null);
   protected readonly submitted = signal(false);
 
@@ -59,20 +63,15 @@ export class QuestionEditorComponent {
 
   protected updateOption(index: number, event: Event): void {
     const options = [...this.current().options];
-    options[index] = (event as CustomEvent<string>).detail ?? '';
+    options[index] = eventText(event);
     this.update({ options });
   }
 
-  protected text(event: Event): string {
-    return (event as CustomEvent<string>).detail ?? '';
-  }
-
-  protected checked(event: Event): boolean {
-    return Boolean((event as CustomEvent<boolean>).detail);
-  }
+  protected readonly text = eventText;
+  protected readonly checked = eventChecked;
 
   protected correctFrom(event: Event): number {
-    return Number((event as CustomEvent<string>).detail ?? 0);
+    return Number(eventText(event));
   }
 
   protected submit(): void {

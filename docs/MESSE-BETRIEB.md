@@ -8,6 +8,9 @@ Checkliste und Notfallplan für den Einsatz am Messestand.
 - [ ] Fragenkatalog im Admin fertig, genügend aktive Fragen (Übersicht zeigt «Alles bereit»)
 - [ ] Einstellungen geprüft (Fragen pro Duell, Zeit pro Frage, Stand-Modus)
 - [ ] Duell mit **echten Geräten** gespielt: iPhone, Android, iPad, Laptop
+- [ ] Lasttest gegen das Live-Backend, z. B. 100 Duelle gleichzeitig:
+      `npm --prefix backend run load-test -- https://playduelio-api.onrender.com 100`
+      (die Testduelle zählen in der Statistik «Duelle heute» mit)
 - [ ] QR-Code auf die Frontend-URL gedruckt und mit mehreren Handys getestet
 - [ ] **Code-Freeze:** nur noch dringende Korrekturen pushen
 

@@ -23,7 +23,7 @@ export class AdminShellComponent {
   ];
 
   protected async logout(): Promise<void> {
-    await this.auth.signOut();
+    await this.auth.logout();
     await this.router.navigate(['/admin/login']);
   }
 }
