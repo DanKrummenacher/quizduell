@@ -28,3 +28,17 @@
 .centered-content {
   width: 100%;
 }
+
+// TEMPORARY (facelift): the content sits slightly above the middle, which
+// looks calmer than the exact middle.
+.main-area.is-facelift {
+  padding-bottom: functions.rem(100);
+
+  @media (max-height: 700px) {
+    padding-bottom: functions.rem(60);
+  }
+
+  @media (max-height: 600px) {
+    padding-bottom: functions.rem(20);
+  }
+}

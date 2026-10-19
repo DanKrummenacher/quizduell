@@ -6,14 +6,14 @@
 $muted: #4d70a4;
 $border: #8098be;
 
-/// Filled square with a white icon, as on the result page.
+/// Filled circle with a white icon (lobby and result page).
 @mixin symbol($size: functions.rem(64)) {
   display: grid;
   place-items: center;
   width: $size;
   height: $size;
   margin-inline: auto;
-  border-radius: functions.rem(8);
+  border-radius: 50%;
   background-color: colors.$dt-color-darkblue-100;
   color: colors.$dt-color-white-100;
 

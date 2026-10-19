@@ -34,9 +34,13 @@
 // TEMPORARY: the facelift uses the type scale of the quiz and result pages.
 :host(.is-modern) {
   .top-bar {
-    margin-bottom: functions.rem(24);
+    margin-bottom: functions.rem(40);
 
     @media (max-height: 700px) {
+      margin-bottom: functions.rem(32);
+    }
+
+    @media (max-height: 600px) {
       margin-bottom: functions.rem(16);
     }
   }

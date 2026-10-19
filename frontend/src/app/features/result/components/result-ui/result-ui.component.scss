@@ -1,6 +1,7 @@
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
+@use 'screen';
 
 // Same values as the quiz page (quiz-status).
 $muted: #4d70a4;
@@ -44,12 +45,7 @@ $actions-inset: functions.rem(24);
 }
 
 .result-icon {
-  display: grid;
-  place-items: center;
-  width: $symbol;
-  height: $symbol;
-  border-radius: functions.rem(8);
-  background-color: colors.$dt-color-darkblue-100;
+  @include screen.symbol($symbol);
 }
 
 .result-icon-glyph {
