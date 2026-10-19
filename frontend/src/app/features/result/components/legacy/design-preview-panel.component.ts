@@ -2,11 +2,9 @@
 import { Component, model } from '@angular/core';
 import type { RematchStatus } from '../../../../core/contracts/game.contract';
 import {
-  ICON_STYLES,
-  NOTICE_STYLES,
   PREVIEW_STATES,
-  type ResultIconStyle,
-  type ResultNoticeStyle,
+  TIMER_STYLES,
+  type ResultTimerStyle,
 } from './design-preview';
 
 @Component({
@@ -25,20 +23,9 @@ import {
         </select>
       </label>
       <label>
-        Symbol
-        <select [value]="iconStyle()" (change)="iconStyle.set($any(value($event)))">
-          @for (option of iconStyles; track option.value) {
-            <option [value]="option.value">{{ option.label }}</option>
-          }
-        </select>
-      </label>
-      <label>
-        Meldung
-        <select
-          [value]="noticeStyle()"
-          (change)="noticeStyle.set($any(value($event)))"
-        >
-          @for (option of noticeStyles; track option.value) {
+        Zeitbalken
+        <select [value]="timer()" (change)="timer.set($any(value($event)))">
+          @for (option of timers; track option.value) {
             <option [value]="option.value">{{ option.label }}</option>
           }
         </select>
@@ -89,12 +76,10 @@ import {
 })
 export class DesignPreviewPanelComponent {
   readonly legacy = model(false);
-  readonly iconStyle = model<ResultIconStyle>('diamond');
-  readonly noticeStyle = model<ResultNoticeStyle>('line');
+  readonly timer = model<ResultTimerStyle>('bar-time');
   readonly state = model<RematchStatus | null>(null);
 
-  protected readonly iconStyles = ICON_STYLES;
-  protected readonly noticeStyles = NOTICE_STYLES;
+  protected readonly timers = TIMER_STYLES;
   protected readonly states = PREVIEW_STATES;
 
   protected value(event: Event): string {

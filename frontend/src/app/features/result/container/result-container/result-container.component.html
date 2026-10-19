@@ -26,8 +26,7 @@
     [rematchMessage]="rematchMessage()"
     [rematchCountdown]="rematchCountdown()"
     [rematchIcon]="rematchIcon()"
-    [iconStyle]="iconStyle()"
-    [noticeStyle]="noticeStyle()"
+    [timerStyle]="timerStyle()"
     [showNoRematchFlyout]="showNoRematchNotice()"
     [noRematchText]="rematchMessage() ?? ''"
     (navigateHome)="handleHome()"
@@ -40,8 +39,7 @@
 @if (showDesignPreview) {
   <app-design-preview-panel
     [(legacy)]="legacyDesign"
-    [(iconStyle)]="iconStyle"
-    [(noticeStyle)]="noticeStyle"
+    [(timer)]="timerStyle"
     [(state)]="previewRematch"
   />
 }

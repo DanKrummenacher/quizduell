@@ -237,7 +237,7 @@ test.describe('playing duels', () => {
 
     await expect(anna.getByText('Schade! Keine Revanche')).toBeVisible();
     await anna.locator('css-flyout css-button', { hasText: 'OK' }).click();
-    await expect(anna.locator('.rematch-message')).toHaveText(
+    await expect(anna.locator('.rematch-line')).toHaveText(
       'Ben hat das Spiel verlassen.',
     );
     await anna.locator('css-button', { hasText: 'Neues Spiel erstellen' }).click();

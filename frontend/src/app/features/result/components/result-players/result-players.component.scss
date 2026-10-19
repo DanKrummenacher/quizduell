@@ -5,8 +5,8 @@
 // Same values as the quiz page (quiz-status, answer cards).
 $border: #8098be;
 $opponent: #00a4e0;
-$win-fill: #e3f4ed;
-$loss-fill: #fbe9e6;
+$right: #00875e;
+$wrong: #d53419;
 
 :host {
   display: block;
@@ -34,13 +34,23 @@ $loss-fill: #fbe9e6;
   color: colors.$dt-color-darkblue-100;
   text-align: left;
 
-  // States only change the fill, never the border.
+  // States only change the fill, never the border: the right/wrong
+  // colours of the quiz answers.
+  &:is(.state-win, .state-loss) {
+    color: colors.$dt-color-white-100;
+
+    .avatar {
+      background-color: colors.$dt-color-white-100;
+      color: colors.$dt-color-darkblue-100;
+    }
+  }
+
   &.state-win {
-    background-color: $win-fill;
+    background-color: $right;
   }
 
   &.state-loss {
-    background-color: $loss-fill;
+    background-color: $wrong;
   }
 }
 
@@ -66,7 +76,7 @@ $loss-fill: #fbe9e6;
   display: flex;
   flex: 1 1 auto;
   min-width: 0;
-  font-size: functions.rem(15);
+  font-size: functions.rem(16);
   font-weight: miscs.$css-ui-font-weight-medium;
   white-space: nowrap;
 }
@@ -93,7 +103,13 @@ $loss-fill: #fbe9e6;
   white-space: nowrap;
 }
 
-.unit {
-  font-size: functions.rem(13);
-  font-weight: miscs.$css-ui-font-weight-regular;
+// Short phones (e.g. iPhone SE): slimmer cards so the page fits.
+@media (max-height: 700px) {
+  .results-list {
+    gap: functions.rem(8);
+  }
+
+  .player-result-card {
+    height: functions.rem(52);
+  }
 }

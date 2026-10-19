@@ -6,9 +6,7 @@
 $muted: #4d70a4;
 $opponent: #00a4e0;
 $track: #dfe3ea;
-$border: #8098be;
-$offer-fill: #eaf7fd;
-$diamond: functions.rem(52);
+$symbol: functions.rem(64);
 
 :host {
   display: flex;
@@ -21,12 +19,12 @@ $diamond: functions.rem(52);
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: functions.rem(32) functions.rem(20);
+  padding: functions.rem(32) functions.rem(20) functions.rem(24);
   box-sizing: border-box;
 }
 
 // ---------------------------------------------------------------------------
-// Outcome: diamond, title, sentence and the two players
+// Outcome: symbol, title, sentence and the two players
 // ---------------------------------------------------------------------------
 .outcome {
   flex-grow: 1;
@@ -38,55 +36,23 @@ $diamond: functions.rem(52);
   text-align: center;
 }
 
-// The diamond of the logo and the quiz page; its corners need room, so the
-// box is smaller than the space it takes.
 .result-icon {
   display: grid;
   place-items: center;
-  width: $diamond;
-  height: $diamond;
-  margin: functions.rem(11);
-  transform: rotate(45deg);
+  width: $symbol;
+  height: $symbol;
+  border-radius: functions.rem(8);
   background-color: colors.$dt-color-darkblue-100;
 }
 
 .result-icon-glyph {
   // As a block the icon sits exactly in the middle (no text baseline).
   display: block;
-  transform: rotate(-45deg);
   color: colors.$dt-color-white-100;
 }
 
-// TEMPORARY: symbol variants under review.
-:host([data-icon='diamond-soft']) .result-icon {
-  border-radius: functions.rem(8);
-}
-
-:host([data-icon='square']) .result-icon,
-:host([data-icon='square-outline']) .result-icon {
-  width: functions.rem(64);
-  height: functions.rem(64);
-  margin: 0;
-  transform: none;
-  border-radius: functions.rem(8);
-
-  .result-icon-glyph {
-    transform: none;
-  }
-}
-
-:host([data-icon='square-outline']) .result-icon {
-  border: functions.rem(1) solid #8098be;
-  border-radius: functions.rem(4);
-  background-color: colors.$dt-color-white-100;
-
-  .result-icon-glyph {
-    color: colors.$dt-color-darkblue-100;
-  }
-}
-
 .result-title {
-  margin: functions.rem(16) 0 0;
+  margin: functions.rem(20) 0 0;
   font-size: functions.rem(28);
   font-weight: miscs.$css-ui-font-weight-bold;
   line-height: 1.2;
@@ -95,7 +61,7 @@ $diamond: functions.rem(52);
 
 .result-subtitle {
   margin: functions.rem(8) 0 0;
-  font-size: functions.rem(15);
+  font-size: functions.rem(16);
   line-height: 1.4;
   color: $muted;
 }
@@ -105,93 +71,57 @@ app-result-players {
 }
 
 // ---------------------------------------------------------------------------
-// Rematch status (like the quiz timer) and the two buttons
+// The two buttons and below them the rematch message
 // ---------------------------------------------------------------------------
 .actions {
   display: flex;
   flex-direction: column;
   gap: functions.rem(12);
+  // As before: the buttons are a bit narrower than the cards above.
+  padding-inline: functions.rem(24);
 }
 
-// The rematch message: «Zeile» is the default; the other two are
-// variants under review (TEMPORARY).
+// Room for one message line with time bar, so nothing jumps.
+.rematch-area {
+  min-height: functions.rem(52);
+  padding-top: functions.rem(4);
+}
+
 .rematch-status {
-  margin-bottom: functions.rem(4);
   color: colors.$dt-color-darkblue-100;
 }
 
+// Centred under the buttons. With a countdown the remaining time is shown
+// in one of the styles under review (TEMPORARY: data-timer).
 .rematch-line {
-  display: flex;
-  align-items: center;
-  gap: functions.rem(8);
   margin: 0;
-  font-size: functions.rem(13);
+  font-size: functions.rem(15);
   line-height: 1.4;
+  text-align: center;
 }
 
 .rematch-icon {
-  display: block;
-  flex: none;
-  color: colors.$dt-color-darkblue-100;
-}
-
-.rematch-message {
-  flex: 1 1 auto;
-  min-width: 0;
+  display: inline-block;
+  margin-right: functions.rem(6);
+  vertical-align: -0.2em;
 }
 
 .rematch-time {
-  flex: none;
   font-weight: miscs.$css-ui-font-weight-bold;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-.is-offer .rematch-icon {
-  color: $opponent;
-}
-
-:host([data-notice='card']) {
-  .rematch-status {
-    padding: functions.rem(12) functions.rem(16);
-    border: functions.rem(1) solid $border;
-    border-radius: functions.rem(4);
-    background-color: colors.$dt-color-white-100;
-
-    &.is-offer {
-      border-color: $opponent;
-      background-color: $offer-fill;
-    }
-  }
-
-  .rematch-line {
-    gap: functions.rem(12);
-    font-size: functions.rem(14);
-  }
-
-  .track {
-    margin-top: functions.rem(10);
-  }
-}
-
-:host([data-notice='center']) {
-  .rematch-line {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .rematch-message {
-    flex: 0 1 auto;
-  }
-
-  .rematch-time::before {
-    content: '· ';
-    font-weight: miscs.$css-ui-font-weight-regular;
-  }
+.timer {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(12);
+  margin-top: functions.rem(8);
 }
 
 .track {
+  flex: 1 1 auto;
   height: functions.rem(6);
-  margin-top: functions.rem(6);
   border-radius: functions.rem(3);
   background-color: $track;
   overflow: hidden;
@@ -205,33 +135,109 @@ app-result-players {
   transition: width 1s linear;
 }
 
-.is-offer .progress {
-  background-color: $opponent;
+// «Balken, Zeit rechts daneben»: like the quiz, text aligned left.
+[data-timer='bar-time'] .rematch-line {
+  text-align: left;
+}
+
+// «Zeit als Marke»: the time in a small pill after the text.
+.time-chip {
+  display: inline-block;
+  margin-left: functions.rem(8);
+  padding: 0 functions.rem(8);
+  border-radius: functions.rem(999);
+  background-color: colors.$dt-color-darkblue-100;
+  color: colors.$dt-color-white-100;
+  font-size: functions.rem(13);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+// «Kreis mit Sekunden»: a ring that empties, the seconds inside, the text
+// next to it.
+[data-timer='ring'] .rematch-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(12);
+  text-align: left;
+}
+
+.ring {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: functions.rem(36);
+  height: functions.rem(36);
+
+  svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+}
+
+.ring-track,
+.ring-progress {
+  fill: none;
+  stroke-width: 3;
+}
+
+.ring-track {
+  stroke: $track;
+}
+
+.ring-progress {
+  stroke: colors.$dt-color-darkblue-100;
+  stroke-dasharray: 100;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.ring-value {
+  font-size: functions.rem(13);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  font-variant-numeric: tabular-nums;
+}
+
+// The opponent is asking: their colour, as in the quiz.
+.is-offer {
+  .rematch-icon {
+    color: $opponent;
+  }
+
+  .progress,
+  .time-chip {
+    background-color: $opponent;
+  }
+
+  .ring-progress {
+    stroke: $opponent;
+  }
 }
 
 // Short phones (e.g. iPhone SE): tighter spacing so everything fits
 // without scrolling.
 @media (max-height: 700px) {
   .main-content {
-    padding-block: functions.rem(16);
+    padding-block: functions.rem(12);
   }
 
   .outcome {
-    padding-bottom: functions.rem(20);
-  }
-
-  .rematch-status {
-    margin-bottom: 0;
+    padding-bottom: functions.rem(16);
   }
 
   .result-icon {
-    width: functions.rem(44);
-    height: functions.rem(44);
-    margin: functions.rem(9);
+    width: functions.rem(48);
+    height: functions.rem(48);
   }
 
   .result-title {
     margin-top: functions.rem(12);
+    font-size: functions.rem(24);
   }
 
   app-result-players {

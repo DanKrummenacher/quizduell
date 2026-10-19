@@ -22,10 +22,7 @@ import { PlayerNameStore } from '../../../../core/player/player-name.store';
 import { ResultUiComponent } from '../../components/result-ui/result-ui.component';
 import { ResultUiLegacyComponent } from '../../components/legacy/result-ui-legacy.component';
 import { DesignPreviewPanelComponent } from '../../components/legacy/design-preview-panel.component';
-import type {
-  ResultIconStyle,
-  ResultNoticeStyle,
-} from '../../components/legacy/design-preview';
+import type { ResultTimerStyle } from '../../components/legacy/design-preview';
 import type { PlayerResultView, RematchCountdownView } from '../../result.types';
 
 interface PlayAgainButton {
@@ -82,8 +79,7 @@ export class ResultContainerComponent implements OnDestroy {
   // (development builds only).
   readonly showDesignPreview = isDevMode();
   readonly legacyDesign = signal(false);
-  readonly iconStyle = signal<ResultIconStyle>('diamond');
-  readonly noticeStyle = signal<ResultNoticeStyle>('line');
+  readonly timerStyle = signal<ResultTimerStyle>('bar-time');
   readonly previewRematch = signal<RematchStatus | null>(null);
 
   /** Rematch state as reported by the server. */
