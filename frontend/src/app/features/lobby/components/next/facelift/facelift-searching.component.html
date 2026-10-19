@@ -1,0 +1,15 @@
+<div role="status">
+  <span class="symbol" aria-hidden="true">
+    <css-icon icon="search" size="lg"></css-icon>
+  </span>
+
+  <h2 class="section-title status-title">Suche Gegner&nbsp;…</h2>
+  <p class="body-text">Warte auf einen weiteren Spieler</p>
+
+  <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+</div>
+
+<css-button class="compact-button" (click)="cancelSearch.emit()">
+  <css-icon icon="close" slot="prefix"></css-icon>
+  Abbrechen
+</css-button>

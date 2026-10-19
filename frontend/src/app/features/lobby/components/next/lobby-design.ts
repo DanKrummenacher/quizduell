@@ -1,8 +1,8 @@
-// TEMPORARY: the lobby designs under review. Remove together with the
-// preview panel once a design is chosen.
+// TEMPORARY: compare the lobby of today with the facelift. Remove together
+// with the preview panel once decided.
 import type { LobbyState } from '../../lobby.types';
 
-export type LobbyDesign = 'today' | 'facelift' | 'duel' | 'flow';
+export type LobbyDesign = 'today' | 'facelift';
 
 export interface DesignOption<T extends string> {
   value: T;
@@ -11,9 +11,7 @@ export interface DesignOption<T extends string> {
 
 export const LOBBY_DESIGNS: DesignOption<LobbyDesign>[] = [
   { value: 'today', label: 'Heute' },
-  { value: 'facelift', label: 'A · Facelift' },
-  { value: 'duel', label: 'B · Facelift mit Duell-Elementen' },
-  { value: 'flow', label: 'C · Neuer Ablauf (ein Schritt weniger)' },
+  { value: 'facelift', label: 'Facelift' },
 ];
 
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [

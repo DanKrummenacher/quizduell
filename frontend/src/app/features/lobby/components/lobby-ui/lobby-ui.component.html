@@ -5,57 +5,44 @@
     <div class="header-area">
       <app-lobby-header
         [playerName]="playerName()"
-        [showGreeting]="design() === 'today'"
+        [modern]="design() === 'facelift'"
         (navigateBack)="navigateBack.emit()"
       >
       </app-lobby-header>
     </div>
   }
 
-  @if (design() !== 'today') {
-    <main class="main-area next">
-      @switch (state()) {
-        @case ('CHOOSE_MODE') {
-          <app-lobby-mode-next
-            [design]="design()"
-            [playerName]="playerName()"
-            [joinError]="joinError()"
-            (selectQuickGame)="selectQuickGame.emit()"
-            (selectFriendGame)="selectFriendGame.emit()"
-            (createGame)="createGame.emit()"
-            (joinGame)="joinGame.emit($event)"
-          />
+  @if (design() === 'facelift') {
+    <main class="main-area">
+      <div class="centered-content">
+        @switch (state()) {
+          @case ('CHOOSE_MODE') {
+            <app-facelift-mode
+              (selectQuickGame)="selectQuickGame.emit()"
+              (selectFriendGame)="selectFriendGame.emit()"
+            />
+          }
+          @case ('CHOOSE_ACTION') {
+            <app-facelift-actions
+              [joinError]="joinError()"
+              (createGame)="createGame.emit()"
+              (joinGame)="joinGame.emit($event)"
+            />
+          }
+          @case ('SEARCHING') {
+            <app-facelift-searching (cancelSearch)="cancelSearch.emit()" />
+          }
+          @case ('WAITING') {
+            <app-facelift-waiting [roomCode]="roomCode()" />
+          }
+          @case ('FOUND') {
+            <app-facelift-match-found
+              [opponentName]="opponentName()"
+              [durationMs]="countdownMs()"
+            />
+          }
         }
-        @case ('CHOOSE_ACTION') {
-          <app-lobby-actions-next
-            [joinError]="joinError()"
-            (createGame)="createGame.emit()"
-            (joinGame)="joinGame.emit($event)"
-          />
-        }
-        @case ('SEARCHING') {
-          <app-lobby-searching-next
-            [design]="design()"
-            [playerName]="playerName()"
-            (cancelSearch)="cancelSearch.emit()"
-          />
-        }
-        @case ('WAITING') {
-          <app-lobby-waiting-next
-            [design]="design()"
-            [roomCode]="roomCode()"
-            [playerName]="playerName()"
-          />
-        }
-        @case ('FOUND') {
-          <app-lobby-found-next
-            [design]="design()"
-            [playerName]="playerName()"
-            [opponentName]="opponentName()"
-            [durationMs]="countdownMs()"
-          />
-        }
-      }
+      </div>
     </main>
   } @else {
     <main class="main-area">

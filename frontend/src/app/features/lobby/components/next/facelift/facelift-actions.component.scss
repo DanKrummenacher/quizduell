@@ -1,0 +1,64 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+:host {
+  display: block;
+}
+
+.section-title {
+  @include facelift.section-title;
+}
+
+.choice-card {
+  @include facelift.choice-card;
+}
+
+.choice-title {
+  @include facelift.choice-title;
+}
+
+.choice-description {
+  @include facelift.choice-description;
+}
+
+// Joining with a code: a white card like the choices.
+.join-card {
+  margin-top: functions.rem(24);
+  padding: functions.rem(20) functions.rem(20) functions.rem(24);
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: colors.$dt-color-white-100;
+  text-align: left;
+}
+
+.join-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: functions.rem(12);
+  margin-top: functions.rem(12);
+}
+
+.code-input {
+  display: block;
+  width: 100%;
+}
+
+// Level with the field below its label.
+.join-button {
+  display: block;
+  width: functions.rem(76);
+  margin-top: functions.rem(21);
+}
+
+@include facelift.short-screen {
+  .section-title {
+    margin-bottom: functions.rem(16);
+  }
+
+  .join-card {
+    margin-top: functions.rem(16);
+    padding-block: functions.rem(16);
+  }
+}

@@ -1,0 +1,50 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+.symbol {
+  @include facelift.symbol;
+}
+
+.section-title {
+  @include facelift.section-title;
+
+  &.status-title {
+    margin: functions.rem(24) 0 0;
+  }
+}
+
+.body-text {
+  @include facelift.body-text;
+}
+
+.opponent-label {
+  margin-top: functions.rem(24);
+  font-size: functions.rem(15);
+}
+
+.opponent-name {
+  max-width: 100%;
+  margin: functions.rem(4) 0 0;
+  overflow: hidden;
+  font-size: functions.rem(28);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1.2;
+  color: colors.$dt-color-darkblue-100;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.countdown-text {
+  margin: functions.rem(48) 0 0;
+  font-size: functions.rem(15);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  font-variant-numeric: tabular-nums;
+  color: colors.$dt-color-darkblue-100;
+}

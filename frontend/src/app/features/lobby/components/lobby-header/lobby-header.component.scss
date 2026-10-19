@@ -8,10 +8,6 @@
 
 .top-bar {
   margin-bottom: functions.rem(35);
-
-  &:last-child {
-    margin-bottom: 0;
-  }
 }
 
 .back-button {
@@ -33,4 +29,26 @@
 
 .greeting-subtitle {
   margin-top: functions.rem(4);
+}
+
+// TEMPORARY: the facelift uses the type scale of the quiz and result pages.
+:host(.is-modern) {
+  .top-bar {
+    margin-bottom: functions.rem(24);
+
+    @media (max-height: 700px) {
+      margin-bottom: functions.rem(16);
+    }
+  }
+
+  .greeting-title {
+    font-weight: miscs.$css-ui-font-weight-bold;
+    line-height: 1.2;
+  }
+
+  .greeting-subtitle {
+    display: block;
+    margin-top: functions.rem(4);
+    color: #4d70a4;
+  }
 }

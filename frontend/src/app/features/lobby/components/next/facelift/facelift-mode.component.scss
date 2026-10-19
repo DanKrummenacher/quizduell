@@ -1,0 +1,26 @@
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+:host {
+  display: block;
+}
+
+.section-title {
+  @include facelift.section-title;
+}
+
+.choice-card {
+  @include facelift.choice-card;
+
+  & + & {
+    margin-top: functions.rem(24);
+  }
+}
+
+.choice-title {
+  @include facelift.choice-title;
+}
+
+.choice-description {
+  @include facelift.choice-description;
+}

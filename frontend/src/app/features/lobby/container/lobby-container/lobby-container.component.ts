@@ -39,7 +39,7 @@ export class LobbyContainerComponent implements OnDestroy {
 
   private readonly game = this.gameClient.state;
 
-  // TEMPORARY: design preview while the lobby facelift is being reviewed
+  // TEMPORARY: compare the lobby of today with the facelift
   // (development builds only).
   readonly showDesignPreview = isDevMode();
   readonly design = signal<LobbyDesign>('facelift');

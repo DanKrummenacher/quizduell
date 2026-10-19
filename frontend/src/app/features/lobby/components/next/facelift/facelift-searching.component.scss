@@ -1,0 +1,77 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+.symbol {
+  @include facelift.symbol;
+}
+
+.section-title {
+  @include facelift.section-title;
+
+  &.status-title {
+    margin: functions.rem(24) 0 functions.rem(8);
+  }
+}
+
+.body-text {
+  @include facelift.body-text;
+}
+
+// Three dots that light up one after the other.
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: functions.rem(8);
+  margin-top: functions.rem(48);
+
+  i {
+    width: functions.rem(8);
+    height: functions.rem(8);
+    border-radius: 50%;
+    background-color: colors.$dt-color-darkblue-100;
+    animation: dot 1.4s ease-in-out infinite both;
+
+    &:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+
+    &:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+  }
+}
+
+@keyframes dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+  }
+
+  40% {
+    opacity: 1;
+  }
+}
+
+// One action: compact, in the middle.
+.compact-button {
+  display: block;
+  width: fit-content;
+  margin: functions.rem(64) auto 0;
+}
+
+@include facelift.short-screen {
+  .dots {
+    margin-top: functions.rem(32);
+  }
+
+  .compact-button {
+    margin-top: functions.rem(32);
+  }
+}

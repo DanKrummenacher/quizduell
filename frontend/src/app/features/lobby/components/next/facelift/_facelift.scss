@@ -1,0 +1,95 @@
+// The lobby in the design system of the quiz and result pages. Same
+// structure as before; only the look is unified. Spacing on the 4px grid.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
+@use 'screen';
+
+$muted: screen.$muted;
+$border: screen.$border;
+
+/// Heading of a step, e.g. «Spielmodus» or «Suche Gegner …».
+@mixin section-title {
+  margin: 0 0 functions.rem(32);
+  font-size: functions.rem(24);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1.25;
+  color: colors.$dt-color-darkblue-100;
+  text-align: center;
+}
+
+@mixin body-text {
+  margin: 0;
+  font-size: functions.rem(16);
+  line-height: 1.4;
+  color: $muted;
+  text-align: center;
+}
+
+/// Filled square with a white icon, as on the result page.
+@mixin symbol {
+  @include screen.symbol;
+}
+
+/// Tappable choice: dark block with the icon, as the quiz answers.
+@mixin choice-card {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(16);
+  width: 100%;
+  // Same size as before.
+  min-height: functions.rem(94);
+  padding: 0 functions.rem(16) 0 0;
+  border: functions.rem(1) solid $border;
+  border-radius: functions.rem(4);
+  background-color: colors.$dt-color-white-100;
+  color: colors.$dt-color-darkblue-100;
+  font: inherit;
+  text-align: left;
+  overflow: hidden;
+  @include interaction.card;
+
+  .choice-block {
+    display: grid;
+    place-items: center;
+    align-self: stretch;
+    flex: none;
+    width: functions.rem(72);
+    background-color: colors.$dt-color-darkblue-100;
+    color: colors.$dt-color-white-100;
+
+    css-icon {
+      display: block;
+    }
+  }
+
+  .choice-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-block: functions.rem(16);
+  }
+}
+
+@mixin choice-title {
+  display: block;
+  font-size: functions.rem(16);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1.3;
+  color: colors.$dt-color-darkblue-100;
+}
+
+@mixin choice-description {
+  display: block;
+  margin-top: functions.rem(4);
+  font-size: functions.rem(14);
+  line-height: 1.35;
+  color: $muted;
+}
+
+/// Short phones (e.g. iPhone SE): tighter spacing so the screens fit.
+@mixin short-screen {
+  @media (max-height: 700px) {
+    @content;
+  }
+}
