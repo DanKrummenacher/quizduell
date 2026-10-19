@@ -90,9 +90,9 @@ app-result-players {
 }
 
 // The space stays reserved, so the buttons never move when a message
-// appears or changes. The message reacts to the width it really has.
+// appears or changes.
 .rematch-area {
-  container: rematch / inline-size;
+  position: relative;
   min-height: functions.rem(80);
   padding-top: functions.rem(4);
 }
@@ -101,7 +101,7 @@ app-result-players {
   color: colors.$dt-color-darkblue-100;
 }
 
-// Centred text; with a countdown the time chip sits at the end of the bar.
+// Without a countdown the message is centred under the buttons.
 .rematch-line {
   margin: 0;
   font-size: functions.rem(15);
@@ -129,15 +129,11 @@ app-result-players {
   white-space: nowrap;
 }
 
-.chip-inline {
-  display: none;
-}
-
 .timer {
   display: flex;
   align-items: center;
   gap: functions.rem(12);
-  margin-top: functions.rem(10);
+  margin-top: functions.rem(8);
 }
 
 .track {
@@ -156,38 +152,72 @@ app-result-players {
   transition: width 1s linear;
 }
 
-// With enough room (tablets, desktops) the countdown reads like the quiz
-// timer: the message left, the time chip right, the bar below.
-@container rematch (min-width: 380px) {
-  .has-countdown {
-    .rematch-line {
-      display: flex;
-      align-items: center;
-      gap: functions.rem(12);
-      text-align: left;
-    }
+// With a countdown it reads like the quiz timer: the message left, the time
+// chip right, the bar below.
+.has-countdown {
+  .rematch-line {
+    display: flex;
+    align-items: center;
+    gap: functions.rem(12);
+    text-align: left;
+  }
 
-    .rematch-icon {
-      flex: none;
-      margin-right: functions.rem(-4);
-    }
+  .rematch-icon {
+    flex: none;
+    margin-right: functions.rem(-4);
+  }
 
-    .rematch-message {
-      flex: 1 1 auto;
-      min-width: 0;
-    }
+  .rematch-message {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
 
-    .chip-inline {
-      display: inline-block;
-    }
+  .chip-below {
+    display: none;
+  }
+}
 
-    .chip-below {
-      display: none;
-    }
+// Not enough room for both side by side: the text centred over the full
+// width, the time chip at the end of the bar.
+.has-countdown.is-stacked {
+  .rematch-line {
+    display: block;
+    text-align: center;
+  }
 
-    .timer {
-      margin-top: functions.rem(8);
-    }
+  .rematch-icon {
+    margin-right: functions.rem(6);
+  }
+
+  .chip-inline {
+    display: none;
+  }
+
+  .chip-below {
+    display: inline-block;
+  }
+
+  .timer {
+    margin-top: functions.rem(10);
+  }
+}
+
+// Invisible copy of message and time in one line, used for measuring.
+.fit-probe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(12);
+  font-size: functions.rem(15);
+  line-height: 1.4;
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+
+  .rematch-icon {
+    margin-right: functions.rem(-4);
   }
 }
 

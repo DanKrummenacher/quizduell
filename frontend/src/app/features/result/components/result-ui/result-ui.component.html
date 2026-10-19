@@ -34,12 +34,13 @@
     </css-button>
 
     <!-- The space stays reserved so the buttons never move. -->
-    <div class="rematch-area" role="status">
+    <div #area class="rematch-area" role="status">
       @let countdown = rematchCountdown();
       @if (rematchMessage(); as message) {
         <div
           class="rematch-status"
           [class.has-countdown]="countdown"
+          [class.is-stacked]="stacked()"
           [class.is-offer]="countdown?.isOffer"
         >
           <p class="rematch-line">
@@ -70,6 +71,17 @@
             </div>
           }
         </div>
+
+        <!-- Measures whether message and time fit side by side. -->
+        @if (countdown) {
+          <span #probe class="fit-probe" aria-hidden="true">
+            @if (rematchIcon(); as icon) {
+              <css-icon [attr.icon]="icon" size="sm" class="rematch-icon"></css-icon>
+            }
+            <span>{{ message }}</span>
+            <span class="time-chip">noch 88 s</span>
+          </span>
+        }
       }
     </div>
   </div>

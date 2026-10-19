@@ -1,4 +1,15 @@
-import { Component, input, output, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  afterRenderEffect,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  DestroyRef,
+  type ElementRef,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { BrandHeaderComponent } from '../../../../core/ui/brand-header/brand-header.component';
 import { ResultPlayersComponent } from '../result-players/result-players.component';
 import type { PlayerResultView, RematchCountdownView } from '../../result.types';
@@ -34,4 +45,38 @@ export class ResultUiComponent {
   readonly navigateHome = output<void>();
   readonly playAgain = output<void>();
   readonly noRematchAcknowledge = output<void>();
+
+  private readonly area = viewChild<ElementRef<HTMLElement>>('area');
+  private readonly probe = viewChild<ElementRef<HTMLElement>>('probe');
+
+  /**
+   * Message and time chip do not fit side by side: the chip moves to the end
+   * of the time bar. Measured, so it only happens when space really runs out.
+   */
+  protected readonly stacked = signal(false);
+
+  constructor() {
+    const observer =
+      typeof ResizeObserver === 'undefined'
+        ? null
+        : new ResizeObserver(() => this.updateStacked());
+    inject(DestroyRef).onDestroy(() => observer?.disconnect());
+
+    // Measure again whenever the message, its symbol or the size changes.
+    afterRenderEffect(() => {
+      this.rematchMessage();
+      this.rematchIcon();
+      const area = this.area()?.nativeElement;
+      if (area && observer) {
+        observer.observe(area);
+      }
+      this.updateStacked();
+    });
+  }
+
+  private updateStacked(): void {
+    const probe = this.probe()?.nativeElement;
+    const area = this.area()?.nativeElement;
+    this.stacked.set(!!probe && !!area && probe.offsetWidth > area.clientWidth);
+  }
 }

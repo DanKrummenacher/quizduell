@@ -94,8 +94,10 @@ test.describe('playing duels', () => {
     await expectNoHorizontalOverflow(anna);
 
     await anna.locator('css-button', { hasText: 'Revanche fordern' }).click();
-    await expect(anna.getByText(/Warte auf Ben\s…/)).toBeVisible();
-    await expect(ben.getByText('Anna möchte eine Revanche!')).toBeVisible();
+    await expect(anna.locator('.rematch-message')).toHaveText(/Warte auf Ben\s…/);
+    await expect(ben.locator('.rematch-message')).toHaveText(
+      'Anna möchte eine Revanche!',
+    );
     await ben.locator('css-button', { hasText: 'Revanche annehmen!' }).click();
     await expect(anna.getByText('Gegner gefunden!')).toBeVisible();
     await expect(ben.getByText('Gegner gefunden!')).toBeVisible();
