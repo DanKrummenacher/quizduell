@@ -80,7 +80,7 @@ describe('ResultContainerComponent', () => {
       label: 'Anfrage gesendet',
       disabled: true,
     });
-    expect(result.rematchMessage()).toBe('Warte auf Ben …');
+    expect(result.rematchMessage()).toBe('Warte auf Ben\u00a0…');
     expect(result.rematchCountdown()?.isOffer).toBe(false);
   });
 

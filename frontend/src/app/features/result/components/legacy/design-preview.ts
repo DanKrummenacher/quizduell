@@ -2,19 +2,21 @@
 // being reviewed. Remove together with the design preview panel.
 import type { RematchStatus } from '../../../../core/contracts/game.contract';
 
-/** How the remaining time of a rematch request is shown. */
-export type ResultTimerStyle = 'bar-time' | 'text-time' | 'chip' | 'ring';
+/** How the rematch message adapts when it gets narrow (phones). */
+export type ResultNarrowStyle =
+  'wrap' | 'stacked' | 'stacked-left' | 'short' | 'small';
 
 export interface DesignOption<T extends string> {
   value: T;
   label: string;
 }
 
-export const TIMER_STYLES: DesignOption<ResultTimerStyle>[] = [
-  { value: 'bar-time', label: 'Balken, Zeit rechts daneben' },
-  { value: 'text-time', label: 'Zeit im Text, Balken darunter' },
-  { value: 'chip', label: 'Zeit als Marke, Balken darunter' },
-  { value: 'ring', label: 'Kreis mit Sekunden' },
+export const NARROW_STYLES: DesignOption<ResultNarrowStyle>[] = [
+  { value: 'wrap', label: 'Umbrechen: wie breit, Text auf 2 Zeilen' },
+  { value: 'stacked', label: 'Gestapelt mittig: Zeit ans Balkenende' },
+  { value: 'stacked-left', label: 'Gestapelt links: Zeit ans Balkenende' },
+  { value: 'short', label: 'Kurztext: ohne Namen, eine Zeile' },
+  { value: 'small', label: 'Kleiner: Text etwas kleiner' },
 ];
 
 export const PREVIEW_STATES: DesignOption<RematchStatus | ''>[] = [

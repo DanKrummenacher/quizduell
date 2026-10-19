@@ -22,7 +22,7 @@ import { PlayerNameStore } from '../../../../core/player/player-name.store';
 import { ResultUiComponent } from '../../components/result-ui/result-ui.component';
 import { ResultUiLegacyComponent } from '../../components/legacy/result-ui-legacy.component';
 import { DesignPreviewPanelComponent } from '../../components/legacy/design-preview-panel.component';
-import type { ResultTimerStyle } from '../../components/legacy/design-preview';
+import type { ResultNarrowStyle } from '../../components/legacy/design-preview';
 import type { PlayerResultView, RematchCountdownView } from '../../result.types';
 
 interface PlayAgainButton {
@@ -79,8 +79,8 @@ export class ResultContainerComponent implements OnDestroy {
   // (development builds only).
   readonly showDesignPreview = isDevMode();
   readonly legacyDesign = signal(false);
-  readonly timerStyle = signal<ResultTimerStyle>('bar-time');
   readonly previewRematch = signal<RematchStatus | null>(null);
+  readonly narrowStyle = signal<ResultNarrowStyle>('wrap');
 
   /** Rematch state as reported by the server. */
   readonly rematch = computed<RematchStatus>(
@@ -113,15 +113,35 @@ export class ResultContainerComponent implements OnDestroy {
     const name = this.opponentName();
     switch (this.rematch()) {
       case 'requested':
-        return `Warte auf ${name} …`;
+        return `Warte auf ${name}\u00a0…`;
       case 'offered':
         return `${name} möchte eine Revanche!`;
       case 'paused':
-        return `Verbindung zu ${name} unterbrochen – wir warten kurz …`;
+        return `Verbindung zu ${name} unterbrochen – wir warten kurz\u00a0…`;
       case 'opponent-left':
         return `${name} hat das Spiel verlassen.`;
       case 'unanswered':
         return `${name} hat nicht rechtzeitig reagiert.`;
+      case 'expired':
+        return 'Die Zeit für eine Revanche ist abgelaufen.';
+      case 'open':
+        return null;
+    }
+  });
+
+  /** TEMPORARY: the message without the opponent's name («Kurztext»). */
+  readonly rematchShortMessage = computed(() => {
+    switch (this.rematch()) {
+      case 'requested':
+        return 'Warte auf Antwort\u00a0…';
+      case 'offered':
+        return 'Revanche angefragt!';
+      case 'paused':
+        return 'Verbindung unterbrochen\u00a0…';
+      case 'opponent-left':
+        return 'Dein Gegner hat das Spiel verlassen.';
+      case 'unanswered':
+        return 'Keine Antwort erhalten.';
       case 'expired':
         return 'Die Zeit für eine Revanche ist abgelaufen.';
       case 'open':

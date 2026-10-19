@@ -33,36 +33,17 @@
       {{ playAgainText() }}
     </css-button>
 
-    <!-- The space stays reserved so the buttons do not move. -->
+    <!-- The space stays reserved so the buttons never move. -->
     <div class="rematch-area" role="status">
       @let countdown = rematchCountdown();
-      @let style = timerStyle();
       @if (rematchMessage(); as message) {
         <div
           class="rematch-status"
-          [attr.data-timer]="countdown ? style : null"
+          [class.has-countdown]="countdown"
           [class.is-offer]="countdown?.isOffer"
         >
           <p class="rematch-line">
-            @if (countdown && style === 'ring') {
-              <span class="ring" aria-hidden="true">
-                <svg viewBox="0 0 36 36">
-                  <circle class="ring-track" cx="18" cy="18" r="16" />
-                  <circle
-                    class="ring-progress"
-                    cx="18"
-                    cy="18"
-                    r="16"
-                    pathLength="100"
-                    [attr.stroke-dashoffset]="100 - countdown.percent"
-                  />
-                </svg>
-                <span class="ring-value">{{ countdown.secondsLeft }}</span>
-              </span>
-              <span class="visually-hidden"
-                >noch {{ countdown.secondsLeft }} s:</span
-              >
-            } @else if (rematchIcon(); as icon) {
+            @if (rematchIcon(); as icon) {
               <css-icon
                 [attr.icon]="icon"
                 size="sm"
@@ -71,22 +52,26 @@
                 aria-hidden="true"
               ></css-icon>
             }
-            <span class="rematch-message">{{ message }}</span>
-            @if (countdown && style === 'text-time') {
-              <span class="rematch-time"> · noch {{ countdown.secondsLeft }} s</span>
-            }
-            @if (countdown && style === 'chip') {
-              <span class="time-chip">noch {{ countdown.secondsLeft }} s</span>
+            <span class="rematch-message">
+              <span class="msg-full">{{ message }}</span>
+              @if (narrowStyle() === 'short') {
+                <span class="msg-short">{{ rematchShortMessage() }}</span>
+              }
+            </span>
+            @if (countdown) {
+              <span class="time-chip chip-inline"
+                >noch {{ countdown.secondsLeft }} s</span
+              >
             }
           </p>
-          @if (countdown && style !== 'ring') {
+          @if (countdown) {
             <div class="timer">
               <div class="track" aria-hidden="true">
                 <div class="progress" [style.width.%]="countdown.percent"></div>
               </div>
-              @if (style === 'bar-time') {
-                <span class="rematch-time">noch {{ countdown.secondsLeft }} s</span>
-              }
+              <span class="time-chip chip-below" aria-hidden="true"
+                >noch {{ countdown.secondsLeft }} s</span
+              >
             </div>
           }
         </div>

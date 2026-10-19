@@ -2,9 +2,9 @@
 import { Component, model } from '@angular/core';
 import type { RematchStatus } from '../../../../core/contracts/game.contract';
 import {
+  NARROW_STYLES,
   PREVIEW_STATES,
-  TIMER_STYLES,
-  type ResultTimerStyle,
+  type ResultNarrowStyle,
 } from './design-preview';
 
 @Component({
@@ -23,9 +23,9 @@ import {
         </select>
       </label>
       <label>
-        Zeitbalken
-        <select [value]="timer()" (change)="timer.set($any(value($event)))">
-          @for (option of timers; track option.value) {
+        Meldung schmal
+        <select [value]="notice()" (change)="notice.set($any(value($event)))">
+          @for (option of notices; track option.value) {
             <option [value]="option.value">{{ option.label }}</option>
           }
         </select>
@@ -76,10 +76,10 @@ import {
 })
 export class DesignPreviewPanelComponent {
   readonly legacy = model(false);
-  readonly timer = model<ResultTimerStyle>('bar-time');
+  readonly notice = model<ResultNarrowStyle>('wrap');
   readonly state = model<RematchStatus | null>(null);
 
-  protected readonly timers = TIMER_STYLES;
+  protected readonly notices = NARROW_STYLES;
   protected readonly states = PREVIEW_STATES;
 
   protected value(event: Event): string {

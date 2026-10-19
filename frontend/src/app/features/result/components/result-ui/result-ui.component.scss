@@ -24,7 +24,8 @@ $symbol: functions.rem(64);
 }
 
 // ---------------------------------------------------------------------------
-// Outcome: symbol, title, sentence and the two players
+// Outcome: symbol, title, sentence and the two players, centred in the space
+// above the buttons (as before).
 // ---------------------------------------------------------------------------
 .outcome {
   flex-grow: 1;
@@ -64,6 +65,8 @@ $symbol: functions.rem(64);
   font-size: functions.rem(16);
   line-height: 1.4;
   color: $muted;
+  // Two even lines on narrow phones instead of a single word left over.
+  text-wrap: balance;
 }
 
 app-result-players {
@@ -71,19 +74,27 @@ app-result-players {
 }
 
 // ---------------------------------------------------------------------------
-// The two buttons and below them the rematch message
+// The two buttons at the bottom (as before) and below them the message
 // ---------------------------------------------------------------------------
 .actions {
+  // The message reacts to the width it really has (see «Narrow» below).
+  container: actions / inline-size;
   display: flex;
   flex-direction: column;
   gap: functions.rem(12);
-  // As before: the buttons are a bit narrower than the cards above.
-  padding-inline: functions.rem(24);
+
+  // As before: the buttons are a bit narrower than the cards above; the
+  // message below uses the full width again.
+  css-button {
+    align-self: center;
+    width: calc(100% - #{functions.rem(48)});
+  }
 }
 
-// Room for one message line with time bar, so nothing jumps.
+// The space for the message stays reserved, so the buttons never move when a
+// message appears or changes.
 .rematch-area {
-  min-height: functions.rem(52);
+  min-height: functions.rem(68);
   padding-top: functions.rem(4);
 }
 
@@ -91,13 +102,13 @@ app-result-players {
   color: colors.$dt-color-darkblue-100;
 }
 
-// Centred under the buttons. With a countdown the remaining time is shown
-// in one of the styles under review (TEMPORARY: data-timer).
+// Without a countdown the message is centred under the buttons.
 .rematch-line {
   margin: 0;
   font-size: functions.rem(15);
   line-height: 1.4;
   text-align: center;
+  text-wrap: balance;
 }
 
 .rematch-icon {
@@ -106,9 +117,35 @@ app-result-players {
   vertical-align: -0.2em;
 }
 
-.rematch-time {
+// With a countdown: the message left, the remaining time right, the time
+// bar below.
+.has-countdown .rematch-line {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(12);
+  text-align: left;
+
+  .rematch-icon {
+    flex: none;
+    margin-right: functions.rem(-4);
+  }
+
+  .rematch-message {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+.time-chip {
+  flex: none;
+  padding: 0 functions.rem(8);
+  border-radius: functions.rem(999);
+  background-color: colors.$dt-color-darkblue-100;
+  color: colors.$dt-color-white-100;
+  font-size: functions.rem(13);
   font-weight: miscs.$css-ui-font-weight-bold;
   font-variant-numeric: tabular-nums;
+  line-height: 1.6;
   white-space: nowrap;
 }
 
@@ -135,72 +172,11 @@ app-result-players {
   transition: width 1s linear;
 }
 
-// «Balken, Zeit rechts daneben»: like the quiz, text aligned left.
-[data-timer='bar-time'] .rematch-line {
-  text-align: left;
-}
-
-// «Zeit als Marke»: the time in a small pill after the text.
-.time-chip {
-  display: inline-block;
-  margin-left: functions.rem(8);
-  padding: 0 functions.rem(8);
-  border-radius: functions.rem(999);
-  background-color: colors.$dt-color-darkblue-100;
-  color: colors.$dt-color-white-100;
-  font-size: functions.rem(13);
-  font-weight: miscs.$css-ui-font-weight-bold;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.6;
-  white-space: nowrap;
-}
-
-// «Kreis mit Sekunden»: a ring that empties, the seconds inside, the text
-// next to it.
-[data-timer='ring'] .rematch-line {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: functions.rem(12);
-  text-align: left;
-}
-
-.ring {
-  position: relative;
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: functions.rem(36);
-  height: functions.rem(36);
-
-  svg {
-    position: absolute;
-    inset: 0;
-    transform: rotate(-90deg);
-  }
-}
-
-.ring-track,
-.ring-progress {
-  fill: none;
-  stroke-width: 3;
-}
-
-.ring-track {
-  stroke: $track;
-}
-
-.ring-progress {
-  stroke: colors.$dt-color-darkblue-100;
-  stroke-dasharray: 100;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 1s linear;
-}
-
-.ring-value {
-  font-size: functions.rem(13);
-  font-weight: miscs.$css-ui-font-weight-bold;
-  font-variant-numeric: tabular-nums;
+// The second time chip (at the end of the bar) and the short text are only
+// used by some narrow layouts.
+.chip-below,
+.msg-short {
+  display: none;
 }
 
 // The opponent is asking: their colour, as in the quiz.
@@ -209,15 +185,74 @@ app-result-players {
     color: $opponent;
   }
 
-  .progress,
-  .time-chip {
+  .time-chip,
+  .progress {
     background-color: $opponent;
   }
+}
 
-  .ring-progress {
-    stroke: $opponent;
+// ---------------------------------------------------------------------------
+// Narrow: when the message has less than 380px (most phones), long names
+// would squeeze the text next to the time chip.
+// TEMPORARY: the layouts under review (data-narrow on the host).
+// ---------------------------------------------------------------------------
+@container actions (max-width: 380px) {
+  // «Gestapelt»: the text over the full width, the time chip at the end of
+  // the bar below; centred or left.
+  :host(:is([data-narrow='stacked'], [data-narrow='stacked-left'])) {
+    .rematch-area {
+      min-height: functions.rem(80);
+    }
+
+    .has-countdown {
+      .rematch-line {
+        display: block;
+        text-align: center;
+      }
+
+      .rematch-icon {
+        margin-right: functions.rem(6);
+      }
+
+      .chip-inline {
+        display: none;
+      }
+
+      .chip-below {
+        display: inline-block;
+      }
+
+      .timer {
+        margin-top: functions.rem(10);
+      }
+    }
+  }
+
+  :host([data-narrow='stacked-left']) .has-countdown .rematch-line {
+    text-align: left;
+  }
+
+  // «Kurztext»: without the name (it is on the cards above), so the message
+  // fits on one line next to the time.
+  :host([data-narrow='short']) {
+    .msg-full {
+      display: none;
+    }
+
+    .msg-short {
+      display: inline;
+    }
+  }
+
+  // «Kleiner»: same layout, slightly smaller text.
+  :host([data-narrow='small']) .rematch-line {
+    font-size: functions.rem(13);
   }
 }
+
+// ---------------------------------------------------------------------------
+// Screen sizes
+// ---------------------------------------------------------------------------
 
 // Short phones (e.g. iPhone SE): tighter spacing so everything fits
 // without scrolling.
@@ -227,7 +262,11 @@ app-result-players {
   }
 
   .outcome {
-    padding-bottom: functions.rem(16);
+    padding-bottom: functions.rem(20);
+  }
+
+  .rematch-area {
+    min-height: functions.rem(60);
   }
 
   .result-icon {
