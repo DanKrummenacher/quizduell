@@ -328,6 +328,21 @@ describe('GameService', () => {
       expect(ctx.questionsService.pickRandom).toHaveBeenCalledTimes(2);
     });
 
+    it('gives the opponent the full time from the rematch request on', async () => {
+      const ctx = setup();
+      await finishGame(ctx);
+      await vi.advanceTimersByTimeAsync(20_000);
+
+      ctx.service.requestRematch('host');
+      const offered = ctx.state('guest');
+      expect(offered.rematch).toBe('offered');
+      expect(offered.phaseDurationMs).toBe(30_000);
+      expect(offered.phaseEndsAt! - Date.now()).toBe(30_000);
+
+      await vi.advanceTimersByTimeAsync(20_000);
+      expect(ctx.state('guest').rematch).toBe('offered');
+    });
+
     it('closes the rematch window after the timeout', async () => {
       const ctx = setup();
       await finishGame(ctx);

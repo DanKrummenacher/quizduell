@@ -160,9 +160,13 @@ export class GameService implements OnApplicationShutdown {
       throw new GameError('REMATCH_UNAVAILABLE');
     }
 
+    const firstRequest = !session.players.some((p) => p.rematchRequested);
     player.rematchRequested = true;
     if (session.players.every((p) => p.rematchRequested)) {
       this.restart(session);
+    } else if (firstRequest) {
+      // The opponent gets the full time to answer, counted from the request.
+      this.openRematchWindow(session);
     } else {
       this.broadcast(session);
     }
@@ -418,6 +422,11 @@ export class GameService implements OnApplicationShutdown {
   private finish(session: Session): void {
     void this.statsService.recordGame(session.mode, session.questions.length);
     // Both modes offer a rematch against the same opponent for a while.
+    this.openRematchWindow(session);
+  }
+
+  /** Starts (or restarts) the time in which a rematch can be agreed on. */
+  private openRematchWindow(session: Session): void {
     const rematchMs = session.settings.rematchTimeoutSec * 1000;
     this.enterPhase(session, 'finished', rematchMs, () =>
       this.expireRematch(session),

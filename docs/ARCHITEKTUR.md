@@ -27,8 +27,9 @@ bzw. `aborted` (mit `endReason`).
 Punkte: 100 pro richtige Antwort, plus bis zu 100 Tempo-Bonus (linear nach Restzeit).
 
 **Revanche** (beide Modi): Nach `finished` können beide Spieler innerhalb der eingestellten
-Zeit eine Revanche gegen denselben Gegner starten. Der Server meldet jedem Spieler den
-Stand als `rematch`:
+Zeit eine Revanche gegen denselben Gegner starten. Mit der ersten Anfrage beginnt die Zeit
+neu, damit der Gegner die volle Zeit zum Antworten hat und die angezeigte Restzeit bei der
+Anfrage voll startet. Der Server meldet jedem Spieler den Stand als `rematch`:
 
 | Status          | Bedeutung                                         | Ergebnis-Screen                    |
 | --------------- | ------------------------------------------------- | ---------------------------------- |

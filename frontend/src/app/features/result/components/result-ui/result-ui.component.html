@@ -52,12 +52,7 @@
                 aria-hidden="true"
               ></css-icon>
             }
-            <span class="rematch-message">
-              <span class="msg-full">{{ message }}</span>
-              @if (narrowStyle() === 'short') {
-                <span class="msg-short">{{ rematchShortMessage() }}</span>
-              }
-            </span>
+            <span class="rematch-message">{{ message }}</span>
             @if (countdown) {
               <span class="time-chip chip-inline"
                 >noch {{ countdown.secondsLeft }} s</span
@@ -69,7 +64,7 @@
               <div class="track" aria-hidden="true">
                 <div class="progress" [style.width.%]="countdown.percent"></div>
               </div>
-              <span class="time-chip chip-below" aria-hidden="true"
+              <span class="time-chip chip-below"
                 >noch {{ countdown.secondsLeft }} s</span
               >
             </div>

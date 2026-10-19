@@ -1,46 +1,17 @@
-@if (legacyDesign()) {
-  <app-result-ui-legacy
-    [statusTitle]="statusTitle()"
-    [statusSubtitle]="statusSubtitle()"
-    [statusIcon]="statusIcon()"
-    [players]="playersView()"
-    [isPlayAgainDisabled]="playAgainButton().disabled"
-    [playAgainText]="playAgainButton().label"
-    [playAgainIcon]="playAgainButton().icon"
-    [playAgainStatusText]="legacyHint()"
-    [showNoRematchFlyout]="showNoRematchNotice()"
-    [noRematchText]="rematchMessage() ?? ''"
-    (navigateHome)="handleHome()"
-    (playAgain)="handlePlayAgain()"
-    (noRematchAcknowledge)="handleNoRematchAcknowledge()"
-  />
-} @else {
-  <app-result-ui
-    [statusTitle]="statusTitle()"
-    [statusSubtitle]="statusSubtitle()"
-    [statusIcon]="statusIcon()"
-    [players]="playersView()"
-    [isPlayAgainDisabled]="playAgainButton().disabled"
-    [playAgainText]="playAgainButton().label"
-    [playAgainIcon]="playAgainButton().icon"
-    [rematchMessage]="rematchMessage()"
-    [rematchCountdown]="rematchCountdown()"
-    [rematchShortMessage]="rematchShortMessage()"
-    [narrowStyle]="narrowStyle()"
-    [rematchIcon]="rematchIcon()"
-    [showNoRematchFlyout]="showNoRematchNotice()"
-    [noRematchText]="rematchMessage() ?? ''"
-    (navigateHome)="handleHome()"
-    (playAgain)="handlePlayAgain()"
-    (noRematchAcknowledge)="handleNoRematchAcknowledge()"
-  />
-}
-
-<!-- TEMPORARY: compare result page designs (development only). -->
-@if (showDesignPreview) {
-  <app-design-preview-panel
-    [(legacy)]="legacyDesign"
-    [(notice)]="narrowStyle"
-    [(state)]="previewRematch"
-  />
-}
+<app-result-ui
+  [statusTitle]="statusTitle()"
+  [statusSubtitle]="statusSubtitle()"
+  [statusIcon]="statusIcon()"
+  [players]="playersView()"
+  [isPlayAgainDisabled]="playAgainButton().disabled"
+  [playAgainText]="playAgainButton().label"
+  [playAgainIcon]="playAgainButton().icon"
+  [rematchMessage]="rematchMessage()"
+  [rematchCountdown]="rematchCountdown()"
+  [rematchIcon]="rematchIcon()"
+  [showNoRematchFlyout]="showNoRematchNotice()"
+  [noRematchText]="rematchMessage() ?? ''"
+  (navigateHome)="handleHome()"
+  (playAgain)="handlePlayAgain()"
+  (noRematchAcknowledge)="handleNoRematchAcknowledge()"
+/>

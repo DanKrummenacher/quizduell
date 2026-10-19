@@ -50,7 +50,7 @@ const FIELDS: NumericField[] = [
   {
     key: 'rematchTimeoutSec',
     label: 'Sekunden für die Revanche',
-    hint: 'So lange können beide nach dem Duell eine Revanche starten.',
+    hint: 'Zeit zum Fordern einer Revanche; nach einer Anfrage beginnt sie für die Antwort neu.',
   },
   {
     key: 'idleResetSec',
