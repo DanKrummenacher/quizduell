@@ -28,3 +28,10 @@
 .centered-content {
   width: 100%;
 }
+
+// TEMPORARY: the new designs lay out their screens themselves.
+.main-area.next {
+  justify-content: flex-start;
+  padding: functions.rem(24) functions.rem(20)
+    clamp(#{functions.rem(28)}, 4.5vh, #{functions.rem(48)});
+}

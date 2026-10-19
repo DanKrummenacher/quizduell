@@ -13,6 +13,12 @@ import { LobbyWaitingComponent } from '../lobby-waiting/lobby-waiting.component'
 import { LobbyMatchFoundComponent } from '../lobby-match-found/lobby-match-found.component';
 import { LobbyModeComponent } from '../lobby-mode/lobby-mode.component';
 import { LobbySearchingComponent } from '../lobby-searching/lobby-searching.component';
+import { LobbyModeNextComponent } from '../next/lobby-mode-next.component';
+import { LobbyActionsNextComponent } from '../next/lobby-actions-next.component';
+import { LobbySearchingNextComponent } from '../next/lobby-searching-next.component';
+import { LobbyWaitingNextComponent } from '../next/lobby-waiting-next.component';
+import { LobbyFoundNextComponent } from '../next/lobby-found-next.component';
+import type { LobbyDesign } from '../next/lobby-design';
 import '@css-ch/components/button';
 import '@css-ch/components/flyout';
 
@@ -26,6 +32,11 @@ import '@css-ch/components/flyout';
     LobbyWaitingComponent,
     LobbySearchingComponent,
     LobbyMatchFoundComponent,
+    LobbyModeNextComponent,
+    LobbyActionsNextComponent,
+    LobbySearchingNextComponent,
+    LobbyWaitingNextComponent,
+    LobbyFoundNextComponent,
   ],
   templateUrl: './lobby-ui.component.html',
   styleUrl: './lobby-ui.component.scss',
@@ -40,6 +51,8 @@ export class LobbyUiComponent {
   readonly opponentLeft = input<boolean>(false);
   readonly countdownMs = input<number>(3000);
   readonly notice = input<string | null>(null);
+  // TEMPORARY: lobby designs under review.
+  readonly design = input<LobbyDesign>('today');
 
   /** Greeting and back navigation, hidden while the duel is about to start. */
   protected readonly hasNavigation = computed(() => this.state() !== 'FOUND');

@@ -5,41 +5,89 @@
     <div class="header-area">
       <app-lobby-header
         [playerName]="playerName()"
+        [showGreeting]="design() === 'today'"
         (navigateBack)="navigateBack.emit()"
       >
       </app-lobby-header>
     </div>
   }
 
-  <main class="main-area">
-    <div class="centered-content">
-      @if (state() === 'CHOOSE_MODE') {
-        <app-lobby-mode
-          (selectQuickGame)="selectQuickGame.emit()"
-          (selectFriendGame)="selectFriendGame.emit()"
-        >
-        </app-lobby-mode>
-      } @else if (state() === 'CHOOSE_ACTION') {
-        <app-lobby-actions
-          [joinError]="joinError()"
-          (createGame)="createGame.emit()"
-          (joinGame)="joinGame.emit($event)"
-        >
-        </app-lobby-actions>
-      } @else if (state() === 'SEARCHING') {
-        <app-lobby-searching
-          (cancelSearch)="cancelSearch.emit()"
-        ></app-lobby-searching>
-      } @else if (state() === 'WAITING') {
-        <app-lobby-waiting [roomCode]="roomCode()"></app-lobby-waiting>
-      } @else if (state() === 'FOUND') {
-        <app-lobby-match-found
-          [opponentName]="opponentName()"
-          [durationMs]="countdownMs()"
-        ></app-lobby-match-found>
+  @if (design() !== 'today') {
+    <main class="main-area next">
+      @switch (state()) {
+        @case ('CHOOSE_MODE') {
+          <app-lobby-mode-next
+            [design]="design()"
+            [playerName]="playerName()"
+            [joinError]="joinError()"
+            (selectQuickGame)="selectQuickGame.emit()"
+            (selectFriendGame)="selectFriendGame.emit()"
+            (createGame)="createGame.emit()"
+            (joinGame)="joinGame.emit($event)"
+          />
+        }
+        @case ('CHOOSE_ACTION') {
+          <app-lobby-actions-next
+            [joinError]="joinError()"
+            (createGame)="createGame.emit()"
+            (joinGame)="joinGame.emit($event)"
+          />
+        }
+        @case ('SEARCHING') {
+          <app-lobby-searching-next
+            [design]="design()"
+            [playerName]="playerName()"
+            (cancelSearch)="cancelSearch.emit()"
+          />
+        }
+        @case ('WAITING') {
+          <app-lobby-waiting-next
+            [design]="design()"
+            [roomCode]="roomCode()"
+            [playerName]="playerName()"
+          />
+        }
+        @case ('FOUND') {
+          <app-lobby-found-next
+            [design]="design()"
+            [playerName]="playerName()"
+            [opponentName]="opponentName()"
+            [durationMs]="countdownMs()"
+          />
+        }
       }
-    </div>
-  </main>
+    </main>
+  } @else {
+    <main class="main-area">
+      <div class="centered-content">
+        @if (state() === 'CHOOSE_MODE') {
+          <app-lobby-mode
+            (selectQuickGame)="selectQuickGame.emit()"
+            (selectFriendGame)="selectFriendGame.emit()"
+          >
+          </app-lobby-mode>
+        } @else if (state() === 'CHOOSE_ACTION') {
+          <app-lobby-actions
+            [joinError]="joinError()"
+            (createGame)="createGame.emit()"
+            (joinGame)="joinGame.emit($event)"
+          >
+          </app-lobby-actions>
+        } @else if (state() === 'SEARCHING') {
+          <app-lobby-searching
+            (cancelSearch)="cancelSearch.emit()"
+          ></app-lobby-searching>
+        } @else if (state() === 'WAITING') {
+          <app-lobby-waiting [roomCode]="roomCode()"></app-lobby-waiting>
+        } @else if (state() === 'FOUND') {
+          <app-lobby-match-found
+            [opponentName]="opponentName()"
+            [durationMs]="countdownMs()"
+          ></app-lobby-match-found>
+        }
+      </div>
+    </main>
+  }
 </div>
 
 @if (opponentLeft()) {

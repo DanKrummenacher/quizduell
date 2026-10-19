@@ -7,6 +7,7 @@
   [joinError]="joinError()"
   [opponentLeft]="opponentLeft()"
   [notice]="notice()"
+  [design]="design()"
   (navigateBack)="handleBack()"
   (selectQuickGame)="handleSelectQuickGame()"
   (selectFriendGame)="handleSelectFriendGame()"
@@ -17,3 +18,8 @@
   (acknowledgeNotice)="handleNoticeAcknowledge()"
 >
 </app-lobby-ui>
+
+<!-- TEMPORARY: compare lobby designs (development only). -->
+@if (showDesignPreview) {
+  <app-lobby-design-panel [(design)]="design" [(screen)]="previewScreen" />
+}

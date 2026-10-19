@@ -11,5 +11,7 @@ import '@css-ch/components/button';
 })
 export class LobbyHeaderComponent {
   readonly playerName = input.required<string>();
+  // TEMPORARY: the new designs show the greeting on the mode screen only.
+  readonly showGreeting = input(true);
   readonly navigateBack = output<void>();
 }

@@ -112,7 +112,7 @@ test.describe('playing duels', () => {
 
     await enterName(anna, 'Anna');
     await anna.getByText('Schnellspiel 1vs1').click();
-    await expect(anna.getByText('Suche Gegner...')).toBeVisible();
+    await expect(anna.getByText(/Suche Gegner/)).toBeVisible();
 
     await enterName(ben, 'Ben');
     await ben.getByText('Schnellspiel 1vs1').click();
@@ -133,7 +133,7 @@ test.describe('playing duels', () => {
       timeout: 40_000,
     });
     await anna.locator('css-button', { hasText: 'Zum Spielmodus' }).click();
-    await expect(anna.getByText('Spielmodus')).toBeVisible();
+    await expect(anna.getByText('Schnellspiel 1vs1')).toBeVisible();
   });
 
   for (const [label, target] of [
@@ -277,7 +277,7 @@ test.describe('playing duels', () => {
     await enterName(anna, 'Anna');
     await anna.getByText('Schnellspiel 1vs1').click();
     await anna.locator('css-button', { hasText: 'Abbrechen' }).click();
-    await expect(anna.getByText('Spielmodus')).toBeVisible();
+    await expect(anna.getByText('Schnellspiel 1vs1')).toBeVisible();
   });
 
   test('a reload during the duel resumes the game', async ({ browser, request }) => {
@@ -321,7 +321,7 @@ test.describe('playing duels', () => {
     await anna.getByText('Schnellspiel 1vs1').click();
     await expect(anna.getByText('Dieser Name ist nicht erlaubt.')).toBeVisible();
     await anna.locator('css-button', { hasText: 'OK' }).click();
-    await expect(anna.getByText('Spielmodus')).toBeVisible();
+    await expect(anna.getByText('Schnellspiel 1vs1')).toBeVisible();
   });
 });
 

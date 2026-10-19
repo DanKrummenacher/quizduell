@@ -8,6 +8,10 @@
 
 .top-bar {
   margin-bottom: functions.rem(35);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .back-button {
