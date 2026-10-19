@@ -14,6 +14,28 @@ export const LOBBY_DESIGNS: DesignOption<LobbyDesign>[] = [
   { value: 'facelift', label: 'Facelift' },
 ];
 
+/** Proposals for the mode screen, on top of the facelift. */
+export type ModeLayout =
+  | 'facelift'
+  | 'refined'
+  | 'tiles'
+  | 'focus'
+  | 'info'
+  | 'buttons'
+  | 'band'
+  | 'toggle';
+
+export const MODE_LAYOUTS: DesignOption<ModeLayout>[] = [
+  { value: 'facelift', label: 'Facelift (aktuell)' },
+  { value: 'refined', label: '1 · Feinschliff' },
+  { value: 'tiles', label: '2 · Zwei Kacheln' },
+  { value: 'focus', label: '3 · Schnellspiel im Fokus' },
+  { value: 'info', label: '4 · Mit Spielinfos' },
+  { value: 'buttons', label: '5 · Zwei Knöpfe' },
+  { value: 'band', label: '6 · Duell-Vorschau' },
+  { value: 'toggle', label: '7 · Umschalter' },
+];
+
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [
   { value: '', label: 'Echter Ablauf' },
   { value: 'CHOOSE_MODE', label: '1 · Modus wählen' },

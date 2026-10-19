@@ -13,11 +13,20 @@
   }
 
   @if (design() === 'facelift') {
-    <main class="main-area is-facelift">
+    <main
+      class="main-area is-facelift"
+      [class.is-top]="
+        state() === 'CHOOSE_MODE' &&
+        (modeLayout() === 'refined' || modeLayout() === 'band')
+      "
+    >
       <div class="centered-content">
         @switch (state()) {
           @case ('CHOOSE_MODE') {
             <app-facelift-mode
+              [layout]="modeLayout()"
+              [playerName]="playerName()"
+              [facts]="gameFacts()"
               (selectQuickGame)="selectQuickGame.emit()"
               (selectFriendGame)="selectFriendGame.emit()"
             />

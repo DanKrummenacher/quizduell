@@ -42,3 +42,9 @@
     padding-bottom: functions.rem(20);
   }
 }
+
+// TEMPORARY (Feinschliff): the choices follow the greeting directly.
+.main-area.is-facelift.is-top {
+  justify-content: flex-start;
+  padding-top: functions.rem(32);
+}
