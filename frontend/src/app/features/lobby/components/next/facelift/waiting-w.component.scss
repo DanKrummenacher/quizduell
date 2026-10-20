@@ -1,6 +1,6 @@
-// TEMPORARY: final proposals for «Spiel erstellt». Same grid as «Code
-// eingeben»: title → text 8, text → code 24, code → copy 12,
-// copy → waiting 32. The waiting part is as wide as the code.
+// TEMPORARY: final proposals for «Spiel erstellt» around W1. On the 4/8
+// grid: title → text 8, text → code 24, code → copy 12, copy → waiting 32,
+// text → light 12. The waiting part is exactly as wide as the code.
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
@@ -17,11 +17,47 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   --gap-code: #{functions.rem(24)};
   --gap-copy: #{functions.rem(12)};
   --gap-waiting: #{functions.rem(32)};
+  --gap-light: #{functions.rem(12)};
+  --light-height: #{functions.rem(4)};
+  --light-width: var(--code-width);
+  --light-speed: 1.8s;
   --box: #{functions.rem(60)};
   --code-width: calc(4 * var(--box) + 3 * #{functions.rem(12)});
 
   display: block;
   text-align: center;
+}
+
+// B2: more air, a finer and slower light.
+:host(.b-calm) {
+  --gap-copy: #{functions.rem(16)};
+  --gap-waiting: #{functions.rem(40)};
+  --gap-light: #{functions.rem(16)};
+  --light-height: #{functions.rem(2)};
+  --light-speed: 2.4s;
+}
+
+// B3: the light as a divider between the code and the text.
+:host(.b-top) {
+  --gap-waiting: #{functions.rem(24)};
+}
+
+// B4: a thicker track with a glowing head.
+:host(.b-comet) {
+  --light-height: #{functions.rem(6)};
+  --light-speed: 2s;
+}
+
+// B5: a short light in the middle, back and forth.
+:host(.b-short) {
+  --light-width: #{functions.rem(120)};
+  --light-speed: 1.4s;
+}
+
+// B7: the light right under the code, the copy button at the end.
+:host(.b-code) {
+  --gap-waiting: #{functions.rem(16)};
+  --gap-copy: #{functions.rem(24)};
 }
 
 .section-title {
@@ -45,7 +81,6 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 }
 
 .code-box {
-  position: relative;
   display: grid;
   place-items: center;
   height: functions.rem(68);
@@ -55,33 +90,12 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   font-size: functions.rem(30);
   font-weight: $bold;
   color: $blue;
-
-  // W6: a light runs through the boxes, one after the other.
-  :host(.w-boxes) &::after {
-    content: '';
-    position: absolute;
-    inset: functions.rem(-1);
-    border: functions.rem(2) solid $opponent;
-    border-radius: inherit;
-    box-shadow: 0 0 functions.rem(12) rgba($opponent, 0.35);
-    opacity: 0;
-    animation: scan 2.4s ease-in-out infinite;
-    animation-delay: calc(0.8s + var(--i) * 0.3s);
-  }
 }
 
 .char {
   display: block;
   animation: roll-in 0.35s $spring both;
   animation-delay: calc(var(--i) * 90ms);
-
-  // W7: the characters hop gently, as a wave.
-  :host(.w-wave) & {
-    animation:
-      roll-in 0.35s $spring both,
-      wave 2.4s ease-in-out infinite;
-    animation-delay: calc(var(--i) * 90ms), calc(0.8s + var(--i) * 0.12s);
-  }
 }
 
 // The copy button as before: plain, in the middle.
@@ -92,7 +106,7 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 }
 
 // ---------------------------------------------------------------------------
-// Waiting
+// Waiting: the text and a light that runs along a thin track
 // ---------------------------------------------------------------------------
 .waiting {
   width: var(--code-width);
@@ -106,14 +120,15 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   color: facelift.$muted;
 }
 
-// W1: a light that runs along a thin track.
 .sweep {
   position: relative;
   display: block;
-  height: functions.rem(4);
-  margin-top: functions.rem(12);
+  width: var(--light-width);
+  max-width: 100%;
+  height: var(--light-height);
+  margin: var(--gap-light) auto 0;
   overflow: hidden;
-  border-radius: functions.rem(2);
+  border-radius: functions.rem(999);
   background-color: $track;
 
   i {
@@ -127,11 +142,42 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
       $opponent,
       rgba($opponent, 0)
     );
-    animation: sweep 1.8s ease-in-out infinite;
+    animation: sweep var(--light-speed) ease-in-out infinite;
+  }
+
+  // The text follows the light (B3, B7).
+  :host(.b-top) &,
+  :host(.b-code) & {
+    margin: 0 auto var(--gap-light);
+  }
+
+  // B4: a solid tail with a glowing head.
+  :host(.b-comet) & {
+    overflow: visible;
+    background-color: rgba($opponent, 0.12);
+
+    i {
+      background: linear-gradient(90deg, rgba($opponent, 0), $opponent);
+      box-shadow: functions.rem(2) 0 functions.rem(10) rgba($opponent, 0.45);
+    }
+  }
+
+  // B5: back and forth, as a calm loader.
+  :host(.b-short) & i {
+    width: 40%;
+    background: $opponent;
+    animation: ping-pong var(--light-speed) ease-in-out infinite alternate;
   }
 }
 
-// W2: text and time on one line, the bar of the minute below.
+// B4: the light is clipped by the width of the code, not by the track.
+:host(.b-comet) .waiting {
+  overflow: hidden;
+  padding-block: functions.rem(4);
+  margin-top: calc(var(--gap-waiting) - #{functions.rem(4)});
+}
+
+// B6: text and waiting time on one line.
 .waiting-row {
   display: flex;
   justify-content: space-between;
@@ -147,145 +193,19 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   color: $blue;
 }
 
-.minute-bar {
-  display: block;
-  height: functions.rem(6);
-  margin-top: functions.rem(8);
-  overflow: hidden;
-  border-radius: functions.rem(3);
-  background-color: $track;
+// B8: the three dots hop, as when someone is typing.
+.dots i {
+  display: inline-block;
+  font-style: normal;
+  animation: hop 1.2s ease-in-out infinite;
 
-  i {
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background-color: $opponent;
-    transform-origin: left;
-    transition: transform 1s linear;
-
-    &.is-reset {
-      transition: none;
-    }
-  }
-}
-
-// W3: the ring of the search, small.
-.waiting-inline {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: functions.rem(12);
-  margin: 0;
-  text-align: left;
-}
-
-.mini-ring {
-  --p: 0;
-
-  flex-shrink: 0;
-  width: functions.rem(36);
-  height: functions.rem(36);
-  border-radius: 50%;
-  background: conic-gradient($opponent calc(var(--p) * 360deg), $track 0);
-  mask: radial-gradient(
-    farthest-side,
-    transparent calc(100% - #{functions.rem(4)}),
-    #000 0
-  );
-  transition: --p 1s linear;
-
-  &.is-reset {
-    transition: none;
-  }
-}
-
-.inline-text {
-  display: grid;
-  gap: functions.rem(2);
-  font-size: functions.rem(15);
-  color: $blue;
-}
-
-.inline-time {
-  font-size: functions.rem(13);
-  font-variant-numeric: tabular-nums;
-  color: facelift.$muted;
-}
-
-// W4: you, a running line, the open seat of your friend.
-.pair {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: functions.rem(12);
-}
-
-.seat {
-  display: grid;
-  place-items: center;
-  width: functions.rem(36);
-  height: functions.rem(36);
-  box-sizing: border-box;
-  border-radius: 50%;
-  font-size: functions.rem(15);
-  font-weight: $bold;
-
-  &.is-me {
-    background-color: $blue;
-    color: $white;
+  &:nth-child(2) {
+    animation-delay: 0.15s;
   }
 
-  &.is-open {
-    border: functions.rem(2) dashed $opponent;
-    background-color: $white;
-    color: $opponent;
-    animation: ping 1.6s ease-out infinite;
+  &:nth-child(3) {
+    animation-delay: 0.3s;
   }
-}
-
-.link {
-  width: functions.rem(72);
-  height: functions.rem(2);
-  margin: 0 functions.rem(8);
-  background: repeating-linear-gradient(
-    90deg,
-    $opponent 0 functions.rem(6),
-    transparent 0 functions.rem(12)
-  );
-  background-size: functions.rem(12) 100%;
-  animation: march 0.6s linear infinite;
-}
-
-// W5: a live badge.
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: functions.rem(10);
-  margin: 0;
-  padding: functions.rem(8) functions.rem(8) functions.rem(8) functions.rem(16);
-  border: functions.rem(1) solid $track;
-  border-radius: functions.rem(999);
-  background-color: $white;
-  font-size: functions.rem(14);
-  color: $blue;
-}
-
-.pulse {
-  width: functions.rem(8);
-  height: functions.rem(8);
-  border-radius: 50%;
-  background-color: $opponent;
-  animation: ping 1.6s ease-out infinite;
-}
-
-.chip-time {
-  padding: functions.rem(2) functions.rem(10);
-  border-radius: functions.rem(999);
-  background-color: rgba($opponent, 0.12);
-  font-size: functions.rem(13);
-  font-weight: $bold;
-  font-variant-numeric: tabular-nums;
-  color: $blue;
 }
 
 // ---------------------------------------------------------------------------
@@ -296,13 +216,25 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
     --gap-code: #{functions.rem(16)};
     --gap-waiting: #{functions.rem(24)};
   }
+
+  :host(.b-calm) {
+    --gap-waiting: #{functions.rem(32)};
+  }
+
+  :host(.b-code) {
+    --gap-waiting: #{functions.rem(12)};
+    --gap-copy: #{functions.rem(16)};
+  }
 }
 
 @media (max-height: 600px) {
-  :host {
+  :host,
+  :host(.b-calm),
+  :host(.b-code) {
     --gap-code: #{functions.rem(12)};
     --gap-copy: #{functions.rem(8)};
     --gap-waiting: #{functions.rem(16)};
+    --gap-light: #{functions.rem(8)};
   }
 
   .code-box {
@@ -323,50 +255,21 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 
 @media (prefers-reduced-motion: reduce) {
   .char,
-  .code-box::after,
   .sweep i,
-  .seat,
-  .link,
-  .pulse {
+  .dots i {
     animation: none !important;
   }
-}
 
-// The ring fills smoothly between the seconds.
-@property --p {
-  syntax: '<number>';
-  inherits: false;
-  initial-value: 0;
+  // Without motion the light stays in the middle.
+  .sweep i {
+    left: 32.5%;
+  }
 }
 
 @keyframes roll-in {
   from {
     opacity: 0;
     transform: translateY(40%);
-  }
-}
-
-@keyframes wave {
-  0%,
-  30%,
-  100% {
-    transform: translateY(0);
-  }
-
-  15% {
-    transform: translateY(functions.rem(-5));
-  }
-}
-
-@keyframes scan {
-  0%,
-  40%,
-  100% {
-    opacity: 0;
-  }
-
-  15% {
-    opacity: 1;
   }
 }
 
@@ -380,19 +283,24 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   }
 }
 
-@keyframes march {
+@keyframes ping-pong {
+  from {
+    transform: translateX(0);
+  }
+
   to {
-    background-position: functions.rem(12) 0;
+    transform: translateX(150%);
   }
 }
 
-@keyframes ping {
-  0% {
-    box-shadow: 0 0 0 0 rgba($opponent, 0.5);
+@keyframes hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
   }
 
-  70%,
-  100% {
-    box-shadow: 0 0 0 functions.rem(7) rgba($opponent, 0);
+  30% {
+    transform: translateY(functions.rem(-3));
   }
 }

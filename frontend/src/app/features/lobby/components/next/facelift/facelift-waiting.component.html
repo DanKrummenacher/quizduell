@@ -1,9 +1,5 @@
 @if (layout() !== 'facelift') {
-  <app-waiting-w
-    [layout]="layout()"
-    [roomCode]="roomCode()"
-    [playerName]="playerName()"
-  />
+  <app-waiting-w [layout]="layout()" [roomCode]="roomCode()" />
 } @else {
   <h2 class="section-title">Spiel erstellt</h2>
   <p class="body-text">Teile diesen Code mit deinem Gegner</p>

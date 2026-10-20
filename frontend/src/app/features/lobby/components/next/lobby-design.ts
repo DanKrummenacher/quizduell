@@ -17,24 +17,26 @@ export const LOBBY_DESIGNS: DesignOption<LobbyDesign>[] = [
 /** Proposals for the «Spiel erstellt» screen. */
 export type WaitingLayout =
   | 'facelift'
-  | 'w-bar'
-  | 'w-time'
-  | 'w-ring'
-  | 'w-friend'
-  | 'w-chip'
-  | 'w-boxes'
-  | 'w-wave';
+  | 'b-base'
+  | 'b-calm'
+  | 'b-top'
+  | 'b-comet'
+  | 'b-short'
+  | 'b-time'
+  | 'b-code'
+  | 'b-dots';
 
-/** The same code and copy button; only the way of waiting differs. */
+/** W1 refined: the same code and copy button, a running light. */
 export const WAITING_LAYOUTS: DesignOption<WaitingLayout>[] = [
   { value: 'facelift', label: 'Heute (Facelift)' },
-  { value: 'w-bar', label: 'W1 · Lichtbalken' },
-  { value: 'w-time', label: 'W2 · Zeitbalken mit Wartezeit' },
-  { value: 'w-ring', label: 'W3 · Kleiner Ring wie die Suche' },
-  { value: 'w-friend', label: 'W4 · Du und dein Freund' },
-  { value: 'w-chip', label: 'W5 · Live-Badge mit Zeit' },
-  { value: 'w-boxes', label: 'W6 · Licht läuft durch die Kästchen' },
-  { value: 'w-wave', label: 'W7 · Zeichen hüpfen als Welle' },
+  { value: 'b-base', label: 'B1 · W1 wie bisher' },
+  { value: 'b-calm', label: 'B2 · Mehr Luft, feineres Licht' },
+  { value: 'b-top', label: 'B3 · Licht als Trennlinie' },
+  { value: 'b-comet', label: 'B4 · Leuchtender Komet' },
+  { value: 'b-short', label: 'B5 · Kurz, hin und her' },
+  { value: 'b-time', label: 'B6 · Mit Wartezeit' },
+  { value: 'b-code', label: 'B7 · Licht direkt unter dem Code' },
+  { value: 'b-dots', label: 'B8 · Hüpfende Punkte' },
 ];
 
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [

@@ -10,74 +10,66 @@
   }
 </div>
 
-<css-button
-  variant="plain"
-  class="copy-button"
-  [attr.disabled]="isCopied() ? true : null"
-  (click)="!isCopied() && copyCode()"
->
-  <css-icon
-    [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
-    slot="prefix"
-  ></css-icon>
-  {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
-</css-button>
+<ng-template #copyButton>
+  <css-button
+    variant="plain"
+    class="copy-button"
+    [attr.disabled]="isCopied() ? true : null"
+    (click)="!isCopied() && copyCode()"
+  >
+    <css-icon
+      [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
+      slot="prefix"
+    ></css-icon>
+    {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
+  </css-button>
+</ng-template>
 
-<div class="waiting" role="status">
-  @switch (layout()) {
-    @case ('w-bar') {
-      <!-- W1: a light runs along a thin bar. -->
+<ng-template #sweep>
+  <span class="sweep" aria-hidden="true"><i></i></span>
+</ng-template>
+
+@switch (layout()) {
+  @case ('b-code') {
+    <!-- B7: the bar right under the code, as if the code were loading. -->
+    <div class="waiting" role="status">
+      <ng-container *ngTemplateOutlet="sweep" />
       <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
-      <span class="sweep" aria-hidden="true"><i></i></span>
-    }
-    @case ('w-time') {
-      <!-- W2: the bar fills once per minute, with the waiting time. -->
-      <p class="waiting-row">
-        <span>Warte auf deinen Freund</span>
-        <span class="time" aria-hidden="true">{{ elapsed() }}</span>
-      </p>
-      <span class="minute-bar" aria-hidden="true"
-        ><i
-          [class.is-reset]="minute() === 0"
-          [style.transform]="'scaleX(' + minute() + ')'"
-        ></i
-      ></span>
-    }
-    @case ('w-ring') {
-      <!-- W3: the ring of the search, small, next to the text. -->
-      <p class="waiting-inline">
-        <span
-          class="mini-ring"
-          [style.--p]="minute()"
-          [class.is-reset]="minute() === 0"
-          aria-hidden="true"
-        ></span>
-        <span class="inline-text">
-          Warte auf deinen Freund
-          <span class="inline-time">Wartezeit {{ elapsed() }}</span>
-        </span>
-      </p>
-    }
-    @case ('w-friend') {
-      <!-- W4: you and the open seat of your friend, joined by a running line. -->
-      <div class="pair" aria-hidden="true">
-        <span class="seat is-me">{{ initial() }}</span>
-        <span class="link"></span>
-        <span class="seat is-open">?</span>
-      </div>
-      <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
-    }
-    @case ('w-chip') {
-      <!-- W5: a live badge with the waiting time. -->
-      <p class="chip">
-        <span class="pulse" aria-hidden="true"></span>
-        Warte auf deinen Freund
-        <span class="chip-time" aria-hidden="true">{{ elapsed() }}</span>
-      </p>
-    }
-    @default {
-      <!-- W6: the boxes themselves wait; a light runs through them. -->
-      <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
-    }
+    </div>
+    <ng-container *ngTemplateOutlet="copyButton" />
   }
-</div>
+  @default {
+    <ng-container *ngTemplateOutlet="copyButton" />
+    <div class="waiting" role="status">
+      @switch (layout()) {
+        @case ('b-top') {
+          <!-- B3: the bar as a divider, the text below. -->
+          <ng-container *ngTemplateOutlet="sweep" />
+          <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
+        }
+        @case ('b-time') {
+          <!-- B6: text and waiting time on one line, the light below. -->
+          <p class="waiting-row">
+            <span>Warte auf deinen Freund</span>
+            <span class="time">{{ elapsed() }}</span>
+          </p>
+          <ng-container *ngTemplateOutlet="sweep" />
+        }
+        @case ('b-dots') {
+          <!-- B8: the dots of the text hop, the light runs below. -->
+          <p class="waiting-text">
+            Warte auf deinen Freund<span class="dots" aria-hidden="true"
+              ><i>.</i><i>.</i><i>.</i></span
+            >
+          </p>
+          <ng-container *ngTemplateOutlet="sweep" />
+        }
+        @default {
+          <!-- B1, B2, B4, B5: the text, the light below. -->
+          <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
+          <ng-container *ngTemplateOutlet="sweep" />
+        }
+      }
+    </div>
+  }
+}
