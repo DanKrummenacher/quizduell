@@ -25,6 +25,7 @@
           @case ('CHOOSE_ACTION') {
             <app-facelift-actions
               [layout]="friendLayout()"
+              [playerName]="playerName()"
               [joinError]="joinError()"
               (createGame)="createGame.emit()"
               (joinGame)="joinGame.emit($event)"

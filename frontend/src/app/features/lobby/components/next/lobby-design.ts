@@ -26,7 +26,12 @@ export type FriendLayout =
   | 'fr-auto'
   | 'fr-steps'
   | 'fr-sheet'
-  | 'fr-explain';
+  | 'fr-explain'
+  | 'fr-roles'
+  | 'fr-smart'
+  | 'fr-dock'
+  | 'fr-stepper'
+  | 'fr-columns';
 
 export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
@@ -39,7 +44,21 @@ export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'fr-steps', label: '8 · Zwei Schritte: Wahl, dann Code' },
   { value: 'fr-sheet', label: '9 · Wie die Suche, Code im Blatt' },
   { value: 'fr-explain', label: '10 · In drei Schritten erklärt' },
+  { value: 'fr-roles', label: '11 · Zwei Rollen mit den Spielern' },
+  { value: 'fr-smart', label: '12 · Code zuerst, Erstellen weicht' },
+  { value: 'fr-dock', label: '13 · Beitreten unten angedockt' },
+  { value: 'fr-stepper', label: '14 · Schritte mit Fortschritt' },
+  { value: 'fr-columns', label: '15 · Zwei Aktionskarten' },
   { value: 'fr-join-first', label: '5 · Beitreten zuerst, Erstellen als «oder»' },
+];
+
+/** Third round of friend proposals. */
+export const FRIEND_EXTRA: readonly FriendLayout[] = [
+  'fr-roles',
+  'fr-smart',
+  'fr-dock',
+  'fr-stepper',
+  'fr-columns',
 ];
 
 /** Further friend proposals in their own component. */

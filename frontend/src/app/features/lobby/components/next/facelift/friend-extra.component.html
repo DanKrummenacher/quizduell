@@ -1,0 +1,217 @@
+<!-- The code as four boxes; one real field lies over them. -->
+<ng-template #codeBoxes let-large="large" let-inverse="inverse">
+  <div
+    class="code-boxes"
+    [class.is-large]="large"
+    [class.is-inverse]="inverse"
+    [class.has-error]="errorMessage()"
+  >
+    <label class="visually-hidden" for="friendCode">Code</label>
+    <input
+      id="friendCode"
+      class="code-field"
+      type="text"
+      autocomplete="off"
+      autocapitalize="characters"
+      spellcheck="false"
+      [attr.maxlength]="codeLength"
+      [attr.aria-invalid]="errorMessage() ? true : null"
+      [attr.aria-describedby]="errorMessage() ? 'friendCodeError' : null"
+      (input)="onCodeInput($event)"
+      (keydown)="onCodeKeydown($event)"
+      (focus)="focused.set(true)"
+      (blur)="focused.set(false)"
+    />
+    @for (slot of slots; track slot) {
+      <span
+        class="code-box"
+        [class.is-filled]="code().length > slot"
+        [class.is-active]="focused() && code().length === slot"
+        aria-hidden="true"
+        >{{ code()[slot] ?? '' }}</span
+      >
+    }
+  </div>
+  @if (errorMessage()) {
+    <p id="friendCodeError" class="code-error" role="alert">{{ errorMessage() }}</p>
+  }
+</ng-template>
+
+<ng-template #arrowButton>
+  <css-button
+    variant="primary"
+    ariaLabel="Beitreten"
+    class="square-button"
+    (click)="submitJoin()"
+  >
+    <css-icon icon="arrow-right-circle" slot="prefix"></css-icon>
+  </css-button>
+</ng-template>
+
+@switch (layout()) {
+  @case ('fr-roles') {
+    <!-- 11: two roles, shown with the players as on «Verbunden!». -->
+    <h2 class="section-title">Freund herausfordern</h2>
+    <button type="button" class="role-card" (click)="createGame.emit()">
+      <span class="pair" aria-hidden="true">
+        <span class="avatar">{{ initial() }}</span>
+        <span class="avatar is-open">?</span>
+      </span>
+      <span class="role-text">
+        <span class="role-title">Ich lade ein</span>
+        <span class="role-description"
+          >Du erstellst ein Spiel und bekommst einen Code</span
+        >
+      </span>
+      <css-icon class="role-arrow" icon="angle-right" aria-hidden="true"></css-icon>
+    </button>
+    <div class="role-card is-static">
+      <span class="pair" aria-hidden="true">
+        <span class="avatar is-friend"
+          ><css-icon icon="link" size="md"></css-icon
+        ></span>
+        <span class="avatar">{{ initial() }}</span>
+      </span>
+      <span class="role-text">
+        <span class="role-title">Ich wurde eingeladen</span>
+        <span class="role-description">Gib den Code deines Freundes ein</span>
+      </span>
+    </div>
+    <div class="role-join">
+      <ng-container *ngTemplateOutlet="codeBoxes" />
+      <ng-container *ngTemplateOutlet="arrowButton" />
+    </div>
+  }
+  @case ('fr-smart') {
+    <!-- 12: the code first; creating steps back as soon as you type. -->
+    <h2 class="section-title is-tight">Freund herausfordern</h2>
+    <p class="body-text">Gib den Code deines Freundes ein</p>
+    <div class="smart-code">
+      <ng-container *ngTemplateOutlet="codeBoxes; context: { large: true }" />
+    </div>
+    @if (hasCode()) {
+      <css-button variant="primary" class="compact" (click)="submitJoin()">
+        <css-icon icon="arrow-right-circle" slot="prefix"></css-icon>
+        Beitreten
+      </css-button>
+    } @else {
+      <button type="button" class="choice-card is-hint" (click)="createGame.emit()">
+        <span class="choice-block" aria-hidden="true">
+          <css-icon icon="add" size="lg"></css-icon>
+        </span>
+        <span class="choice-text">
+          <span class="choice-title">Noch keinen Code?</span>
+          <span class="choice-description"
+            >Erstelle ein Spiel und lade deinen Freund ein</span
+          >
+        </span>
+      </button>
+    }
+  }
+  @case ('fr-dock') {
+    <!-- 13: creating in the middle, joining docked at the bottom. -->
+    <h2 class="section-title">Freund herausfordern</h2>
+    <button type="button" class="big-card" (click)="createGame.emit()">
+      <span class="symbol" aria-hidden="true">
+        <css-icon icon="add" size="lg"></css-icon>
+      </span>
+      <span class="big-title">Spiel erstellen</span>
+      <span class="big-text"
+        >Du bekommst einen Code, den du deinem Freund schickst</span
+      >
+    </button>
+    <section class="dock" aria-labelledby="dockTitle">
+      <span id="dockTitle" class="dock-title">Code bekommen?</span>
+      <div class="dock-row">
+        <ng-container *ngTemplateOutlet="codeBoxes; context: { inverse: true }" />
+        <css-button
+          inverse
+          ariaLabel="Beitreten"
+          class="square-button"
+          (click)="submitJoin()"
+        >
+          <css-icon icon="arrow-right-circle" slot="prefix"></css-icon>
+        </css-button>
+      </div>
+    </section>
+  }
+  @case ('fr-stepper') {
+    <!-- 14: two steps with a small progress at the top. -->
+    <ol class="stepper" aria-label="Ablauf">
+      <li class="is-done">Wählen</li>
+      <li [class.is-done]="joinOpen()">Code</li>
+      <li>Spielen</li>
+    </ol>
+    @if (!joinOpen()) {
+      <h2 class="section-title">Freund herausfordern</h2>
+      <button type="button" class="choice-card" (click)="createGame.emit()">
+        <span class="choice-block" aria-hidden="true">
+          <css-icon icon="add" size="lg"></css-icon>
+        </span>
+        <span class="choice-text">
+          <span class="choice-title">Spiel erstellen</span>
+          <span class="choice-description"
+            >Du bekommst einen Code für deinen Freund</span
+          >
+        </span>
+      </button>
+      <button type="button" class="choice-card" (click)="joinOpen.set(true)">
+        <span class="choice-block" aria-hidden="true">
+          <css-icon icon="link" size="lg"></css-icon>
+        </span>
+        <span class="choice-text">
+          <span class="choice-title">Mit Code beitreten</span>
+          <span class="choice-description">Du hast einen Code bekommen</span>
+        </span>
+      </button>
+    } @else {
+      <div class="step">
+        <h2 class="section-title is-tight">Code eingeben</h2>
+        <p class="body-text">Den Code bekommst du von deinem Freund</p>
+        <div class="smart-code">
+          <ng-container *ngTemplateOutlet="codeBoxes; context: { large: true }" />
+        </div>
+        <div class="step-actions">
+          <css-button (click)="joinOpen.set(false)">
+            <css-icon icon="angle-left-circle" slot="prefix"></css-icon>
+            Zurück
+          </css-button>
+          <css-button variant="primary" (click)="submitJoin()">
+            <css-icon icon="arrow-right-circle" slot="prefix"></css-icon>
+            Beitreten
+          </css-button>
+        </div>
+      </div>
+    }
+  }
+  @case ('fr-columns') {
+    <!-- 15: two complete action cards, side by side on wide screens. -->
+    <h2 class="section-title">Freund herausfordern</h2>
+    <div class="columns">
+      <article class="action-card">
+        <span class="symbol" aria-hidden="true">
+          <css-icon icon="add" size="lg"></css-icon>
+        </span>
+        <h3 class="action-title">Neues Spiel</h3>
+        <p class="action-text">Du bekommst einen Code für deinen Freund</p>
+        <css-button
+          variant="primary"
+          class="action-button"
+          (click)="createGame.emit()"
+        >
+          Spiel erstellen
+        </css-button>
+      </article>
+      <article class="action-card">
+        <span class="symbol is-light" aria-hidden="true">
+          <css-icon icon="link" size="lg"></css-icon>
+        </span>
+        <h3 class="action-title">Spiel beitreten</h3>
+        <ng-container *ngTemplateOutlet="codeBoxes" />
+        <css-button class="action-button" (click)="submitJoin()"
+          >Beitreten</css-button
+        >
+      </article>
+    </div>
+  }
+}
