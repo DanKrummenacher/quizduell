@@ -1,0 +1,383 @@
+// TEMPORARY: the ring and the connected players merged into one element.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$track: #dfe3ea;
+$page: colors.$dt-color-pepper-bright;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+
+:host {
+  display: block;
+  overflow-x: clip;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+  margin: functions.rem(28) 0 functions.rem(8);
+}
+
+.body-text {
+  @include facelift.body-text;
+
+  strong {
+    color: $blue;
+  }
+}
+
+.visual {
+  display: grid;
+  place-items: center;
+  min-height: functions.rem(176);
+}
+
+// Where the search had its button.
+.start {
+  display: grid;
+  place-items: center;
+  min-height: functions.rem(40);
+  margin: clamp(#{functions.rem(40)}, 8vh, #{functions.rem(80)}) 0 0;
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+}
+
+// ---------------------------------------------------------------------------
+// Shared: avatars, ticks, number
+// ---------------------------------------------------------------------------
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: functions.rem(96);
+  height: functions.rem(96);
+  box-sizing: border-box;
+  border: functions.rem(4) solid $page;
+  border-radius: 50%;
+  background-color: $blue;
+  color: $white;
+  font-size: functions.rem(36);
+  font-weight: $bold;
+
+  &.is-opponent {
+    background-color: $opponent;
+  }
+
+  &.is-small {
+    width: functions.rem(60);
+    height: functions.rem(60);
+    border-width: functions.rem(3);
+    font-size: functions.rem(24);
+  }
+}
+
+.duo {
+  position: relative;
+  display: flex;
+
+  .is-left {
+    animation: meet-left 0.7s $spring both;
+  }
+
+  .is-right {
+    margin-left: functions.rem(-22);
+    animation: meet-right 0.7s $spring both;
+  }
+}
+
+.tick {
+  stroke: $track;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke 0.15s ease;
+
+  &.is-filled {
+    stroke: $blue;
+  }
+}
+
+.number {
+  font-size: functions.rem(56);
+  font-weight: $bold;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+  animation: rise 0.35s ease-out both;
+
+  &.is-go {
+    font-size: functions.rem(32);
+  }
+}
+
+.dial {
+  position: relative;
+  width: functions.rem(176);
+  height: functions.rem(176);
+  border-radius: 50%;
+  animation: pulse 1s ease-out infinite;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  &.is-small {
+    width: functions.rem(120);
+    height: functions.rem(120);
+
+    .number {
+      font-size: functions.rem(44);
+
+      &.is-go {
+        font-size: functions.rem(26);
+      }
+    }
+  }
+}
+
+.dial-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+// ---------------------------------------------------------------------------
+// V1 · The badge between the players counts down
+// ---------------------------------------------------------------------------
+.badge {
+  position: absolute;
+  bottom: functions.rem(-18);
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: functions.rem(52);
+  height: functions.rem(52);
+  margin-left: functions.rem(-26);
+  box-sizing: border-box;
+  border-radius: 50%;
+  background-color: $white;
+  box-shadow: 0 0 0 functions.rem(4) $page;
+  color: $blue;
+  animation: pop 0.35s 0.5s $spring both;
+
+  svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+
+  &.is-done {
+    background-color: $green;
+    color: $white;
+  }
+
+  css-icon {
+    display: block;
+  }
+}
+
+.badge-track,
+.badge-fill {
+  fill: none;
+  stroke-width: 4;
+}
+
+.badge-track {
+  stroke: $track;
+}
+
+.badge-fill {
+  stroke: $blue;
+  stroke-dasharray: 1;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.05s linear;
+}
+
+.badge-number {
+  font-size: functions.rem(22);
+  font-weight: $bold;
+  animation: rise 0.3s ease-out both;
+}
+
+// ---------------------------------------------------------------------------
+// V2 · The players sit on the ring
+// ---------------------------------------------------------------------------
+.on-left,
+.on-right {
+  position: absolute;
+  top: 50%;
+  margin-top: functions.rem(-30);
+}
+
+.on-left {
+  left: 7.5%;
+  margin-left: functions.rem(-30);
+  animation: meet-left 0.7s $spring both;
+}
+
+.on-right {
+  right: 7.5%;
+  margin-right: functions.rem(-30);
+  animation: meet-right 0.7s $spring both;
+}
+
+// ---------------------------------------------------------------------------
+// V3 · The ring between the players, connected by a line
+// ---------------------------------------------------------------------------
+.bridge {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: functions.rem(8);
+  width: 100%;
+  max-width: functions.rem(340);
+  padding-top: functions.rem(30);
+
+  // The line that connects both players through the ring, at the height
+  // of the avatar centres.
+  &::before {
+    content: '';
+    position: absolute;
+    top: functions.rem(59);
+    right: 15%;
+    left: 15%;
+    height: functions.rem(2);
+    background-color: $track;
+  }
+}
+
+.side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: functions.rem(8);
+  min-width: 0;
+
+  &.is-left {
+    animation: meet-left 0.7s $spring both;
+  }
+
+  &.is-right {
+    animation: meet-right 0.7s $spring both;
+  }
+}
+
+.side-name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: functions.rem(14);
+  font-weight: $bold;
+  color: $blue;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bridge .dial {
+  margin-top: functions.rem(-30);
+  background-color: $page;
+}
+
+// ---------------------------------------------------------------------------
+// V4 · A capsule-shaped ring around both players
+// ---------------------------------------------------------------------------
+.capsule {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: functions.rem(240);
+  height: functions.rem(140);
+  border-radius: functions.rem(70);
+  animation: pulse 1s ease-out infinite;
+
+  svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .avatar {
+    width: functions.rem(84);
+    height: functions.rem(84);
+    font-size: functions.rem(32);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Short phones (e.g. iPhone SE)
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .section-title {
+    margin-top: functions.rem(20);
+  }
+
+  .visual {
+    min-height: functions.rem(144);
+  }
+
+  .dial:not(.is-small) {
+    width: functions.rem(152);
+    height: functions.rem(152);
+  }
+
+  .start {
+    margin-top: functions.rem(28);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($opponent, 0.35);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(18) rgba($opponent, 0);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(functions.rem(10));
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes meet-left {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(-48));
+  }
+}
+
+@keyframes meet-right {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(48));
+  }
+}

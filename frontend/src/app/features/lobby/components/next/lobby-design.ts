@@ -31,33 +31,30 @@ export type MatchLayout =
   | 'ticket'
   | 'band'
   | 'flash'
-  | 'r-ring'
-  | 'r-meet'
-  | 'r-sequence'
-  | 'r-segments'
-  | 'r-avatar';
+  | 'c-orbit'
+  | 'c-capsule'
+  | 'c-badge'
+  | 'c-bridge';
 
 export const MATCH_LAYOUTS: DesignOption<MatchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
   { value: 'ring', label: 'M2 · Ring (Favorit)' },
   { value: 'meet', label: 'M8 · Verbunden (Favorit)' },
-  { value: 'r-ring', label: 'R1 · Ring, verfeinert' },
-  { value: 'r-meet', label: 'R2 · Verbunden, verfeinert' },
-  { value: 'r-sequence', label: 'R3 · Ring wird zu Verbunden' },
-  { value: 'r-segments', label: 'R4 · Verbunden mit 3 Segmenten' },
-  { value: 'r-avatar', label: 'R5 · Gegner im Ring' },
+  { value: 'c-badge', label: 'V1 · Verbunden, Countdown im Abzeichen' },
+  { value: 'c-orbit', label: 'V2 · Spieler auf dem Ring' },
+  { value: 'c-bridge', label: 'V3 · Ring zwischen den Spielern' },
+  { value: 'c-capsule', label: 'V4 · Kapsel-Ring um die Spieler' },
 ];
 
 /** Match proposals that use the whole screen. */
 export const FULLSCREEN_MATCH: readonly MatchLayout[] = ['stage', 'split', 'flash'];
 
-/** Refined proposals based on the favourites M2 and M8. */
-export const MATCH_REFINED: readonly MatchLayout[] = [
-  'r-ring',
-  'r-meet',
-  'r-sequence',
-  'r-segments',
-  'r-avatar',
+/** Combinations of the favourites: ring (M2) and connected players (M8). */
+export const MATCH_COMBOS: readonly MatchLayout[] = [
+  'c-orbit',
+  'c-capsule',
+  'c-badge',
+  'c-bridge',
 ];
 
 /** Further match proposals in their own component. */
