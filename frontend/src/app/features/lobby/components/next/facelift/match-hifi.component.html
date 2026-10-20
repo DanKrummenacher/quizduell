@@ -1,0 +1,95 @@
+@for (run of [round()]; track run) {
+  @switch (layout()) {
+    @case ('h-cards') {
+      <!-- H1: two player cards, the start clock where «vs» would be. -->
+      <section role="status">
+        <h2 class="section-title">Gegner gefunden!</h2>
+        <div class="pair">
+          <article class="player-card is-left">
+            <span class="avatar" aria-hidden="true">{{ myInitial() }}</span>
+            <span class="card-name">{{ playerName() }}</span>
+            <span class="card-label">Du</span>
+          </article>
+          <article class="player-card is-right">
+            <span class="avatar is-opponent" aria-hidden="true">{{
+              opponentInitial()
+            }}</span>
+            <span class="card-name">{{ opponentName() }}</span>
+            <span class="card-label">Gegner</span>
+          </article>
+          <span class="clock" aria-hidden="true">
+            <svg viewBox="0 0 56 56">
+              <circle class="clock-track" cx="28" cy="28" r="24" />
+              <circle
+                class="clock-fill"
+                cx="28"
+                cy="28"
+                r="24"
+                pathLength="1"
+                [attr.stroke-dashoffset]="1 - left()"
+              />
+            </svg>
+            @for (second of [seconds()]; track second) {
+              <span class="clock-number">{{ second > 0 ? second : 'Los' }}</span>
+            }
+          </span>
+        </div>
+        <p class="start">
+          @if (seconds() > 0) {
+            Das Duell beginnt in {{ seconds() }}&nbsp;s
+          } @else {
+            Los geht’s!
+          }
+        </p>
+      </section>
+    }
+    @case ('h-profile') {
+      <!-- H3: the card of the opponent, ready to play. -->
+      <section role="status">
+        <h2 class="section-title">Gegner gefunden!</h2>
+        <article class="profile">
+          <span class="avatar is-opponent is-large" aria-hidden="true">{{
+            opponentInitial()
+          }}</span>
+          <span class="profile-name">{{ opponentName() }}</span>
+          <span class="ready">
+            <css-icon icon="checkmark" size="sm" aria-hidden="true"></css-icon>
+            Bereit
+          </span>
+          <span class="profile-bar" aria-hidden="true">
+            <i [style.transform]="'scaleX(' + left() + ')'"></i>
+          </span>
+        </article>
+        <p class="start">
+          @if (seconds() > 0) {
+            Das Duell beginnt in {{ seconds() }}&nbsp;s
+          } @else {
+            Los geht’s!
+          }
+        </p>
+      </section>
+    }
+    @default {
+      <!-- H2 and H4: the players meet, then the name of the opponent. -->
+      <section class="focus" [class.is-dark]="layout() === 'h-dark'" role="status">
+        <div class="duo" aria-hidden="true">
+          <span class="avatar is-left">{{ myInitial() }}</span>
+          <span class="avatar is-right is-opponent">{{ opponentInitial() }}</span>
+          <span class="badge"><css-icon icon="checkmark" size="sm"></css-icon></span>
+        </div>
+        <span class="eyebrow">Gegner gefunden</span>
+        <h2 class="focus-name">{{ opponentName() }}</h2>
+        <span class="line" aria-hidden="true">
+          <i [style.transform]="'scaleX(' + left() + ')'"></i>
+        </span>
+        <p class="focus-start">
+          @if (seconds() > 0) {
+            Start in {{ seconds() }}&nbsp;s
+          } @else {
+            Los geht’s!
+          }
+        </p>
+      </section>
+    }
+  }
+}

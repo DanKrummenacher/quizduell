@@ -9,14 +9,14 @@ import {
   signal,
 } from '@angular/core';
 import '@css-ch/components/icon';
-import { MATCH_MORE, MATCH_COMBOS, type MatchLayout } from '../lobby-design';
-import { MatchComboComponent } from './match-combo.component';
+import { MATCH_MORE, MATCH_HIFI, type MatchLayout } from '../lobby-design';
+import { MatchHifiComponent } from './match-hifi.component';
 import { MatchMoreComponent } from './match-more.component';
 import { MatchIdeasComponent } from './match-ideas.component';
 
 @Component({
   selector: 'app-facelift-match-found',
-  imports: [MatchIdeasComponent, MatchMoreComponent, MatchComboComponent],
+  imports: [MatchIdeasComponent, MatchMoreComponent, MatchHifiComponent],
   host: { '[class.is-proposal]': "layout() !== 'facelift'" },
   templateUrl: './facelift-match-found.component.html',
   styleUrl: './facelift-match-found.component.scss',
@@ -26,7 +26,7 @@ export class FaceliftMatchFoundComponent implements OnInit {
   // TEMPORARY: proposals for this screen.
   readonly layout = input<MatchLayout>('facelift');
   readonly playerName = input('');
-  protected readonly isCombo = computed(() => MATCH_COMBOS.includes(this.layout()));
+  protected readonly isHifi = computed(() => MATCH_HIFI.includes(this.layout()));
   protected readonly isMore = computed(() => MATCH_MORE.includes(this.layout()));
   readonly opponentName = input.required<string>();
   readonly durationMs = input<number>(3000);

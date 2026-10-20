@@ -1,0 +1,410 @@
+// TEMPORARY: high-fidelity proposals for «Gegner gefunden».
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$track: #dfe3ea;
+$page: colors.$dt-color-pepper-bright;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+
+:host {
+  display: block;
+  overflow-x: clip;
+  text-align: center;
+}
+
+:host(.h-dark) {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-title {
+  @include facelift.section-title;
+}
+
+.start {
+  margin: functions.rem(32) 0 0;
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: functions.rem(64);
+  height: functions.rem(64);
+  box-sizing: border-box;
+  border-radius: 50%;
+  background-color: $blue;
+  color: $white;
+  font-size: functions.rem(26);
+  font-weight: $bold;
+
+  &.is-opponent {
+    background-color: $opponent;
+  }
+
+  &.is-large {
+    width: functions.rem(88);
+    height: functions.rem(88);
+    font-size: functions.rem(34);
+    animation: pop 0.45s $spring both;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// H1 · Two player cards with the start clock between them
+// ---------------------------------------------------------------------------
+.pair {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: functions.rem(8);
+}
+
+.player-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: functions.rem(4);
+  min-width: 0;
+  padding: functions.rem(24) functions.rem(12) functions.rem(20);
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: $white;
+
+  .avatar {
+    margin-bottom: functions.rem(12);
+  }
+
+  &.is-left {
+    animation: from-left 0.6s $spring both;
+  }
+
+  &.is-right {
+    order: 3;
+    animation: from-right 0.6s $spring both;
+  }
+}
+
+// Long names wrap onto a second line instead of being cut.
+.card-name {
+  display: -webkit-box;
+  max-width: 100%;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: functions.rem(17);
+  font-weight: $bold;
+  line-height: 1.25;
+  color: $blue;
+  overflow-wrap: anywhere;
+}
+
+.card-label {
+  font-size: functions.rem(13);
+  color: facelift.$muted;
+}
+
+// The clock sits between the cards, at the height of the avatars.
+.clock {
+  position: relative;
+  order: 2;
+  display: grid;
+  place-items: center;
+  width: functions.rem(52);
+  height: functions.rem(52);
+  margin-top: functions.rem(30);
+  border-radius: 50%;
+  background-color: $white;
+  animation: pop 0.4s 0.4s $spring both;
+
+  svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+}
+
+.clock-track,
+.clock-fill {
+  fill: none;
+  stroke-width: 4;
+}
+
+.clock-track {
+  stroke: $track;
+}
+
+.clock-fill {
+  stroke: $blue;
+  stroke-dasharray: 1;
+  stroke-linecap: round;
+}
+
+.clock-number {
+  font-size: functions.rem(20);
+  font-weight: $bold;
+  color: $blue;
+  animation: rise 0.3s ease-out both;
+}
+
+// ---------------------------------------------------------------------------
+// H2 / H4 · The players meet, the opponent's name is the headline
+// ---------------------------------------------------------------------------
+.focus {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.duo {
+  position: relative;
+  display: flex;
+
+  .avatar {
+    width: functions.rem(88);
+    height: functions.rem(88);
+    border: functions.rem(4) solid $page;
+    font-size: functions.rem(34);
+  }
+
+  .is-left {
+    animation: from-left 0.7s $spring both;
+  }
+
+  .is-right {
+    margin-left: functions.rem(-20);
+    animation: from-right 0.7s $spring both;
+  }
+}
+
+.badge {
+  position: absolute;
+  bottom: functions.rem(-6);
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: functions.rem(32);
+  height: functions.rem(32);
+  margin-left: functions.rem(-16);
+  box-sizing: border-box;
+  border: functions.rem(3) solid $page;
+  border-radius: 50%;
+  background-color: $green;
+  color: $white;
+  animation: pop 0.35s 0.55s $spring both;
+
+  css-icon {
+    display: block;
+  }
+}
+
+.eyebrow {
+  margin-top: functions.rem(32);
+  font-size: functions.rem(13);
+  font-weight: $bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $opponent;
+  animation: rise 0.4s 0.3s ease-out both;
+}
+
+.focus-name {
+  max-width: 100%;
+  margin: functions.rem(8) 0 0;
+  overflow: hidden;
+  font-size: functions.rem(32);
+  font-weight: $bold;
+  line-height: 1.15;
+  color: $blue;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  animation: rise 0.4s 0.4s ease-out both;
+}
+
+// A thin line that runs down until the start.
+.line {
+  display: block;
+  width: functions.rem(160);
+  height: functions.rem(4);
+  margin-top: functions.rem(40);
+  overflow: hidden;
+  border-radius: functions.rem(2);
+  background-color: $track;
+
+  i {
+    display: block;
+    height: 100%;
+    background-color: $blue;
+    transform-origin: left;
+  }
+}
+
+.focus-start {
+  margin: functions.rem(12) 0 0;
+  font-size: functions.rem(14);
+  font-variant-numeric: tabular-nums;
+  color: facelift.$muted;
+}
+
+// H4: the same on dark blue, over the whole screen.
+.focus.is-dark {
+  flex-grow: 1;
+  justify-content: center;
+  padding: functions.rem(32) functions.rem(20) functions.rem(64);
+  background-color: $blue;
+
+  .avatar,
+  .badge {
+    border-color: $blue;
+  }
+
+  .avatar.is-left {
+    background-color: $white;
+    color: $blue;
+  }
+
+  .focus-name {
+    color: $white;
+  }
+
+  .line {
+    background-color: rgba(255, 255, 255, 0.2);
+
+    i {
+      background-color: $opponent;
+    }
+  }
+
+  .focus-start {
+    color: rgba(255, 255, 255, 0.75);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// H3 · The opponent's card
+// ---------------------------------------------------------------------------
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: functions.rem(8);
+  max-width: functions.rem(320);
+  margin: 0 auto;
+  padding-top: functions.rem(32);
+  overflow: hidden;
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: $white;
+  animation: rise 0.45s ease-out both;
+
+  .avatar {
+    margin-bottom: functions.rem(8);
+  }
+}
+
+.profile-name {
+  max-width: 100%;
+  padding: 0 functions.rem(16);
+  overflow: hidden;
+  box-sizing: border-box;
+  font-size: functions.rem(24);
+  font-weight: $bold;
+  color: $blue;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ready {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(4);
+  padding: functions.rem(2) functions.rem(12) functions.rem(2) functions.rem(8);
+  border-radius: functions.rem(999);
+  background-color: $green;
+  color: $white;
+  font-size: functions.rem(13);
+  font-weight: $bold;
+  animation: pop 0.35s 0.45s $spring both;
+
+  css-icon {
+    display: block;
+  }
+}
+
+.profile-bar {
+  align-self: stretch;
+  height: functions.rem(6);
+  margin-top: functions.rem(28);
+  background-color: $track;
+
+  i {
+    display: block;
+    height: 100%;
+    background-color: $blue;
+    transform-origin: left;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Short phones (e.g. iPhone SE)
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .section-title {
+    margin-bottom: functions.rem(24);
+  }
+
+  .focus-name {
+    font-size: functions.rem(28);
+  }
+
+  .line {
+    margin-top: functions.rem(32);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(functions.rem(10));
+  }
+}
+
+@keyframes from-left {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(-40));
+  }
+}
+
+@keyframes from-right {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(40));
+  }
+}

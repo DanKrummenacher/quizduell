@@ -31,30 +31,35 @@ export type MatchLayout =
   | 'ticket'
   | 'band'
   | 'flash'
-  | 'c-orbit'
-  | 'c-capsule'
-  | 'c-badge'
-  | 'c-bridge';
+  | 'h-cards'
+  | 'h-focus'
+  | 'h-profile'
+  | 'h-dark';
 
 export const MATCH_LAYOUTS: DesignOption<MatchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
   { value: 'ring', label: 'M2 · Ring (Favorit)' },
   { value: 'meet', label: 'M8 · Verbunden (Favorit)' },
-  { value: 'c-badge', label: 'V1 · Verbunden, Countdown im Abzeichen' },
-  { value: 'c-orbit', label: 'V2 · Spieler auf dem Ring' },
-  { value: 'c-bridge', label: 'V3 · Ring zwischen den Spielern' },
-  { value: 'c-capsule', label: 'V4 · Kapsel-Ring um die Spieler' },
+  { value: 'h-cards', label: 'H1 · Spielerkarten mit Start-Uhr' },
+  { value: 'h-focus', label: 'H2 · Gegner im Fokus' },
+  { value: 'h-profile', label: 'H3 · Karte des Gegners' },
+  { value: 'h-dark', label: 'H4 · Gegner im Fokus, dunkel (Vollbild)' },
 ];
 
 /** Match proposals that use the whole screen. */
-export const FULLSCREEN_MATCH: readonly MatchLayout[] = ['stage', 'split', 'flash'];
+export const FULLSCREEN_MATCH: readonly MatchLayout[] = [
+  'stage',
+  'split',
+  'flash',
+  'h-dark',
+];
 
-/** Combinations of the favourites: ring (M2) and connected players (M8). */
-export const MATCH_COMBOS: readonly MatchLayout[] = [
-  'c-orbit',
-  'c-capsule',
-  'c-badge',
-  'c-bridge',
+/** High-fidelity proposals: clear hierarchy, cards and one calm motion. */
+export const MATCH_HIFI: readonly MatchLayout[] = [
+  'h-cards',
+  'h-focus',
+  'h-profile',
+  'h-dark',
 ];
 
 /** Further match proposals in their own component. */
