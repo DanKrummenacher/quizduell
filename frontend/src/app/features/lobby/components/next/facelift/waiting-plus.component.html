@@ -1,0 +1,188 @@
+<!-- The boxes of «Code eingeben», filled with your code. -->
+<ng-template #codeBoxes let-large="large">
+  <div
+    class="code-boxes"
+    [class.is-large]="large"
+    role="text"
+    [attr.aria-label]="'Code ' + roomCode()"
+  >
+    @for (char of chars(); track $index) {
+      <span class="code-box" [style.--i]="$index" aria-hidden="true"
+        ><span class="char">{{ char }}</span></span
+      >
+    }
+  </div>
+</ng-template>
+
+<!-- Waiting, with the pulse of the search. -->
+<ng-template #status>
+  <p class="status" role="status">
+    <span class="pulse" aria-hidden="true"></span>
+    Warte auf deinen Freund&nbsp;…
+  </p>
+</ng-template>
+
+<ng-template #copyLabel>
+  <css-icon
+    [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
+    slot="prefix"
+  ></css-icon>
+  {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
+</ng-template>
+
+@switch (layout()) {
+  @case ('x-share') {
+    <!-- X2: as X1, with copy and share side by side. -->
+    <h2 class="section-title">Spiel erstellt</h2>
+    <h3 class="code-title">Dein Code</h3>
+    <p class="code-text">Gib ihn deinem Freund</p>
+    <ng-container *ngTemplateOutlet="codeBoxes" />
+    <ng-container *ngTemplateOutlet="status" />
+    <div class="two-buttons" [class.is-single]="!canShare">
+      <css-button [class.is-copied]="isCopied()" (click)="copyCode()">
+        <ng-container *ngTemplateOutlet="copyLabel" />
+      </css-button>
+      @if (canShare) {
+        <css-button variant="primary" (click)="shareCode()">
+          <css-icon icon="share" slot="prefix"></css-icon>
+          Teilen
+        </css-button>
+      }
+    </div>
+  }
+  @case ('x-story') {
+    <!-- X4: your seat taken, your friend's still open, then the code. -->
+    <div class="duo" aria-hidden="true">
+      <span class="avatar">{{ initial() }}</span>
+      <span class="avatar is-open">?</span>
+    </div>
+    <h2 class="section-title is-tight">Spiel erstellt</h2>
+    <p class="code-text">Dein Freund braucht diesen Code</p>
+    <ng-container *ngTemplateOutlet="codeBoxes" />
+    <ng-container *ngTemplateOutlet="status" />
+    <css-button class="compact" [class.is-copied]="isCopied()" (click)="copyCode()">
+      <ng-container *ngTemplateOutlet="copyLabel" />
+    </css-button>
+  }
+  @case ('x-card') {
+    <!-- X5: the code as a card of the mode screen; a tap copies it. -->
+    <h2 class="section-title">Spiel erstellt</h2>
+    <button
+      type="button"
+      class="choice-card"
+      [class.is-copied]="isCopied()"
+      [attr.aria-label]="'Code ' + roomCode() + ' kopieren'"
+      (click)="copyCode()"
+    >
+      <span class="choice-block" aria-hidden="true">
+        <css-icon
+          [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
+          size="lg"
+        ></css-icon>
+      </span>
+      <span class="choice-text">
+        <span class="card-label">{{
+          isCopied() ? 'Kopiert!' : 'Dein Code · Tippen zum Kopieren'
+        }}</span>
+        <span class="card-code">{{ roomCode() }}</span>
+      </span>
+    </button>
+    <ng-container *ngTemplateOutlet="status" />
+    @if (canShare) {
+      <css-button variant="primary" class="compact" (click)="shareCode()">
+        <css-icon icon="share" slot="prefix"></css-icon>
+        Code teilen
+      </css-button>
+    }
+  }
+  @case ('x-big') {
+    <!-- X6: only the code, large; one action. -->
+    <h2 class="section-title is-tight">Spiel erstellt</h2>
+    <p class="code-text">Gib deinem Freund diesen Code</p>
+    <ng-container *ngTemplateOutlet="codeBoxes; context: { large: true }" />
+    <ng-container *ngTemplateOutlet="status" />
+    @if (canShare) {
+      <css-button variant="primary" class="compact" (click)="shareCode()">
+        <css-icon icon="share" slot="prefix"></css-icon>
+        Code teilen
+      </css-button>
+    } @else {
+      <css-button variant="primary" class="compact" (click)="copyCode()">
+        <ng-container *ngTemplateOutlet="copyLabel" />
+      </css-button>
+    }
+  }
+  @case ('x-tap') {
+    <!-- X7: tapping the code copies it; sharing is the one action. -->
+    <h2 class="section-title">Spiel erstellt</h2>
+    <h3 class="code-title">Dein Code</h3>
+    <p class="code-text">Tippe auf den Code, um ihn zu kopieren</p>
+    <button
+      type="button"
+      class="tap-code"
+      [class.is-copied]="isCopied()"
+      [attr.aria-label]="'Code ' + roomCode() + ' kopieren'"
+      (click)="copyCode()"
+    >
+      <ng-container *ngTemplateOutlet="codeBoxes" />
+    </button>
+    <p class="status" [class.is-ok]="isCopied()" role="status">
+      @if (isCopied()) {
+        <css-icon icon="checked-circle" size="sm" aria-hidden="true"></css-icon>
+        Kopiert! Jetzt deinem Freund schicken
+      } @else {
+        <span class="pulse" aria-hidden="true"></span>
+        Warte auf deinen Freund&nbsp;…
+      }
+    </p>
+    @if (canShare) {
+      <css-button variant="primary" class="compact" (click)="shareCode()">
+        <css-icon icon="share" slot="prefix"></css-icon>
+        Code teilen
+      </css-button>
+    }
+  }
+  @case ('x-dark') {
+    <!-- X8: the code on a dark area, the strongest moment of the page. -->
+    <h2 class="section-title">Spiel erstellt</h2>
+    <section class="dark" aria-labelledby="darkTitle">
+      <h3 id="darkTitle" class="dark-title">Dein Code</h3>
+      <div class="dark-code"><ng-container *ngTemplateOutlet="codeBoxes" /></div>
+      <css-button
+        inverse
+        class="compact is-in-dark"
+        [class.is-copied]="isCopied()"
+        (click)="copyCode()"
+      >
+        <ng-container *ngTemplateOutlet="copyLabel" />
+      </css-button>
+    </section>
+    <ng-container *ngTemplateOutlet="status" />
+  }
+  @case ('x-time') {
+    <!-- X9: X1, the waiting time counts as on the search. -->
+    <h2 class="section-title">Spiel erstellt</h2>
+    <h3 class="code-title">Dein Code</h3>
+    <p class="code-text">Gib ihn deinem Freund</p>
+    <ng-container *ngTemplateOutlet="codeBoxes" />
+    <p class="status" role="status">
+      <span class="pulse" aria-hidden="true"></span>
+      Warte auf deinen Freund
+      <span class="time">{{ elapsed() }}</span>
+    </p>
+    <css-button class="compact" [class.is-copied]="isCopied()" (click)="copyCode()">
+      <ng-container *ngTemplateOutlet="copyLabel" />
+    </css-button>
+  }
+  @default {
+    <!-- X1 / X3: the mirror of «Code eingeben»; X3 lets a light run through. -->
+    <h2 class="section-title">Spiel erstellt</h2>
+    <h3 class="code-title">Dein Code</h3>
+    <p class="code-text">Gib ihn deinem Freund</p>
+    <ng-container *ngTemplateOutlet="codeBoxes" />
+    <ng-container *ngTemplateOutlet="status" />
+    <css-button class="compact" [class.is-copied]="isCopied()" (click)="copyCode()">
+      <ng-container *ngTemplateOutlet="copyLabel" />
+    </css-button>
+  }
+}

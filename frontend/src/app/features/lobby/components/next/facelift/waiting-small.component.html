@@ -1,0 +1,35 @@
+<h2 class="section-title">Spiel erstellt</h2>
+<p class="body-text">Gib deinem Freund diesen Code</p>
+
+<div class="code-box">
+  <span class="code-text">{{ roomCode() }}</span>
+</div>
+
+@if (layout() === 's-share' && canShare) {
+  <div class="buttons">
+    <css-button variant="primary" (click)="shareCode()">
+      <css-icon icon="share" slot="prefix"></css-icon>
+      Teilen
+    </css-button>
+    <css-button [class.is-copied]="isCopied()" (click)="copyCode()">
+      <css-icon
+        [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
+        slot="prefix"
+      ></css-icon>
+      {{ isCopied() ? 'Kopiert' : 'Kopieren' }}
+    </css-button>
+  </div>
+} @else {
+  <css-button class="compact" [class.is-copied]="isCopied()" (click)="copyCode()">
+    <css-icon
+      [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
+      slot="prefix"
+    ></css-icon>
+    {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
+  </css-button>
+}
+
+<p class="waiting" role="status">
+  <span class="pulse" aria-hidden="true"></span>
+  Warte auf deinen Freund&nbsp;…
+</p>

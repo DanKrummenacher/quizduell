@@ -1,0 +1,413 @@
+// TEMPORARY: «Spiel erstellt» as the counterpart of «Code eingeben».
+// Same 4/8 grid: title → text 4, text → code 16, code → status 12,
+// status → action 24.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$track: #dfe3ea;
+$page: colors.$dt-color-pepper-bright;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+
+:host {
+  --gap-code: #{functions.rem(16)};
+  --gap-status: #{functions.rem(12)};
+  --gap-action: #{functions.rem(24)};
+
+  display: block;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+
+  &.is-tight {
+    margin: functions.rem(24) 0 functions.rem(4);
+  }
+}
+
+// The same title and text as «Code eingeben».
+.code-title {
+  margin: 0;
+  font-size: functions.rem(18);
+  font-weight: $bold;
+  line-height: 1.3;
+  color: $blue;
+}
+
+.code-text {
+  margin: functions.rem(4) 0 0;
+  font-size: functions.rem(14);
+  line-height: 1.4;
+  color: facelift.$muted;
+}
+
+// ---------------------------------------------------------------------------
+// The boxes of «Code eingeben», filled; the characters roll in one by one
+// ---------------------------------------------------------------------------
+.code-boxes {
+  display: grid;
+  grid-template-columns: repeat(4, functions.rem(60));
+  justify-content: center;
+  gap: functions.rem(12);
+  margin-top: var(--gap-code);
+
+  &.is-large {
+    grid-template-columns: repeat(4, functions.rem(68));
+
+    .code-box {
+      height: functions.rem(80);
+      font-size: functions.rem(36);
+    }
+  }
+}
+
+.code-box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: functions.rem(68);
+  overflow: hidden;
+  border: functions.rem(1) solid $blue;
+  border-radius: functions.rem(4);
+  background-color: $white;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  color: $blue;
+
+  // X3: a soft light runs through the boxes while you wait.
+  :host(.x-shimmer) &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      rgba($opponent, 0) 30%,
+      rgba($opponent, 0.18) 50%,
+      rgba($opponent, 0) 70%
+    );
+    transform: translateX(-100%);
+    animation: shimmer 2.4s ease-in-out infinite;
+    animation-delay: calc(0.6s + var(--i) * 120ms);
+  }
+}
+
+.char {
+  display: block;
+  animation: roll-in 0.35s $spring both;
+  animation-delay: calc(var(--i) * 90ms);
+}
+
+// Waiting: a pulsing dot, as the ring of the search.
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(10);
+  min-height: functions.rem(20);
+  margin: var(--gap-status) 0 0;
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+.pulse {
+  width: functions.rem(8);
+  height: functions.rem(8);
+  border-radius: 50%;
+  background-color: $opponent;
+  animation: ping 1.6s ease-out infinite;
+}
+
+// One action: compact, in the middle.
+.compact {
+  display: block;
+  width: fit-content;
+  margin: var(--gap-action) auto 0;
+}
+
+css-button.is-copied {
+  color: $green;
+}
+
+// Two actions: side by side, the width of the content.
+.two-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: functions.rem(12);
+  margin-top: var(--gap-action);
+
+  &.is-single {
+    grid-template-columns: auto;
+    justify-content: center;
+  }
+
+  css-button {
+    display: block;
+    width: 100%;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// X4 · Your seat taken, your friend's still open
+// ---------------------------------------------------------------------------
+.duo {
+  display: flex;
+  justify-content: center;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: functions.rem(72);
+  height: functions.rem(72);
+  box-sizing: border-box;
+  border: functions.rem(4) solid $page;
+  border-radius: 50%;
+  background-color: $blue;
+  color: $white;
+  font-size: functions.rem(28);
+  font-weight: $bold;
+
+  &.is-open {
+    margin-left: functions.rem(-18);
+    border: functions.rem(3) dashed $opponent;
+    background-color: $page;
+    color: $opponent;
+    animation: breathe 2s ease-in-out infinite;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// X5 · The code as a card of the mode screen
+// ---------------------------------------------------------------------------
+.choice-card {
+  @include facelift.choice-card;
+
+  .choice-block {
+    transition: background-color 0.25s ease;
+  }
+
+  &.is-copied .choice-block {
+    background-color: $green;
+  }
+}
+
+.card-label {
+  display: block;
+  font-size: functions.rem(13);
+  color: facelift.$muted;
+
+  .is-copied & {
+    font-weight: $bold;
+    color: $green;
+  }
+}
+
+.card-code {
+  display: block;
+  margin-top: functions.rem(2);
+  font-size: functions.rem(32);
+  font-weight: $bold;
+  letter-spacing: 0.16em;
+  color: $blue;
+}
+
+:host(.x-card) .status {
+  margin-top: functions.rem(20);
+}
+
+// ---------------------------------------------------------------------------
+// X7 · Tapping the code copies it
+// ---------------------------------------------------------------------------
+.tap-code {
+  display: block;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: functions.rem(2) solid $opponent;
+    outline-offset: functions.rem(4);
+    border-radius: functions.rem(4);
+  }
+
+  .code-box {
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  &:hover .code-box {
+    background-color: rgba($opponent, 0.06);
+  }
+
+  &.is-copied .code-box {
+    border-color: $green;
+    background-color: rgba($green, 0.06);
+  }
+}
+
+.status.is-ok {
+  font-weight: $bold;
+  color: $green;
+
+  css-icon {
+    display: block;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// X8 · The code on a dark area
+// ---------------------------------------------------------------------------
+.dark {
+  padding: functions.rem(20) functions.rem(16) functions.rem(20);
+  border-radius: functions.rem(8);
+  background-color: $blue;
+}
+
+.dark-title {
+  margin: 0;
+  font-size: functions.rem(18);
+  font-weight: $bold;
+  color: $white;
+}
+
+.dark-code .code-boxes {
+  margin-top: functions.rem(16);
+}
+
+.compact.is-in-dark {
+  margin-top: functions.rem(16);
+}
+
+:host(.x-dark) .status {
+  margin-top: functions.rem(16);
+}
+
+// ---------------------------------------------------------------------------
+// X9 · The waiting time
+// ---------------------------------------------------------------------------
+.time {
+  min-width: functions.rem(32);
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+  text-align: left;
+}
+
+// Two actions side by side only where both fit.
+@media (max-width: 389px) {
+  .two-buttons {
+    grid-template-columns: 1fr;
+    width: calc(100% - #{functions.rem(48)});
+    margin-inline: auto;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Smaller screens: the same rhythm, a step tighter
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  :host {
+    --gap-code: #{functions.rem(12)};
+    --gap-status: #{functions.rem(8)};
+    --gap-action: #{functions.rem(16)};
+  }
+
+  .section-title {
+    margin-bottom: functions.rem(16);
+  }
+
+  .code-box {
+    height: functions.rem(60);
+    font-size: functions.rem(26);
+  }
+
+  .code-boxes.is-large .code-box {
+    height: functions.rem(68);
+    font-size: functions.rem(30);
+  }
+
+  .avatar {
+    width: functions.rem(60);
+    height: functions.rem(60);
+    font-size: functions.rem(24);
+  }
+
+  .section-title.is-tight {
+    margin-top: functions.rem(16);
+  }
+}
+
+@media (max-height: 600px) {
+  .code-box {
+    height: functions.rem(52);
+  }
+
+  .code-boxes.is-large .code-box {
+    height: functions.rem(60);
+  }
+}
+
+@media (max-width: 359px) {
+  .code-boxes,
+  .code-boxes.is-large {
+    grid-template-columns: repeat(4, functions.rem(54));
+    gap: functions.rem(8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .char,
+  .pulse,
+  .avatar.is-open,
+  .code-box::after {
+    animation: none;
+  }
+}
+
+@keyframes roll-in {
+  from {
+    opacity: 0;
+    transform: translateY(70%);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba($opponent, 0.5);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(7) rgba($opponent, 0);
+  }
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(0.94);
+    opacity: 0.7;
+  }
+}
