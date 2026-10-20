@@ -45,10 +45,22 @@ export type MatchLayout =
   | 'y-join'
   | 'y-depth'
   | 'y-dark'
-  | 'y-heartbeat';
+  | 'y-heartbeat'
+  | 'z-num-below'
+  | 'z-num-under'
+  | 'z-ring-under'
+  | 'z-behind'
+  | 'z-halves'
+  | 'z-join';
 
 export const MATCH_LAYOUTS: DesignOption<MatchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
+  { value: 'z-num-below', label: 'Z1 · Zahl ganz unten' },
+  { value: 'z-num-under', label: 'Z2 · Zahl unter den Profilen' },
+  { value: 'z-ring-under', label: 'Z3 · Kleiner Ring unter den Profilen' },
+  { value: 'z-behind', label: 'Z4 · Zahl dahinter (Y3 ohne Zeile)' },
+  { value: 'z-halves', label: 'Z5 · Ringhälften (Y1 ohne Zeile)' },
+  { value: 'z-join', label: 'Z6 · Gegner kommt dazu (Y2 ohne Zeile)' },
   { value: 'y-halves', label: 'Y1 · Zwei Ringhälften schliessen sich' },
   { value: 'y-join', label: 'Y2 · Dein Ring, der Gegner kommt dazu' },
   { value: 'y-depth', label: 'Y3 · Grosse Zahl hinter den Spielern' },
@@ -74,6 +86,16 @@ export const FULLSCREEN_MATCH: readonly MatchLayout[] = [
   'split',
   'flash',
   'y-dark',
+];
+
+/** Proposals with exactly one countdown (no extra line below). */
+export const MATCH_CLEAN: readonly MatchLayout[] = [
+  'z-num-below',
+  'z-num-under',
+  'z-ring-under',
+  'z-behind',
+  'z-halves',
+  'z-join',
 ];
 
 /** Further combinations: a story or depth behind each one. */

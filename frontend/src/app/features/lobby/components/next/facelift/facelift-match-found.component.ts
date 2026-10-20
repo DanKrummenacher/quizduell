@@ -11,12 +11,14 @@ import {
 import '@css-ch/components/icon';
 import {
   MATCH_BLEND,
+  MATCH_CLEAN,
   MATCH_DUEL,
   MATCH_EVOLVED,
   MATCH_MORE,
   type MatchLayout,
 } from '../lobby-design';
 import { MatchBlendComponent } from './match-blend.component';
+import { MatchCleanComponent } from './match-clean.component';
 import { MatchDuelComponent } from './match-duel.component';
 import { MatchEvolvedComponent } from './match-evolved.component';
 import { MatchMoreComponent } from './match-more.component';
@@ -30,6 +32,7 @@ import { MatchIdeasComponent } from './match-ideas.component';
     MatchEvolvedComponent,
     MatchBlendComponent,
     MatchDuelComponent,
+    MatchCleanComponent,
   ],
   host: { '[class.is-proposal]': "layout() !== 'facelift'" },
   templateUrl: './facelift-match-found.component.html',
@@ -40,6 +43,7 @@ export class FaceliftMatchFoundComponent implements OnInit {
   // TEMPORARY: proposals for this screen.
   readonly layout = input<MatchLayout>('facelift');
   readonly playerName = input('');
+  protected readonly isClean = computed(() => MATCH_CLEAN.includes(this.layout()));
   protected readonly isDuel = computed(() => MATCH_DUEL.includes(this.layout()));
   protected readonly isBlend = computed(() => MATCH_BLEND.includes(this.layout()));
   protected readonly isEvolved = computed(() =>
