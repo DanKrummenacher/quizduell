@@ -16,11 +16,11 @@ import {
 import {
   FRIEND_EXTRA,
   FRIEND_MORE,
-  FRIEND_LIB,
+  FRIEND_LIVE,
   type FriendLayout,
 } from '../lobby-design';
 import { FriendExtraComponent } from './friend-extra.component';
-import { FriendLibComponent } from './friend-lib.component';
+import { FriendLiveComponent } from './friend-live.component';
 import { FriendIdeasComponent } from './friend-ideas.component';
 import { FriendMoreComponent } from './friend-more.component';
 
@@ -30,7 +30,7 @@ import { FriendMoreComponent } from './friend-more.component';
     FriendIdeasComponent,
     FriendMoreComponent,
     FriendExtraComponent,
-    FriendLibComponent,
+    FriendLiveComponent,
   ],
   templateUrl: './facelift-actions.component.html',
   styleUrl: './facelift-actions.component.scss',
@@ -40,7 +40,7 @@ export class FaceliftActionsComponent {
   // TEMPORARY: proposals for this screen.
   readonly layout = input<FriendLayout>('facelift');
   readonly playerName = input('');
-  protected readonly isLib = computed(() => FRIEND_LIB.includes(this.layout()));
+  protected readonly isLive = computed(() => FRIEND_LIVE.includes(this.layout()));
   protected readonly isExtra = computed(() => FRIEND_EXTRA.includes(this.layout()));
   readonly joinError = input<string>('');
   protected readonly isMore = computed(() => FRIEND_MORE.includes(this.layout()));

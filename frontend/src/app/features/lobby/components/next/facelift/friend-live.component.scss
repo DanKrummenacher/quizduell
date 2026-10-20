@@ -1,0 +1,300 @@
+// TEMPORARY: variant 7 with the motion of the search and «Verbunden!».
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$red: #d53419;
+$track: #dfe3ea;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+}
+
+.choice-card {
+  @include facelift.choice-card;
+}
+
+.choice-title {
+  @include facelift.choice-title;
+}
+
+.choice-description {
+  @include facelift.choice-description;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(16);
+  margin: functions.rem(28) 0 functions.rem(16);
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1 1 auto;
+    height: functions.rem(1);
+    background-color: $track;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The code boxes of 7, alive
+// ---------------------------------------------------------------------------
+.code-boxes {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, functions.rem(60));
+  justify-content: center;
+  gap: functions.rem(10);
+
+  &.has-error {
+    animation: shake 0.35s ease-in-out;
+  }
+}
+
+.code-field {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  font-size: functions.rem(16);
+  cursor: text;
+}
+
+.code-box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: functions.rem(68);
+  overflow: hidden;
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: $white;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  color: $blue;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
+
+  &.is-filled {
+    border-color: $blue;
+  }
+
+  // The box that waits for the next character pulses, as the search ring.
+  &.is-waiting {
+    border-color: $blue;
+    animation: pulse 1.2s ease-out infinite;
+  }
+
+  // Complete: a green wave runs from the first to the last box.
+  .is-joining & {
+    border-color: $green;
+    background-color: $green;
+    color: $white;
+    transition-delay: calc(var(--i) * 70ms);
+  }
+
+  .has-error & {
+    border-color: $red;
+  }
+}
+
+// Each character rolls in from below, as the countdown numbers.
+.char {
+  display: block;
+  animation: roll-in 0.3s $spring both;
+}
+
+.code-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(8);
+  min-height: functions.rem(20);
+  margin: functions.rem(12) 0 0;
+  font-size: functions.rem(14);
+  font-variant-numeric: tabular-nums;
+  color: facelift.$muted;
+
+  &.is-error {
+    color: $red;
+  }
+}
+
+.spinner {
+  width: functions.rem(14);
+  height: functions.rem(14);
+  border: functions.rem(2) solid $track;
+  border-top-color: $green;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+// ---------------------------------------------------------------------------
+// «Duell»: you and the open seat in the dark block of the card
+// ---------------------------------------------------------------------------
+.choice-card .choice-block.is-duel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-avatar {
+  display: grid;
+  place-items: center;
+  width: functions.rem(30);
+  height: functions.rem(30);
+  box-sizing: border-box;
+  border: functions.rem(2) solid $blue;
+  border-radius: 50%;
+  background-color: $white;
+  color: $blue;
+  font-size: functions.rem(13);
+  font-weight: $bold;
+
+  &.is-open {
+    margin-left: functions.rem(-8);
+    border: functions.rem(2) dashed $opponent;
+    background-color: $blue;
+    color: $opponent;
+    animation: breathe 2s ease-in-out infinite;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// «Fortschritt»: one segment per character
+// ---------------------------------------------------------------------------
+.segments {
+  display: grid;
+  grid-template-columns: repeat(4, functions.rem(60));
+  justify-content: center;
+  gap: functions.rem(10);
+  margin-top: functions.rem(10);
+
+  i {
+    height: functions.rem(4);
+    border-radius: functions.rem(2);
+    background-color: $track;
+    transition: background-color 0.25s ease;
+
+    &.is-on {
+      background-color: $opponent;
+    }
+  }
+
+  .is-joining + & i {
+    background-color: $green;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Smaller screens
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .section-title {
+    margin-bottom: functions.rem(16);
+  }
+
+  .divider {
+    margin: functions.rem(20) 0 functions.rem(12);
+  }
+
+  .code-box {
+    height: functions.rem(60);
+    font-size: functions.rem(26);
+  }
+}
+
+@media (max-height: 600px) {
+  .code-box {
+    height: functions.rem(52);
+  }
+
+  .choice-description {
+    display: none;
+  }
+
+  .choice-card {
+    min-height: functions.rem(72);
+  }
+}
+
+@media (max-width: 359px) {
+  .code-boxes,
+  .segments {
+    grid-template-columns: repeat(4, functions.rem(54));
+    gap: functions.rem(8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-boxes,
+  .code-box,
+  .char,
+  .spinner,
+  .mini-avatar {
+    animation: none;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($opponent, 0.5);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(8) rgba($opponent, 0);
+  }
+}
+
+@keyframes roll-in {
+  from {
+    opacity: 0;
+    transform: translateY(70%);
+  }
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(functions.rem(-6));
+  }
+
+  40%,
+  80% {
+    transform: translateX(functions.rem(6));
+  }
+}

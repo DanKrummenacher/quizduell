@@ -1,0 +1,89 @@
+<h2 class="section-title">Freund herausfordern</h2>
+
+<!-- Creating, as in 7. In «Duell» the block shows you and the open seat. -->
+<button type="button" class="choice-card" (click)="createGame.emit()">
+  @if (layout() === 'l-duel') {
+    <span class="choice-block is-duel" aria-hidden="true">
+      <span class="mini-avatar">{{ initial() }}</span>
+      <span class="mini-avatar is-open">?</span>
+    </span>
+  } @else {
+    <span class="choice-block" aria-hidden="true">
+      <css-icon icon="add" size="lg"></css-icon>
+    </span>
+  }
+  <span class="choice-text">
+    <span class="choice-title">Spiel erstellen</span>
+    <span class="choice-description">Du bekommst einen Code für deinen Freund</span>
+  </span>
+</button>
+
+<p class="divider"><span>oder Code eingeben</span></p>
+
+<!-- The code: four boxes, one real field over them. -->
+<div
+  class="code-boxes"
+  [class.is-focused]="focused()"
+  [class.is-joining]="joining()"
+  [class.has-error]="errorMessage()"
+>
+  <label class="visually-hidden" for="friendCode">Code deines Freundes</label>
+  <input
+    #codeField
+    id="friendCode"
+    class="code-field"
+    type="text"
+    autocomplete="off"
+    autocapitalize="characters"
+    spellcheck="false"
+    [readOnly]="joining()"
+    [attr.maxlength]="codeLength"
+    [attr.aria-invalid]="errorMessage() ? true : null"
+    aria-describedby="friendCodeStatus"
+    (input)="onCodeInput($event)"
+    (focus)="focused.set(true)"
+    (blur)="focused.set(false)"
+  />
+  @for (slot of slots; track slot) {
+    <span
+      class="code-box"
+      [class.is-filled]="code().length > slot"
+      [class.is-waiting]="focused() && !joining() && code().length === slot"
+      [style.--i]="slot"
+      aria-hidden="true"
+    >
+      @if (code()[slot]; as char) {
+        @for (shown of [char]; track shown) {
+          <span class="char">{{ shown }}</span>
+        }
+      }
+    </span>
+  }
+</div>
+
+<!-- «Fortschritt»: one segment per character. -->
+@if (layout() === 'l-progress') {
+  <div class="segments" aria-hidden="true">
+    @for (slot of slots; track slot) {
+      <i [class.is-on]="code().length > slot"></i>
+    }
+  </div>
+}
+
+<p
+  id="friendCodeStatus"
+  class="code-status"
+  [class.is-error]="errorMessage()"
+  role="status"
+>
+  @if (errorMessage(); as error) {
+    {{ error }}
+  } @else if (joining()) {
+    <span class="spinner" aria-hidden="true"></span>
+    Code vollständig, verbinde&nbsp;…
+  } @else if (layout() === 'l-progress') {
+    {{ code().length }} von {{ codeLength }} Zeichen
+  } @else {
+    Nach dem vierten Zeichen geht es automatisch weiter
+  }
+</p>

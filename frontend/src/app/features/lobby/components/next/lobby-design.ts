@@ -32,18 +32,24 @@ export type FriendLayout =
   | 'fr-dock'
   | 'fr-stepper'
   | 'fr-columns'
-  | 'k-form'
-  | 'k-steps';
+  | 'l-alive'
+  | 'l-duel'
+  | 'l-progress';
 
 export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
-  { value: 'k-form', label: 'K1 · Ein Formular für den Code (wie Jackbox)' },
-  { value: 'k-steps', label: 'K2 · Wie die Modus-Seite, Code als Schritt' },
-  { value: 'fr-auto', label: '7 · Favorit zum Vergleich' },
+  { value: 'fr-auto', label: '7 · Original (Favorit)' },
+  { value: 'l-alive', label: 'L1 · 7 lebendig: Puls, rollende Zeichen' },
+  { value: 'l-duel', label: 'L2 · L1 mit Duell-Bild in der Karte' },
+  { value: 'l-progress', label: 'L3 · L1 mit Fortschritt pro Zeichen' },
 ];
 
-/** Friend proposals made only of design system parts. */
-export const FRIEND_LIB: readonly FriendLayout[] = ['k-form', 'k-steps'];
+/** Variant 7 with the motion of the search and «Verbunden!». */
+export const FRIEND_LIVE: readonly FriendLayout[] = [
+  'l-alive',
+  'l-duel',
+  'l-progress',
+];
 
 /** Third round of friend proposals. */
 export const FRIEND_EXTRA: readonly FriendLayout[] = [

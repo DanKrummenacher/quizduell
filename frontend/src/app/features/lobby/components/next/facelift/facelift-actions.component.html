@@ -1,6 +1,7 @@
-@if (isLib()) {
-  <app-friend-lib
+@if (isLive()) {
+  <app-friend-live
     [layout]="layout()"
+    [playerName]="playerName()"
     [joinError]="joinError()"
     (createGame)="createGame.emit()"
     (joinGame)="joinGame.emit($event)"
