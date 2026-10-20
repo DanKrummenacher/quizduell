@@ -13,14 +13,25 @@ import {
   GAME_CODE_ALPHABET,
   GAME_CODE_LENGTH,
 } from '../../../../../core/contracts/game.contract';
-import { FRIEND_EXTRA, FRIEND_MORE, type FriendLayout } from '../lobby-design';
+import {
+  FRIEND_EXTRA,
+  FRIEND_MORE,
+  FRIEND_PLUS,
+  type FriendLayout,
+} from '../lobby-design';
 import { FriendExtraComponent } from './friend-extra.component';
+import { FriendPlusComponent } from './friend-plus.component';
 import { FriendIdeasComponent } from './friend-ideas.component';
 import { FriendMoreComponent } from './friend-more.component';
 
 @Component({
   selector: 'app-facelift-actions',
-  imports: [FriendIdeasComponent, FriendMoreComponent, FriendExtraComponent],
+  imports: [
+    FriendIdeasComponent,
+    FriendMoreComponent,
+    FriendExtraComponent,
+    FriendPlusComponent,
+  ],
   templateUrl: './facelift-actions.component.html',
   styleUrl: './facelift-actions.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -29,6 +40,7 @@ export class FaceliftActionsComponent {
   // TEMPORARY: proposals for this screen.
   readonly layout = input<FriendLayout>('facelift');
   readonly playerName = input('');
+  protected readonly isPlus = computed(() => FRIEND_PLUS.includes(this.layout()));
   protected readonly isExtra = computed(() => FRIEND_EXTRA.includes(this.layout()));
   readonly joinError = input<string>('');
   protected readonly isMore = computed(() => FRIEND_MORE.includes(this.layout()));

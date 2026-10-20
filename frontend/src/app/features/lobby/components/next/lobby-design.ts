@@ -31,10 +31,23 @@ export type FriendLayout =
   | 'fr-smart'
   | 'fr-dock'
   | 'fr-stepper'
-  | 'fr-columns';
+  | 'fr-columns'
+  | 'fr-paste'
+  | 'fr-live'
+  | 'fr-flip'
+  | 'fr-story'
+  | 'fr-best';
 
 export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
+  {
+    value: 'fr-best',
+    label: '20 · Das Beste vereint (Schritte, Einfügen, Prüfung)',
+  },
+  { value: 'fr-story', label: '19 · Dein Platz, der Platz deines Freundes' },
+  { value: 'fr-flip', label: '18 · Eine Karte, zwei Seiten' },
+  { value: 'fr-live', label: '17 · Code mit Sofort-Prüfung' },
+  { value: 'fr-paste', label: '16 · Code mit einem Tipp einfügen' },
   { value: 'fr-boxes', label: '1 · Code in vier Kästchen' },
   { value: 'fr-accordion', label: '2 · Zwei Karten, Beitreten klappt auf' },
   { value: 'fr-tabs', label: '3 · Umschalter Erstellen / Beitreten' },
@@ -50,6 +63,15 @@ export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'fr-stepper', label: '14 · Schritte mit Fortschritt' },
   { value: 'fr-columns', label: '15 · Zwei Aktionskarten' },
   { value: 'fr-join-first', label: '5 · Beitreten zuerst, Erstellen als «oder»' },
+];
+
+/** Fourth round of friend proposals. */
+export const FRIEND_PLUS: readonly FriendLayout[] = [
+  'fr-paste',
+  'fr-live',
+  'fr-flip',
+  'fr-story',
+  'fr-best',
 ];
 
 /** Third round of friend proposals. */
