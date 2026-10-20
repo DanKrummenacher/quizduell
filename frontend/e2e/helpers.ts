@@ -103,8 +103,8 @@ export async function joinByCode(
 ): Promise<void> {
   await enterName(page, name);
   await page.getByText('Freund herausfordern').first().click();
-  await page.locator('css-input-text#roomCode input').fill(code);
-  await page.locator('css-button.join-button').click();
+  // The fourth character joins by itself.
+  await page.locator('#friendCode').fill(code);
 }
 
 export async function waitForQuestion(page: Page, number: number): Promise<void> {

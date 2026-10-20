@@ -1,88 +1,73 @@
-@if (isM1()) {
-  <app-friend-m1
-    [layout]="layout()"
-    [joinError]="joinError()"
-    (createGame)="createGame.emit()"
-    (joinGame)="joinGame.emit($event)"
-  />
-} @else if (isOr()) {
-  <app-friend-or
-    [layout]="layout()"
-    [playerName]="playerName()"
-    [joinError]="joinError()"
-    (createGame)="createGame.emit()"
-    (joinGame)="joinGame.emit($event)"
-  />
-} @else if (isLive()) {
-  <app-friend-live
-    [layout]="layout()"
-    [playerName]="playerName()"
-    [joinError]="joinError()"
-    (createGame)="createGame.emit()"
-    (joinGame)="joinGame.emit($event)"
-  />
-} @else if (isExtra()) {
-  <app-friend-extra
-    [layout]="layout()"
-    [playerName]="playerName()"
-    [joinError]="joinError()"
-    (createGame)="createGame.emit()"
-    (joinGame)="joinGame.emit($event)"
-  />
-} @else if (isMore()) {
-  <app-friend-more
-    [layout]="layout()"
-    [joinError]="joinError()"
-    (createGame)="createGame.emit()"
-    (joinGame)="joinGame.emit($event)"
-  />
-} @else if (layout() !== 'facelift') {
-  <app-friend-ideas
-    [layout]="layout()"
-    [joinError]="joinError()"
-    (createGame)="createGame.emit()"
-    (joinGame)="joinGame.emit($event)"
-  />
-} @else {
-  <h2 class="section-title">Freund herausfordern</h2>
+<h2 class="section-title">Freund herausfordern</h2>
 
-  <button type="button" class="choice-card" (click)="createGame.emit()">
-    <span class="choice-block" aria-hidden="true">
-      <css-icon icon="add" size="lg"></css-icon>
-    </span>
-    <span class="choice-text">
-      <span class="choice-title">Spiel erstellen</span>
-      <span class="choice-description">Erstelle einen Code für deinen Gegner</span>
-    </span>
-  </button>
+<button type="button" class="choice-card" (click)="createGame.emit()">
+  <span class="choice-block" aria-hidden="true">
+    <css-icon icon="add" size="lg"></css-icon>
+  </span>
+  <span class="choice-text">
+    <span class="choice-title">Spiel erstellen</span>
+    <span class="choice-description">Du bekommst einen Code für deinen Freund</span>
+  </span>
+</button>
 
-  <div class="join-card">
-    <span class="choice-title">Mit Code beitreten</span>
-    <span class="choice-description">Gib den Code deines Gegners ein</span>
+<p class="or"><span>oder</span></p>
 
-    <div class="join-row">
-      <css-input-text
-        id="roomCode"
-        label="Code"
-        placeholder="z.B. 05CA"
-        class="code-input"
-        uppercase
-        [maxlength]="codeLength"
-        autocomplete="off"
-        [errorMessage]="errorMessage() || undefined"
-        (input)="onCodeInput($event)"
-        (keydown)="onCodeKeydown($event)"
+<section aria-labelledby="joinTitle">
+  <h3 id="joinTitle" class="join-title">Code eingeben</h3>
+  <p class="join-text">Den Code hat dir dein Freund geschickt</p>
+
+  <!-- Four boxes; one real field lies invisibly over them. -->
+  <div
+    class="code-boxes"
+    [class.is-joining]="joining()"
+    [class.has-error]="errorMessage()"
+  >
+    <label class="visually-hidden" for="friendCode">Code deines Freundes</label>
+    <input
+      #codeField
+      id="friendCode"
+      class="code-field"
+      type="text"
+      autocomplete="off"
+      autocapitalize="characters"
+      spellcheck="false"
+      [readOnly]="joining()"
+      [attr.maxlength]="codeLength"
+      [attr.aria-invalid]="errorMessage() ? true : null"
+      aria-describedby="friendCodeStatus"
+      (input)="onCodeInput($event)"
+      (focus)="focused.set(true)"
+      (blur)="focused.set(false)"
+    />
+    @for (slot of slots; track slot) {
+      <span
+        class="code-box"
+        [class.is-filled]="code().length > slot"
+        [class.is-waiting]="focused() && !joining() && code().length === slot"
+        [style.--i]="slot"
+        aria-hidden="true"
       >
-      </css-input-text>
-
-      <css-button
-        variant="primary"
-        ariaLabel="Beitreten"
-        class="join-button"
-        (click)="submitJoin()"
-      >
-        <css-icon icon="arrow-right-circle" slot="prefix"></css-icon>
-      </css-button>
-    </div>
+        @if (code()[slot]; as char) {
+          @for (shown of [char]; track shown) {
+            <span class="char">{{ shown }}</span>
+          }
+        }
+      </span>
+    }
   </div>
-}
+
+  <!-- Keeps its height, so nothing jumps when a message appears. -->
+  <p
+    id="friendCodeStatus"
+    class="code-status"
+    [class.is-error]="errorMessage()"
+    role="status"
+  >
+    @if (errorMessage(); as error) {
+      {{ error }}
+    } @else if (joining()) {
+      <span class="spinner" aria-hidden="true"></span>
+      Verbinde&nbsp;…
+    }
+  </p>
+</section>

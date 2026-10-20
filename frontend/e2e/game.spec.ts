@@ -308,8 +308,7 @@ test.describe('playing duels', () => {
 
     await enterName(anna, 'Anna');
     await anna.getByText('Freund herausfordern').first().click();
-    await anna.locator('css-input-text#roomCode input').fill('ZZZZ');
-    await anna.locator('css-button.join-button').click();
+    await anna.locator('#friendCode').fill('ZZZZ');
     await expect(
       anna.getByText('Zu diesem Code gibt es kein offenes Spiel.'),
     ).toBeVisible();
