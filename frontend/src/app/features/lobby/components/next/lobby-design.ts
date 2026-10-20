@@ -48,28 +48,30 @@ export type FriendLayout =
   | 'n-duel'
   | 'n-form'
   | 'n-card'
-  | 'n-focus';
+  | 'n-focus'
+  | 'o-quiet'
+  | 'o-merged'
+  | 'o-short'
+  | 'o-airy'
+  | 'o-question';
 
 export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
-  { value: 'fr-auto', label: '7 · Original (Favorit)' },
-  { value: 'n-calm', label: 'N1 · Final: ruhig, mit «Einfügen»' },
-  { value: 'n-duel', label: 'N2 · Final: Duell-Bild und Symbol' },
-  { value: 'n-form', label: 'N3 · Final: Formular mit Labels' },
-  { value: 'n-card', label: 'N4 · Final: Code-Karte mit «Einfügen»' },
-  { value: 'n-focus', label: 'N5 · Final: Karte macht beim Tippen Platz' },
-  { value: 'l-alive', label: 'L1 · 7 lebendig (Basis)' },
-  { value: 'm-center', label: 'M1 · «oder», dann «Code eingeben» mittig' },
-  { value: 'm-badge', label: 'M2 · «oder» als runder Punkt' },
-  { value: 'm-left', label: 'M3 · Überschrift linksbündig' },
-  { value: 'm-icon', label: 'M4 · Überschrift mit Symbol' },
-  { value: 'm-eyebrow', label: 'M5 · Ohne «oder», zwei kleine Labels' },
-  { value: 'm-card', label: 'M6 · Code in einer weissen Karte' },
-  { value: 'm-paste', label: 'M7 · Mit «Code einfügen»' },
-  { value: 'm-duel', label: 'M8 · Mit Duell-Bild in der Karte' },
-  { value: 'm-progress', label: 'M9 · Mit Fortschritt pro Zeichen' },
-  { value: 'l-duel', label: 'L2 · L1 mit Duell-Bild' },
-  { value: 'l-progress', label: 'L3 · L1 mit Fortschritt' },
+  { value: 'm-center', label: 'M1 · Favorit zum Vergleich' },
+  { value: 'o-quiet', label: 'O1 · Ohne Hinweis unten' },
+  { value: 'o-merged', label: 'O2 · Hinweis als Untertitel' },
+  { value: 'o-short', label: 'O3 · Ohne Untertitel, kurzer Hinweis' },
+  { value: 'o-airy', label: 'O4 · Wie O1, mit mehr Luft' },
+  { value: 'o-question', label: 'O5 · Als Frage formuliert' },
+];
+
+/** Final proposals for M1: the words and the spacing. */
+export const FRIEND_M1: readonly FriendLayout[] = [
+  'o-quiet',
+  'o-merged',
+  'o-short',
+  'o-airy',
+  'o-question',
 ];
 
 /** Refinements of L1: «oder», a heading, then the code. */

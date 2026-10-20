@@ -1,4 +1,11 @@
-@if (isOr()) {
+@if (isM1()) {
+  <app-friend-m1
+    [layout]="layout()"
+    [joinError]="joinError()"
+    (createGame)="createGame.emit()"
+    (joinGame)="joinGame.emit($event)"
+  />
+} @else if (isOr()) {
   <app-friend-or
     [layout]="layout()"
     [playerName]="playerName()"
