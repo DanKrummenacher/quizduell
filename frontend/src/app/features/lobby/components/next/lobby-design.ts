@@ -16,16 +16,28 @@ export const LOBBY_DESIGNS: DesignOption<LobbyDesign>[] = [
 
 /** Proposals for the «Spiel erstellt» screen. */
 export type WaitingLayout =
-  'facelift' | 'w-boxes' | 'w-ring' | 'w-duo' | 'w-share' | 'w-blocks' | 'w-steps';
+  | 'facelift'
+  | 'x-mirror'
+  | 'x-share'
+  | 'x-shimmer'
+  | 'x-story'
+  | 'x-card'
+  | 'x-big'
+  | 'x-tap'
+  | 'x-dark'
+  | 'x-time';
 
 export const WAITING_LAYOUTS: DesignOption<WaitingLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
-  { value: 'w-boxes', label: '1 · Code in den Kästchen vom Beitreten' },
-  { value: 'w-ring', label: '2 · Wie die Suche: Code im Ring' },
-  { value: 'w-duo', label: '3 · Dein Platz, der Platz deines Freundes' },
-  { value: 'w-share', label: '4 · Karte mit Kopieren und Teilen' },
-  { value: 'w-blocks', label: '5 · Code als dunkle Blöcke' },
-  { value: 'w-steps', label: '6 · Mit den drei Schritten' },
+  { value: 'x-mirror', label: 'X1 · Gegenstück zu «Code eingeben»' },
+  { value: 'x-share', label: 'X2 · X1 mit Kopieren und Teilen' },
+  { value: 'x-shimmer', label: 'X3 · X1, ein Licht läuft durch' },
+  { value: 'x-story', label: 'X4 · Dein Platz, sein Platz, dann der Code' },
+  { value: 'x-card', label: 'X5 · Code als Karte, Tippen kopiert' },
+  { value: 'x-big', label: 'X6 · Nur der grosse Code, eine Aktion' },
+  { value: 'x-tap', label: 'X7 · Tippen auf den Code kopiert' },
+  { value: 'x-dark', label: 'X8 · Code auf dunkler Fläche' },
+  { value: 'x-time', label: 'X9 · X1 mit Wartezeit' },
 ];
 
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [

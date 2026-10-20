@@ -14,16 +14,19 @@ import type { WaitingLayout } from '../lobby-design';
 
 const COPIED_FEEDBACK_MS = 1500;
 
-/** TEMPORARY: proposals for the «Spiel erstellt» screen. */
+/**
+ * TEMPORARY: «Spiel erstellt» as the counterpart of «Code eingeben» (O1):
+ * same structure, spacing and boxes; the code rolls in, the boxes wait.
+ */
 @Component({
-  selector: 'app-waiting-ideas',
+  selector: 'app-waiting-plus',
   imports: [NgTemplateOutlet],
-  templateUrl: './waiting-ideas.component.html',
-  styleUrl: './waiting-ideas.component.scss',
+  templateUrl: './waiting-plus.component.html',
+  styleUrl: './waiting-plus.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: { '[class]': 'layout()' },
 })
-export class WaitingIdeasComponent {
+export class WaitingPlusComponent {
   readonly layout = input.required<WaitingLayout>();
   readonly roomCode = input.required<string>();
   readonly playerName = input('');
@@ -37,12 +40,11 @@ export class WaitingIdeasComponent {
   protected readonly canShare =
     typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
-  /** The ring of the search: one tick per second while waiting. */
-  protected readonly ticks = Array.from({ length: 60 }, (_, index) => index * 6);
+  /** X9: how long you have been waiting. */
   private readonly seconds = signal(0);
-  protected readonly filledTicks = computed(() => {
+  protected readonly elapsed = computed(() => {
     const seconds = this.seconds();
-    return seconds > 0 && seconds % 60 === 0 ? 60 : seconds % 60;
+    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   });
 
   constructor() {
@@ -51,6 +53,9 @@ export class WaitingIdeasComponent {
   }
 
   protected async copyCode(): Promise<void> {
+    if (this.isCopied()) {
+      return;
+    }
     try {
       await navigator.clipboard.writeText(this.roomCode());
     } catch {
