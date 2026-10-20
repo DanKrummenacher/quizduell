@@ -1,0 +1,424 @@
+// TEMPORARY: «Spiel erstellt» around one prominent code card.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$track: #dfe3ea;
+$page: colors.$dt-color-pepper-bright;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+
+  &.is-tight {
+    margin-bottom: functions.rem(8);
+  }
+}
+
+.body-text {
+  @include facelift.body-text;
+}
+
+css-button.is-copied {
+  color: $green;
+}
+
+// ---------------------------------------------------------------------------
+// The code card: raised, generous, the code as the hero
+// ---------------------------------------------------------------------------
+.card {
+  margin-top: functions.rem(28);
+  padding: functions.rem(28) functions.rem(20) functions.rem(20);
+  border: functions.rem(1) solid #e3e8f0;
+  border-radius: functions.rem(16);
+  background-color: $white;
+  box-shadow:
+    0 functions.rem(1) functions.rem(2) rgba(0, 50, 125, 0.06),
+    0 functions.rem(12) functions.rem(32) rgba(0, 50, 125, 0.1);
+
+  &.is-dark {
+    border-color: $blue;
+    background-color: $blue;
+    color: $white;
+  }
+}
+
+.label {
+  font-size: functions.rem(12);
+  font-weight: $bold;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: $opponent;
+}
+
+.code {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: functions.rem(14);
+  margin: functions.rem(8) 0 0;
+  font-size: functions.rem(56);
+  font-weight: $bold;
+  line-height: 1.1;
+  color: $blue;
+
+  .is-dark & {
+    color: $white;
+  }
+}
+
+.char {
+  display: inline-block;
+  animation: roll-in 0.45s $spring both;
+  animation-delay: calc(var(--i) * 90ms);
+}
+
+.rule {
+  display: block;
+  height: functions.rem(1);
+  margin: functions.rem(24) 0 functions.rem(16);
+  background-color: $track;
+
+  .is-dark & {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: functions.rem(12);
+
+  &.is-single {
+    grid-template-columns: auto;
+    justify-content: center;
+  }
+
+  css-button {
+    display: block;
+    width: 100%;
+  }
+}
+
+// Waiting: three dots that hop, as when someone is typing.
+.waiting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(8);
+  margin: functions.rem(24) 0 0;
+  font-size: functions.rem(15);
+  color: facelift.$muted;
+}
+
+.dots {
+  display: inline-flex;
+  gap: functions.rem(4);
+
+  i {
+    width: functions.rem(6);
+    height: functions.rem(6);
+    border-radius: 50%;
+    background-color: $opponent;
+    animation: hop 1.2s ease-in-out infinite;
+
+    &:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Q3 · The code as the headline, without a card
+// ---------------------------------------------------------------------------
+.eyebrow {
+  display: block;
+  font-size: functions.rem(13);
+  font-weight: $bold;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: $opponent;
+}
+
+.code.is-hero {
+  gap: functions.rem(16);
+  margin-top: functions.rem(12);
+  font-size: functions.rem(72);
+}
+
+.sep {
+  width: functions.rem(1);
+  height: functions.rem(48);
+  background-color: $track;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(10);
+  margin: functions.rem(24) 0 0;
+  padding: functions.rem(8) functions.rem(16);
+  border: functions.rem(1) solid $track;
+  border-radius: functions.rem(999);
+  background-color: $white;
+  font-size: functions.rem(14);
+  color: $blue;
+}
+
+.pulse {
+  width: functions.rem(8);
+  height: functions.rem(8);
+  border-radius: 50%;
+  background-color: $opponent;
+  animation: ping 1.6s ease-out infinite;
+}
+
+.hero-actions {
+  display: grid;
+  justify-items: center;
+  gap: functions.rem(4);
+  margin-top: functions.rem(32);
+}
+
+// ---------------------------------------------------------------------------
+// Q4 · The players at the top of the card
+// ---------------------------------------------------------------------------
+.players {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(10);
+  margin-bottom: functions.rem(20);
+  padding-bottom: functions.rem(16);
+  border-bottom: functions.rem(1) solid $track;
+}
+
+.mini {
+  display: grid;
+  place-items: center;
+  width: functions.rem(32);
+  height: functions.rem(32);
+  box-sizing: border-box;
+  border-radius: 50%;
+  font-size: functions.rem(14);
+  font-weight: $bold;
+
+  &.is-me {
+    background-color: $blue;
+    color: $white;
+  }
+
+  &.is-open {
+    margin-left: functions.rem(-16);
+    border: functions.rem(2) dashed $opponent;
+    background-color: $white;
+    color: $opponent;
+  }
+}
+
+.players-text {
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+// ---------------------------------------------------------------------------
+// Q5 · A ticket stub with the live hint
+// ---------------------------------------------------------------------------
+.cut {
+  position: relative;
+  display: block;
+  margin: functions.rem(20) functions.rem(-4) 0;
+  border-top: functions.rem(2) dashed $track;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: functions.rem(-13);
+    width: functions.rem(24);
+    height: functions.rem(24);
+    border-radius: 50%;
+    background-color: $page;
+  }
+
+  &::before {
+    left: functions.rem(-29);
+  }
+
+  &::after {
+    right: functions.rem(-29);
+  }
+}
+
+:host(.q-stub) .waiting {
+  margin-top: functions.rem(14);
+}
+
+// ---------------------------------------------------------------------------
+// Q6 · The way, as three small steps
+// ---------------------------------------------------------------------------
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: functions.rem(8);
+  margin: functions.rem(24) 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: functions.rem(6);
+    font-size: functions.rem(13);
+    color: facelift.$muted;
+
+    &.is-active {
+      font-weight: $bold;
+      color: $blue;
+    }
+  }
+}
+
+.step-dot {
+  width: functions.rem(10);
+  height: functions.rem(10);
+  border-radius: 50%;
+  background-color: $track;
+
+  .is-active & {
+    background-color: $opponent;
+    animation: ping 1.6s ease-out infinite;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Smaller screens
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .card {
+    margin-top: functions.rem(20);
+    padding: functions.rem(20) functions.rem(16) functions.rem(16);
+  }
+
+  .code {
+    font-size: functions.rem(48);
+  }
+
+  .code.is-hero {
+    font-size: functions.rem(60);
+  }
+
+  .rule {
+    margin: functions.rem(16) 0 functions.rem(12);
+  }
+
+  .waiting,
+  .steps,
+  .chip {
+    margin-top: functions.rem(16);
+  }
+
+  .hero-actions {
+    margin-top: functions.rem(20);
+  }
+
+  .players {
+    margin-bottom: functions.rem(12);
+    padding-bottom: functions.rem(12);
+  }
+}
+
+@media (max-height: 600px) {
+  .card {
+    padding: functions.rem(16) functions.rem(14) functions.rem(14);
+  }
+
+  .code {
+    font-size: functions.rem(44);
+  }
+
+  .players {
+    margin-bottom: functions.rem(8);
+    padding-bottom: functions.rem(8);
+  }
+
+  .rule {
+    margin: functions.rem(12) 0 functions.rem(10);
+  }
+}
+
+@media (max-width: 374px) {
+  .actions {
+    grid-template-columns: 1fr;
+    gap: functions.rem(8);
+  }
+}
+
+@media (max-width: 359px) {
+  .code {
+    gap: functions.rem(10);
+    font-size: functions.rem(44);
+  }
+
+  .code.is-hero {
+    gap: functions.rem(10);
+    font-size: functions.rem(52);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .char,
+  .dots i,
+  .pulse,
+  .step-dot {
+    animation: none;
+  }
+}
+
+@keyframes roll-in {
+  from {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+}
+
+@keyframes hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+
+  30% {
+    transform: translateY(functions.rem(-4));
+    opacity: 1;
+  }
+}
+
+@keyframes ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba($opponent, 0.5);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(7) rgba($opponent, 0);
+  }
+}

@@ -2,8 +2,6 @@ import {
   Component,
   computed,
   CUSTOM_ELEMENTS_SCHEMA,
-  DestroyRef,
-  inject,
   input,
   signal,
 } from '@angular/core';
@@ -15,19 +13,19 @@ import type { WaitingLayout } from '../lobby-design';
 const COPIED_FEEDBACK_MS = 1500;
 
 /**
- * TEMPORARY: final candidates for «Spiel erstellt», built exactly like the
- * final search and match screens: visual, title, text, the code, then one
- * action at the same place.
+ * TEMPORARY: «Spiel erstellt» around one prominent code card (as Jackbox,
+ * Kahoot or Spotify Jam): the code large, the actions right at the card,
+ * a calm live hint; no greeting above.
  */
 @Component({
-  selector: 'app-waiting-final',
+  selector: 'app-waiting-q',
   imports: [NgTemplateOutlet],
-  templateUrl: './waiting-final.component.html',
-  styleUrl: './waiting-final.component.scss',
+  templateUrl: './waiting-q.component.html',
+  styleUrl: './waiting-q.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: { '[class]': 'layout()' },
 })
-export class WaitingFinalComponent {
+export class WaitingQComponent {
   readonly layout = input.required<WaitingLayout>();
   readonly roomCode = input.required<string>();
   readonly playerName = input('');
@@ -36,26 +34,10 @@ export class WaitingFinalComponent {
   protected readonly initial = computed(() =>
     this.playerName().trim().charAt(0).toUpperCase(),
   );
+  protected readonly isDark = computed(() => this.layout() === 'q-dark');
   protected readonly isCopied = signal(false);
   protected readonly canShare =
     typeof navigator !== 'undefined' && typeof navigator.share === 'function';
-
-  /** The ring of the search: one tick per second while waiting. */
-  protected readonly ticks = Array.from({ length: 60 }, (_, index) => index * 6);
-  private readonly seconds = signal(0);
-  protected readonly filledTicks = computed(() => {
-    const seconds = this.seconds();
-    return seconds > 0 && seconds % 60 === 0 ? 60 : seconds % 60;
-  });
-  protected readonly elapsed = computed(() => {
-    const seconds = this.seconds();
-    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
-  });
-
-  constructor() {
-    const timer = setInterval(() => this.seconds.update((value) => value + 1), 1000);
-    inject(DestroyRef).onDestroy(() => clearInterval(timer));
-  }
 
   protected async copyCode(): Promise<void> {
     if (this.isCopied()) {

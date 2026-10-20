@@ -6,6 +6,7 @@
       <app-lobby-header
         [playerName]="playerName()"
         [modern]="design() === 'facelift'"
+        [showGreeting]="!(state() === 'WAITING' && waitingLayout().startsWith('q-'))"
         (navigateBack)="navigateBack.emit()"
       >
       </app-lobby-header>
