@@ -1,0 +1,184 @@
+// TEMPORARY: friend proposals made only of design system parts.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+
+  &.is-tight {
+    margin-bottom: functions.rem(8);
+  }
+
+  &.is-step {
+    margin: functions.rem(24) 0 functions.rem(8);
+  }
+}
+
+.body-text {
+  @include facelift.body-text;
+}
+
+.symbol {
+  @include facelift.symbol;
+}
+
+.choice-card {
+  @include facelift.choice-card;
+
+  & + & {
+    margin-top: functions.rem(16);
+  }
+}
+
+.choice-title {
+  @include facelift.choice-title;
+}
+
+.choice-description {
+  @include facelift.choice-description;
+}
+
+.compact {
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+css-input-text {
+  display: block;
+  width: 100%;
+  text-align: left;
+}
+
+.form-button {
+  display: block;
+  width: 100%;
+  margin-top: functions.rem(16);
+}
+
+// ---------------------------------------------------------------------------
+// K1 · One form for the code
+// ---------------------------------------------------------------------------
+.form-card {
+  margin-top: functions.rem(24);
+  padding: functions.rem(20);
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: $white;
+}
+
+.hint {
+  margin: functions.rem(32) 0 functions.rem(12);
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+// ---------------------------------------------------------------------------
+// K3 · Two cards, then the code as its own step
+// ---------------------------------------------------------------------------
+.step {
+  animation: rise 0.25s ease-out both;
+}
+
+.step-field {
+  max-width: functions.rem(280);
+  margin: functions.rem(24) auto 0;
+}
+
+// One main action and a quiet way back to the choice.
+.compact.is-main {
+  margin-top: functions.rem(28);
+}
+
+.compact.is-back {
+  margin-top: functions.rem(8);
+}
+
+// ---------------------------------------------------------------------------
+// Smaller screens
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .section-title {
+    margin-bottom: functions.rem(16);
+  }
+
+  .form-card {
+    margin-top: functions.rem(16);
+    padding: functions.rem(16);
+  }
+
+  .hint {
+    margin: functions.rem(20) 0 functions.rem(8);
+  }
+
+  .symbol {
+    width: functions.rem(52);
+    height: functions.rem(52);
+  }
+
+  .step-field {
+    margin-top: functions.rem(12);
+  }
+
+  .compact.is-main {
+    margin-top: functions.rem(16);
+  }
+}
+
+@media (max-height: 600px) {
+  .choice-description {
+    display: none;
+  }
+
+  .choice-card {
+    min-height: functions.rem(72);
+  }
+
+  .step .symbol {
+    display: none;
+  }
+
+  .section-title.is-step {
+    margin-top: 0;
+  }
+
+  :host(.k-form) .body-text {
+    display: none;
+  }
+
+  :host(.k-form) .section-title {
+    margin-bottom: functions.rem(12);
+  }
+
+  .form-card {
+    margin-top: functions.rem(8);
+  }
+
+  .hint {
+    margin-top: functions.rem(14);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step {
+    animation: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(functions.rem(8));
+  }
+}

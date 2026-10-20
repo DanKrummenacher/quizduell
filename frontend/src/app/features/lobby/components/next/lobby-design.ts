@@ -32,27 +32,18 @@ export type FriendLayout =
   | 'fr-dock'
   | 'fr-stepper'
   | 'fr-columns'
-  | 'j-polish'
-  | 'j-label'
-  | 'j-cards'
-  | 'j-focus';
+  | 'k-form'
+  | 'k-steps';
 
 export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
-  { value: 'fr-auto', label: '7 · Original (Favorit)' },
-  { value: 'j-polish', label: 'J1 · 7 verfeinert' },
-  { value: 'j-label', label: 'J2 · 7 als Formular mit Titel' },
-  { value: 'j-cards', label: 'J3 · 7 als Kartenpaar' },
-  { value: 'j-focus', label: 'J4 · 7, Karte macht beim Tippen Platz' },
+  { value: 'k-form', label: 'K1 · Ein Formular für den Code (wie Jackbox)' },
+  { value: 'k-steps', label: 'K2 · Wie die Modus-Seite, Code als Schritt' },
+  { value: 'fr-auto', label: '7 · Favorit zum Vergleich' },
 ];
 
-/** Refinements of the favourite 7. */
-export const FRIEND_SEVEN: readonly FriendLayout[] = [
-  'j-polish',
-  'j-label',
-  'j-cards',
-  'j-focus',
-];
+/** Friend proposals made only of design system parts. */
+export const FRIEND_LIB: readonly FriendLayout[] = ['k-form', 'k-steps'];
 
 /** Third round of friend proposals. */
 export const FRIEND_EXTRA: readonly FriendLayout[] = [
