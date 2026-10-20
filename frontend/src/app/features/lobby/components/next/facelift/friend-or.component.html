@@ -6,41 +6,60 @@
   <span class="eyebrow">Neues Spiel</span>
 }
 
-<!-- Creating: the card of the mode screen. -->
-<button type="button" class="choice-card" (click)="createGame.emit()">
-  @if (current.duel) {
-    <span class="choice-block is-duel" aria-hidden="true">
-      <span class="mini-avatar">{{ initial() }}</span>
-      <span class="mini-avatar is-open">?</span>
-    </span>
-  } @else {
-    <span class="choice-block" aria-hidden="true">
-      <css-icon icon="add" size="lg"></css-icon>
-    </span>
-  }
-  <span class="choice-text">
-    <span class="choice-title">Spiel erstellen</span>
-    <span class="choice-description">Du bekommst einen Code für deinen Freund</span>
-  </span>
-</button>
+<!-- Creating: the card of the mode screen (makes room while typing). -->
+@let collapsed = !!current.collapse && isTyping();
+<div
+  class="collapse"
+  [class.is-collapsed]="collapsed"
+  [attr.inert]="collapsed ? true : null"
+>
+  <div class="collapse-inner">
+    <button type="button" class="choice-card" (click)="createGame.emit()">
+      @if (current.duel) {
+        <span class="choice-block is-duel" aria-hidden="true">
+          <span class="mini-avatar">{{ initial() }}</span>
+          <span class="mini-avatar is-open">?</span>
+        </span>
+      } @else {
+        <span class="choice-block" aria-hidden="true">
+          <css-icon icon="add" size="lg"></css-icon>
+        </span>
+      }
+      <span class="choice-text">
+        <span class="choice-title">Spiel erstellen</span>
+        <span class="choice-description"
+          >Du bekommst einen Code für deinen Freund</span
+        >
+      </span>
+    </button>
 
-<!-- «oder» on its own. -->
-@switch (current.separator) {
-  @case ('badge') {
-    <p class="or-badge"><span>oder</span></p>
-  }
-  @case ('line') {
-    <p class="or-line"><span>oder</span></p>
-  }
-}
+    <!-- «oder» on its own. -->
+    @switch (current.separator) {
+      @case ('badge') {
+        <p class="or-badge"><span>oder</span></p>
+      }
+      @case ('line') {
+        <p class="or-line"><span>oder</span></p>
+      }
+    }
+  </div>
+</div>
 
 <section class="join" [class.is-card]="current.card" aria-labelledby="joinTitle">
   <!-- The heading of the code. -->
   @switch (current.heading) {
     @case ('left') {
-      <div class="heading is-left">
-        <h3 id="joinTitle" class="join-title">Code eingeben</h3>
-        <p class="join-text">Den Code hat dir dein Freund geschickt</p>
+      <div class="heading is-left" [class.has-action]="current.pasteTop && canPaste">
+        <div>
+          <h3 id="joinTitle" class="join-title">Code eingeben</h3>
+          <p class="join-text">Den Code hat dir dein Freund geschickt</p>
+        </div>
+        @if (current.pasteTop && canPaste) {
+          <css-button variant="plain" class="paste is-top" (click)="pasteCode()">
+            <css-icon icon="copy" slot="prefix"></css-icon>
+            Einfügen
+          </css-button>
+        }
       </div>
     }
     @case ('icon') {
@@ -65,6 +84,7 @@
   <!-- The code boxes of L1. -->
   <div
     class="code-boxes"
+    [class.is-wide]="current.wide"
     [class.is-joining]="joining()"
     [class.has-error]="errorMessage()"
   >
@@ -124,7 +144,9 @@
     } @else if (current.progress) {
       {{ code().length }} von {{ codeLength }} Zeichen
     } @else {
-      Nach dem vierten Zeichen geht es automatisch weiter
+      <span class="idle-hint"
+        >Nach dem vierten Zeichen geht es automatisch weiter</span
+      >
     }
   </p>
 

@@ -30,8 +30,14 @@ interface Look {
   duel?: boolean;
   /** One segment per character under the boxes. */
   progress?: boolean;
-  /** «Code einfügen» from the clipboard. */
+  /** «Code einfügen» from the clipboard, below the code. */
   paste?: boolean;
+  /** «Code einfügen» at the top right of the code card. */
+  pasteTop?: boolean;
+  /** The boxes as wide as the card above. */
+  wide?: boolean;
+  /** While typing, the card makes room above the keyboard. */
+  collapse?: boolean;
 }
 
 const LOOKS: Partial<Record<FriendLayout, Look>> = {
@@ -44,6 +50,18 @@ const LOOKS: Partial<Record<FriendLayout, Look>> = {
   'm-paste': { separator: 'line', heading: 'center', paste: true },
   'm-duel': { separator: 'line', heading: 'center', duel: true },
   'm-progress': { separator: 'badge', heading: 'center', progress: true },
+  // Final combinations of the parts that worked best.
+  'n-calm': { separator: 'badge', heading: 'center', paste: true },
+  'n-duel': { separator: 'badge', heading: 'icon', duel: true },
+  'n-form': { separator: 'none', heading: 'eyebrow', wide: true },
+  'n-card': {
+    separator: 'badge',
+    heading: 'left',
+    card: true,
+    pasteTop: true,
+    wide: true,
+  },
+  'n-focus': { separator: 'badge', heading: 'center', collapse: true },
 };
 
 /**
@@ -84,6 +102,10 @@ export class FriendOrComponent {
   private readonly serverErrorShown = signal(false);
   protected readonly errorMessage = computed(() =>
     this.serverErrorShown() ? this.joinError() : '',
+  );
+  /** The card makes room while the code is being typed. */
+  protected readonly isTyping = computed(
+    () => this.focused() || this.code().length > 0,
   );
   protected readonly initial = computed(() =>
     this.playerName().trim().charAt(0).toUpperCase(),

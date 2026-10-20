@@ -142,7 +142,8 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   text-align: left;
 }
 
-:host(.m-eyebrow) .join {
+:host(.m-eyebrow) .join,
+:host(.n-form) .join {
   margin-top: functions.rem(32);
 }
 
@@ -152,6 +153,37 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   border: functions.rem(1) solid facelift.$border;
   border-radius: functions.rem(4);
   background-color: $white;
+}
+
+// A heading with an action on the right (paste).
+.heading.has-action {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: functions.rem(8);
+}
+
+.paste.is-top {
+  margin: functions.rem(-6) functions.rem(-8) 0 0;
+}
+
+// While typing, the card folds away so the code stays above the keyboard.
+.collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 0.3s ease,
+    opacity 0.2s ease;
+
+  &.is-collapsed {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+.collapse-inner {
+  min-height: 0;
+  overflow: hidden;
 }
 
 // ---------------------------------------------------------------------------
@@ -170,6 +202,11 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 
   .heading.is-left + & {
     justify-content: start;
+  }
+
+  // As wide as the card above.
+  &.is-wide {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -330,7 +367,7 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 
   .or-line,
   .or-badge {
-    margin: functions.rem(16) 0;
+    margin: functions.rem(12) 0;
   }
 
   .or-badge span {
@@ -346,7 +383,8 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
     display: none;
   }
 
-  :host(.m-eyebrow) .join {
+  :host(.m-eyebrow) .join,
+  :host(.n-form) .join {
     margin-top: functions.rem(20);
   }
 
@@ -374,6 +412,24 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   :host(.m-paste) .or-line {
     margin: functions.rem(10) 0;
   }
+
+  // Joining with paste or in a card: the hint gets shorter, the paste
+  // link moves closer.
+  :host(.n-calm),
+  :host(.n-card) {
+    .code-status {
+      margin-top: functions.rem(8);
+    }
+
+    .heading {
+      margin-bottom: functions.rem(8);
+    }
+  }
+
+  :host(.n-card) .or-badge,
+  :host(.n-calm) .or-badge {
+    margin: functions.rem(8) 0;
+  }
 }
 
 @media (max-height: 600px) {
@@ -400,6 +456,19 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 
   .code-status {
     margin-top: functions.rem(8);
+  }
+
+  // With «Einfügen» there is no room for the idle hint on the smallest
+  // phones; errors and «verbinde» still show.
+  :host(.n-calm),
+  :host(.n-card) {
+    .idle-hint {
+      display: none;
+    }
+
+    .code-status {
+      min-height: 0;
+    }
   }
 }
 

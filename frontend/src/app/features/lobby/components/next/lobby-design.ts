@@ -43,11 +43,21 @@ export type FriendLayout =
   | 'm-card'
   | 'm-paste'
   | 'm-duel'
-  | 'm-progress';
+  | 'm-progress'
+  | 'n-calm'
+  | 'n-duel'
+  | 'n-form'
+  | 'n-card'
+  | 'n-focus';
 
 export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
   { value: 'fr-auto', label: '7 · Original (Favorit)' },
+  { value: 'n-calm', label: 'N1 · Final: ruhig, mit «Einfügen»' },
+  { value: 'n-duel', label: 'N2 · Final: Duell-Bild und Symbol' },
+  { value: 'n-form', label: 'N3 · Final: Formular mit Labels' },
+  { value: 'n-card', label: 'N4 · Final: Code-Karte mit «Einfügen»' },
+  { value: 'n-focus', label: 'N5 · Final: Karte macht beim Tippen Platz' },
   { value: 'l-alive', label: 'L1 · 7 lebendig (Basis)' },
   { value: 'm-center', label: 'M1 · «oder», dann «Code eingeben» mittig' },
   { value: 'm-badge', label: 'M2 · «oder» als runder Punkt' },
@@ -73,6 +83,11 @@ export const FRIEND_OR: readonly FriendLayout[] = [
   'm-paste',
   'm-duel',
   'm-progress',
+  'n-calm',
+  'n-duel',
+  'n-form',
+  'n-card',
+  'n-focus',
 ];
 
 /** Variant 7 with the motion of the search and «Verbunden!». */
