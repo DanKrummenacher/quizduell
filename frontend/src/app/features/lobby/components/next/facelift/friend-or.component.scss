@@ -1,0 +1,464 @@
+// TEMPORARY: refinements of L1: «oder», a heading, then the code.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$red: #d53419;
+$track: #dfe3ea;
+$page: colors.$dt-color-pepper-bright;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+}
+
+.choice-card {
+  @include facelift.choice-card;
+}
+
+.choice-title {
+  @include facelift.choice-title;
+}
+
+.choice-description {
+  @include facelift.choice-description;
+}
+
+// ---------------------------------------------------------------------------
+// «oder» on its own
+// ---------------------------------------------------------------------------
+.or-line {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(16);
+  margin: functions.rem(24) 0;
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1 1 auto;
+    height: functions.rem(1);
+    background-color: $track;
+  }
+}
+
+// A round badge on the line.
+.or-badge {
+  position: relative;
+  margin: functions.rem(24) 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    height: functions.rem(1);
+    background-color: $track;
+  }
+
+  span {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: functions.rem(44);
+    height: functions.rem(44);
+    border: functions.rem(1) solid $track;
+    border-radius: 50%;
+    background-color: $page;
+    font-size: functions.rem(13);
+    font-weight: $bold;
+    color: facelift.$muted;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The heading of the code
+// ---------------------------------------------------------------------------
+.heading {
+  margin-bottom: functions.rem(16);
+
+  &.is-left {
+    text-align: left;
+  }
+
+  &.is-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: functions.rem(10);
+  }
+}
+
+.join-title {
+  margin: 0;
+  font-size: functions.rem(18);
+  font-weight: $bold;
+  color: $blue;
+}
+
+.join-text {
+  margin: functions.rem(4) 0 0;
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+.join-icon {
+  display: grid;
+  place-items: center;
+  width: functions.rem(32);
+  height: functions.rem(32);
+  border-radius: 50%;
+  background-color: $blue;
+  color: $white;
+
+  css-icon {
+    display: block;
+  }
+}
+
+// A small label above a part (as the quiz category).
+.eyebrow {
+  display: block;
+  margin-bottom: functions.rem(10);
+  font-size: functions.rem(12);
+  font-weight: $bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $opponent;
+  text-align: left;
+}
+
+:host(.m-eyebrow) .join {
+  margin-top: functions.rem(32);
+}
+
+// The code inside a white card.
+.join.is-card {
+  padding: functions.rem(20) functions.rem(16) functions.rem(12);
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: $white;
+}
+
+// ---------------------------------------------------------------------------
+// The code boxes of L1
+// ---------------------------------------------------------------------------
+.code-boxes {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, functions.rem(60));
+  justify-content: center;
+  gap: functions.rem(10);
+
+  &.has-error {
+    animation: shake 0.35s ease-in-out;
+  }
+
+  .heading.is-left + & {
+    justify-content: start;
+  }
+}
+
+.code-field {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  font-size: functions.rem(16);
+  cursor: text;
+}
+
+.code-box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: functions.rem(68);
+  overflow: hidden;
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: $white;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  color: $blue;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
+
+  &.is-filled {
+    border-color: $blue;
+  }
+
+  // The box that waits pulses, as the search ring.
+  &.is-waiting {
+    border-color: $blue;
+    animation: pulse 1.2s ease-out infinite;
+  }
+
+  // Complete: a green wave from the first to the last box.
+  .is-joining & {
+    border-color: $green;
+    background-color: $green;
+    color: $white;
+    transition-delay: calc(var(--i) * 70ms);
+  }
+
+  .has-error & {
+    border-color: $red;
+  }
+}
+
+.char {
+  display: block;
+  animation: roll-in 0.3s $spring both;
+}
+
+.code-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(8);
+  min-height: functions.rem(20);
+  margin: functions.rem(12) 0 0;
+  font-size: functions.rem(14);
+  font-variant-numeric: tabular-nums;
+  color: facelift.$muted;
+
+  &.is-error {
+    color: $red;
+  }
+
+  .heading.is-left ~ & {
+    justify-content: flex-start;
+  }
+}
+
+.spinner {
+  width: functions.rem(14);
+  height: functions.rem(14);
+  border: functions.rem(2) solid $track;
+  border-top-color: $green;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.paste {
+  display: block;
+  width: fit-content;
+  margin: functions.rem(4) auto 0;
+}
+
+// ---------------------------------------------------------------------------
+// Extras: you and the open seat; one segment per character
+// ---------------------------------------------------------------------------
+.choice-card .choice-block.is-duel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-avatar {
+  display: grid;
+  place-items: center;
+  width: functions.rem(30);
+  height: functions.rem(30);
+  box-sizing: border-box;
+  border: functions.rem(2) solid $blue;
+  border-radius: 50%;
+  background-color: $white;
+  color: $blue;
+  font-size: functions.rem(13);
+  font-weight: $bold;
+
+  &.is-open {
+    margin-left: functions.rem(-8);
+    border: functions.rem(2) dashed $opponent;
+    background-color: $blue;
+    color: $opponent;
+    animation: breathe 2s ease-in-out infinite;
+  }
+}
+
+.segments {
+  display: grid;
+  grid-template-columns: repeat(4, functions.rem(60));
+  justify-content: center;
+  gap: functions.rem(10);
+  margin-top: functions.rem(10);
+
+  i {
+    height: functions.rem(4);
+    border-radius: functions.rem(2);
+    background-color: $track;
+    transition: background-color 0.25s ease;
+
+    &.is-on {
+      background-color: $opponent;
+    }
+  }
+
+  &.is-joining i {
+    background-color: $green;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Smaller screens
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .section-title {
+    margin-bottom: functions.rem(16);
+  }
+
+  .or-line,
+  .or-badge {
+    margin: functions.rem(16) 0;
+  }
+
+  .or-badge span {
+    width: functions.rem(36);
+    height: functions.rem(36);
+  }
+
+  .heading {
+    margin-bottom: functions.rem(12);
+  }
+
+  .join-text {
+    display: none;
+  }
+
+  :host(.m-eyebrow) .join {
+    margin-top: functions.rem(20);
+  }
+
+  .code-box {
+    height: functions.rem(60);
+    font-size: functions.rem(26);
+  }
+
+  .join.is-card {
+    padding: functions.rem(14) functions.rem(12) functions.rem(6);
+
+    .code-status {
+      font-size: functions.rem(13);
+    }
+  }
+
+  :host(.m-card) .or-badge {
+    margin: functions.rem(10) 0;
+  }
+
+  .paste {
+    margin-top: 0;
+  }
+
+  :host(.m-paste) .or-line {
+    margin: functions.rem(10) 0;
+  }
+}
+
+@media (max-height: 600px) {
+  .code-box {
+    height: functions.rem(52);
+  }
+
+  .choice-description {
+    display: none;
+  }
+
+  .choice-card {
+    min-height: functions.rem(72);
+  }
+
+  .or-line,
+  .or-badge {
+    margin: functions.rem(10) 0;
+  }
+
+  .join.is-card {
+    padding-top: functions.rem(14);
+  }
+
+  .code-status {
+    margin-top: functions.rem(8);
+  }
+}
+
+@media (max-width: 359px) {
+  .code-boxes,
+  .segments {
+    grid-template-columns: repeat(4, functions.rem(54));
+    gap: functions.rem(8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-boxes,
+  .code-box,
+  .char,
+  .spinner,
+  .mini-avatar {
+    animation: none;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($opponent, 0.5);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(8) rgba($opponent, 0);
+  }
+}
+
+@keyframes roll-in {
+  from {
+    opacity: 0;
+    transform: translateY(70%);
+  }
+}
+
+@keyframes breathe {
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(functions.rem(-6));
+  }
+
+  40%,
+  80% {
+    transform: translateX(functions.rem(6));
+  }
+}

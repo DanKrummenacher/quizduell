@@ -1,4 +1,12 @@
-@if (isLive()) {
+@if (isOr()) {
+  <app-friend-or
+    [layout]="layout()"
+    [playerName]="playerName()"
+    [joinError]="joinError()"
+    (createGame)="createGame.emit()"
+    (joinGame)="joinGame.emit($event)"
+  />
+} @else if (isLive()) {
   <app-friend-live
     [layout]="layout()"
     [playerName]="playerName()"
