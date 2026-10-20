@@ -13,7 +13,7 @@
   }
 
   @if (design() === 'facelift') {
-    <main class="main-area is-facelift">
+    <main class="main-area is-facelift" [class.is-stage]="fullscreen()">
       <div class="centered-content">
         @switch (state()) {
           @case ('CHOOSE_MODE') {
@@ -37,6 +37,8 @@
           }
           @case ('FOUND') {
             <app-facelift-match-found
+              [layout]="matchLayout()"
+              [playerName]="playerName()"
               [opponentName]="opponentName()"
               [durationMs]="countdownMs()"
             />

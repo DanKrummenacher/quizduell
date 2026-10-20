@@ -1,0 +1,558 @@
+// TEMPORARY: proposals for the «Gegner gefunden» screen.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$track: #dfe3ea;
+$light: #e5ecf5;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+:host(.stage),
+:host(.split) {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.symbol {
+  @include facelift.symbol;
+}
+
+.title {
+  @include facelift.section-title;
+  margin: functions.rem(24) 0 functions.rem(8);
+
+  &.is-top {
+    margin: 0 0 functions.rem(32);
+  }
+}
+
+.text {
+  @include facelift.body-text;
+
+  strong {
+    color: $blue;
+  }
+}
+
+.start {
+  margin: functions.rem(12) 0 0;
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+}
+
+.eyebrow {
+  font-size: functions.rem(13);
+  font-weight: $bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $opponent;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: functions.rem(80);
+  height: functions.rem(80);
+  border-radius: 50%;
+  background-color: $blue;
+  color: $white;
+  font-size: functions.rem(32);
+  font-weight: $bold;
+
+  &.small {
+    width: functions.rem(44);
+    height: functions.rem(44);
+    font-size: functions.rem(18);
+  }
+
+  &.big {
+    width: functions.rem(88);
+    height: functions.rem(88);
+    font-size: functions.rem(34);
+  }
+
+  &.is-opponent {
+    background-color: $opponent;
+  }
+
+  &.is-inverse {
+    background-color: $white;
+    color: $blue;
+  }
+}
+
+// A bar that empties during the countdown.
+.bar {
+  display: block;
+  width: functions.rem(224);
+  height: functions.rem(6);
+  margin: functions.rem(40) auto 0;
+  overflow: hidden;
+  border-radius: functions.rem(3);
+  background-color: $track;
+
+  i {
+    display: block;
+    height: 100%;
+    background-color: $blue;
+    transform-origin: left;
+    transition: transform 0.1s linear;
+  }
+
+  &.is-flush {
+    width: auto;
+    margin: 0;
+    border-radius: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// M2 · Ring as on the search screen, now counting down
+// ---------------------------------------------------------------------------
+.dial {
+  position: relative;
+  width: functions.rem(176);
+  height: functions.rem(176);
+  margin: 0 auto;
+  border-radius: 50%;
+  animation: pulse 1s ease-out infinite;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.tick {
+  stroke: $track;
+  stroke-width: 4;
+  stroke-linecap: round;
+
+  &.is-filled {
+    stroke: $blue;
+  }
+}
+
+.dial-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.dial-number,
+.dial-go {
+  font-size: functions.rem(56);
+  font-weight: $bold;
+  line-height: 1;
+  color: $blue;
+  animation: pop 0.35s ease-out;
+}
+
+.dial-go {
+  font-size: functions.rem(40);
+}
+
+.dial-label {
+  margin-top: functions.rem(4);
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+// ---------------------------------------------------------------------------
+// M3 · You against your opponent
+// ---------------------------------------------------------------------------
+.duo {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: functions.rem(12);
+}
+
+.player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: functions.rem(12);
+  min-width: 0;
+
+  &.is-me {
+    animation: from-left 0.5s ease-out both;
+  }
+
+  &.is-opponent {
+    animation: from-right 0.5s ease-out both;
+  }
+}
+
+.player-name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: functions.rem(17);
+  font-weight: $bold;
+  color: $blue;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vs {
+  margin-top: functions.rem(28);
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: facelift.$muted;
+}
+
+.pill {
+  display: inline-block;
+  margin: functions.rem(40) 0 0;
+  padding: functions.rem(8) functions.rem(16);
+  border-radius: functions.rem(999);
+  background-color: $blue;
+  color: $white;
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+}
+
+// ---------------------------------------------------------------------------
+// M4 · The number is the design
+// ---------------------------------------------------------------------------
+.versus {
+  margin: functions.rem(8) 0 0;
+  font-size: functions.rem(20);
+  color: $blue;
+}
+
+.big {
+  display: grid;
+  place-items: center;
+  height: functions.rem(168);
+  margin: functions.rem(16) 0;
+}
+
+.big-number {
+  font-size: functions.rem(144);
+  font-weight: $bold;
+  line-height: 1;
+  color: $blue;
+  animation: pop 0.4s ease-out;
+
+  &.is-go {
+    font-size: functions.rem(80);
+    color: $opponent;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// M5 · Duel card, both players ready
+// ---------------------------------------------------------------------------
+.duel-card {
+  overflow: hidden;
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: $white;
+  text-align: left;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(12);
+  padding: functions.rem(16);
+}
+
+.row-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: functions.rem(16);
+  font-weight: $bold;
+  color: $blue;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ready {
+  padding: functions.rem(2) functions.rem(10);
+  border-radius: functions.rem(999);
+  background-color: $green;
+  color: $white;
+  font-size: functions.rem(13);
+  font-weight: $bold;
+}
+
+.divider {
+  position: relative;
+  display: block;
+  border-top: functions.rem(1) solid $track;
+
+  span {
+    position: absolute;
+    top: 50%;
+    left: functions.rem(60);
+    padding: 0 functions.rem(8);
+    transform: translateY(-50%);
+    background-color: $white;
+    font-size: functions.rem(12);
+    font-weight: $bold;
+    text-transform: uppercase;
+    color: facelift.$muted;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// M6 · Stage: dark full screen
+// ---------------------------------------------------------------------------
+.stage {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: functions.rem(32) functions.rem(20);
+  background: radial-gradient(circle at 50% 35%, #0a4596 0%, $blue 65%);
+  color: $white;
+}
+
+.eyebrow.is-light {
+  margin-bottom: functions.rem(24);
+}
+
+.stage-name {
+  max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stage-vs {
+  margin: functions.rem(12) 0;
+  font-size: functions.rem(14);
+  font-weight: $bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $opponent;
+}
+
+.stage-count {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: functions.rem(104);
+  height: functions.rem(104);
+  margin-top: functions.rem(48);
+
+  svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+
+  circle {
+    fill: none;
+    stroke-width: 5;
+  }
+
+  span {
+    font-size: functions.rem(40);
+    font-weight: $bold;
+  }
+}
+
+.stage-track {
+  stroke: rgba(255, 255, 255, 0.2);
+}
+
+.stage-fill {
+  stroke: $opponent;
+  stroke-dasharray: 1;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+.stage-text {
+  margin: functions.rem(16) 0 0;
+  font-size: functions.rem(15);
+  opacity: 0.8;
+}
+
+// ---------------------------------------------------------------------------
+// M7 · Split screen, the countdown in the middle
+// ---------------------------------------------------------------------------
+.split {
+  position: relative;
+  flex-grow: 1;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+}
+
+.half {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(4);
+  min-height: 0;
+  padding: functions.rem(16) functions.rem(20);
+
+  .avatar {
+    margin-bottom: functions.rem(8);
+  }
+
+  &.is-me {
+    z-index: 1;
+    margin-bottom: functions.rem(-24);
+    padding-bottom: functions.rem(40);
+    background-color: $blue;
+    color: $white;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - #{functions.rem(48)}), 0 100%);
+    animation: from-top 0.5s ease-out both;
+  }
+
+  &.is-opponent {
+    padding-top: functions.rem(40);
+    background-color: $light;
+    color: $blue;
+    animation: from-bottom 0.5s ease-out both;
+  }
+}
+
+.half-label {
+  font-size: functions.rem(13);
+  opacity: 0.8;
+}
+
+.half-name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: functions.rem(22);
+  font-weight: $bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.diamond {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: functions.rem(64);
+  height: functions.rem(64);
+  transform: translate(-50%, -50%) rotate(45deg);
+  border: functions.rem(3) solid colors.$dt-color-pepper-bright;
+  background-color: $opponent;
+
+  span {
+    transform: rotate(-45deg);
+    font-size: functions.rem(22);
+    font-weight: $bold;
+    color: $white;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Short phones (e.g. iPhone SE)
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .dial {
+    width: functions.rem(144);
+    height: functions.rem(144);
+  }
+
+  .big {
+    height: functions.rem(128);
+  }
+
+  .big-number {
+    font-size: functions.rem(112);
+  }
+
+  .avatar.big {
+    width: functions.rem(64);
+    height: functions.rem(64);
+    font-size: functions.rem(26);
+  }
+
+  .stage-count {
+    margin-top: functions.rem(32);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dial,
+  .dial-number,
+  .dial-go,
+  .big-number,
+  .player,
+  .half {
+    animation: none;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($opponent, 0.35);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(20) rgba($opponent, 0);
+  }
+}
+
+@keyframes from-left {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(-24));
+  }
+}
+
+@keyframes from-right {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(24));
+  }
+}
+
+@keyframes from-top {
+  from {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes from-bottom {
+  from {
+    transform: translateY(100%);
+  }
+}

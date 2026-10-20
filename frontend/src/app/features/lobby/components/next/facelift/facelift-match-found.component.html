@@ -1,18 +1,27 @@
-<div role="status">
-  <span class="symbol" aria-hidden="true">
-    <css-icon icon="checkmark-circle" size="lg"></css-icon>
-  </span>
+@if (layout() !== 'facelift') {
+  <app-match-ideas
+    [layout]="layout()"
+    [playerName]="playerName()"
+    [opponentName]="opponentName()"
+    [durationMs]="durationMs()"
+  />
+} @else {
+  <div role="status">
+    <span class="symbol" aria-hidden="true">
+      <css-icon icon="checkmark-circle" size="lg"></css-icon>
+    </span>
 
-  <h2 class="section-title status-title">Gegner gefunden!</h2>
+    <h2 class="section-title status-title">Gegner gefunden!</h2>
 
-  <p class="body-text opponent-label">Dein Gegner</p>
-  <p class="opponent-name">{{ opponentName() }}</p>
+    <p class="body-text opponent-label">Dein Gegner</p>
+    <p class="opponent-name">{{ opponentName() }}</p>
 
-  <p class="countdown-text">
-    @if (countdown() > 0) {
-      Das Duell beginnt in {{ countdown() }}&nbsp;s
-    } @else {
-      Los geht’s!
-    }
-  </p>
-</div>
+    <p class="countdown-text">
+      @if (countdown() > 0) {
+        Das Duell beginnt in {{ countdown() }}&nbsp;s
+      } @else {
+        Los geht’s!
+      }
+    </p>
+  </div>
+}

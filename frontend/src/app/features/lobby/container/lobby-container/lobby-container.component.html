@@ -8,6 +8,7 @@
   [opponentLeft]="opponentLeft()"
   [notice]="notice()"
   [design]="design()"
+  [matchLayout]="matchLayout()"
   (navigateBack)="handleBack()"
   (selectQuickGame)="handleSelectQuickGame()"
   (selectFriendGame)="handleSelectFriendGame()"
@@ -21,5 +22,9 @@
 
 <!-- TEMPORARY: compare lobby designs (development only). -->
 @if (showDesignPreview) {
-  <app-lobby-design-panel [(design)]="design" [(screen)]="previewScreen" />
+  <app-lobby-design-panel
+    [(design)]="design"
+    [(match)]="matchLayout"
+    [(screen)]="previewScreen"
+  />
 }
