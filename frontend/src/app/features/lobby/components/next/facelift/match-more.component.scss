@@ -1,0 +1,522 @@
+// TEMPORARY: further proposals for the «Gegner gefunden» screen.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$track: #dfe3ea;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+:host(.flash) {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  @include facelift.section-title;
+  margin: functions.rem(32) 0 functions.rem(8);
+
+  &.is-top {
+    margin-top: 0;
+  }
+}
+
+.text {
+  @include facelift.body-text;
+
+  strong {
+    color: $blue;
+  }
+}
+
+.start {
+  margin: functions.rem(40) 0 0;
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+}
+
+.eyebrow {
+  display: block;
+  margin-top: functions.rem(24);
+  font-size: functions.rem(13);
+  font-weight: $bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $opponent;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: functions.rem(88);
+  height: functions.rem(88);
+  border-radius: 50%;
+  background-color: $blue;
+  color: $white;
+  font-size: functions.rem(34);
+  font-weight: $bold;
+
+  &.small {
+    width: functions.rem(44);
+    height: functions.rem(44);
+    font-size: functions.rem(18);
+  }
+
+  &.is-opponent {
+    background-color: $opponent;
+  }
+
+  &.is-inverse {
+    background-color: $white;
+    color: $blue;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// M8 · Verbunden: the two players move together, a check confirms it
+// ---------------------------------------------------------------------------
+.meet {
+  position: relative;
+  display: flex;
+  justify-content: center;
+
+  .avatar {
+    border: functions.rem(4) solid colors.$dt-color-pepper-bright;
+  }
+
+  .is-left {
+    animation: meet-left 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  }
+
+  .is-right {
+    margin-left: functions.rem(-20);
+    animation: meet-right 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  }
+}
+
+.badge {
+  position: absolute;
+  bottom: functions.rem(-6);
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: functions.rem(32);
+  height: functions.rem(32);
+  margin-left: functions.rem(-16);
+  border: functions.rem(3) solid colors.$dt-color-pepper-bright;
+  border-radius: 50%;
+  background-color: $green;
+  color: $white;
+  animation: pop 0.3s 0.55s ease-out both;
+
+  css-icon {
+    display: block;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// M9 · Startampel: one light per second, all green at the start
+// ---------------------------------------------------------------------------
+.lights {
+  display: inline-flex;
+  gap: functions.rem(16);
+  margin-top: functions.rem(40);
+  padding: functions.rem(16) functions.rem(20);
+  border-radius: functions.rem(999);
+  background-color: $blue;
+}
+
+.light {
+  width: functions.rem(44);
+  height: functions.rem(44);
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.15);
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &.is-on {
+    background-color: $opponent;
+    box-shadow: 0 0 functions.rem(16) rgba($opponent, 0.8);
+  }
+
+  .is-go & {
+    background-color: #2bd18e;
+    box-shadow: 0 0 functions.rem(16) rgba(#2bd18e, 0.8);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// M10 · Gegner aufdecken: the «?» of the search turns into the opponent
+// ---------------------------------------------------------------------------
+.flip {
+  width: functions.rem(112);
+  height: functions.rem(112);
+  margin: 0 auto;
+  perspective: functions.rem(600);
+}
+
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  animation: flip 0.7s 0.2s ease-in-out both;
+}
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  font-size: functions.rem(44);
+  font-weight: $bold;
+
+  &.is-front {
+    border: functions.rem(2) dashed $opponent;
+    color: $opponent;
+  }
+
+  &.is-back {
+    transform: rotateY(180deg);
+    background-color: $opponent;
+    color: $white;
+  }
+}
+
+.name {
+  max-width: 100%;
+  margin: functions.rem(4) 0 0;
+  overflow: hidden;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  color: $blue;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ---------------------------------------------------------------------------
+// M11 · Anzeigetafel: as before a match on TV
+// ---------------------------------------------------------------------------
+.board {
+  padding: functions.rem(16) functions.rem(16) functions.rem(24);
+  border-radius: functions.rem(12);
+  background-color: $blue;
+  color: $white;
+}
+
+.board-label {
+  font-size: functions.rem(12);
+  font-weight: $bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $opponent;
+}
+
+.board-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: functions.rem(8);
+  margin-top: functions.rem(16);
+}
+
+.board-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: functions.rem(8);
+  min-width: 0;
+}
+
+.board-name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.board-score {
+  padding: functions.rem(8) functions.rem(12);
+  border-radius: functions.rem(8);
+  background-color: rgba(255, 255, 255, 0.1);
+  font-size: functions.rem(32);
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+// ---------------------------------------------------------------------------
+// M12 · Ticket gestempelt
+// ---------------------------------------------------------------------------
+.ticket {
+  overflow: hidden;
+  border-radius: functions.rem(12);
+  background-color: $white;
+  box-shadow: 0 functions.rem(8) functions.rem(24) rgba(0, 50, 125, 0.12);
+  text-align: left;
+}
+
+.ticket-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: functions.rem(16) functions.rem(20);
+  background-color: $blue;
+  color: $white;
+}
+
+.ticket-label {
+  font-size: functions.rem(12);
+  font-weight: $bold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.ticket-mode {
+  font-size: functions.rem(18);
+  font-weight: $bold;
+}
+
+.ticket-body {
+  position: relative;
+  display: grid;
+  gap: functions.rem(16);
+  padding: functions.rem(20);
+
+  > div {
+    min-width: 0;
+  }
+}
+
+.ticket-key {
+  display: block;
+  font-size: functions.rem(12);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: facelift.$muted;
+}
+
+.ticket-value {
+  display: block;
+  overflow: hidden;
+  font-size: functions.rem(20);
+  font-weight: $bold;
+  color: $blue;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stamp {
+  position: absolute;
+  right: functions.rem(20);
+  bottom: functions.rem(24);
+  padding: functions.rem(4) functions.rem(12);
+  border: functions.rem(3) solid $green;
+  border-radius: functions.rem(6);
+  color: $green;
+  font-size: functions.rem(20);
+  font-weight: $bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transform: rotate(-12deg);
+  animation: stamp 0.35s 0.3s ease-in both;
+}
+
+// ---------------------------------------------------------------------------
+// M13 · Duell-Band across the whole width
+// ---------------------------------------------------------------------------
+.band {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: functions.rem(12);
+  margin: 0 functions.rem(-20);
+  padding: functions.rem(20) functions.rem(16);
+  background-color: $blue;
+  color: $white;
+  animation: grow 0.5s ease-out both;
+}
+
+.band-name {
+  min-width: 0;
+  overflow: hidden;
+  font-size: functions.rem(16);
+  font-weight: $bold;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &.is-right {
+    text-align: left;
+  }
+}
+
+.band-vs {
+  display: grid;
+  place-items: center;
+  width: functions.rem(40);
+  height: functions.rem(40);
+  border-radius: 50%;
+  background-color: $opponent;
+  font-size: functions.rem(14);
+  font-weight: $bold;
+  text-transform: uppercase;
+}
+
+.count {
+  display: grid;
+  place-items: center;
+  width: functions.rem(88);
+  height: functions.rem(88);
+  margin: functions.rem(40) auto functions.rem(12);
+  border: functions.rem(3) solid $blue;
+  border-radius: 50%;
+
+  span {
+    font-size: functions.rem(36);
+    font-weight: $bold;
+    color: $blue;
+    animation: pop 0.35s ease-out;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// M14 · Farbflash: the whole screen in light blue
+// ---------------------------------------------------------------------------
+.flash {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: functions.rem(32) functions.rem(20);
+  background-color: $opponent;
+  color: $white;
+  animation: fade-in 0.4s ease-out both;
+}
+
+.flash-eyebrow {
+  font-size: functions.rem(13);
+  font-weight: $bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.flash-name {
+  max-width: 100%;
+  margin: functions.rem(16) 0 0;
+  overflow: hidden;
+  font-size: functions.rem(36);
+  font-weight: $bold;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flash-text {
+  margin: functions.rem(4) 0 0;
+  font-size: functions.rem(17);
+  opacity: 0.9;
+}
+
+.flash-number {
+  display: grid;
+  place-items: center;
+  height: functions.rem(176);
+  margin-top: functions.rem(24);
+
+  span {
+    font-size: functions.rem(160);
+    font-weight: $bold;
+    line-height: 1;
+    animation: pop 0.4s ease-out;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Short phones (e.g. iPhone SE)
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .start,
+  .lights {
+    margin-top: functions.rem(32);
+  }
+
+  .flash-number {
+    height: functions.rem(136);
+
+    span {
+      font-size: functions.rem(120);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes meet-left {
+  from {
+    transform: translateX(functions.rem(-48));
+  }
+}
+
+@keyframes meet-right {
+  from {
+    transform: translateX(functions.rem(48));
+  }
+}
+
+@keyframes flip {
+  to {
+    transform: rotateY(180deg);
+  }
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-12deg) scale(2.2);
+  }
+}
+
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}

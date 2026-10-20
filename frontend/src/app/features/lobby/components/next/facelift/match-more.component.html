@@ -1,0 +1,131 @@
+<ng-template #startText>
+  @if (seconds() > 0) {
+    Das Duell beginnt in {{ seconds() }}&nbsp;s
+  } @else {
+    Los geht’s!
+  }
+</ng-template>
+
+<!-- Re-created on each preview round, so the entry animations play again. -->
+@for (run of [round()]; track run) {
+  @switch (layout()) {
+    @case ('meet') {
+      <section role="status">
+        <div class="meet" aria-hidden="true">
+          <span class="avatar is-left">{{ myInitial() }}</span>
+          <span class="avatar is-right is-opponent">{{ opponentInitial() }}</span>
+          <span class="badge"><css-icon icon="checkmark" size="sm"></css-icon></span>
+        </div>
+        <h2 class="title">Verbunden!</h2>
+        <p class="text">
+          Du spielst gegen <strong>{{ opponentName() }}</strong>
+        </p>
+        <p class="start"><ng-container *ngTemplateOutlet="startText" /></p>
+      </section>
+    }
+    @case ('lights') {
+      <section role="status">
+        <h2 class="title is-top">Gegner gefunden!</h2>
+        <p class="text">
+          Du spielst gegen <strong>{{ opponentName() }}</strong>
+        </p>
+        <div class="lights" [class.is-go]="seconds() === 0" aria-hidden="true">
+          @for (light of lights; track light) {
+            <span class="light" [class.is-on]="light <= litLights()"></span>
+          }
+        </div>
+        <p class="start"><ng-container *ngTemplateOutlet="startText" /></p>
+      </section>
+    }
+    @case ('flip') {
+      <section role="status">
+        <div class="flip" aria-hidden="true">
+          <div class="flip-inner">
+            <span class="flip-face is-front">?</span>
+            <span class="flip-face is-back">{{ opponentInitial() }}</span>
+          </div>
+        </div>
+        <span class="eyebrow">Dein Gegner</span>
+        <h2 class="name">{{ opponentName() }}</h2>
+        <p class="start"><ng-container *ngTemplateOutlet="startText" /></p>
+      </section>
+    }
+    @case ('board') {
+      <section role="status">
+        <h2 class="title is-top">Gegner gefunden!</h2>
+        <div class="board">
+          <span class="board-label">Schnellspiel</span>
+          <div class="board-row">
+            <div class="board-player">
+              <span class="avatar small is-inverse" aria-hidden="true">{{
+                myInitial()
+              }}</span>
+              <span class="board-name">{{ playerName() }}</span>
+            </div>
+            <span class="board-score" aria-label="Punktestand 0 zu 0">0 : 0</span>
+            <div class="board-player">
+              <span class="avatar small is-opponent" aria-hidden="true">{{
+                opponentInitial()
+              }}</span>
+              <span class="board-name">{{ opponentName() }}</span>
+            </div>
+          </div>
+        </div>
+        <p class="start"><ng-container *ngTemplateOutlet="startText" /></p>
+      </section>
+    }
+    @case ('ticket') {
+      <section role="status">
+        <article class="ticket">
+          <header class="ticket-head">
+            <span class="ticket-label">Duell-Ticket</span>
+            <span class="ticket-mode">Schnellspiel</span>
+          </header>
+          <div class="ticket-body">
+            <div>
+              <span class="ticket-key">Spieler</span>
+              <span class="ticket-value">{{ playerName() }}</span>
+            </div>
+            <div>
+              <span class="ticket-key">Gegner</span>
+              <span class="ticket-value">{{ opponentName() }}</span>
+            </div>
+            <span class="stamp" aria-hidden="true">Bereit</span>
+          </div>
+        </article>
+        <p class="start"><ng-container *ngTemplateOutlet="startText" /></p>
+      </section>
+    }
+    @case ('band') {
+      <section role="status">
+        <h2 class="title is-top">Gegner gefunden!</h2>
+        <div class="band">
+          <span class="band-name">{{ playerName() }}</span>
+          <span class="band-vs" aria-hidden="true">vs</span>
+          <span class="band-name is-right">{{ opponentName() }}</span>
+        </div>
+        <div class="count" aria-hidden="true">
+          @for (second of [seconds()]; track second) {
+            <span>{{ second > 0 ? second : 'Los!' }}</span>
+          }
+        </div>
+        <p class="text"><ng-container *ngTemplateOutlet="startText" /></p>
+      </section>
+    }
+    @case ('flash') {
+      <section class="flash" role="status">
+        <span class="flash-eyebrow">Gegner gefunden</span>
+        <h2 class="flash-name">{{ opponentName() }}</h2>
+        <p class="flash-text">ist dein Gegner</p>
+        <div class="flash-number" aria-hidden="true">
+          @for (second of [seconds()]; track second) {
+            <span>{{ second > 0 ? second : 'Los!' }}</span>
+          }
+        </div>
+        <span class="visually-hidden"
+          ><ng-container *ngTemplateOutlet="startText"
+        /></span>
+      </section>
+    }
+  }
+}

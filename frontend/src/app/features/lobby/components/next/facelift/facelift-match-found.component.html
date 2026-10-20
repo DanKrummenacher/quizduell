@@ -1,4 +1,11 @@
-@if (layout() !== 'facelift') {
+@if (isMore()) {
+  <app-match-more
+    [layout]="layout()"
+    [playerName]="playerName()"
+    [opponentName]="opponentName()"
+    [durationMs]="durationMs()"
+  />
+} @else if (layout() !== 'facelift') {
   <app-match-ideas
     [layout]="layout()"
     [playerName]="playerName()"
