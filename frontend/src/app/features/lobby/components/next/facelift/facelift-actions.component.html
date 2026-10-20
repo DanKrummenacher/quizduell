@@ -1,15 +1,6 @@
-@if (isFive()) {
-  <app-friend-five
+@if (isFinal()) {
+  <app-friend-final
     [layout]="layout()"
-    [playerName]="playerName()"
-    [joinError]="joinError()"
-    (createGame)="createGame.emit()"
-    (joinGame)="joinGame.emit($event)"
-  />
-} @else if (isPlus()) {
-  <app-friend-plus
-    [layout]="layout()"
-    [playerName]="playerName()"
     [joinError]="joinError()"
     (createGame)="createGame.emit()"
     (joinGame)="joinGame.emit($event)"

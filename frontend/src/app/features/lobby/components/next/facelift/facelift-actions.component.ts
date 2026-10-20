@@ -15,14 +15,12 @@ import {
 } from '../../../../../core/contracts/game.contract';
 import {
   FRIEND_EXTRA,
-  FRIEND_FIVE,
   FRIEND_MORE,
-  FRIEND_PLUS,
+  FRIEND_FINAL,
   type FriendLayout,
 } from '../lobby-design';
 import { FriendExtraComponent } from './friend-extra.component';
-import { FriendFiveComponent } from './friend-five.component';
-import { FriendPlusComponent } from './friend-plus.component';
+import { FriendFinalComponent } from './friend-final.component';
 import { FriendIdeasComponent } from './friend-ideas.component';
 import { FriendMoreComponent } from './friend-more.component';
 
@@ -32,8 +30,7 @@ import { FriendMoreComponent } from './friend-more.component';
     FriendIdeasComponent,
     FriendMoreComponent,
     FriendExtraComponent,
-    FriendPlusComponent,
-    FriendFiveComponent,
+    FriendFinalComponent,
   ],
   templateUrl: './facelift-actions.component.html',
   styleUrl: './facelift-actions.component.scss',
@@ -43,8 +40,7 @@ export class FaceliftActionsComponent {
   // TEMPORARY: proposals for this screen.
   readonly layout = input<FriendLayout>('facelift');
   readonly playerName = input('');
-  protected readonly isFive = computed(() => FRIEND_FIVE.includes(this.layout()));
-  protected readonly isPlus = computed(() => FRIEND_PLUS.includes(this.layout()));
+  protected readonly isFinal = computed(() => FRIEND_FINAL.includes(this.layout()));
   protected readonly isExtra = computed(() => FRIEND_EXTRA.includes(this.layout()));
   readonly joinError = input<string>('');
   protected readonly isMore = computed(() => FRIEND_MORE.includes(this.layout()));

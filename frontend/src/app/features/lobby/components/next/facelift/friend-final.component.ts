@@ -19,18 +19,22 @@ import {
 } from '../../../../../core/contracts/game.contract';
 import type { FriendLayout } from '../lobby-design';
 
-/** TEMPORARY: a fourth round of proposals for «Freund herausfordern». */
+type Tab = 'create' | 'join';
+
+/**
+ * TEMPORARY: final proposals from the favourites 3 (switch), 7 (joins by
+ * itself after the fourth character) and 12 (code first).
+ */
 @Component({
-  selector: 'app-friend-plus',
+  selector: 'app-friend-final',
   imports: [NgTemplateOutlet],
-  templateUrl: './friend-plus.component.html',
-  styleUrl: './friend-plus.component.scss',
+  templateUrl: './friend-final.component.html',
+  styleUrl: './friend-final.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: { '[class]': 'layout()' },
 })
-export class FriendPlusComponent {
+export class FriendFinalComponent {
   readonly layout = input.required<FriendLayout>();
-  readonly playerName = input('');
   readonly joinError = input<string>('');
   readonly createGame = output<void>();
   readonly joinGame = output<string>();
@@ -42,42 +46,62 @@ export class FriendPlusComponent {
     { length: GAME_CODE_LENGTH },
     (_, index) => index,
   );
-  /** Pasting needs the clipboard API (not in every browser). */
-  protected readonly canPaste =
-    typeof navigator !== 'undefined' && !!navigator.clipboard?.readText;
 
   protected readonly code = signal('');
   protected readonly focused = signal(false);
+  /** Set while a complete code is being checked by the server. */
+  protected readonly joining = signal(false);
   private readonly localError = signal('');
+  /** The server's answer shows until the code is changed. */
+  private readonly serverErrorShown = signal(false);
   protected readonly errorMessage = computed(
-    () => this.localError() || this.joinError(),
+    () => this.localError() || (this.serverErrorShown() ? this.joinError() : ''),
   );
-  protected readonly isComplete = computed(
-    () => this.code().length === GAME_CODE_LENGTH,
-  );
-  protected readonly initial = computed(() =>
-    this.playerName().trim().charAt(0).toUpperCase(),
-  );
+  protected readonly isEmpty = computed(() => this.code().length === 0);
 
-  /** The code side or step is shown. */
-  protected readonly joinOpen = signal(false);
+  /** The switch of «3»: which way is shown. */
+  protected readonly tab = signal<Tab>('create');
 
   constructor() {
-    // Each proposal starts fresh in the preview.
+    // Only a new layout resets the preview.
     effect(() => {
-      this.layout();
-      // Only a new layout resets; the field appearing must not.
+      const layout = this.layout();
       untracked(() => {
-        this.joinOpen.set(false);
+        this.tab.set(layout === 'g-switch-join' ? 'join' : 'create');
         this.setCode('');
+        this.joining.set(false);
         this.localError.set('');
+        this.serverErrorShown.set(false);
       });
     });
+    // An answer from the server ends the check; the code is selected, so
+    // typing replaces it right away.
+    effect(() => {
+      if (this.joinError()) {
+        untracked(() => {
+          if (this.joining()) {
+            this.joining.set(false);
+            this.serverErrorShown.set(true);
+            this.field()?.nativeElement.select();
+          }
+        });
+      }
+    });
+  }
+
+  protected showTab(tab: Tab): void {
+    this.tab.set(tab);
+    this.localError.set('');
   }
 
   protected onCodeInput(event: Event): void {
     this.setCode((event.target as HTMLInputElement).value);
     this.localError.set('');
+    this.serverErrorShown.set(false);
+    // As in «7»: the fourth character joins by itself.
+    if (this.code().length === GAME_CODE_LENGTH) {
+      this.submitJoin();
+    }
   }
 
   protected onCodeKeydown(event: KeyboardEvent): void {
@@ -87,27 +111,16 @@ export class FriendPlusComponent {
     }
   }
 
-  /** Takes the code from the clipboard, e.g. from a chat message. */
-  protected async pasteCode(): Promise<void> {
-    try {
-      this.setCode(await navigator.clipboard.readText());
-      this.localError.set('');
-    } catch {
-      // No permission: the field gets the focus, so it can be pasted by hand.
-    }
-    this.field()?.nativeElement.focus();
-  }
-
   protected submitJoin(): void {
+    if (this.joining()) {
+      return;
+    }
     const code = this.code();
-    if (!code) {
-      this.localError.set('Bitte Code eingeben.');
-      return;
-    }
     if (code.length !== GAME_CODE_LENGTH) {
-      this.localError.set(`Der Code muss genau ${GAME_CODE_LENGTH} Zeichen haben.`);
+      this.localError.set(`Der Code hat ${GAME_CODE_LENGTH} Zeichen.`);
       return;
     }
+    this.joining.set(true);
     this.joinGame.emit(code);
   }
 

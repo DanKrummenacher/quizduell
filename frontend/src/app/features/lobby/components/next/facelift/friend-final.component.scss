@@ -1,0 +1,380 @@
+// TEMPORARY: final friend proposals (from the favourites 3, 7 and 12).
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$red: #d53419;
+$track: #dfe3ea;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+
+  &.is-tight {
+    margin-bottom: functions.rem(8);
+  }
+
+  &.is-step {
+    margin: functions.rem(24) 0 functions.rem(8);
+  }
+}
+
+.body-text {
+  @include facelift.body-text;
+}
+
+.symbol {
+  @include facelift.symbol;
+}
+
+.compact {
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.choice-card {
+  @include facelift.choice-card;
+}
+
+.choice-title {
+  @include facelift.choice-title;
+}
+
+.choice-description {
+  @include facelift.choice-description;
+}
+
+// ---------------------------------------------------------------------------
+// The code
+// ---------------------------------------------------------------------------
+.entry {
+  margin-top: functions.rem(28);
+}
+
+.code-boxes {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, functions.rem(60));
+  justify-content: center;
+  gap: functions.rem(10);
+
+  &.has-error {
+    animation: shake 0.35s ease-in-out;
+  }
+}
+
+.code-field {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  font-size: functions.rem(16);
+  cursor: text;
+}
+
+.code-box {
+  display: grid;
+  place-items: center;
+  height: functions.rem(68);
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(6);
+  background-color: $white;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  color: $blue;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.2s ease;
+
+  &.is-filled {
+    border-color: $blue;
+  }
+
+  &.is-active {
+    border-color: $blue;
+    box-shadow: 0 0 0 functions.rem(3) rgba($opponent, 0.35);
+  }
+
+  .is-joining & {
+    border-color: $green;
+    background-color: rgba($green, 0.06);
+  }
+
+  .has-error & {
+    border-color: $red;
+  }
+}
+
+// A blinking caret in the box where the next character goes.
+.caret {
+  width: functions.rem(2);
+  height: functions.rem(28);
+  background-color: $blue;
+  animation: blink 1s steps(1) infinite;
+}
+
+.code-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(8);
+  min-height: functions.rem(20);
+  margin: functions.rem(12) 0 0;
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+
+  &.is-error {
+    color: $red;
+  }
+}
+
+.spinner {
+  width: functions.rem(14);
+  height: functions.rem(14);
+  border: functions.rem(2) solid $track;
+  border-top-color: $green;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+// ---------------------------------------------------------------------------
+// G1 / G2 · Creating steps back while you type
+// ---------------------------------------------------------------------------
+.secondary {
+  margin-top: functions.rem(32);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s $ease;
+
+  // Kept in place (no jump), only faded out.
+  &.is-hidden {
+    opacity: 0;
+    transform: translateY(functions.rem(8));
+    pointer-events: none;
+  }
+
+  &.is-button {
+    margin-top: clamp(#{functions.rem(32)}, 6vh, #{functions.rem(56)});
+  }
+}
+
+.or {
+  display: block;
+  margin-bottom: functions.rem(12);
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+// ---------------------------------------------------------------------------
+// G3 / G4 · The switch
+// ---------------------------------------------------------------------------
+.switch {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: functions.rem(24);
+  padding: functions.rem(4);
+  border-radius: functions.rem(999);
+  background-color: $track;
+}
+
+// The white pill slides to the chosen side.
+.switch-pill {
+  position: absolute;
+  top: functions.rem(4);
+  bottom: functions.rem(4);
+  left: functions.rem(4);
+  width: calc(50% - #{functions.rem(4)});
+  border-radius: functions.rem(999);
+  background-color: $white;
+  box-shadow: 0 functions.rem(1) functions.rem(4) rgba(0, 50, 125, 0.15);
+  transition: transform 0.3s $ease;
+
+  .is-right & {
+    transform: translateX(100%);
+  }
+}
+
+.switch-tab {
+  position: relative;
+  min-height: functions.rem(44);
+  border: 0;
+  border-radius: functions.rem(999);
+  background: none;
+  color: facelift.$muted;
+  font: inherit;
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &.is-active {
+    color: $blue;
+  }
+
+  &:focus-visible {
+    outline: functions.rem(2) solid $opponent;
+    outline-offset: functions.rem(2);
+  }
+}
+
+// Both panels lie on top of each other: the taller one sets the height.
+.panels {
+  display: grid;
+  margin-top: functions.rem(28);
+}
+
+.panel {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(functions.rem(6));
+  transition:
+    opacity 0.2s ease,
+    transform 0.25s $ease,
+    visibility 0s linear 0.2s;
+
+  &.is-shown {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.25s ease 0.05s,
+      transform 0.3s $ease 0.05s,
+      visibility 0s;
+  }
+}
+
+.panel-text {
+  @include facelift.body-text;
+  max-width: functions.rem(300);
+  margin: 0 0 functions.rem(20);
+}
+
+.symbol + .panel-text {
+  margin-top: functions.rem(16);
+}
+
+// ---------------------------------------------------------------------------
+// Smaller screens
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .entry {
+    margin-top: functions.rem(20);
+  }
+
+  .code-box {
+    height: functions.rem(58);
+    font-size: functions.rem(26);
+  }
+
+  .secondary {
+    margin-top: functions.rem(24);
+
+    &.is-button {
+      margin-top: functions.rem(24);
+    }
+  }
+
+  .switch {
+    margin-top: functions.rem(16);
+  }
+
+  .panels {
+    margin-top: functions.rem(20);
+  }
+
+  .symbol {
+    width: functions.rem(52);
+    height: functions.rem(52);
+  }
+
+  .section-title.is-step {
+    margin-top: functions.rem(16);
+  }
+}
+
+@media (max-height: 600px) {
+  .code-box {
+    height: functions.rem(52);
+  }
+
+  .panel .symbol,
+  :host(.g-search) .symbol {
+    display: none;
+  }
+
+  :host(.g-search) .section-title.is-step {
+    margin-top: 0;
+  }
+
+  .panel-text {
+    margin-bottom: functions.rem(14);
+  }
+}
+
+@media (max-width: 359px) {
+  .code-boxes {
+    grid-template-columns: repeat(4, functions.rem(54));
+    gap: functions.rem(8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-boxes,
+  .caret,
+  .spinner {
+    animation: none;
+  }
+
+  .switch-pill,
+  .panel,
+  .secondary {
+    transition: none;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(functions.rem(-6));
+  }
+
+  40%,
+  80% {
+    transform: translateX(functions.rem(6));
+  }
+}
