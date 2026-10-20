@@ -17,59 +17,24 @@ export const LOBBY_DESIGNS: DesignOption<LobbyDesign>[] = [
 /** Proposals for the «Spiel erstellt» screen. */
 export type WaitingLayout =
   | 'facelift'
-  | 's-tidy'
-  | 's-share'
-  | 'x-mirror'
-  | 'x-share'
-  | 'x-shimmer'
-  | 'x-story'
-  | 'x-card'
-  | 'x-big'
-  | 'x-tap'
-  | 'x-dark'
-  | 'x-time'
-  | 'y-ring'
-  | 'y-hero'
-  | 'y-ticket'
-  | 'y-message'
-  | 'y-seats'
-  | 'y-timeline'
-  | 'z-duo'
-  | 'z-ring'
-  | 'z-code'
-  | 'z-share'
-  | 'z-letters'
-  | 'z-me-ring'
-  | 'z-code-ring'
-  | 'z-seat'
-  | 'z-tap'
-  | 'z-dark'
-  | 'q-card'
-  | 'q-dark'
-  | 'q-hero'
-  | 'q-players'
-  | 'q-stub'
-  | 'q-steps';
+  | 'w-bar'
+  | 'w-time'
+  | 'w-ring'
+  | 'w-friend'
+  | 'w-chip'
+  | 'w-boxes'
+  | 'w-wave';
 
-/** A gallery from small changes to whole new approaches. */
+/** The same code and copy button; only the way of waiting differs. */
 export const WAITING_LAYOUTS: DesignOption<WaitingLayout>[] = [
   { value: 'facelift', label: 'Heute (Facelift)' },
-  { value: 's-tidy', label: 'Klein 1 · Heute, verfeinert' },
-  { value: 's-share', label: 'Klein 2 · Heute, mit Teilen' },
-  { value: 'x-mirror', label: 'Mittel 1 · Kästchen wie «Code eingeben»' },
-  { value: 'x-tap', label: 'Mittel 2 · Tippen auf den Code kopiert' },
-  { value: 'x-time', label: 'Mittel 3 · Kästchen mit Wartezeit' },
-  { value: 'q-card', label: 'Mittel 4 · Code-Karte' },
-  { value: 'q-dark', label: 'Mittel 5 · Dunkle Code-Karte' },
-  { value: 'q-hero', label: 'Mittel 6 · Code als Überschrift' },
-  { value: 'z-duo', label: 'Gross 1 · Wie «Verbunden!»' },
-  { value: 'z-ring', label: 'Gross 2 · Wie die Suche (Ring)' },
-  { value: 'z-code-ring', label: 'Gross 3 · Code im Ring' },
-  { value: 'y-seats', label: 'Gross 4 · Zwei Plätze' },
-  { value: 'y-message', label: 'Gross 5 · Die Nachricht an deinen Freund' },
-  { value: 'y-ticket', label: 'Gross 6 · Einladungs-Ticket' },
-  { value: 'q-stub', label: 'Gross 7 · Code-Karte als Ticket' },
-  { value: 'y-timeline', label: 'Gross 8 · Ablauf von links nach rechts' },
+  { value: 'w-bar', label: 'W1 · Lichtbalken' },
+  { value: 'w-time', label: 'W2 · Zeitbalken mit Wartezeit' },
+  { value: 'w-ring', label: 'W3 · Kleiner Ring wie die Suche' },
+  { value: 'w-friend', label: 'W4 · Du und dein Freund' },
+  { value: 'w-chip', label: 'W5 · Live-Badge mit Zeit' },
+  { value: 'w-boxes', label: 'W6 · Licht läuft durch die Kästchen' },
+  { value: 'w-wave', label: 'W7 · Zeichen hüpfen als Welle' },
 ];
 
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [

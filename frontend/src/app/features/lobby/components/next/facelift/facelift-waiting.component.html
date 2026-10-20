@@ -1,25 +1,5 @@
-@if (layout().startsWith('s-')) {
-  <app-waiting-small [layout]="layout()" [roomCode]="roomCode()" />
-} @else if (layout().startsWith('x-')) {
-  <app-waiting-plus
-    [layout]="layout()"
-    [roomCode]="roomCode()"
-    [playerName]="playerName()"
-  />
-} @else if (layout().startsWith('y-')) {
-  <app-waiting-new
-    [layout]="layout()"
-    [roomCode]="roomCode()"
-    [playerName]="playerName()"
-  />
-} @else if (layout().startsWith('z-')) {
-  <app-waiting-final
-    [layout]="layout()"
-    [roomCode]="roomCode()"
-    [playerName]="playerName()"
-  />
-} @else if (layout().startsWith('q-')) {
-  <app-waiting-q
+@if (layout() !== 'facelift') {
+  <app-waiting-w
     [layout]="layout()"
     [roomCode]="roomCode()"
     [playerName]="playerName()"

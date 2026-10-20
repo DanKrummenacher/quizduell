@@ -1,0 +1,83 @@
+<h2 class="section-title">Spiel erstellt</h2>
+<p class="body-text">Teile diesen Code mit deinem Freund</p>
+
+<!-- The boxes of «Code eingeben», filled with your code. -->
+<div class="code-boxes" role="text" [attr.aria-label]="'Code ' + roomCode()">
+  @for (char of chars(); track $index) {
+    <span class="code-box" [style.--i]="$index" aria-hidden="true"
+      ><span class="char">{{ char }}</span></span
+    >
+  }
+</div>
+
+<css-button
+  variant="plain"
+  class="copy-button"
+  [attr.disabled]="isCopied() ? true : null"
+  (click)="!isCopied() && copyCode()"
+>
+  <css-icon
+    [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
+    slot="prefix"
+  ></css-icon>
+  {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
+</css-button>
+
+<div class="waiting" role="status">
+  @switch (layout()) {
+    @case ('w-bar') {
+      <!-- W1: a light runs along a thin bar. -->
+      <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
+      <span class="sweep" aria-hidden="true"><i></i></span>
+    }
+    @case ('w-time') {
+      <!-- W2: the bar fills once per minute, with the waiting time. -->
+      <p class="waiting-row">
+        <span>Warte auf deinen Freund</span>
+        <span class="time" aria-hidden="true">{{ elapsed() }}</span>
+      </p>
+      <span class="minute-bar" aria-hidden="true"
+        ><i
+          [class.is-reset]="minute() === 0"
+          [style.transform]="'scaleX(' + minute() + ')'"
+        ></i
+      ></span>
+    }
+    @case ('w-ring') {
+      <!-- W3: the ring of the search, small, next to the text. -->
+      <p class="waiting-inline">
+        <span
+          class="mini-ring"
+          [style.--p]="minute()"
+          [class.is-reset]="minute() === 0"
+          aria-hidden="true"
+        ></span>
+        <span class="inline-text">
+          Warte auf deinen Freund
+          <span class="inline-time">Wartezeit {{ elapsed() }}</span>
+        </span>
+      </p>
+    }
+    @case ('w-friend') {
+      <!-- W4: you and the open seat of your friend, joined by a running line. -->
+      <div class="pair" aria-hidden="true">
+        <span class="seat is-me">{{ initial() }}</span>
+        <span class="link"></span>
+        <span class="seat is-open">?</span>
+      </div>
+      <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
+    }
+    @case ('w-chip') {
+      <!-- W5: a live badge with the waiting time. -->
+      <p class="chip">
+        <span class="pulse" aria-hidden="true"></span>
+        Warte auf deinen Freund
+        <span class="chip-time" aria-hidden="true">{{ elapsed() }}</span>
+      </p>
+    }
+    @default {
+      <!-- W6: the boxes themselves wait; a light runs through them. -->
+      <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
+    }
+  }
+</div>

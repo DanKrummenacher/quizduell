@@ -14,7 +14,5 @@ export class LobbyHeaderComponent {
   readonly playerName = input.required<string>();
   // TEMPORARY: typography of the facelift.
   readonly modern = input(false);
-  /** TEMPORARY: proposals that show only «Zurück», without the greeting. */
-  readonly showGreeting = input(true);
   readonly navigateBack = output<void>();
 }

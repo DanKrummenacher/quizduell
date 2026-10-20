@@ -1,0 +1,398 @@
+// TEMPORARY: final proposals for «Spiel erstellt». Same grid as «Code
+// eingeben»: title → text 8, text → code 24, code → copy 12,
+// copy → waiting 32. The waiting part is as wide as the code.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$track: #dfe3ea;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+
+:host {
+  --gap-code: #{functions.rem(24)};
+  --gap-copy: #{functions.rem(12)};
+  --gap-waiting: #{functions.rem(32)};
+  --box: #{functions.rem(60)};
+  --code-width: calc(4 * var(--box) + 3 * #{functions.rem(12)});
+
+  display: block;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+  margin-bottom: functions.rem(8);
+}
+
+.body-text {
+  @include facelift.body-text;
+}
+
+// ---------------------------------------------------------------------------
+// The code: the boxes of «Code eingeben», the characters roll in
+// ---------------------------------------------------------------------------
+.code-boxes {
+  display: grid;
+  grid-template-columns: repeat(4, var(--box));
+  justify-content: center;
+  gap: functions.rem(12);
+  margin-top: var(--gap-code);
+}
+
+.code-box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: functions.rem(68);
+  border: functions.rem(1) solid $blue;
+  border-radius: functions.rem(4);
+  background-color: $white;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  color: $blue;
+
+  // W6: a light runs through the boxes, one after the other.
+  :host(.w-boxes) &::after {
+    content: '';
+    position: absolute;
+    inset: functions.rem(-1);
+    border: functions.rem(2) solid $opponent;
+    border-radius: inherit;
+    box-shadow: 0 0 functions.rem(12) rgba($opponent, 0.35);
+    opacity: 0;
+    animation: scan 2.4s ease-in-out infinite;
+    animation-delay: calc(0.8s + var(--i) * 0.3s);
+  }
+}
+
+.char {
+  display: block;
+  animation: roll-in 0.35s $spring both;
+  animation-delay: calc(var(--i) * 90ms);
+
+  // W7: the characters hop gently, as a wave.
+  :host(.w-wave) & {
+    animation:
+      roll-in 0.35s $spring both,
+      wave 2.4s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 90ms), calc(0.8s + var(--i) * 0.12s);
+  }
+}
+
+// The copy button as before: plain, in the middle.
+.copy-button {
+  display: block;
+  width: fit-content;
+  margin: var(--gap-copy) auto 0;
+}
+
+// ---------------------------------------------------------------------------
+// Waiting
+// ---------------------------------------------------------------------------
+.waiting {
+  width: var(--code-width);
+  max-width: 100%;
+  margin: var(--gap-waiting) auto 0;
+}
+
+.waiting-text {
+  margin: 0;
+  font-size: functions.rem(15);
+  color: facelift.$muted;
+}
+
+// W1: a light that runs along a thin track.
+.sweep {
+  position: relative;
+  display: block;
+  height: functions.rem(4);
+  margin-top: functions.rem(12);
+  overflow: hidden;
+  border-radius: functions.rem(2);
+  background-color: $track;
+
+  i {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 35%;
+    border-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      rgba($opponent, 0),
+      $opponent,
+      rgba($opponent, 0)
+    );
+    animation: sweep 1.8s ease-in-out infinite;
+  }
+}
+
+// W2: text and time on one line, the bar of the minute below.
+.waiting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0;
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+.time {
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+}
+
+.minute-bar {
+  display: block;
+  height: functions.rem(6);
+  margin-top: functions.rem(8);
+  overflow: hidden;
+  border-radius: functions.rem(3);
+  background-color: $track;
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background-color: $opponent;
+    transform-origin: left;
+    transition: transform 1s linear;
+
+    &.is-reset {
+      transition: none;
+    }
+  }
+}
+
+// W3: the ring of the search, small.
+.waiting-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(12);
+  margin: 0;
+  text-align: left;
+}
+
+.mini-ring {
+  --p: 0;
+
+  flex-shrink: 0;
+  width: functions.rem(36);
+  height: functions.rem(36);
+  border-radius: 50%;
+  background: conic-gradient($opponent calc(var(--p) * 360deg), $track 0);
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - #{functions.rem(4)}),
+    #000 0
+  );
+  transition: --p 1s linear;
+
+  &.is-reset {
+    transition: none;
+  }
+}
+
+.inline-text {
+  display: grid;
+  gap: functions.rem(2);
+  font-size: functions.rem(15);
+  color: $blue;
+}
+
+.inline-time {
+  font-size: functions.rem(13);
+  font-variant-numeric: tabular-nums;
+  color: facelift.$muted;
+}
+
+// W4: you, a running line, the open seat of your friend.
+.pair {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: functions.rem(12);
+}
+
+.seat {
+  display: grid;
+  place-items: center;
+  width: functions.rem(36);
+  height: functions.rem(36);
+  box-sizing: border-box;
+  border-radius: 50%;
+  font-size: functions.rem(15);
+  font-weight: $bold;
+
+  &.is-me {
+    background-color: $blue;
+    color: $white;
+  }
+
+  &.is-open {
+    border: functions.rem(2) dashed $opponent;
+    background-color: $white;
+    color: $opponent;
+    animation: ping 1.6s ease-out infinite;
+  }
+}
+
+.link {
+  width: functions.rem(72);
+  height: functions.rem(2);
+  margin: 0 functions.rem(8);
+  background: repeating-linear-gradient(
+    90deg,
+    $opponent 0 functions.rem(6),
+    transparent 0 functions.rem(12)
+  );
+  background-size: functions.rem(12) 100%;
+  animation: march 0.6s linear infinite;
+}
+
+// W5: a live badge.
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(10);
+  margin: 0;
+  padding: functions.rem(8) functions.rem(8) functions.rem(8) functions.rem(16);
+  border: functions.rem(1) solid $track;
+  border-radius: functions.rem(999);
+  background-color: $white;
+  font-size: functions.rem(14);
+  color: $blue;
+}
+
+.pulse {
+  width: functions.rem(8);
+  height: functions.rem(8);
+  border-radius: 50%;
+  background-color: $opponent;
+  animation: ping 1.6s ease-out infinite;
+}
+
+.chip-time {
+  padding: functions.rem(2) functions.rem(10);
+  border-radius: functions.rem(999);
+  background-color: rgba($opponent, 0.12);
+  font-size: functions.rem(13);
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+}
+
+// ---------------------------------------------------------------------------
+// Smaller screens
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  :host {
+    --gap-code: #{functions.rem(16)};
+    --gap-waiting: #{functions.rem(24)};
+  }
+}
+
+@media (max-height: 600px) {
+  :host {
+    --gap-code: #{functions.rem(12)};
+    --gap-copy: #{functions.rem(8)};
+    --gap-waiting: #{functions.rem(16)};
+  }
+
+  .code-box {
+    height: functions.rem(56);
+  }
+}
+
+@media (max-width: 359px) {
+  :host {
+    --box: #{functions.rem(54)};
+  }
+
+  .code-box {
+    height: functions.rem(60);
+    font-size: functions.rem(26);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .char,
+  .code-box::after,
+  .sweep i,
+  .seat,
+  .link,
+  .pulse {
+    animation: none !important;
+  }
+}
+
+// The ring fills smoothly between the seconds.
+@property --p {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes roll-in {
+  from {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+}
+
+@keyframes wave {
+  0%,
+  30%,
+  100% {
+    transform: translateY(0);
+  }
+
+  15% {
+    transform: translateY(functions.rem(-5));
+  }
+}
+
+@keyframes scan {
+  0%,
+  40%,
+  100% {
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+}
+
+@keyframes sweep {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(290%);
+  }
+}
+
+@keyframes march {
+  to {
+    background-position: functions.rem(12) 0;
+  }
+}
+
+@keyframes ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba($opponent, 0.5);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(7) rgba($opponent, 0);
+  }
+}
