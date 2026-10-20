@@ -32,27 +32,26 @@ export type FriendLayout =
   | 'fr-dock'
   | 'fr-stepper'
   | 'fr-columns'
-  | 'i-cards'
-  | 'i-ring'
-  | 'i-pill'
-  | 'i-lib';
+  | 'j-polish'
+  | 'j-label'
+  | 'j-cards'
+  | 'j-focus';
 
 export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
-  { value: 'i-cards', label: 'I1 · Zwei Karten wie die Modus-Seite' },
-  { value: 'i-ring', label: 'I2 · Ring der Suche füllt sich' },
-  { value: 'i-pill', label: 'I3 · Ein Feld mit vier Segmenten' },
-  { value: 'i-lib', label: 'I4 · Nur Komponenten der Library' },
-  { value: 'fr-auto', label: '7 · Ohne Button (Favorit)' },
-  { value: 'fr-smart', label: '12 · Code zuerst (Favorit)' },
+  { value: 'fr-auto', label: '7 · Original (Favorit)' },
+  { value: 'j-polish', label: 'J1 · 7 verfeinert' },
+  { value: 'j-label', label: 'J2 · 7 als Formular mit Titel' },
+  { value: 'j-cards', label: 'J3 · 7 als Kartenpaar' },
+  { value: 'j-focus', label: 'J4 · 7, Karte macht beim Tippen Platz' },
 ];
 
-/** Friend proposals built on the rest of the app. */
-export const FRIEND_IRIS: readonly FriendLayout[] = [
-  'i-cards',
-  'i-ring',
-  'i-pill',
-  'i-lib',
+/** Refinements of the favourite 7. */
+export const FRIEND_SEVEN: readonly FriendLayout[] = [
+  'j-polish',
+  'j-label',
+  'j-cards',
+  'j-focus',
 ];
 
 /** Third round of friend proposals. */

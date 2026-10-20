@@ -11,9 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import '@css-ch/components/button';
 import '@css-ch/components/icon';
-import '@css-ch/components/input-text';
 import {
   GAME_CODE_ALPHABET,
   GAME_CODE_LENGTH,
@@ -21,19 +19,18 @@ import {
 import type { FriendLayout } from '../lobby-design';
 
 /**
- * TEMPORARY: friend proposals that build on the rest of the app: the cards
- * of the mode screen, the ring of the search, the input of the library.
- * All of them join by themselves after the fourth character.
+ * TEMPORARY: refinements of the favourite 7: creating as a card on top,
+ * the code below; the fourth character joins by itself.
  */
 @Component({
-  selector: 'app-friend-iris',
+  selector: 'app-friend-seven',
   imports: [NgTemplateOutlet],
-  templateUrl: './friend-iris.component.html',
-  styleUrl: './friend-iris.component.scss',
+  templateUrl: './friend-seven.component.html',
+  styleUrl: './friend-seven.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: { '[class]': 'layout()' },
 })
-export class FriendIrisComponent {
+export class FriendSevenComponent {
   readonly layout = input.required<FriendLayout>();
   readonly joinError = input<string>('');
   readonly createGame = output<void>();
@@ -46,8 +43,6 @@ export class FriendIrisComponent {
     { length: GAME_CODE_LENGTH },
     (_, index) => index,
   );
-  /** The ring of the search: 60 ticks, a quarter per character. */
-  protected readonly ticks = Array.from({ length: 60 }, (_, index) => index * 6);
 
   protected readonly code = signal('');
   protected readonly focused = signal(false);
@@ -56,9 +51,9 @@ export class FriendIrisComponent {
   protected readonly errorMessage = computed(() =>
     this.serverErrorShown() ? this.joinError() : '',
   );
-  protected readonly isEmpty = computed(() => this.code().length === 0);
-  protected readonly filledTicks = computed(
-    () => (this.code().length / GAME_CODE_LENGTH) * 60,
+  /** «Fokus»: the card makes room while the code is being typed. */
+  protected readonly isTyping = computed(
+    () => this.focused() || this.code().length > 0,
   );
 
   constructor() {
@@ -87,11 +82,9 @@ export class FriendIrisComponent {
   }
 
   protected onCodeInput(event: Event): void {
-    this.setCode(
-      (event.target as HTMLInputElement).value,
-      event.target as HTMLInputElement,
-    );
+    this.setCode((event.target as HTMLInputElement).value);
     this.serverErrorShown.set(false);
+    // The fourth character joins by itself.
     if (this.code().length === GAME_CODE_LENGTH) {
       this.joining.set(true);
       this.joinGame.emit(this.code());
@@ -99,13 +92,13 @@ export class FriendIrisComponent {
   }
 
   /** Keeps only characters that can appear in a game code. */
-  private setCode(raw: string, target?: { value: string }): void {
+  private setCode(raw: string): void {
     const value = Array.from((raw || '').toUpperCase())
       .filter((char) => GAME_CODE_ALPHABET.includes(char))
       .join('')
       .slice(0, GAME_CODE_LENGTH);
     this.code.set(value);
-    const element = target ?? this.field()?.nativeElement;
+    const element = this.field()?.nativeElement;
     if (element && element.value !== value) {
       element.value = value;
     }

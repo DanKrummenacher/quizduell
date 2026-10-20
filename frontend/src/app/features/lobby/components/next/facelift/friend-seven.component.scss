@@ -1,0 +1,293 @@
+// TEMPORARY: refinements of the favourite 7.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$red: #d53419;
+$track: #dfe3ea;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+}
+
+.choice-card {
+  @include facelift.choice-card;
+}
+
+.choice-title {
+  @include facelift.choice-title;
+}
+
+.choice-description {
+  @include facelift.choice-description;
+}
+
+// ---------------------------------------------------------------------------
+// The code: four boxes as wide as the card above
+// ---------------------------------------------------------------------------
+.code-boxes {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: functions.rem(12);
+
+  &.has-error {
+    animation: shake 0.35s ease-in-out;
+  }
+}
+
+.code-field {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  font-size: functions.rem(16);
+  cursor: text;
+}
+
+.code-box {
+  display: grid;
+  place-items: center;
+  height: functions.rem(68);
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: $white;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  color: $blue;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.2s ease;
+
+  &.is-filled {
+    border-color: $blue;
+  }
+
+  &.is-active {
+    border-color: $blue;
+    box-shadow: 0 0 0 functions.rem(3) rgba($opponent, 0.3);
+  }
+
+  .is-joining & {
+    border-color: $green;
+    background-color: rgba($green, 0.06);
+  }
+
+  .has-error & {
+    border-color: $red;
+  }
+}
+
+.char {
+  animation: pop 0.18s $ease;
+}
+
+.caret {
+  width: functions.rem(2);
+  height: functions.rem(28);
+  background-color: $blue;
+  animation: blink 1s steps(1) infinite;
+}
+
+.code-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(8);
+  min-height: functions.rem(20);
+  margin: functions.rem(12) 0 0;
+  font-size: functions.rem(13);
+  color: facelift.$muted;
+
+  &.is-error {
+    font-size: functions.rem(14);
+    color: $red;
+  }
+}
+
+.spinner {
+  width: functions.rem(14);
+  height: functions.rem(14);
+  border: functions.rem(2) solid $track;
+  border-top-color: $green;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(16);
+  margin: functions.rem(28) 0 functions.rem(16);
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1 1 auto;
+    height: functions.rem(1);
+    background-color: $track;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// J2 · A label above the code
+// ---------------------------------------------------------------------------
+.labelled {
+  margin-top: functions.rem(32);
+  text-align: left;
+}
+
+.label-title {
+  @include facelift.choice-title;
+}
+
+.label-text {
+  display: block;
+  margin: functions.rem(2) 0 functions.rem(12);
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+// ---------------------------------------------------------------------------
+// J3 · A pair of cards
+// ---------------------------------------------------------------------------
+.join-card {
+  margin-top: functions.rem(16);
+  padding: functions.rem(16) functions.rem(16) functions.rem(8);
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: $white;
+  text-align: left;
+}
+
+.join-code {
+  margin-top: functions.rem(12);
+}
+
+// ---------------------------------------------------------------------------
+// J4 · The card makes room while typing
+// ---------------------------------------------------------------------------
+.collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows 0.3s $ease,
+    opacity 0.2s ease;
+
+  &.is-collapsed {
+    grid-template-rows: 0fr;
+    opacity: 0;
+  }
+}
+
+.collapse-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+// While typing, the line becomes the label of the code.
+.divider.is-label {
+  margin-top: 0;
+  font-weight: $bold;
+  color: $blue;
+}
+
+// ---------------------------------------------------------------------------
+// Smaller screens
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .section-title {
+    margin-bottom: functions.rem(16);
+  }
+
+  .code-box {
+    height: functions.rem(60);
+    font-size: functions.rem(26);
+  }
+
+  .divider {
+    margin: functions.rem(20) 0 functions.rem(12);
+  }
+
+  .labelled {
+    margin-top: functions.rem(20);
+  }
+}
+
+@media (max-height: 600px) {
+  .code-box {
+    height: functions.rem(52);
+  }
+
+  .choice-description {
+    display: none;
+  }
+
+  .choice-card {
+    min-height: functions.rem(72);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-boxes,
+  .char,
+  .caret,
+  .spinner {
+    animation: none;
+  }
+
+  .collapse {
+    transition: none;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(functions.rem(-6));
+  }
+
+  40%,
+  80% {
+    transform: translateX(functions.rem(6));
+  }
+}
