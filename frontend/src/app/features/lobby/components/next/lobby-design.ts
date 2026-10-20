@@ -31,35 +31,36 @@ export type MatchLayout =
   | 'ticket'
   | 'band'
   | 'flash'
-  | 'h-cards'
-  | 'h-focus'
-  | 'h-profile'
-  | 'h-dark';
+  | 'e-ring-roll'
+  | 'e-ring-dark'
+  | 'e-ring-name'
+  | 'e-meet-dots'
+  | 'e-meet-glow'
+  | 'e-ring-to-meet';
 
 export const MATCH_LAYOUTS: DesignOption<MatchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
   { value: 'ring', label: 'M2 · Ring (Favorit)' },
   { value: 'meet', label: 'M8 · Verbunden (Favorit)' },
-  { value: 'h-cards', label: 'H1 · Spielerkarten mit Start-Uhr' },
-  { value: 'h-focus', label: 'H2 · Gegner im Fokus' },
-  { value: 'h-profile', label: 'H3 · Karte des Gegners' },
-  { value: 'h-dark', label: 'H4 · Gegner im Fokus, dunkel (Vollbild)' },
+  { value: 'e-ring-roll', label: 'M2.1 · Ring, Zahl rollt, grüner Start' },
+  { value: 'e-ring-dark', label: 'M2.2 · Ring als dunkle Scheibe' },
+  { value: 'e-ring-name', label: 'M2.3 · Ring, Gegner als Überschrift' },
+  { value: 'e-meet-dots', label: 'M8.1 · Verbunden mit 3 Punkten' },
+  { value: 'e-meet-glow', label: 'M8.2 · Verbunden mit Leuchten' },
+  { value: 'e-ring-to-meet', label: 'M2 → M8 · Ring wird zu Verbunden' },
 ];
 
 /** Match proposals that use the whole screen. */
-export const FULLSCREEN_MATCH: readonly MatchLayout[] = [
-  'stage',
-  'split',
-  'flash',
-  'h-dark',
-];
+export const FULLSCREEN_MATCH: readonly MatchLayout[] = ['stage', 'split', 'flash'];
 
-/** High-fidelity proposals: clear hierarchy, cards and one calm motion. */
-export const MATCH_HIFI: readonly MatchLayout[] = [
-  'h-cards',
-  'h-focus',
-  'h-profile',
-  'h-dark',
+/** Proposals that build directly on the favourites M2 and M8. */
+export const MATCH_EVOLVED: readonly MatchLayout[] = [
+  'e-ring-roll',
+  'e-ring-dark',
+  'e-ring-name',
+  'e-meet-dots',
+  'e-meet-glow',
+  'e-ring-to-meet',
 ];
 
 /** Further match proposals in their own component. */

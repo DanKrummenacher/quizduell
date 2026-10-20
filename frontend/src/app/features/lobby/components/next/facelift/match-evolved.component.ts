@@ -8,40 +8,52 @@ import {
   type OnInit,
   signal,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import '@css-ch/components/icon';
 import type { MatchLayout } from '../lobby-design';
 
 const TICK_MS = 50;
 /** In the preview the countdown starts again, so it can be looked at. */
-const RESTART_MS = 1500;
+const RESTART_MS = 1800;
+/** «Ring öffnet sich»: how long the full ring shows before the players. */
+const RING_PHASE_MS = 900;
 
 /**
- * TEMPORARY: high-fidelity proposals for «Gegner gefunden». A clear
- * hierarchy (who is my opponent?), calm cards and one motion each.
+ * TEMPORARY: proposals that build directly on the favourites M2 (ring)
+ * and M8 (connected players). Each one improves a single thing.
  */
 @Component({
-  selector: 'app-match-hifi',
-  templateUrl: './match-hifi.component.html',
-  styleUrl: './match-hifi.component.scss',
+  selector: 'app-match-evolved',
+  imports: [NgTemplateOutlet],
+  templateUrl: './match-evolved.component.html',
+  styleUrl: './match-evolved.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: { '[class]': 'layout()' },
 })
-export class MatchHifiComponent implements OnInit {
+export class MatchEvolvedComponent implements OnInit {
   readonly layout = input.required<MatchLayout>();
   readonly playerName = input('');
   readonly opponentName = input('');
   readonly durationMs = input(3000);
+
+  protected readonly ticks = Array.from({ length: 60 }, (_, index) => index * 6);
+  protected readonly dots = [3, 2, 1];
 
   private readonly remainingMs = signal(0);
   /** Counts the restarts, so animations play again in the preview. */
   protected readonly round = signal(0);
   private readonly destroyRef = inject(DestroyRef);
 
-  protected readonly seconds = computed(() => Math.ceil(this.remainingMs() / 1000));
-  /** Share of the countdown that is left, from 1 down to 0. */
-  protected readonly left = computed(
-    () => this.remainingMs() / Math.max(1, this.durationMs()),
+  private readonly elapsedMs = computed(
+    () => this.durationMs() - this.remainingMs(),
   );
+  protected readonly seconds = computed(() => Math.ceil(this.remainingMs() / 1000));
+  protected readonly filledTicks = computed(() =>
+    Math.round((this.remainingMs() / Math.max(1, this.durationMs())) * 60),
+  );
+
+  /** «Ring öffnet sich»: the full ring first, then the players. */
+  protected readonly ringPhase = computed(() => this.elapsedMs() < RING_PHASE_MS);
 
   protected readonly myInitial = computed(() => this.initialOf(this.playerName()));
   protected readonly opponentInitial = computed(() =>
