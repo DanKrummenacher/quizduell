@@ -1,5 +1,5 @@
 <!-- The code as four boxes; one real field lies over them. -->
-<ng-template #codeBoxes let-large="large" let-autofocus="autofocus">
+<ng-template #codeBoxes let-large="large">
   <div
     class="code-boxes"
     [class.is-large]="large"
@@ -13,7 +13,6 @@
       autocomplete="off"
       autocapitalize="characters"
       spellcheck="false"
-      [attr.autofocus]="autofocus ? true : null"
       [attr.maxlength]="codeLength"
       [attr.aria-invalid]="errorMessage() ? true : null"
       [attr.aria-describedby]="errorMessage() ? 'friendCodeError' : null"
@@ -123,9 +122,7 @@
         <h2 class="section-title is-step">Code eingeben</h2>
         <p class="body-text">Den Code bekommst du von deinem Freund</p>
         <div class="step-code">
-          <ng-container
-            *ngTemplateOutlet="codeBoxes; context: { large: true, autofocus: true }"
-          />
+          <ng-container *ngTemplateOutlet="codeBoxes; context: { large: true }" />
         </div>
         <css-button variant="primary" class="compact" (click)="submitJoin()">
           <css-icon icon="arrow-right-circle" slot="prefix"></css-icon>
@@ -160,7 +157,12 @@
       </css-button>
     </div>
     @if (joinOpen()) {
-      <div class="backdrop" (click)="joinOpen.set(false)"></div>
+      <button
+        type="button"
+        class="backdrop"
+        aria-label="Schliessen"
+        (click)="joinOpen.set(false)"
+      ></button>
       <section
         class="sheet"
         role="dialog"
@@ -171,9 +173,7 @@
         <h2 id="sheetTitle" class="sheet-title">Mit Code beitreten</h2>
         <p class="body-text">Gib den Code deines Freundes ein</p>
         <div class="sheet-code">
-          <ng-container
-            *ngTemplateOutlet="codeBoxes; context: { large: true, autofocus: true }"
-          />
+          <ng-container *ngTemplateOutlet="codeBoxes; context: { large: true }" />
         </div>
         <div class="two-buttons is-row">
           <css-button stretch (click)="joinOpen.set(false)">Abbrechen</css-button>

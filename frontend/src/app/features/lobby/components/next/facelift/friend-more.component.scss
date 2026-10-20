@@ -299,6 +299,8 @@ $white: colors.$dt-color-white-100;
 .backdrop {
   position: fixed;
   inset: 0;
+  padding: 0;
+  border: 0;
   z-index: 5;
   background-color: rgba(0, 50, 125, 0.35);
   animation: fade-in 0.2s ease-out;
