@@ -14,6 +14,20 @@ export const LOBBY_DESIGNS: DesignOption<LobbyDesign>[] = [
   { value: 'facelift', label: 'Facelift' },
 ];
 
+/** Proposals for the «Spiel erstellt» screen. */
+export type WaitingLayout =
+  'facelift' | 'w-boxes' | 'w-ring' | 'w-duo' | 'w-share' | 'w-blocks' | 'w-steps';
+
+export const WAITING_LAYOUTS: DesignOption<WaitingLayout>[] = [
+  { value: 'facelift', label: 'Facelift (aktuell)' },
+  { value: 'w-boxes', label: '1 · Code in den Kästchen vom Beitreten' },
+  { value: 'w-ring', label: '2 · Wie die Suche: Code im Ring' },
+  { value: 'w-duo', label: '3 · Dein Platz, der Platz deines Freundes' },
+  { value: 'w-share', label: '4 · Karte mit Kopieren und Teilen' },
+  { value: 'w-blocks', label: '5 · Code als dunkle Blöcke' },
+  { value: 'w-steps', label: '6 · Mit den drei Schritten' },
+];
+
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [
   { value: '', label: 'Echter Ablauf' },
   { value: 'CHOOSE_MODE', label: '1 · Modus wählen' },

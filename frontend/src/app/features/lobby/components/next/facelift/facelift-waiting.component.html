@@ -1,21 +1,29 @@
-<h2 class="section-title">Spiel erstellt</h2>
-<p class="body-text">Teile diesen Code mit deinem Gegner</p>
+@if (layout() !== 'facelift') {
+  <app-waiting-ideas
+    [layout]="layout()"
+    [roomCode]="roomCode()"
+    [playerName]="playerName()"
+  />
+} @else {
+  <h2 class="section-title">Spiel erstellt</h2>
+  <p class="body-text">Teile diesen Code mit deinem Gegner</p>
 
-<div class="code-box">
-  <span class="code-text">{{ roomCode() }}</span>
-</div>
+  <div class="code-box">
+    <span class="code-text">{{ roomCode() }}</span>
+  </div>
 
-<css-button
-  variant="plain"
-  class="copy-button"
-  [attr.disabled]="isCopied() ? true : null"
-  (click)="!isCopied() && copyCode()"
->
-  <css-icon
-    [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
-    slot="prefix"
-  ></css-icon>
-  {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
-</css-button>
+  <css-button
+    variant="plain"
+    class="copy-button"
+    [attr.disabled]="isCopied() ? true : null"
+    (click)="!isCopied() && copyCode()"
+  >
+    <css-icon
+      [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
+      slot="prefix"
+    ></css-icon>
+    {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
+  </css-button>
 
-<p class="waiting-text" role="status">Warte auf den Gegner&nbsp;…</p>
+  <p class="waiting-text" role="status">Warte auf den Gegner&nbsp;…</p>
+}

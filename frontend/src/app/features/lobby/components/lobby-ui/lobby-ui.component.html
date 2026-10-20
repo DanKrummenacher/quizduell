@@ -33,7 +33,11 @@
             <app-facelift-searching (cancelSearch)="cancelSearch.emit()" />
           }
           @case ('WAITING') {
-            <app-facelift-waiting [roomCode]="roomCode()" />
+            <app-facelift-waiting
+              [layout]="waitingLayout()"
+              [playerName]="playerName()"
+              [roomCode]="roomCode()"
+            />
           }
           @case ('FOUND') {
             <app-facelift-match-found

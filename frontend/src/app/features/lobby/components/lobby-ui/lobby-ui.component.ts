@@ -18,7 +18,7 @@ import { FaceliftActionsComponent } from '../next/facelift/facelift-actions.comp
 import { FaceliftSearchingComponent } from '../next/facelift/facelift-searching.component';
 import { FaceliftWaitingComponent } from '../next/facelift/facelift-waiting.component';
 import { FaceliftMatchFoundComponent } from '../next/facelift/facelift-match-found.component';
-import type { LobbyDesign } from '../next/lobby-design';
+import type { LobbyDesign, WaitingLayout } from '../next/lobby-design';
 import '@css-ch/components/button';
 import '@css-ch/components/flyout';
 
@@ -53,6 +53,7 @@ export class LobbyUiComponent {
   readonly notice = input<string | null>(null);
   // TEMPORARY: lobby designs under review.
   readonly design = input<LobbyDesign>('today');
+  readonly waitingLayout = input<WaitingLayout>('facelift');
 
   /** Greeting and back navigation, hidden while the duel is about to start. */
   protected readonly hasNavigation = computed(() => this.state() !== 'FOUND');
