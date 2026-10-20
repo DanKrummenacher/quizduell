@@ -1,0 +1,424 @@
+// TEMPORARY: friend proposals without a switch (from 7 and 12).
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$red: #d53419;
+$track: #dfe3ea;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+
+  &.is-tight {
+    margin-bottom: functions.rem(8);
+  }
+}
+
+.body-text {
+  @include facelift.body-text;
+}
+
+.choice-card {
+  @include facelift.choice-card;
+}
+
+.choice-title {
+  @include facelift.choice-title;
+}
+
+.choice-description {
+  @include facelift.choice-description;
+}
+
+// ---------------------------------------------------------------------------
+// The code
+// ---------------------------------------------------------------------------
+.entry {
+  margin-top: functions.rem(28);
+}
+
+.code-boxes {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, functions.rem(64));
+  justify-content: center;
+  gap: functions.rem(12);
+
+  &.has-error {
+    animation: shake 0.35s ease-in-out;
+  }
+}
+
+.code-field {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  font-size: functions.rem(16);
+  cursor: text;
+}
+
+.code-box {
+  display: grid;
+  place-items: center;
+  height: functions.rem(76);
+  border: functions.rem(2) solid $track;
+  border-radius: functions.rem(10);
+  background-color: $white;
+  box-shadow: 0 functions.rem(1) functions.rem(2) rgba(0, 50, 125, 0.06);
+  font-size: functions.rem(32);
+  font-weight: $bold;
+  color: $blue;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s $ease;
+
+  &.is-filled {
+    border-color: $blue;
+  }
+
+  // The box for the next character lifts slightly.
+  &.is-active {
+    border-color: $blue;
+    box-shadow: 0 0 0 functions.rem(4) rgba($opponent, 0.25);
+    transform: translateY(functions.rem(-2));
+  }
+
+  .is-joining & {
+    border-color: $green;
+    background-color: rgba($green, 0.06);
+  }
+
+  .has-error & {
+    border-color: $red;
+  }
+
+  // On dark blue.
+  .is-inverse & {
+    border-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+    color: $white;
+
+    &.is-filled,
+    &.is-active {
+      border-color: $white;
+    }
+  }
+
+  .is-inverse.is-joining & {
+    border-color: #4fd1a1;
+  }
+
+  .is-inverse.has-error & {
+    border-color: #ff8a75;
+  }
+}
+
+// Each character pops in.
+.char {
+  animation: pop 0.18s $ease;
+}
+
+.caret {
+  width: functions.rem(2);
+  height: functions.rem(30);
+  background-color: currentColor;
+  animation: blink 1s steps(1) infinite;
+}
+
+// Only speaks when something happens; keeps its height so nothing jumps.
+.code-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(8);
+  min-height: functions.rem(20);
+  margin: functions.rem(12) 0 0;
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+
+  &.is-error {
+    color: $red;
+  }
+
+  .is-inverse + & {
+    color: rgba(255, 255, 255, 0.8);
+
+    &.is-error {
+      color: #ffb4a6;
+    }
+  }
+}
+
+.spinner {
+  width: functions.rem(14);
+  height: functions.rem(14);
+  border: functions.rem(2) solid $track;
+  border-top-color: $green;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+// Creating fades out (in place) while a code is typed.
+.secondary,
+.link-line {
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s $ease;
+
+  &.is-hidden {
+    opacity: 0;
+    transform: translateY(functions.rem(8));
+    pointer-events: none;
+  }
+}
+
+.secondary {
+  margin-top: functions.rem(24);
+
+  &.is-tight {
+    margin-top: functions.rem(16);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// H1 · Creating as a quiet line
+// ---------------------------------------------------------------------------
+.link-line {
+  margin: clamp(#{functions.rem(32)}, 6vh, #{functions.rem(56)}) 0 0;
+  font-size: functions.rem(15);
+  color: facelift.$muted;
+}
+
+.text-link {
+  padding: functions.rem(4);
+  border: 0;
+  background: none;
+  color: $blue;
+  font: inherit;
+  font-weight: $bold;
+  text-decoration: underline;
+  text-underline-offset: functions.rem(3);
+  cursor: pointer;
+
+  &:hover {
+    color: $opponent;
+  }
+
+  &:focus-visible {
+    outline: functions.rem(2) solid $opponent;
+    outline-offset: functions.rem(2);
+    border-radius: functions.rem(2);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// H2 · The code in its own card
+// ---------------------------------------------------------------------------
+.code-card {
+  padding: functions.rem(20) functions.rem(16) functions.rem(12);
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: $white;
+
+  .code-box {
+    background-color: $white;
+  }
+}
+
+.card-title {
+  display: block;
+  margin-bottom: functions.rem(16);
+  @include facelift.choice-title;
+}
+
+// ---------------------------------------------------------------------------
+// H3 · Dark area for the code
+// ---------------------------------------------------------------------------
+.dark-zone {
+  padding: functions.rem(24) functions.rem(16) functions.rem(12);
+  border-radius: functions.rem(8);
+  background-color: $blue;
+}
+
+.zone-title {
+  display: block;
+  margin-bottom: functions.rem(16);
+  font-size: functions.rem(17);
+  font-weight: $bold;
+  color: $white;
+}
+
+.light-zone {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(16);
+  width: 100%;
+  padding: functions.rem(16) functions.rem(20);
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(8);
+  background-color: $white;
+  font: inherit;
+  text-align: left;
+  @include interaction.card;
+}
+
+.zone-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.zone-plus {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: functions.rem(40);
+  height: functions.rem(40);
+  border-radius: 50%;
+  background-color: $blue;
+  color: $white;
+
+  css-icon {
+    display: block;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// H4 · Creating first, the code below
+// ---------------------------------------------------------------------------
+.divider {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(16);
+  margin: functions.rem(28) 0 functions.rem(16);
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1 1 auto;
+    height: functions.rem(1);
+    background-color: $track;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Smaller screens
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .entry {
+    margin-top: functions.rem(20);
+  }
+
+  .code-box {
+    height: functions.rem(64);
+    font-size: functions.rem(28);
+  }
+
+  .divider {
+    margin: functions.rem(20) 0 functions.rem(12);
+  }
+
+  .dark-zone,
+  .code-card {
+    padding-top: functions.rem(16);
+  }
+
+  .zone-title,
+  .card-title {
+    margin-bottom: functions.rem(12);
+  }
+}
+
+@media (max-height: 600px) {
+  .code-box {
+    height: functions.rem(54);
+  }
+
+  .light-zone .choice-description,
+  .secondary .choice-description {
+    display: none;
+  }
+
+  .secondary {
+    margin-top: functions.rem(14);
+  }
+
+  .secondary .choice-card {
+    min-height: functions.rem(72);
+  }
+}
+
+@media (max-width: 359px) {
+  .code-boxes {
+    grid-template-columns: repeat(4, functions.rem(56));
+    gap: functions.rem(8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-boxes,
+  .char,
+  .caret,
+  .spinner {
+    animation: none;
+  }
+
+  .code-box,
+  .secondary,
+  .link-line {
+    transition: none;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(functions.rem(-6));
+  }
+
+  40%,
+  80% {
+    transform: translateX(functions.rem(6));
+  }
+}

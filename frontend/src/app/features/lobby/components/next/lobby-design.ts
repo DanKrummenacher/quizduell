@@ -32,28 +32,27 @@ export type FriendLayout =
   | 'fr-dock'
   | 'fr-stepper'
   | 'fr-columns'
-  | 'g-code-first'
-  | 'g-search'
-  | 'g-switch'
-  | 'g-switch-join';
+  | 'h-link'
+  | 'h-card'
+  | 'h-dark'
+  | 'h-create-first';
 
 export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
-  { value: 'g-code-first', label: 'G1 · Code zuerst, automatisch' },
-  { value: 'g-search', label: 'G2 · Wie die Suche: Code, ein Button' },
-  { value: 'g-switch', label: 'G3 · Umschalter, Erstellen zuerst' },
-  { value: 'g-switch-join', label: 'G4 · Umschalter, Beitreten zuerst' },
-  { value: 'fr-tabs', label: '3 · Umschalter (Favorit)' },
+  { value: 'h-link', label: 'H1 · Nur der Code, Erstellen als Zeile' },
+  { value: 'h-card', label: 'H2 · Code in einer Karte' },
+  { value: 'h-dark', label: 'H3 · Dunkle Fläche für den Code' },
+  { value: 'h-create-first', label: 'H4 · Erstellen oben, Code darunter' },
   { value: 'fr-auto', label: '7 · Ohne Button (Favorit)' },
   { value: 'fr-smart', label: '12 · Code zuerst (Favorit)' },
 ];
 
-/** Final friend proposals (from the favourites 3, 7 and 12). */
-export const FRIEND_FINAL: readonly FriendLayout[] = [
-  'g-code-first',
-  'g-search',
-  'g-switch',
-  'g-switch-join',
+/** Friend proposals without a switch (from 7 and 12). */
+export const FRIEND_CODE: readonly FriendLayout[] = [
+  'h-link',
+  'h-card',
+  'h-dark',
+  'h-create-first',
 ];
 
 /** Third round of friend proposals. */

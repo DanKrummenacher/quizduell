@@ -19,21 +19,19 @@ import {
 } from '../../../../../core/contracts/game.contract';
 import type { FriendLayout } from '../lobby-design';
 
-type Tab = 'create' | 'join';
-
 /**
- * TEMPORARY: final proposals from the favourites 3 (switch), 7 (joins by
- * itself after the fourth character) and 12 (code first).
+ * TEMPORARY: proposals without a switch, from the favourites 12 (code
+ * first) and 7 (joins by itself after the fourth character).
  */
 @Component({
-  selector: 'app-friend-final',
+  selector: 'app-friend-code',
   imports: [NgTemplateOutlet],
-  templateUrl: './friend-final.component.html',
-  styleUrl: './friend-final.component.scss',
+  templateUrl: './friend-code.component.html',
+  styleUrl: './friend-code.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: { '[class]': 'layout()' },
 })
-export class FriendFinalComponent {
+export class FriendCodeComponent {
   readonly layout = input.required<FriendLayout>();
   readonly joinError = input<string>('');
   readonly createGame = output<void>();
@@ -51,26 +49,20 @@ export class FriendFinalComponent {
   protected readonly focused = signal(false);
   /** Set while a complete code is being checked by the server. */
   protected readonly joining = signal(false);
-  private readonly localError = signal('');
   /** The server's answer shows until the code is changed. */
   private readonly serverErrorShown = signal(false);
-  protected readonly errorMessage = computed(
-    () => this.localError() || (this.serverErrorShown() ? this.joinError() : ''),
+  protected readonly errorMessage = computed(() =>
+    this.serverErrorShown() ? this.joinError() : '',
   );
   protected readonly isEmpty = computed(() => this.code().length === 0);
-
-  /** The switch of «3»: which way is shown. */
-  protected readonly tab = signal<Tab>('create');
 
   constructor() {
     // Only a new layout resets the preview.
     effect(() => {
-      const layout = this.layout();
+      this.layout();
       untracked(() => {
-        this.tab.set(layout === 'g-switch-join' ? 'join' : 'create');
         this.setCode('');
         this.joining.set(false);
-        this.localError.set('');
         this.serverErrorShown.set(false);
       });
     });
@@ -89,39 +81,14 @@ export class FriendFinalComponent {
     });
   }
 
-  protected showTab(tab: Tab): void {
-    this.tab.set(tab);
-    this.localError.set('');
-  }
-
   protected onCodeInput(event: Event): void {
     this.setCode((event.target as HTMLInputElement).value);
-    this.localError.set('');
     this.serverErrorShown.set(false);
-    // As in «7»: the fourth character joins by itself.
+    // The fourth character joins by itself.
     if (this.code().length === GAME_CODE_LENGTH) {
-      this.submitJoin();
+      this.joining.set(true);
+      this.joinGame.emit(this.code());
     }
-  }
-
-  protected onCodeKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      this.submitJoin();
-    }
-  }
-
-  protected submitJoin(): void {
-    if (this.joining()) {
-      return;
-    }
-    const code = this.code();
-    if (code.length !== GAME_CODE_LENGTH) {
-      this.localError.set(`Der Code hat ${GAME_CODE_LENGTH} Zeichen.`);
-      return;
-    }
-    this.joining.set(true);
-    this.joinGame.emit(code);
   }
 
   /** Keeps only characters that can appear in a game code. */
