@@ -1,13 +1,7 @@
 // TEMPORARY: panel to switch between lobby designs (development only).
 import { Component, model } from '@angular/core';
 import type { LobbyState } from '../../lobby.types';
-import {
-  LOBBY_DESIGNS,
-  MATCH_LAYOUTS,
-  PREVIEW_SCREENS,
-  type LobbyDesign,
-  type MatchLayout,
-} from './lobby-design';
+import { LOBBY_DESIGNS, PREVIEW_SCREENS, type LobbyDesign } from './lobby-design';
 
 @Component({
   selector: 'app-lobby-design-panel',
@@ -18,14 +12,6 @@ import {
         Design
         <select [value]="design()" (change)="design.set($any(value($event)))">
           @for (option of designs; track option.value) {
-            <option [value]="option.value">{{ option.label }}</option>
-          }
-        </select>
-      </label>
-      <label>
-        Gegner gefunden
-        <select [value]="match()" (change)="match.set($any(value($event)))">
-          @for (option of matches; track option.value) {
             <option [value]="option.value">{{ option.label }}</option>
           }
         </select>
@@ -78,10 +64,7 @@ export class LobbyDesignPanelComponent {
   readonly design = model<LobbyDesign>('today');
   readonly screen = model<LobbyState | null>(null);
 
-  readonly match = model<MatchLayout>('facelift');
-
   protected readonly designs = LOBBY_DESIGNS;
-  protected readonly matches = MATCH_LAYOUTS;
   protected readonly screens = PREVIEW_SCREENS;
 
   protected value(event: Event): string {

@@ -1,69 +1,36 @@
-@if (isPolish()) {
-  <app-match-polish
-    [layout]="layout()"
-    [playerName]="playerName()"
-    [opponentName]="opponentName()"
-    [durationMs]="durationMs()"
-  />
-} @else if (isClean()) {
-  <app-match-clean
-    [layout]="layout()"
-    [playerName]="playerName()"
-    [opponentName]="opponentName()"
-    [durationMs]="durationMs()"
-  />
-} @else if (isDuel()) {
-  <app-match-duel
-    [layout]="layout()"
-    [playerName]="playerName()"
-    [opponentName]="opponentName()"
-    [durationMs]="durationMs()"
-  />
-} @else if (isBlend()) {
-  <app-match-blend
-    [layout]="layout()"
-    [playerName]="playerName()"
-    [opponentName]="opponentName()"
-    [durationMs]="durationMs()"
-  />
-} @else if (isEvolved()) {
-  <app-match-evolved
-    [layout]="layout()"
-    [playerName]="playerName()"
-    [opponentName]="opponentName()"
-    [durationMs]="durationMs()"
-  />
-} @else if (isMore()) {
-  <app-match-more
-    [layout]="layout()"
-    [playerName]="playerName()"
-    [opponentName]="opponentName()"
-    [durationMs]="durationMs()"
-  />
-} @else if (layout() !== 'facelift') {
-  <app-match-ideas
-    [layout]="layout()"
-    [playerName]="playerName()"
-    [opponentName]="opponentName()"
-    [durationMs]="durationMs()"
-  />
-} @else {
-  <div role="status">
-    <span class="symbol" aria-hidden="true">
-      <css-icon icon="checkmark-circle" size="lg"></css-icon>
-    </span>
-
-    <h2 class="section-title status-title">Gegner gefunden!</h2>
-
-    <p class="body-text opponent-label">Dein Gegner</p>
-    <p class="opponent-name">{{ opponentName() }}</p>
-
-    <p class="countdown-text">
-      @if (countdown() > 0) {
-        Das Duell beginnt in {{ countdown() }}&nbsp;s
-      } @else {
-        Los geht’s!
-      }
-    </p>
+<div role="status">
+  <!-- Both players move together; the check confirms the match. -->
+  <div class="visual" aria-hidden="true">
+    <div class="duo">
+      <span class="glow"></span>
+      <span class="avatar is-me">{{ myInitial() }}</span>
+      <span class="avatar is-opponent">{{ opponentInitial() }}</span>
+      <span class="badge"><css-icon icon="checkmark" size="sm"></css-icon></span>
+    </div>
   </div>
-}
+
+  <h2 class="section-title status-title">Verbunden!</h2>
+  <p class="body-text">
+    Du spielst gegen <strong class="opponent-name">{{ opponentName() }}</strong>
+  </p>
+
+  <!-- Screen readers get the countdown as a sentence. -->
+  <p class="visually-hidden">
+    @if (countdown() > 0) {
+      Das Duell beginnt in {{ countdown() }} Sekunden
+    } @else {
+      Los geht’s!
+    }
+  </p>
+
+  <!-- The countdown, where the search had its cancel button. -->
+  <div class="countdown" aria-hidden="true">
+    @for (second of [countdown()]; track second) {
+      @if (second > 0) {
+        <span class="countdown-number">{{ second }}</span>
+      } @else {
+        <span class="countdown-number is-go">Los!</span>
+      }
+    }
+  </div>
+</div>

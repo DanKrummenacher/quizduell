@@ -1,10 +1,5 @@
 <div class="top-bar">
-  <css-button
-    variant="plain"
-    class="back-button"
-    [style.visibility]="canGoBack() ? null : 'hidden'"
-    (click)="navigateBack.emit()"
-  >
+  <css-button variant="plain" class="back-button" (click)="navigateBack.emit()">
     <css-icon icon="angle-left-circle" slot="prefix"></css-icon>
     Zurück
   </css-button>

@@ -6,7 +6,6 @@
       <app-lobby-header
         [playerName]="playerName()"
         [modern]="design() === 'facelift'"
-        [canGoBack]="state() !== 'FOUND'"
         (navigateBack)="navigateBack.emit()"
       >
       </app-lobby-header>
@@ -14,7 +13,7 @@
   }
 
   @if (design() === 'facelift') {
-    <main class="main-area is-facelift" [class.is-stage]="fullscreen()">
+    <main class="main-area is-facelift">
       <div class="centered-content">
         @switch (state()) {
           @case ('CHOOSE_MODE') {
@@ -38,7 +37,6 @@
           }
           @case ('FOUND') {
             <app-facelift-match-found
-              [layout]="matchLayout()"
               [playerName]="playerName()"
               [opponentName]="opponentName()"
               [durationMs]="countdownMs()"

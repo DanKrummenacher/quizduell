@@ -114,7 +114,7 @@ test.describe('responsive layout', () => {
       await capture(player, device, '04-waiting');
 
       await joinByCode(opponent, code, 'Maximilian');
-      await expect(player.getByText('Gegner gefunden!')).toBeVisible();
+      await expect(player.getByText('Verbunden!')).toBeVisible();
       await capture(player, device, '05-found');
 
       for (let number = 1; number <= 3; number++) {

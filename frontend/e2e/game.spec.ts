@@ -63,7 +63,7 @@ test.describe('playing duels', () => {
     await expectNoHorizontalOverflow(anna);
 
     await joinByCode(ben, code, 'Ben');
-    await expect(anna.getByText('Gegner gefunden!')).toBeVisible();
+    await expect(anna.getByText('Verbunden!')).toBeVisible();
     await expect(anna.locator('.opponent-name')).toHaveText('Ben');
 
     await waitForQuestion(anna, 1);
@@ -99,8 +99,8 @@ test.describe('playing duels', () => {
       'Anna möchte eine Revanche!',
     );
     await ben.locator('css-button', { hasText: 'Revanche annehmen!' }).click();
-    await expect(anna.getByText('Gegner gefunden!')).toBeVisible();
-    await expect(ben.getByText('Gegner gefunden!')).toBeVisible();
+    await expect(anna.getByText('Verbunden!')).toBeVisible();
+    await expect(ben.getByText('Verbunden!')).toBeVisible();
     await waitForQuestion(anna, 1);
   });
 
@@ -117,7 +117,7 @@ test.describe('playing duels', () => {
     await enterName(ben, 'Ben');
     await ben.getByText('Schnellspiel 1vs1').click();
 
-    await expect(anna.getByText('Gegner gefunden!')).toBeVisible();
+    await expect(anna.getByText('Verbunden!')).toBeVisible();
     await waitForQuestion(anna, 1);
     await waitForQuestion(ben, 1);
 
@@ -224,7 +224,7 @@ test.describe('playing duels', () => {
       }),
     ).toBeVisible();
     await anna.locator('css-button', { hasText: 'Revanche annehmen!' }).click();
-    await expect(anna.getByText('Gegner gefunden!')).toBeVisible();
+    await expect(anna.getByText('Verbunden!')).toBeVisible();
     await waitForQuestion(ben, 1);
   });
 

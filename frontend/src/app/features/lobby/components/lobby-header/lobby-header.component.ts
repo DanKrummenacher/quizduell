@@ -14,7 +14,5 @@ export class LobbyHeaderComponent {
   readonly playerName = input.required<string>();
   // TEMPORARY: typography of the facelift.
   readonly modern = input(false);
-  /** Hidden but still taking its space, so the greeting does not move. */
-  readonly canGoBack = input(true);
   readonly navigateBack = output<void>();
 }
