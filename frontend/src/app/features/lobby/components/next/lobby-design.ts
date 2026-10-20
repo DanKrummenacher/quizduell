@@ -36,10 +36,18 @@ export type MatchLayout =
   | 'e-ring-name'
   | 'e-meet-dots'
   | 'e-meet-glow'
-  | 'e-ring-to-meet';
+  | 'e-ring-to-meet'
+  | 'x-venn'
+  | 'x-inring'
+  | 'x-chip'
+  | 'x-inline';
 
 export const MATCH_LAYOUTS: DesignOption<MatchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
+  { value: 'x-venn', label: 'X1 · Zwei Ringe, die sich überlappen' },
+  { value: 'x-inring', label: 'X2 · Verbunden im Ring' },
+  { value: 'x-chip', label: 'X3 · Verbunden, Start-Chip mit Ring' },
+  { value: 'x-inline', label: 'X4 · Ring, Spieler beim Namen' },
   { value: 'ring', label: 'M2 · Ring (Favorit)' },
   { value: 'meet', label: 'M8 · Verbunden (Favorit)' },
   { value: 'e-ring-roll', label: 'M2.1 · Ring, Zahl rollt, grüner Start' },
@@ -52,6 +60,14 @@ export const MATCH_LAYOUTS: DesignOption<MatchLayout>[] = [
 
 /** Match proposals that use the whole screen. */
 export const FULLSCREEN_MATCH: readonly MatchLayout[] = ['stage', 'split', 'flash'];
+
+/** Combinations of M2.1 and M8.2. */
+export const MATCH_BLEND: readonly MatchLayout[] = [
+  'x-venn',
+  'x-inring',
+  'x-chip',
+  'x-inline',
+];
 
 /** Proposals that build directly on the favourites M2 and M8. */
 export const MATCH_EVOLVED: readonly MatchLayout[] = [

@@ -1,4 +1,11 @@
-@if (isEvolved()) {
+@if (isBlend()) {
+  <app-match-blend
+    [layout]="layout()"
+    [playerName]="playerName()"
+    [opponentName]="opponentName()"
+    [durationMs]="durationMs()"
+  />
+} @else if (isEvolved()) {
   <app-match-evolved
     [layout]="layout()"
     [playerName]="playerName()"

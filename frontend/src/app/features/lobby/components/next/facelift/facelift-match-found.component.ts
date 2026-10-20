@@ -9,14 +9,25 @@ import {
   signal,
 } from '@angular/core';
 import '@css-ch/components/icon';
-import { MATCH_MORE, MATCH_EVOLVED, type MatchLayout } from '../lobby-design';
+import {
+  MATCH_BLEND,
+  MATCH_EVOLVED,
+  MATCH_MORE,
+  type MatchLayout,
+} from '../lobby-design';
+import { MatchBlendComponent } from './match-blend.component';
 import { MatchEvolvedComponent } from './match-evolved.component';
 import { MatchMoreComponent } from './match-more.component';
 import { MatchIdeasComponent } from './match-ideas.component';
 
 @Component({
   selector: 'app-facelift-match-found',
-  imports: [MatchIdeasComponent, MatchMoreComponent, MatchEvolvedComponent],
+  imports: [
+    MatchIdeasComponent,
+    MatchMoreComponent,
+    MatchEvolvedComponent,
+    MatchBlendComponent,
+  ],
   host: { '[class.is-proposal]': "layout() !== 'facelift'" },
   templateUrl: './facelift-match-found.component.html',
   styleUrl: './facelift-match-found.component.scss',
@@ -26,6 +37,7 @@ export class FaceliftMatchFoundComponent implements OnInit {
   // TEMPORARY: proposals for this screen.
   readonly layout = input<MatchLayout>('facelift');
   readonly playerName = input('');
+  protected readonly isBlend = computed(() => MATCH_BLEND.includes(this.layout()));
   protected readonly isEvolved = computed(() =>
     MATCH_EVOLVED.includes(this.layout()),
   );
