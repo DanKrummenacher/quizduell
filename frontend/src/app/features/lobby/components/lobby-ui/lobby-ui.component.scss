@@ -42,13 +42,3 @@
     padding-bottom: functions.rem(20);
   }
 }
-
-// TEMPORARY (search proposal «Bühne»): the stage fills the whole area.
-.main-area.is-facelift.is-stage {
-  padding: 0;
-
-  .centered-content {
-    flex-grow: 1;
-    display: flex;
-  }
-}

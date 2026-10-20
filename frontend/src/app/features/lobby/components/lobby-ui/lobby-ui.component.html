@@ -13,7 +13,7 @@
   }
 
   @if (design() === 'facelift') {
-    <main class="main-area is-facelift" [class.is-stage]="fullscreen()">
+    <main class="main-area is-facelift">
       <div class="centered-content">
         @switch (state()) {
           @case ('CHOOSE_MODE') {
@@ -30,11 +30,7 @@
             />
           }
           @case ('SEARCHING') {
-            <app-facelift-searching
-              [layout]="searchLayout()"
-              [playerName]="playerName()"
-              (cancelSearch)="cancelSearch.emit()"
-            />
+            <app-facelift-searching (cancelSearch)="cancelSearch.emit()" />
           }
           @case ('WAITING') {
             <app-facelift-waiting [roomCode]="roomCode()" />

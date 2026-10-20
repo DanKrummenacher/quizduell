@@ -1,21 +1,14 @@
 @use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'facelift';
+
+$pulse: #00a4e0;
+$track: #dfe3ea;
 
 :host {
   display: block;
   text-align: center;
-}
-
-// TEMPORARY: proposals with their own structure may fill the area.
-:host(.is-concept) {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.symbol {
-  @include facelift.symbol;
 }
 
 .section-title {
@@ -30,290 +23,117 @@
   @include facelift.body-text;
 }
 
-// Three dots that light up one after the other.
-.dots {
+// The waiting time in a ring: one tick per second, it pulses gently.
+.dial {
+  position: relative;
+  width: functions.rem(176);
+  height: functions.rem(176);
+  margin: 0 auto;
+  border-radius: 50%;
+  animation: pulse 1.6s ease-out infinite;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.tick {
+  stroke: $track;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke 0.3s ease;
+
+  &.is-filled {
+    stroke: colors.$dt-color-darkblue-100;
+  }
+}
+
+.dial-center {
+  position: absolute;
+  inset: 0;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: functions.rem(8);
-  margin-top: functions.rem(48);
-
-  i {
-    width: functions.rem(8);
-    height: functions.rem(8);
-    border-radius: 50%;
-    background-color: colors.$dt-color-darkblue-100;
-    animation: dot 1.4s ease-in-out infinite both;
-
-    &:nth-child(1) {
-      animation-delay: -0.32s;
-    }
-
-    &:nth-child(2) {
-      animation-delay: -0.16s;
-    }
-  }
 }
 
-@keyframes dot {
-  0%,
-  80%,
-  100% {
-    opacity: 0.2;
-  }
-
-  40% {
-    opacity: 1;
-  }
+.dial-time {
+  font-size: functions.rem(40);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: colors.$dt-color-darkblue-100;
 }
 
-// One action: compact, in the middle.
+.dial-label {
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+// One action: compact, in the middle, with some distance to the text.
 .compact-button {
   display: block;
   width: fit-content;
-  margin: functions.rem(64) auto 0;
+  margin: clamp(#{functions.rem(48)}, 9vh, #{functions.rem(96)}) auto 0;
+}
+
+// Medium height phones (e.g. Pro Max): a slightly smaller ring.
+@media (max-height: 800px) {
+  .dial {
+    width: functions.rem(152);
+    height: functions.rem(152);
+  }
+
+  .dial-time {
+    font-size: functions.rem(36);
+  }
 }
 
 @include facelift.short-screen {
-  .dots {
-    margin-top: functions.rem(32);
+  .section-title.status-title {
+    margin-top: functions.rem(16);
   }
 
+  .dial {
+    width: functions.rem(144);
+    height: functions.rem(144);
+  }
+
+  .dial-time {
+    font-size: functions.rem(34);
+  }
+
+  .compact-button {
+    margin-top: clamp(#{functions.rem(32)}, 7vh, #{functions.rem(48)});
+  }
+}
+
+// Very short phones (e.g. iPhone SE in the browser): no room to spare.
+@media (max-height: 600px) {
   .compact-button {
     margin-top: functions.rem(32);
   }
 }
 
-// ---------------------------------------------------------------------------
-// TEMPORARY: proposals for this screen
-// ---------------------------------------------------------------------------
-$opponent: #00a4e0;
+@media (prefers-reduced-motion: reduce) {
+  .dial {
+    animation: none;
+  }
 
-.avatar {
-  display: grid;
-  place-items: center;
-  width: functions.rem(64);
-  height: functions.rem(64);
-  border-radius: 50%;
-  background-color: colors.$dt-color-darkblue-100;
-  color: colors.$dt-color-white-100;
-  font-size: functions.rem(26);
-  font-weight: 700;
-
-  &.is-unknown {
-    border: functions.rem(2) dashed $opponent;
-    background: none;
-    color: $opponent;
-    animation: fade 1.6s ease-in-out infinite;
+  .tick {
+    transition: none;
   }
 }
 
-.elapsed {
-  margin: functions.rem(16) 0 0;
-  font-size: functions.rem(15);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: colors.$dt-color-darkblue-100;
-}
-
-// 1 · Radar: rings spread out from the symbol.
-.radar {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: functions.rem(64);
-  height: functions.rem(64);
-  margin: 0 auto;
-
-  i {
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    border: functions.rem(2) solid $opponent;
-    animation: ping 2s ease-out infinite;
-
-    &:nth-child(2) {
-      animation-delay: 1s;
-    }
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($pulse, 0.35);
   }
 
-  .symbol {
-    position: relative;
-  }
-}
-
-// 2 · Du gegen ?
-.duo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: functions.rem(16);
-}
-
-.vs {
-  font-size: functions.rem(14);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: facelift.$muted;
-}
-
-// 3 · Duell-Band and 5 · Ladebalken: a bar moving like the quiz timer.
-.band {
-  display: block;
-  margin-bottom: functions.rem(8);
-}
-
-.bar {
-  display: block;
-  width: functions.rem(160);
-  height: functions.rem(6);
-  margin: functions.rem(32) auto 0;
-  overflow: hidden;
-  border-radius: functions.rem(3);
-  background-color: #dfe3ea;
-
-  &.wide {
-    width: functions.rem(224);
-  }
-
-  position: relative;
-
-  i {
-    position: absolute;
-    top: 0;
-    left: -40%;
-    width: 40%;
-    height: 100%;
-    border-radius: functions.rem(3);
-    background-color: colors.$dt-color-darkblue-100;
-    animation: slide 1.4s ease-in-out infinite;
-  }
-
-  // Without motion: a calm, visible bar instead.
-  @media (prefers-reduced-motion: reduce) {
-    i {
-      left: 0;
-      width: 100%;
-      opacity: 0.35;
-    }
-  }
-}
-
-.section-title.plain {
-  margin-top: 0;
-}
-
-// 4 · Tipps beim Warten
-.tip {
-  margin-top: functions.rem(32);
-  padding: functions.rem(16) functions.rem(20);
-  border: functions.rem(1) solid facelift.$border;
-  border-radius: functions.rem(4);
-  background-color: colors.$dt-color-white-100;
-}
-
-.tip-label {
-  display: block;
-  font-size: functions.rem(12);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: $opponent;
-}
-
-.tip-text {
-  min-height: 2.8em;
-  margin: functions.rem(4) 0 0;
-  font-size: functions.rem(15);
-  line-height: 1.4;
-  color: colors.$dt-color-darkblue-100;
-  text-wrap: balance;
-  animation: fade-in 0.4s ease-out;
-}
-
-// 6 · Umlaufbahn: dots circle around you.
-.orbit {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: functions.rem(112);
-  height: functions.rem(112);
-  margin: 0 auto;
-}
-
-.orbit-ring {
-  position: absolute;
-  inset: 0;
-  border: functions.rem(1) dashed facelift.$border;
-  border-radius: 50%;
-  animation: spin 3s linear infinite;
-
-  i {
-    position: absolute;
-    top: functions.rem(-5);
-    left: calc(50% - #{functions.rem(5)});
-    width: functions.rem(10);
-    height: functions.rem(10);
-    border-radius: 50%;
-    background-color: $opponent;
-    transform-origin: functions.rem(5) functions.rem(61);
-
-    &:nth-child(2) {
-      transform: rotate(120deg);
-      opacity: 0.6;
-    }
-
-    &:nth-child(3) {
-      transform: rotate(240deg);
-      opacity: 0.3;
-    }
-  }
-}
-
-@keyframes ping {
-  from {
-    opacity: 0.8;
-    transform: scale(1);
-  }
-
-  to {
-    opacity: 0;
-    transform: scale(1.9);
-  }
-}
-
-@keyframes slide {
-  to {
-    left: 100%;
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes fade {
-  50% {
-    opacity: 0.45;
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(functions.rem(4));
-  }
-}
-
-@include facelift.short-screen {
-  .tip {
-    margin-top: functions.rem(16);
-    padding: functions.rem(12) functions.rem(16);
-  }
-
-  :host:has(.tip) .compact-button {
-    margin-top: functions.rem(24);
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(20) rgba($pulse, 0);
   }
 }

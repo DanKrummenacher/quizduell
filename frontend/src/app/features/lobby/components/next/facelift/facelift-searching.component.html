@@ -1,82 +1,31 @@
-@if (isConcept()) {
-  <app-search-concept
-    [layout]="layout()"
-    [playerName]="playerName()"
-    (cancelSearch)="cancelSearch.emit()"
-  />
-} @else if (isClock()) {
-  <app-search-clock [layout]="layout()" (cancelSearch)="cancelSearch.emit()" />
-} @else if (isFinal()) {
-  <app-search-final [layout]="layout()" (cancelSearch)="cancelSearch.emit()" />
-} @else {
-  <div role="status">
-    @switch (layout()) {
-      @case ('radar') {
-        <span class="radar" aria-hidden="true">
-          <i></i><i></i>
-          <span class="symbol"><css-icon icon="search" size="lg"></css-icon></span>
-        </span>
-        <h2 class="section-title status-title">Suche Gegner&nbsp;…</h2>
-        <p class="body-text">Warte auf einen weiteren Spieler</p>
-        <p class="elapsed">Seit {{ elapsed() }}</p>
+<div role="status">
+  <div class="dial">
+    <svg viewBox="0 0 200 200" aria-hidden="true">
+      @for (angle of ticks; track angle) {
+        <line
+          class="tick"
+          [class.is-filled]="$index < filledTicks()"
+          x1="100"
+          y1="8"
+          x2="100"
+          y2="22"
+          [attr.transform]="'rotate(' + angle + ' 100 100)'"
+        />
       }
-      @case ('duo') {
-        <div class="duo" aria-hidden="true">
-          <span class="avatar">{{ initial() }}</span>
-          <span class="vs">vs</span>
-          <span class="avatar is-unknown">?</span>
-        </div>
-        <h2 class="section-title status-title">Suche Gegner&nbsp;…</h2>
-        <p class="body-text">Warte auf einen weiteren Spieler</p>
-      }
-      @case ('band') {
-        <app-search-band class="band" [playerName]="playerName()" />
-        <h2 class="section-title status-title">Suche Gegner&nbsp;…</h2>
-        <p class="body-text">Gleich beginnt dein Duell</p>
-        <span class="bar" aria-hidden="true"><i></i></span>
-      }
-      @case ('tips') {
-        <span class="symbol" aria-hidden="true">
-          <css-icon icon="search" size="lg"></css-icon>
-        </span>
-        <h2 class="section-title status-title">Suche Gegner&nbsp;…</h2>
-        <p class="body-text">Warte auf einen weiteren Spieler</p>
-        <div class="tip">
-          <span class="tip-label">Tipp</span>
-          @for (tip of tips; track $index) {
-            @if ($index === tipIndex()) {
-              <p class="tip-text">{{ tip }}</p>
-            }
-          }
-        </div>
-      }
-      @case ('bar') {
-        <h2 class="section-title status-title plain">Suche Gegner&nbsp;…</h2>
-        <p class="body-text">Warte auf einen weiteren Spieler</p>
-        <span class="bar wide" aria-hidden="true"><i></i></span>
-        <p class="elapsed">{{ elapsed() }}</p>
-      }
-      @case ('orbit') {
-        <span class="orbit" aria-hidden="true">
-          <span class="orbit-ring"><i></i><i></i><i></i></span>
-          <span class="avatar large">{{ initial() }}</span>
-        </span>
-        <h2 class="section-title status-title">Suche Gegner&nbsp;…</h2>
-        <p class="body-text">Warte auf einen weiteren Spieler</p>
-      }
-      @default {
-        <span class="symbol" aria-hidden="true">
-          <css-icon icon="search" size="lg"></css-icon>
-        </span>
-        <h2 class="section-title status-title">Suche Gegner&nbsp;…</h2>
-        <p class="body-text">Warte auf einen weiteren Spieler</p>
-        <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
-      }
-    }
+    </svg>
+    <div class="dial-center">
+      <span class="dial-time">{{ elapsed() }}</span>
+      <span class="dial-label">Wartezeit</span>
+    </div>
   </div>
 
-  <css-button class="compact-button" (click)="cancelSearch.emit()">
-    <css-icon icon="close" slot="prefix"></css-icon>
-    Abbrechen
-  </css-button>
-}
+  <h2 class="section-title status-title">Suche Gegner&nbsp;…</h2>
+  <p class="body-text">
+    Du wirst automatisch verbunden,<br />sobald jemand bereit ist
+  </p>
+</div>
+
+<css-button variant="primary" class="compact-button" (click)="cancelSearch.emit()">
+  <css-icon icon="close" slot="prefix"></css-icon>
+  Abbrechen
+</css-button>
