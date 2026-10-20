@@ -13,6 +13,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import '@css-ch/components/button';
 import '@css-ch/components/icon';
+import '@css-ch/components/input-text';
 import {
   GAME_CODE_ALPHABET,
   GAME_CODE_LENGTH,
@@ -20,18 +21,19 @@ import {
 import type { FriendLayout } from '../lobby-design';
 
 /**
- * TEMPORARY: proposals without a switch, from the favourites 12 (code
- * first) and 7 (joins by itself after the fourth character).
+ * TEMPORARY: friend proposals that build on the rest of the app: the cards
+ * of the mode screen, the ring of the search, the input of the library.
+ * All of them join by themselves after the fourth character.
  */
 @Component({
-  selector: 'app-friend-code',
+  selector: 'app-friend-iris',
   imports: [NgTemplateOutlet],
-  templateUrl: './friend-code.component.html',
-  styleUrl: './friend-code.component.scss',
+  templateUrl: './friend-iris.component.html',
+  styleUrl: './friend-iris.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: { '[class]': 'layout()' },
 })
-export class FriendCodeComponent {
+export class FriendIrisComponent {
   readonly layout = input.required<FriendLayout>();
   readonly joinError = input<string>('');
   readonly createGame = output<void>();
@@ -44,17 +46,20 @@ export class FriendCodeComponent {
     { length: GAME_CODE_LENGTH },
     (_, index) => index,
   );
+  /** The ring of the search: 60 ticks, a quarter per character. */
+  protected readonly ticks = Array.from({ length: 60 }, (_, index) => index * 6);
 
   protected readonly code = signal('');
   protected readonly focused = signal(false);
-  /** Set while a complete code is being checked by the server. */
   protected readonly joining = signal(false);
-  /** The server's answer shows until the code is changed. */
   private readonly serverErrorShown = signal(false);
   protected readonly errorMessage = computed(() =>
     this.serverErrorShown() ? this.joinError() : '',
   );
   protected readonly isEmpty = computed(() => this.code().length === 0);
+  protected readonly filledTicks = computed(
+    () => (this.code().length / GAME_CODE_LENGTH) * 60,
+  );
 
   constructor() {
     // Only a new layout resets the preview.
@@ -82,9 +87,11 @@ export class FriendCodeComponent {
   }
 
   protected onCodeInput(event: Event): void {
-    this.setCode((event.target as HTMLInputElement).value);
+    this.setCode(
+      (event.target as HTMLInputElement).value,
+      event.target as HTMLInputElement,
+    );
     this.serverErrorShown.set(false);
-    // The fourth character joins by itself.
     if (this.code().length === GAME_CODE_LENGTH) {
       this.joining.set(true);
       this.joinGame.emit(this.code());
@@ -92,13 +99,13 @@ export class FriendCodeComponent {
   }
 
   /** Keeps only characters that can appear in a game code. */
-  private setCode(raw: string): void {
+  private setCode(raw: string, target?: { value: string }): void {
     const value = Array.from((raw || '').toUpperCase())
       .filter((char) => GAME_CODE_ALPHABET.includes(char))
       .join('')
       .slice(0, GAME_CODE_LENGTH);
     this.code.set(value);
-    const element = this.field()?.nativeElement;
+    const element = target ?? this.field()?.nativeElement;
     if (element && element.value !== value) {
       element.value = value;
     }

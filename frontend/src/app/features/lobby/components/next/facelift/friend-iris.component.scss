@@ -1,0 +1,436 @@
+// TEMPORARY: friend proposals built on the rest of the app.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$red: #d53419;
+$track: #dfe3ea;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+
+  &.is-tight {
+    margin-bottom: functions.rem(8);
+  }
+}
+
+.body-text {
+  @include facelift.body-text;
+}
+
+.compact {
+  display: block;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.choice-card {
+  @include facelift.choice-card;
+
+  & + & {
+    margin-top: functions.rem(16);
+  }
+}
+
+.choice-title {
+  @include facelift.choice-title;
+}
+
+.choice-description {
+  @include facelift.choice-description;
+}
+
+.code-field {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  font-size: functions.rem(16);
+  cursor: text;
+}
+
+.code-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(8);
+  min-height: functions.rem(20);
+  margin: functions.rem(12) 0 0;
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+
+  &.is-error {
+    color: $red;
+  }
+}
+
+.spinner {
+  width: functions.rem(14);
+  height: functions.rem(14);
+  border: functions.rem(2) solid $track;
+  border-top-color: $green;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.secondary {
+  margin-top: clamp(#{functions.rem(24)}, 5vh, #{functions.rem(48)});
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s $ease;
+
+  &.is-hidden {
+    opacity: 0;
+    transform: translateY(functions.rem(8));
+    pointer-events: none;
+  }
+}
+
+.or {
+  display: block;
+  margin-bottom: functions.rem(12);
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+// ---------------------------------------------------------------------------
+// I1 · Two cards like the mode screen; the code inside the second one
+// ---------------------------------------------------------------------------
+.choice-card.is-join {
+  cursor: default;
+
+  &:hover {
+    background-color: $white;
+  }
+
+  .choice-text {
+    padding-block: functions.rem(14);
+  }
+}
+
+.mini-boxes {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, functions.rem(40));
+  gap: functions.rem(8);
+  margin-top: functions.rem(8);
+}
+
+.mini-box {
+  display: grid;
+  place-items: center;
+  height: functions.rem(44);
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  font-size: functions.rem(20);
+  font-weight: $bold;
+  color: $blue;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &.is-filled,
+  &.is-active {
+    border-color: $blue;
+  }
+
+  &.is-active {
+    box-shadow: 0 0 0 functions.rem(3) rgba($opponent, 0.3);
+  }
+
+  .is-joining & {
+    border-color: $green;
+  }
+
+  .has-error & {
+    border-color: $red;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// I2 · The ring of the search, a quarter per character
+// ---------------------------------------------------------------------------
+.dial {
+  position: relative;
+  width: functions.rem(184);
+  height: functions.rem(184);
+  margin: functions.rem(24) auto 0;
+  border-radius: 50%;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  &.has-error {
+    animation: shake 0.35s ease-in-out;
+  }
+}
+
+.tick {
+  stroke: $track;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke 0.25s ease;
+
+  &.is-filled {
+    stroke: $blue;
+  }
+
+  .is-joining & {
+    stroke: $green;
+  }
+
+  .has-error & {
+    stroke: $red;
+  }
+}
+
+.dial-code {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(4);
+  font-size: functions.rem(34);
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+}
+
+.dial-char {
+  width: functions.rem(26);
+  border-bottom: functions.rem(2) solid transparent;
+
+  &.is-empty {
+    color: $track;
+  }
+
+  &.is-active {
+    border-bottom-color: $opponent;
+  }
+}
+
+.dial-hint {
+  position: absolute;
+  right: 0;
+  bottom: functions.rem(44);
+  left: 0;
+  font-size: functions.rem(13);
+  color: facelift.$muted;
+  pointer-events: none;
+}
+
+// ---------------------------------------------------------------------------
+// I3 · One field with four segments
+// ---------------------------------------------------------------------------
+.pill {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: functions.rem(280);
+  max-width: 100%;
+  height: functions.rem(72);
+  margin: functions.rem(28) auto 0;
+  overflow: hidden;
+  border: functions.rem(2) solid facelift.$border;
+  border-radius: functions.rem(16);
+  background-color: $white;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.2s ease;
+
+  &.is-focused {
+    border-color: $blue;
+    box-shadow: 0 0 0 functions.rem(4) rgba($opponent, 0.2);
+  }
+
+  &.is-joining {
+    border-color: $green;
+  }
+
+  &.has-error {
+    border-color: $red;
+    animation: shake 0.35s ease-in-out;
+  }
+}
+
+.segment {
+  position: relative;
+  display: grid;
+  place-items: center;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  color: $blue;
+
+  & + & {
+    border-left: functions.rem(1) solid $track;
+  }
+
+  // A short line marks where the next character goes.
+  &.is-active::after {
+    content: '';
+    position: absolute;
+    bottom: functions.rem(14);
+    left: 50%;
+    width: functions.rem(20);
+    height: functions.rem(3);
+    margin-left: functions.rem(-10);
+    border-radius: functions.rem(2);
+    background-color: $opponent;
+    animation: blink 1s steps(1) infinite;
+  }
+}
+
+.char {
+  animation: pop 0.18s $ease;
+}
+
+// ---------------------------------------------------------------------------
+// I4 · Only library components
+// ---------------------------------------------------------------------------
+.divider {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(16);
+  margin: functions.rem(24) 0 functions.rem(8);
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1 1 auto;
+    height: functions.rem(1);
+    background-color: $track;
+  }
+}
+
+.lib-input {
+  display: block;
+  width: 100%;
+  max-width: functions.rem(280);
+  margin: 0 auto;
+}
+
+// ---------------------------------------------------------------------------
+// Smaller screens
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .dial {
+    width: functions.rem(160);
+    height: functions.rem(160);
+    margin-top: functions.rem(16);
+  }
+
+  .dial-hint {
+    bottom: functions.rem(36);
+  }
+
+  .pill {
+    height: functions.rem(64);
+    margin-top: functions.rem(20);
+  }
+
+  .secondary {
+    margin-top: functions.rem(16);
+  }
+
+  .divider {
+    margin-top: functions.rem(16);
+  }
+}
+
+@media (max-height: 600px) {
+  .dial {
+    width: functions.rem(128);
+    height: functions.rem(128);
+    margin-top: functions.rem(10);
+  }
+
+  .dial-hint {
+    bottom: functions.rem(26);
+  }
+
+  .secondary {
+    margin-top: functions.rem(8);
+  }
+
+  .or {
+    margin-bottom: functions.rem(8);
+  }
+
+  .dial-code {
+    font-size: functions.rem(28);
+  }
+
+  .secondary .choice-description {
+    display: none;
+  }
+}
+
+@media (max-width: 359px) {
+  .mini-boxes {
+    grid-template-columns: repeat(4, functions.rem(36));
+    gap: functions.rem(6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dial,
+  .pill,
+  .char,
+  .segment::after,
+  .spinner {
+    animation: none;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shake {
+  20%,
+  60% {
+    transform: translateX(functions.rem(-6));
+  }
+
+  40%,
+  80% {
+    transform: translateX(functions.rem(6));
+  }
+}

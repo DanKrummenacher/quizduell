@@ -32,27 +32,27 @@ export type FriendLayout =
   | 'fr-dock'
   | 'fr-stepper'
   | 'fr-columns'
-  | 'h-link'
-  | 'h-card'
-  | 'h-dark'
-  | 'h-create-first';
+  | 'i-cards'
+  | 'i-ring'
+  | 'i-pill'
+  | 'i-lib';
 
 export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
-  { value: 'h-link', label: 'H1 · Nur der Code, Erstellen als Zeile' },
-  { value: 'h-card', label: 'H2 · Code in einer Karte' },
-  { value: 'h-dark', label: 'H3 · Dunkle Fläche für den Code' },
-  { value: 'h-create-first', label: 'H4 · Erstellen oben, Code darunter' },
+  { value: 'i-cards', label: 'I1 · Zwei Karten wie die Modus-Seite' },
+  { value: 'i-ring', label: 'I2 · Ring der Suche füllt sich' },
+  { value: 'i-pill', label: 'I3 · Ein Feld mit vier Segmenten' },
+  { value: 'i-lib', label: 'I4 · Nur Komponenten der Library' },
   { value: 'fr-auto', label: '7 · Ohne Button (Favorit)' },
   { value: 'fr-smart', label: '12 · Code zuerst (Favorit)' },
 ];
 
-/** Friend proposals without a switch (from 7 and 12). */
-export const FRIEND_CODE: readonly FriendLayout[] = [
-  'h-link',
-  'h-card',
-  'h-dark',
-  'h-create-first',
+/** Friend proposals built on the rest of the app. */
+export const FRIEND_IRIS: readonly FriendLayout[] = [
+  'i-cards',
+  'i-ring',
+  'i-pill',
+  'i-lib',
 ];
 
 /** Third round of friend proposals. */
