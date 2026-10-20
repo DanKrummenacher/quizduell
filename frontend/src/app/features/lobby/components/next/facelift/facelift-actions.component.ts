@@ -13,14 +13,19 @@ import {
   GAME_CODE_ALPHABET,
   GAME_CODE_LENGTH,
 } from '../../../../../core/contracts/game.contract';
+import type { FriendLayout } from '../lobby-design';
+import { FriendIdeasComponent } from './friend-ideas.component';
 
 @Component({
   selector: 'app-facelift-actions',
+  imports: [FriendIdeasComponent],
   templateUrl: './facelift-actions.component.html',
   styleUrl: './facelift-actions.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class FaceliftActionsComponent {
+  // TEMPORARY: proposals for this screen.
+  readonly layout = input<FriendLayout>('facelift');
   readonly joinError = input<string>('');
   readonly createGame = output<void>();
   readonly joinGame = output<string>();

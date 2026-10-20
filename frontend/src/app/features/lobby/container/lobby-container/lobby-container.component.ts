@@ -19,7 +19,7 @@ import { IdleResetService } from '../../../../core/platform/idle-reset.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
 import { LobbyUiComponent } from '../../components/lobby-ui/lobby-ui.component';
 import { LobbyDesignPanelComponent } from '../../components/next/design-preview-panel.component';
-import type { LobbyDesign } from '../../components/next/lobby-design';
+import type { FriendLayout, LobbyDesign } from '../../components/next/lobby-design';
 import type { LobbyState } from '../../lobby.types';
 
 @Component({
@@ -44,6 +44,7 @@ export class LobbyContainerComponent implements OnDestroy {
   readonly showDesignPreview = isDevMode();
   readonly design = signal<LobbyDesign>('facelift');
   readonly previewScreen = signal<LobbyState | null>(null);
+  readonly friendLayout = signal<FriendLayout>('facelift');
 
   readonly lobbyState = computed<LobbyState>(
     () => this.previewScreen() ?? this.realLobbyState(),
