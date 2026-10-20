@@ -1,4 +1,11 @@
-@if (isBlend()) {
+@if (isDuel()) {
+  <app-match-duel
+    [layout]="layout()"
+    [playerName]="playerName()"
+    [opponentName]="opponentName()"
+    [durationMs]="durationMs()"
+  />
+} @else if (isBlend()) {
   <app-match-blend
     [layout]="layout()"
     [playerName]="playerName()"

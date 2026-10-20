@@ -1,0 +1,524 @@
+// TEMPORARY: further combinations of the ring (M2) and the players (M8).
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$track: #dfe3ea;
+$page: colors.$dt-color-pepper-bright;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+
+:host {
+  --page: #{$page};
+
+  display: block;
+  overflow-x: clip;
+  text-align: center;
+}
+
+:host(.y-dark) {
+  --page: #{$blue};
+
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+
+  section {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: functions.rem(32) functions.rem(20) functions.rem(64);
+    background-color: $blue;
+  }
+
+  .section-title,
+  .start {
+    color: $white;
+  }
+
+  .body-text {
+    color: rgba(255, 255, 255, 0.8);
+
+    strong {
+      color: $white;
+    }
+  }
+
+  .tick {
+    stroke: rgba(255, 255, 255, 0.2);
+
+    &.is-filled {
+      stroke: $white;
+    }
+  }
+
+  .badge.is-count {
+    background-color: $white;
+    color: $blue;
+  }
+}
+
+.visual {
+  display: grid;
+  place-items: center;
+  height: functions.rem(200);
+}
+
+.section-title {
+  @include facelift.section-title;
+  margin: functions.rem(24) 0 functions.rem(8);
+}
+
+.body-text {
+  @include facelift.body-text;
+
+  strong {
+    color: $blue;
+  }
+}
+
+.start {
+  display: grid;
+  place-items: center;
+  min-height: functions.rem(40);
+  margin: clamp(#{functions.rem(32)}, 7vh, #{functions.rem(64)}) 0 0;
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+}
+
+// ---------------------------------------------------------------------------
+// Shared parts
+// ---------------------------------------------------------------------------
+svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.tick {
+  stroke: $track;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke 0.2s ease;
+
+  &.is-filled {
+    stroke: $blue;
+  }
+
+  // At the start every ring turns green (M2.1).
+  .is-done & {
+    stroke: $green !important;
+  }
+}
+
+.avatar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: functions.rem(80);
+  height: functions.rem(80);
+  box-sizing: border-box;
+  border: functions.rem(4) solid var(--page);
+  border-radius: 50%;
+  background-color: $blue;
+  color: $white;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+
+  &.is-opponent {
+    background-color: $opponent;
+  }
+}
+
+:host(.y-dark) .avatar:not(.is-opponent) {
+  background-color: $white;
+  color: $blue;
+}
+
+.badge {
+  position: absolute;
+  bottom: functions.rem(-6);
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: functions.rem(34);
+  height: functions.rem(34);
+  margin-left: functions.rem(-17);
+  box-sizing: border-box;
+  border: functions.rem(3) solid var(--page);
+  border-radius: 50%;
+  background-color: $green;
+  color: $white;
+  animation: pop 0.35s 0.6s $spring both;
+
+  css-icon {
+    display: block;
+  }
+
+  &.is-count {
+    bottom: functions.rem(4);
+    width: functions.rem(44);
+    height: functions.rem(44);
+    margin-left: functions.rem(-22);
+    background-color: $blue;
+
+    .roll-number {
+      font-size: functions.rem(20);
+      font-weight: $bold;
+    }
+
+    .is-done & {
+      background-color: $green;
+      color: $white;
+    }
+  }
+}
+
+.glow {
+  position: absolute;
+  inset: functions.rem(-24) functions.rem(-36);
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba($opponent, 0.3),
+    rgba($opponent, 0)
+  );
+  animation: glow 0.8s 0.45s ease-out both;
+}
+
+.roll {
+  display: grid;
+  overflow: hidden;
+}
+
+.roll-number {
+  grid-area: 1 / 1;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  animation: roll-in 0.4s $spring both;
+}
+
+.duo {
+  position: relative;
+  display: flex;
+
+  .is-left {
+    animation: meet-left 0.7s $spring both;
+  }
+
+  .is-right {
+    margin-left: functions.rem(-20);
+    animation: meet-right 0.7s $spring both;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Y1 · Two half rings that close around the players
+// ---------------------------------------------------------------------------
+.halves {
+  position: relative;
+  width: functions.rem(200);
+  height: functions.rem(200);
+}
+
+.half {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+
+  svg {
+    position: absolute;
+    inset: 0;
+  }
+
+  .avatar {
+    width: functions.rem(76);
+    height: functions.rem(76);
+  }
+
+  &.is-left {
+    animation: half-left 0.8s $spring both;
+
+    .avatar {
+      transform: translateX(functions.rem(-30));
+    }
+  }
+
+  &.is-right {
+    animation: half-right 0.8s $spring both;
+
+    .avatar {
+      transform: translateX(functions.rem(30));
+    }
+  }
+}
+
+.halves .badge {
+  bottom: functions.rem(56);
+}
+
+// ---------------------------------------------------------------------------
+// Y2 / Y4 · Two rings that overlap
+// ---------------------------------------------------------------------------
+.venn {
+  position: relative;
+  display: flex;
+}
+
+.venn-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: functions.rem(136);
+  height: functions.rem(136);
+
+  svg {
+    position: absolute;
+    inset: 0;
+  }
+
+  &.is-left {
+    animation: meet-left 0.7s $spring both;
+  }
+
+  &.is-right {
+    margin-left: functions.rem(-28);
+    animation: meet-right 0.7s $spring both;
+  }
+}
+
+// Y2: your ring is already there, only the opponent comes in.
+.venn.is-staged {
+  .venn-ring.is-left {
+    animation: settle 0.6s 0.2s $spring both;
+  }
+
+  .venn-ring.is-right {
+    animation: join 0.8s 0.25s $spring both;
+  }
+
+  .glow {
+    animation-delay: 0.8s;
+  }
+
+  .badge {
+    animation-delay: 0.9s;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Y3 · The big number behind the players
+// ---------------------------------------------------------------------------
+.depth {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: functions.rem(200);
+}
+
+.depth-number {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgba($opponent, 0.22);
+
+  .roll {
+    height: functions.rem(200);
+  }
+
+  .roll-number {
+    font-size: functions.rem(184);
+    font-weight: $bold;
+    line-height: functions.rem(200);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Y5 · The ring beats each second
+// ---------------------------------------------------------------------------
+.beat-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: functions.rem(200);
+  height: functions.rem(200);
+
+  > svg {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+.wave {
+  position: absolute;
+  inset: functions.rem(14);
+  border: functions.rem(2) solid $opponent;
+  border-radius: 50%;
+  animation: wave 0.9s ease-out both;
+}
+
+.duo.is-beating {
+  animation: beat 1s 0.7s ease-in-out infinite;
+
+  .avatar {
+    width: functions.rem(76);
+    height: functions.rem(76);
+  }
+
+  .is-right {
+    margin-left: functions.rem(-18);
+  }
+
+  .is-done & {
+    animation: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Short phones (e.g. iPhone SE)
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .visual,
+  .depth {
+    height: functions.rem(168);
+  }
+
+  .halves,
+  .beat-ring {
+    width: functions.rem(168);
+    height: functions.rem(168);
+  }
+
+  .half .avatar,
+  .duo.is-beating .avatar {
+    width: functions.rem(64);
+    height: functions.rem(64);
+    font-size: functions.rem(24);
+  }
+
+  .halves .badge {
+    bottom: functions.rem(46);
+  }
+
+  .venn-ring {
+    width: functions.rem(116);
+    height: functions.rem(116);
+
+    .avatar {
+      width: functions.rem(68);
+      height: functions.rem(68);
+      font-size: functions.rem(26);
+    }
+  }
+
+  .section-title {
+    margin-top: functions.rem(16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
+}
+
+@keyframes roll-in {
+  from {
+    opacity: 0;
+    transform: translateY(70%);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes glow {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes meet-left {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(-56));
+  }
+}
+
+@keyframes meet-right {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(56));
+  }
+}
+
+@keyframes half-left {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(-64));
+  }
+}
+
+@keyframes half-right {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(64));
+  }
+}
+
+// Y2: your ring starts in the middle (as in the search) and makes room.
+@keyframes settle {
+  from {
+    transform: translateX(functions.rem(54));
+  }
+}
+
+@keyframes join {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(120));
+  }
+}
+
+@keyframes wave {
+  from {
+    opacity: 0.7;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes beat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  15% {
+    transform: scale(1.05);
+  }
+}

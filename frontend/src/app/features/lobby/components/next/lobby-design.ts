@@ -40,10 +40,20 @@ export type MatchLayout =
   | 'x-venn'
   | 'x-inring'
   | 'x-chip'
-  | 'x-inline';
+  | 'x-inline'
+  | 'y-halves'
+  | 'y-join'
+  | 'y-depth'
+  | 'y-dark'
+  | 'y-heartbeat';
 
 export const MATCH_LAYOUTS: DesignOption<MatchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
+  { value: 'y-halves', label: 'Y1 · Zwei Ringhälften schliessen sich' },
+  { value: 'y-join', label: 'Y2 · Dein Ring, der Gegner kommt dazu' },
+  { value: 'y-depth', label: 'Y3 · Grosse Zahl hinter den Spielern' },
+  { value: 'y-heartbeat', label: 'Y4 · Ring im Herzschlag' },
+  { value: 'y-dark', label: 'Y5 · Zwei Ringe, dunkel (Vollbild)' },
   { value: 'x-venn', label: 'X1 · Zwei Ringe, die sich überlappen' },
   { value: 'x-inring', label: 'X2 · Verbunden im Ring' },
   { value: 'x-chip', label: 'X3 · Verbunden, Start-Chip mit Ring' },
@@ -59,7 +69,21 @@ export const MATCH_LAYOUTS: DesignOption<MatchLayout>[] = [
 ];
 
 /** Match proposals that use the whole screen. */
-export const FULLSCREEN_MATCH: readonly MatchLayout[] = ['stage', 'split', 'flash'];
+export const FULLSCREEN_MATCH: readonly MatchLayout[] = [
+  'stage',
+  'split',
+  'flash',
+  'y-dark',
+];
+
+/** Further combinations: a story or depth behind each one. */
+export const MATCH_DUEL: readonly MatchLayout[] = [
+  'y-halves',
+  'y-join',
+  'y-depth',
+  'y-dark',
+  'y-heartbeat',
+];
 
 /** Combinations of M2.1 and M8.2. */
 export const MATCH_BLEND: readonly MatchLayout[] = [
@@ -88,6 +112,7 @@ export const MATCH_MORE: readonly MatchLayout[] = [
   'ticket',
   'band',
   'flash',
+  'y-dark',
 ];
 
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [
