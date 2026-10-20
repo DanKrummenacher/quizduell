@@ -17,27 +17,21 @@ export const LOBBY_DESIGNS: DesignOption<LobbyDesign>[] = [
 /** Proposals for the «Spiel erstellt» screen. */
 export type WaitingLayout =
   | 'facelift'
-  | 'x-mirror'
-  | 'x-share'
-  | 'x-shimmer'
-  | 'x-story'
-  | 'x-card'
-  | 'x-big'
-  | 'x-tap'
-  | 'x-dark'
-  | 'x-time';
+  | 'y-ring'
+  | 'y-hero'
+  | 'y-ticket'
+  | 'y-message'
+  | 'y-seats'
+  | 'y-timeline';
 
 export const WAITING_LAYOUTS: DesignOption<WaitingLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
-  { value: 'x-mirror', label: 'X1 · Gegenstück zu «Code eingeben»' },
-  { value: 'x-share', label: 'X2 · X1 mit Kopieren und Teilen' },
-  { value: 'x-shimmer', label: 'X3 · X1, ein Licht läuft durch' },
-  { value: 'x-story', label: 'X4 · Dein Platz, sein Platz, dann der Code' },
-  { value: 'x-card', label: 'X5 · Code als Karte, Tippen kopiert' },
-  { value: 'x-big', label: 'X6 · Nur der grosse Code, eine Aktion' },
-  { value: 'x-tap', label: 'X7 · Tippen auf den Code kopiert' },
-  { value: 'x-dark', label: 'X8 · Code auf dunkler Fläche' },
-  { value: 'x-time', label: 'X9 · X1 mit Wartezeit' },
+  { value: 'y-ring', label: 'Y1 · Ring der Suche mit dem Code' },
+  { value: 'y-hero', label: 'Y2 · Der Code als Überschrift' },
+  { value: 'y-ticket', label: 'Y3 · Einladungs-Ticket' },
+  { value: 'y-message', label: 'Y4 · Die Nachricht an deinen Freund' },
+  { value: 'y-seats', label: 'Y5 · Zwei Plätze und Code-Pille' },
+  { value: 'y-timeline', label: 'Y6 · Ablauf von links nach rechts' },
 ];
 
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [
