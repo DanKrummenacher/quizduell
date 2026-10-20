@@ -7,7 +7,6 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
 import '@css-ch/components/button';
 import '@css-ch/components/icon';
 import type { WaitingLayout } from '../lobby-design';
@@ -15,12 +14,11 @@ import type { WaitingLayout } from '../lobby-design';
 const COPIED_FEEDBACK_MS = 1000;
 
 /**
- * TEMPORARY: final proposals for «Spiel erstellt» around W1: the same
- * code and copy button, a running light while you wait.
+ * TEMPORARY: final proposals for «Spiel erstellt» : the spacing and
+ * copy button of before, the code in boxes, a dark blue bar while you wait.
  */
 @Component({
   selector: 'app-waiting-w',
-  imports: [NgTemplateOutlet],
   templateUrl: './waiting-w.component.html',
   styleUrl: './waiting-w.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -39,6 +37,10 @@ export class WaitingWComponent {
     const seconds = this.seconds();
     return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   });
+  /** Share of the current minute, for the time bar (0 to 1). */
+  protected readonly minute = computed(() => (this.seconds() % 60) / 60);
+  /** The twelve blocks of D5. */
+  protected readonly blocks = Array.from({ length: 12 }, (_, index) => index);
 
   constructor() {
     const timer = setInterval(() => this.seconds.update((value) => value + 1), 1000);

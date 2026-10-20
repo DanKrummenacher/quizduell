@@ -1,12 +1,11 @@
-// TEMPORARY: final proposals for «Spiel erstellt» around W1. On the 4/8
-// grid: title → text 8, text → code 24, code → copy 12, copy → waiting 32,
-// text → light 12. The waiting part is exactly as wide as the code.
+// TEMPORARY: final proposals for «Spiel erstellt». The spacing of before
+// (title → text 8, text → code 32, code → copy 16, copy → waiting 40),
+// the code in boxes, a dark blue bar as wide as the code while you wait.
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'facelift';
 
-$opponent: #00a4e0;
 $track: #dfe3ea;
 $bold: miscs.$css-ui-font-weight-bold;
 $blue: colors.$dt-color-darkblue-100;
@@ -14,50 +13,15 @@ $white: colors.$dt-color-white-100;
 $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 
 :host {
-  --gap-code: #{functions.rem(24)};
-  --gap-copy: #{functions.rem(12)};
-  --gap-waiting: #{functions.rem(32)};
-  --gap-light: #{functions.rem(12)};
-  --light-height: #{functions.rem(4)};
-  --light-width: var(--code-width);
-  --light-speed: 1.8s;
+  --gap-code: #{functions.rem(32)};
+  --gap-copy: #{functions.rem(16)};
+  --gap-waiting: #{functions.rem(40)};
+  --gap-bar: #{functions.rem(12)};
   --box: #{functions.rem(60)};
   --code-width: calc(4 * var(--box) + 3 * #{functions.rem(12)});
 
   display: block;
   text-align: center;
-}
-
-// B2: more air, a finer and slower light.
-:host(.b-calm) {
-  --gap-copy: #{functions.rem(16)};
-  --gap-waiting: #{functions.rem(40)};
-  --gap-light: #{functions.rem(16)};
-  --light-height: #{functions.rem(2)};
-  --light-speed: 2.4s;
-}
-
-// B3: the light as a divider between the code and the text.
-:host(.b-top) {
-  --gap-waiting: #{functions.rem(24)};
-}
-
-// B4: a thicker track with a glowing head.
-:host(.b-comet) {
-  --light-height: #{functions.rem(6)};
-  --light-speed: 2s;
-}
-
-// B5: a short light in the middle, back and forth.
-:host(.b-short) {
-  --light-width: #{functions.rem(120)};
-  --light-speed: 1.4s;
-}
-
-// B7: the light right under the code, the copy button at the end.
-:host(.b-code) {
-  --gap-waiting: #{functions.rem(16)};
-  --gap-copy: #{functions.rem(24)};
 }
 
 .section-title {
@@ -106,7 +70,7 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 }
 
 // ---------------------------------------------------------------------------
-// Waiting: the text and a light that runs along a thin track
+// Waiting: the text, the bar below
 // ---------------------------------------------------------------------------
 .waiting {
   width: var(--code-width);
@@ -120,13 +84,11 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   color: facelift.$muted;
 }
 
-.sweep {
+.bar {
   position: relative;
   display: block;
-  width: var(--light-width);
-  max-width: 100%;
-  height: var(--light-height);
-  margin: var(--gap-light) auto 0;
+  height: functions.rem(4);
+  margin-top: var(--gap-bar);
   overflow: hidden;
   border-radius: functions.rem(999);
   background-color: $track;
@@ -134,50 +96,95 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   i {
     position: absolute;
     inset: 0 auto 0 0;
-    width: 35%;
     border-radius: inherit;
-    background: linear-gradient(
-      90deg,
-      rgba($opponent, 0),
-      $opponent,
-      rgba($opponent, 0)
-    );
-    animation: sweep var(--light-speed) ease-in-out infinite;
-  }
-
-  // The text follows the light (B3, B7).
-  :host(.b-top) &,
-  :host(.b-code) & {
-    margin: 0 auto var(--gap-light);
-  }
-
-  // B4: a solid tail with a glowing head.
-  :host(.b-comet) & {
-    overflow: visible;
-    background-color: rgba($opponent, 0.12);
-
-    i {
-      background: linear-gradient(90deg, rgba($opponent, 0), $opponent);
-      box-shadow: functions.rem(2) 0 functions.rem(10) rgba($opponent, 0.45);
-    }
-  }
-
-  // B5: back and forth, as a calm loader.
-  :host(.b-short) & i {
-    width: 40%;
-    background: $opponent;
-    animation: ping-pong var(--light-speed) ease-in-out infinite alternate;
+    background-color: $blue;
   }
 }
 
-// B4: the light is clipped by the width of the code, not by the track.
-:host(.b-comet) .waiting {
-  overflow: hidden;
-  padding-block: functions.rem(4);
-  margin-top: calc(var(--gap-waiting) - #{functions.rem(4)});
+// D1: a dark blue light runs from left to right.
+:host(.d-dark) .bar i {
+  width: 35%;
+  background: linear-gradient(90deg, rgba($blue, 0), $blue, rgba($blue, 0));
+  animation: sweep 1.8s ease-in-out infinite;
 }
 
-// B6: text and waiting time on one line.
+// D2: a solid piece swings back and forth.
+:host(.d-pingpong) .bar i {
+  width: 30%;
+  animation: swing 1.2s ease-in-out infinite alternate;
+}
+
+// D3: a long and a short light, as the loaders of Android.
+:host(.d-dual) .bar i {
+  inset: 0;
+
+  &.is-long {
+    animation: dual-long 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+  }
+
+  &.is-short {
+    animation: dual-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite;
+    left: -200%;
+    right: 100%;
+  }
+}
+
+// D4: diagonal stripes run through a dark blue bar.
+:host(.d-stripes) .bar {
+  height: functions.rem(8);
+  background-color: $blue;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba($white, 0.2) 0 functions.rem(8),
+    transparent functions.rem(8) functions.rem(16)
+  );
+  animation: stripes 0.8s linear infinite;
+
+  i {
+    display: none;
+  }
+}
+
+// D5: twelve blocks light up one after the other.
+:host(.d-blocks) .bar {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: functions.rem(4);
+  height: functions.rem(6);
+  border-radius: 0;
+  background: none;
+
+  i {
+    position: static;
+    border-radius: functions.rem(2);
+    background-color: $track;
+    animation: block 1.8s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 0.1s);
+  }
+}
+
+// D6: the bar grows from the middle and fades out.
+:host(.d-center) .bar i {
+  inset: 0;
+  animation: grow 1.8s ease-out infinite;
+}
+
+// D7: a dot travels along a fine line.
+:host(.d-dot) .bar {
+  height: functions.rem(2);
+  overflow: visible;
+
+  i {
+    top: functions.rem(-4);
+    width: functions.rem(10);
+    height: functions.rem(10);
+    border-radius: 50%;
+    box-shadow: 0 0 0 functions.rem(4) rgba($blue, 0.12);
+    animation: travel 1.6s ease-in-out infinite alternate;
+  }
+}
+
+// D8: text and waiting time on one line, the bar fills once per minute.
 .waiting-row {
   display: flex;
   justify-content: space-between;
@@ -193,48 +200,32 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   color: $blue;
 }
 
-// B8: the three dots hop, as when someone is typing.
-.dots i {
-  display: inline-block;
-  font-style: normal;
-  animation: hop 1.2s ease-in-out infinite;
+:host(.d-time) .bar i {
+  inset: 0;
+  transform-origin: left;
+  transition: transform 1s linear;
 
-  &:nth-child(2) {
-    animation-delay: 0.15s;
-  }
-
-  &:nth-child(3) {
-    animation-delay: 0.3s;
+  &.is-reset {
+    transition: none;
   }
 }
 
 // ---------------------------------------------------------------------------
-// Smaller screens
+// Smaller screens: the spacing of before
 // ---------------------------------------------------------------------------
 @include facelift.short-screen {
   :host {
-    --gap-code: #{functions.rem(16)};
+    --gap-code: #{functions.rem(24)};
     --gap-waiting: #{functions.rem(24)};
-  }
-
-  :host(.b-calm) {
-    --gap-waiting: #{functions.rem(32)};
-  }
-
-  :host(.b-code) {
-    --gap-waiting: #{functions.rem(12)};
-    --gap-copy: #{functions.rem(16)};
   }
 }
 
 @media (max-height: 600px) {
-  :host,
-  :host(.b-calm),
-  :host(.b-code) {
-    --gap-code: #{functions.rem(12)};
+  :host {
+    --gap-code: #{functions.rem(16)};
     --gap-copy: #{functions.rem(8)};
     --gap-waiting: #{functions.rem(16)};
-    --gap-light: #{functions.rem(8)};
+    --gap-bar: #{functions.rem(8)};
   }
 
   .code-box {
@@ -253,16 +244,19 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   }
 }
 
+// Without motion: a calm, half filled bar.
 @media (prefers-reduced-motion: reduce) {
   .char,
-  .sweep i,
-  .dots i {
+  .bar,
+  .bar i {
     animation: none !important;
   }
 
-  // Without motion the light stays in the middle.
-  .sweep i {
-    left: 32.5%;
+  :host(:not(.d-time)) .bar i {
+    inset: 0 50% 0 0;
+    width: auto;
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -283,24 +277,75 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   }
 }
 
-@keyframes ping-pong {
-  from {
-    transform: translateX(0);
-  }
-
+@keyframes swing {
   to {
-    transform: translateX(150%);
+    transform: translateX(233%);
   }
 }
 
-@keyframes hop {
-  0%,
-  60%,
-  100% {
-    transform: translateY(0);
+@keyframes dual-long {
+  0% {
+    left: -35%;
+    right: 100%;
   }
 
-  30% {
-    transform: translateY(functions.rem(-3));
+  60%,
+  100% {
+    left: 100%;
+    right: -90%;
+  }
+}
+
+@keyframes dual-short {
+  0% {
+    left: -200%;
+    right: 100%;
+  }
+
+  60%,
+  100% {
+    left: 107%;
+    right: -8%;
+  }
+}
+
+@keyframes stripes {
+  to {
+    background-position: functions.rem(22.63) 0;
+  }
+}
+
+@keyframes block {
+  0%,
+  45%,
+  100% {
+    background-color: $track;
+  }
+
+  15% {
+    background-color: $blue;
+  }
+}
+
+@keyframes grow {
+  0% {
+    opacity: 1;
+    transform: scaleX(0);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes travel {
+  to {
+    left: calc(100% - #{functions.rem(10)});
   }
 }

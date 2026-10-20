@@ -10,66 +10,51 @@
   }
 </div>
 
-<ng-template #copyButton>
-  <css-button
-    variant="plain"
-    class="copy-button"
-    [attr.disabled]="isCopied() ? true : null"
-    (click)="!isCopied() && copyCode()"
-  >
-    <css-icon
-      [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
-      slot="prefix"
-    ></css-icon>
-    {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
-  </css-button>
-</ng-template>
+<css-button
+  variant="plain"
+  class="copy-button"
+  [attr.disabled]="isCopied() ? true : null"
+  (click)="!isCopied() && copyCode()"
+>
+  <css-icon
+    [attr.icon]="isCopied() ? 'checked-circle' : 'copy'"
+    slot="prefix"
+  ></css-icon>
+  {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
+</css-button>
 
-<ng-template #sweep>
-  <span class="sweep" aria-hidden="true"><i></i></span>
-</ng-template>
-
-@switch (layout()) {
-  @case ('b-code') {
-    <!-- B7: the bar right under the code, as if the code were loading. -->
-    <div class="waiting" role="status">
-      <ng-container *ngTemplateOutlet="sweep" />
-      <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
-    </div>
-    <ng-container *ngTemplateOutlet="copyButton" />
+<div class="waiting" role="status">
+  @if (layout() === 'd-time') {
+    <p class="waiting-row">
+      <span>Warte auf deinen Freund</span>
+      <span class="time">{{ elapsed() }}</span>
+    </p>
+  } @else {
+    <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
   }
-  @default {
-    <ng-container *ngTemplateOutlet="copyButton" />
-    <div class="waiting" role="status">
-      @switch (layout()) {
-        @case ('b-top') {
-          <!-- B3: the bar as a divider, the text below. -->
-          <ng-container *ngTemplateOutlet="sweep" />
-          <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
-        }
-        @case ('b-time') {
-          <!-- B6: text and waiting time on one line, the light below. -->
-          <p class="waiting-row">
-            <span>Warte auf deinen Freund</span>
-            <span class="time">{{ elapsed() }}</span>
-          </p>
-          <ng-container *ngTemplateOutlet="sweep" />
-        }
-        @case ('b-dots') {
-          <!-- B8: the dots of the text hop, the light runs below. -->
-          <p class="waiting-text">
-            Warte auf deinen Freund<span class="dots" aria-hidden="true"
-              ><i>.</i><i>.</i><i>.</i></span
-            >
-          </p>
-          <ng-container *ngTemplateOutlet="sweep" />
-        }
-        @default {
-          <!-- B1, B2, B4, B5: the text, the light below. -->
-          <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
-          <ng-container *ngTemplateOutlet="sweep" />
+
+  <span class="bar" aria-hidden="true">
+    @switch (layout()) {
+      @case ('d-dual') {
+        <!-- D3: a long and a short light, one after the other. -->
+        <i class="is-long"></i><i class="is-short"></i>
+      }
+      @case ('d-blocks') {
+        <!-- D5: twelve blocks light up one after the other. -->
+        @for (block of blocks; track block) {
+          <i [style.--i]="block"></i>
         }
       }
-    </div>
-  }
-}
+      @case ('d-time') {
+        <!-- D8: the bar fills once per minute. -->
+        <i
+          [class.is-reset]="minute() === 0"
+          [style.transform]="'scaleX(' + minute() + ')'"
+        ></i>
+      }
+      @default {
+        <i></i>
+      }
+    }
+  </span>
+</div>

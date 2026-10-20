@@ -17,26 +17,26 @@ export const LOBBY_DESIGNS: DesignOption<LobbyDesign>[] = [
 /** Proposals for the «Spiel erstellt» screen. */
 export type WaitingLayout =
   | 'facelift'
-  | 'b-base'
-  | 'b-calm'
-  | 'b-top'
-  | 'b-comet'
-  | 'b-short'
-  | 'b-time'
-  | 'b-code'
-  | 'b-dots';
+  | 'd-dark'
+  | 'd-pingpong'
+  | 'd-dual'
+  | 'd-stripes'
+  | 'd-blocks'
+  | 'd-center'
+  | 'd-dot'
+  | 'd-time';
 
-/** W1 refined: the same code and copy button, a running light. */
+/** The spacing of before, the code in boxes, a dark blue bar. */
 export const WAITING_LAYOUTS: DesignOption<WaitingLayout>[] = [
   { value: 'facelift', label: 'Heute (Facelift)' },
-  { value: 'b-base', label: 'B1 · W1 wie bisher' },
-  { value: 'b-calm', label: 'B2 · Mehr Luft, feineres Licht' },
-  { value: 'b-top', label: 'B3 · Licht als Trennlinie' },
-  { value: 'b-comet', label: 'B4 · Leuchtender Komet' },
-  { value: 'b-short', label: 'B5 · Kurz, hin und her' },
-  { value: 'b-time', label: 'B6 · Mit Wartezeit' },
-  { value: 'b-code', label: 'B7 · Licht direkt unter dem Code' },
-  { value: 'b-dots', label: 'B8 · Hüpfende Punkte' },
+  { value: 'd-dark', label: 'D1 · Dunkelblaues Licht' },
+  { value: 'd-pingpong', label: 'D2 · Pendel' },
+  { value: 'd-dual', label: 'D3 · Zwei Lichter' },
+  { value: 'd-stripes', label: 'D4 · Laufende Streifen' },
+  { value: 'd-blocks', label: 'D5 · Blöcke' },
+  { value: 'd-center', label: 'D6 · Aus der Mitte' },
+  { value: 'd-dot', label: 'D7 · Punkt auf der Linie' },
+  { value: 'd-time', label: 'D8 · Zeitbalken mit Wartezeit' },
 ];
 
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [
