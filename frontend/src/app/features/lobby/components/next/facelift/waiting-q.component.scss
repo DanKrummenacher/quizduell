@@ -361,6 +361,10 @@ css-button.is-copied {
   .rule {
     margin: functions.rem(12) 0 functions.rem(10);
   }
+
+  .waiting {
+    margin-top: functions.rem(10);
+  }
 }
 
 @media (max-width: 374px) {
