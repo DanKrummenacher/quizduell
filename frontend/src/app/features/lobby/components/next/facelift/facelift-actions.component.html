@@ -1,4 +1,11 @@
-@if (layout() !== 'facelift') {
+@if (isMore()) {
+  <app-friend-more
+    [layout]="layout()"
+    [joinError]="joinError()"
+    (createGame)="createGame.emit()"
+    (joinGame)="joinGame.emit($event)"
+  />
+} @else if (layout() !== 'facelift') {
   <app-friend-ideas
     [layout]="layout()"
     [joinError]="joinError()"

@@ -21,7 +21,12 @@ export type FriendLayout =
   | 'fr-boxes'
   | 'fr-join-first'
   | 'fr-tabs'
-  | 'fr-tiles';
+  | 'fr-tiles'
+  | 'fr-hero'
+  | 'fr-auto'
+  | 'fr-steps'
+  | 'fr-sheet'
+  | 'fr-explain';
 
 export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
@@ -29,7 +34,21 @@ export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'fr-accordion', label: '2 · Zwei Karten, Beitreten klappt auf' },
   { value: 'fr-tabs', label: '3 · Umschalter Erstellen / Beitreten' },
   { value: 'fr-tiles', label: '4 · Zwei Kacheln nebeneinander' },
+  { value: 'fr-hero', label: '6 · Erstellen als dunkle Hauptkarte' },
+  { value: 'fr-auto', label: '7 · Beitreten ohne Button (automatisch)' },
+  { value: 'fr-steps', label: '8 · Zwei Schritte: Wahl, dann Code' },
+  { value: 'fr-sheet', label: '9 · Wie die Suche, Code im Blatt' },
+  { value: 'fr-explain', label: '10 · In drei Schritten erklärt' },
   { value: 'fr-join-first', label: '5 · Beitreten zuerst, Erstellen als «oder»' },
+];
+
+/** Further friend proposals in their own component. */
+export const FRIEND_MORE: readonly FriendLayout[] = [
+  'fr-hero',
+  'fr-auto',
+  'fr-steps',
+  'fr-sheet',
+  'fr-explain',
 ];
 
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [
