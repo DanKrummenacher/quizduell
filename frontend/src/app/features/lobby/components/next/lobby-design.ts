@@ -17,6 +17,12 @@ export const LOBBY_DESIGNS: DesignOption<LobbyDesign>[] = [
 /** Proposals for the search screen, on top of the facelift. */
 export type SearchLayout =
   | 'facelift'
+  | 'clock'
+  | 'clock-top'
+  | 'clock-card'
+  | 'clock-dark'
+  | 'clock-stage'
+  | 'clock-quiet'
   | 'bar-below'
   | 'bar-end'
   | 'bar-label'
@@ -46,6 +52,12 @@ export type SearchLayout =
 
 export const SEARCH_LAYOUTS: DesignOption<SearchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
+  { value: 'clock', label: 'C1 · Sekundenring mit Puls' },
+  { value: 'clock-top', label: 'C2 · Text oben, Ring unten' },
+  { value: 'clock-card', label: 'C3 · Ring in einer Karte' },
+  { value: 'clock-dark', label: 'C4 · Dunkle Uhr' },
+  { value: 'clock-stage', label: 'C5 · Vollbild, Aktion unten' },
+  { value: 'clock-quiet', label: 'C6 · Ruhig, nur ein Satz' },
   { value: 'bar-below', label: 'A1 · Balken, Zeit darunter' },
   { value: 'bar-end', label: 'A2 · Balken, Zeit am Ende' },
   { value: 'bar-label', label: 'A3 · Wartezeit über dem Balken' },
@@ -101,6 +113,7 @@ export const SEARCH_CONCEPTS: readonly SearchLayout[] = [
 
 /** Search proposals that use the whole screen (no greeting, no back link). */
 export const FULLSCREEN_SEARCH: readonly SearchLayout[] = [
+  'clock-stage',
   'stage',
   'warmup',
   'split',
@@ -126,4 +139,14 @@ export const SEARCH_FINAL: readonly SearchLayout[] = [
   'ring-ticks',
   'ring-spin',
   'ring-dark',
+];
+
+/** The chosen time ring with second ticks in different arrangements. */
+export const SEARCH_CLOCK: readonly SearchLayout[] = [
+  'clock',
+  'clock-top',
+  'clock-card',
+  'clock-dark',
+  'clock-stage',
+  'clock-quiet',
 ];

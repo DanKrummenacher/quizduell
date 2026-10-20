@@ -4,6 +4,8 @@
     [playerName]="playerName()"
     (cancelSearch)="cancelSearch.emit()"
   />
+} @else if (isClock()) {
+  <app-search-clock [layout]="layout()" (cancelSearch)="cancelSearch.emit()" />
 } @else if (isFinal()) {
   <app-search-final [layout]="layout()" (cancelSearch)="cancelSearch.emit()" />
 } @else {

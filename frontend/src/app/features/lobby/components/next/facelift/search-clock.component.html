@@ -1,0 +1,84 @@
+<!-- The ring: one tick per second, the newest one in light blue. -->
+<ng-template #dial let-label="label">
+  <div class="dial">
+    <svg viewBox="0 0 200 200" aria-hidden="true">
+      @if (layout() === 'clock-dark') {
+        <circle class="disc" cx="100" cy="100" r="100" />
+      }
+      @for (angle of ticks; track angle) {
+        <line
+          class="tick"
+          [class.is-on]="$index < lit()"
+          [class.is-head]="$index === lit() - 1"
+          x1="100"
+          y1="8"
+          x2="100"
+          y2="22"
+          [attr.transform]="'rotate(' + angle + ' 100 100)'"
+        />
+      }
+    </svg>
+    <div class="dial-center">
+      <span class="dial-time">{{ elapsed() }}</span>
+      @if (label) {
+        <span class="dial-label">{{ label }}</span>
+      }
+    </div>
+  </div>
+</ng-template>
+
+@switch (layout()) {
+  @case ('clock-top') {
+    <section role="status">
+      <h2 class="title is-top">Suche Gegner&nbsp;…</h2>
+      <p class="text">Warte auf einen weiteren Spieler</p>
+      <ng-container *ngTemplateOutlet="dial; context: { label: 'Wartezeit' }" />
+    </section>
+  }
+  @case ('clock-card') {
+    <section class="card" role="status">
+      <ng-container *ngTemplateOutlet="dial; context: { label: '' }" />
+      <div class="card-text">
+        <h2 class="title">Suche Gegner&nbsp;…</h2>
+        <p class="text">Du wirst automatisch verbunden, sobald jemand bereit ist</p>
+      </div>
+    </section>
+  }
+  @case ('clock-stage') {
+    <section class="stage" role="status">
+      <div class="stage-main">
+        <span class="eyebrow">Schnellspiel</span>
+        <ng-container *ngTemplateOutlet="dial; context: { label: 'Wartezeit' }" />
+        <h2 class="title">Wir suchen deinen Gegner</h2>
+        <p class="text">Sobald jemand bereit ist, geht es los</p>
+      </div>
+    </section>
+  }
+  @case ('clock-quiet') {
+    <section role="status">
+      <ng-container *ngTemplateOutlet="dial; context: { label: 'Suche läuft' }" />
+      <p class="text is-single">
+        Du wirst automatisch verbunden,<br />sobald jemand bereit ist
+      </p>
+    </section>
+  }
+  @default {
+    <!-- clock and clock-dark -->
+    <section role="status">
+      <ng-container *ngTemplateOutlet="dial; context: { label: 'Wartezeit' }" />
+      <h2 class="title">Suche Gegner&nbsp;…</h2>
+      <p class="text">Warte auf einen weiteren Spieler</p>
+    </section>
+  }
+}
+
+@if (layout() === 'clock-quiet') {
+  <css-button variant="plain" class="compact" (click)="cancelSearch.emit()">
+    Suche abbrechen
+  </css-button>
+} @else {
+  <css-button class="compact" (click)="cancelSearch.emit()">
+    <css-icon icon="close" slot="prefix"></css-icon>
+    Abbrechen
+  </css-button>
+}

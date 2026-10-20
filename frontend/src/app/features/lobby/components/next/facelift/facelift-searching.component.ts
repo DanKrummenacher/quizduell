@@ -10,9 +10,15 @@ import {
 } from '@angular/core';
 import '@css-ch/components/icon';
 import '@css-ch/components/button';
-import { SEARCH_CONCEPTS, SEARCH_FINAL, type SearchLayout } from '../lobby-design';
+import {
+  SEARCH_CLOCK,
+  SEARCH_CONCEPTS,
+  SEARCH_FINAL,
+  type SearchLayout,
+} from '../lobby-design';
 import { SearchConceptComponent } from './search-concept.component';
 import { SearchBandComponent } from './search-band.component';
+import { SearchClockComponent } from './search-clock.component';
 import { SearchFinalComponent } from './search-final.component';
 
 const TIP_MS = 4500;
@@ -25,8 +31,13 @@ const TIPS = [
 
 @Component({
   selector: 'app-facelift-searching',
-  imports: [SearchBandComponent, SearchConceptComponent, SearchFinalComponent],
-  host: { '[class.is-concept]': 'isConcept()' },
+  imports: [
+    SearchBandComponent,
+    SearchConceptComponent,
+    SearchFinalComponent,
+    SearchClockComponent,
+  ],
+  host: { '[class.is-concept]': 'isConcept() || isClock()' },
   templateUrl: './facelift-searching.component.html',
   styleUrl: './facelift-searching.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -44,6 +55,7 @@ export class FaceliftSearchingComponent {
   );
 
   protected readonly isFinal = computed(() => SEARCH_FINAL.includes(this.layout()));
+  protected readonly isClock = computed(() => SEARCH_CLOCK.includes(this.layout()));
 
   protected readonly initial = computed(() =>
     this.playerName().charAt(0).toUpperCase(),
