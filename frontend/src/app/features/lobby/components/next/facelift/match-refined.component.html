@@ -1,0 +1,129 @@
+@for (run of [round()]; track run) {
+  <section role="status">
+    <!-- 1. The visual, in the same place and size as the search ring. -->
+    <div class="visual" aria-hidden="true">
+      @switch (layout()) {
+        @case ('r-ring') {
+          <div class="dial">
+            <svg viewBox="0 0 200 200">
+              @for (angle of ticks; track angle) {
+                <line
+                  class="tick"
+                  [class.is-filled]="$index < filledTicks()"
+                  x1="100"
+                  y1="8"
+                  x2="100"
+                  y2="22"
+                  [attr.transform]="'rotate(' + angle + ' 100 100)'"
+                />
+              }
+            </svg>
+            <div class="dial-center">
+              @for (second of [seconds()]; track second) {
+                <span class="dial-number" [class.is-go]="second === 0">{{
+                  second > 0 ? second : 'Los!'
+                }}</span>
+              }
+            </div>
+          </div>
+        }
+        @case ('r-avatar') {
+          <div class="dial">
+            <svg viewBox="0 0 200 200">
+              @for (angle of ticks; track angle) {
+                <line
+                  class="tick"
+                  [class.is-filled]="$index < filledTicks()"
+                  x1="100"
+                  y1="8"
+                  x2="100"
+                  y2="22"
+                  [attr.transform]="'rotate(' + angle + ' 100 100)'"
+                />
+              }
+            </svg>
+            <div class="dial-center">
+              <span class="avatar is-opponent is-large">{{
+                opponentInitial()
+              }}</span>
+            </div>
+          </div>
+        }
+        @case ('r-sequence') {
+          @if (ringPhase()) {
+            <div class="dial is-leaving">
+              <svg viewBox="0 0 200 200">
+                @for (angle of ticks; track angle) {
+                  <line
+                    class="tick"
+                    [class.is-filled]="$index < sequenceTicks()"
+                    x1="100"
+                    y1="8"
+                    x2="100"
+                    y2="22"
+                    [attr.transform]="'rotate(' + angle + ' 100 100)'"
+                  />
+                }
+              </svg>
+              <div class="dial-center">
+                @if (sequenceTicks() === 60) {
+                  <span class="check"
+                    ><css-icon icon="checkmark" size="lg"></css-icon
+                  ></span>
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="duo">
+              <span class="avatar is-left">{{ myInitial() }}</span>
+              <span class="avatar is-right is-opponent">{{
+                opponentInitial()
+              }}</span>
+              <span class="ripple"></span>
+              <span class="badge"
+                ><css-icon icon="checkmark" size="sm"></css-icon
+              ></span>
+            </div>
+          }
+        }
+        @default {
+          <!-- r-meet and r-segments: the players move together. -->
+          <div class="duo">
+            <span class="avatar is-left">{{ myInitial() }}</span>
+            <span class="avatar is-right is-opponent">{{ opponentInitial() }}</span>
+            <span class="ripple"></span>
+            <span class="badge"
+              ><css-icon icon="checkmark" size="sm"></css-icon
+            ></span>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- 2. Title and text, exactly where the search had them. -->
+    <h2 class="section-title">Gegner gefunden!</h2>
+    <p class="body-text">
+      Du spielst gegen <strong>{{ opponentName() }}</strong>
+    </p>
+
+    <!-- 3. The countdown, where the search had its button. -->
+    <div class="slot">
+      @if (layout() === 'r-segments') {
+        <div class="segments" aria-hidden="true">
+          @for (segment of segments; track segment) {
+            <span class="segment"
+              ><i [style.transform]="'scaleX(' + segmentFill(segment) + ')'"></i
+            ></span>
+          }
+        </div>
+      }
+      <p class="start" [class.is-pill]="layout() === 'r-avatar'">
+        @if (seconds() > 0) {
+          Das Duell beginnt in {{ seconds() }}&nbsp;s
+        } @else {
+          Los geht’s!
+        }
+      </p>
+    </div>
+  </section>
+}

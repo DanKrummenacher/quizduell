@@ -1,0 +1,345 @@
+// TEMPORARY: refined match proposals. Sizes and spacing follow the search
+// screen, so the page does not jump when the opponent is found.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$track: #dfe3ea;
+$page: colors.$dt-color-pepper-bright;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+
+:host {
+  display: block;
+  overflow-x: clip;
+  text-align: center;
+}
+
+.section-title {
+  @include facelift.section-title;
+  margin: functions.rem(24) 0 functions.rem(8);
+}
+
+.body-text {
+  @include facelift.body-text;
+
+  strong {
+    color: $blue;
+  }
+}
+
+// The visual has the height of the search ring.
+.visual {
+  display: grid;
+  place-items: center;
+  height: functions.rem(176);
+}
+
+// Same place and height as the cancel button of the search.
+.slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(12);
+  min-height: functions.rem(40);
+  margin-top: clamp(#{functions.rem(48)}, 9vh, #{functions.rem(96)});
+}
+
+.start {
+  margin: 0;
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+
+  &.is-pill {
+    padding: functions.rem(10) functions.rem(20);
+    border-radius: functions.rem(999);
+    background-color: $blue;
+    color: $white;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The ring of the search
+// ---------------------------------------------------------------------------
+.dial {
+  position: relative;
+  width: functions.rem(176);
+  height: functions.rem(176);
+  border-radius: 50%;
+  animation: pulse 1s ease-out infinite;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  // R3: the ring gives way to the players.
+  &.is-leaving {
+    animation: leave 0.25s 0.65s ease-in forwards;
+  }
+}
+
+.tick {
+  stroke: $track;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke 0.15s ease;
+
+  &.is-filled {
+    stroke: $blue;
+  }
+}
+
+.dial-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+// The number changes calmly: it rises in, instead of jumping.
+.dial-number {
+  font-size: functions.rem(64);
+  font-weight: $bold;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+  animation: rise 0.35s ease-out both;
+
+  &.is-go {
+    font-size: functions.rem(36);
+  }
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  width: functions.rem(64);
+  height: functions.rem(64);
+  border-radius: 50%;
+  background-color: $green;
+  color: $white;
+  animation: pop 0.3s $spring both;
+
+  css-icon {
+    display: block;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The players that move together
+// ---------------------------------------------------------------------------
+.avatar {
+  display: grid;
+  place-items: center;
+  width: functions.rem(96);
+  height: functions.rem(96);
+  box-sizing: border-box;
+  border: functions.rem(4) solid $page;
+  border-radius: 50%;
+  background-color: $blue;
+  color: $white;
+  font-size: functions.rem(36);
+  font-weight: $bold;
+
+  &.is-opponent {
+    background-color: $opponent;
+  }
+
+  &.is-large {
+    width: functions.rem(120);
+    height: functions.rem(120);
+    border: none;
+    font-size: functions.rem(48);
+    animation: pop 0.45s $spring both;
+  }
+}
+
+.duo {
+  position: relative;
+  display: flex;
+
+  .is-left {
+    animation: meet-left 0.7s $spring both;
+  }
+
+  .is-right {
+    margin-left: functions.rem(-22);
+    animation: meet-right 0.7s $spring both;
+  }
+}
+
+// A soft wave where the two meet.
+.ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: functions.rem(96);
+  height: functions.rem(96);
+  margin: functions.rem(-48) 0 0 functions.rem(-48);
+  border: functions.rem(2) solid $opponent;
+  border-radius: 50%;
+  opacity: 0;
+  animation: ripple 0.9s 0.45s ease-out;
+}
+
+.badge {
+  position: absolute;
+  bottom: functions.rem(-8);
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: functions.rem(34);
+  height: functions.rem(34);
+  margin-left: functions.rem(-17);
+  box-sizing: border-box;
+  border: functions.rem(3) solid $page;
+  border-radius: 50%;
+  background-color: $green;
+  color: $white;
+  animation: pop 0.35s 0.55s $spring both;
+
+  css-icon {
+    display: block;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// R4 · Three segments, one per second
+// ---------------------------------------------------------------------------
+.segments {
+  display: flex;
+  gap: functions.rem(6);
+}
+
+.segment {
+  width: functions.rem(64);
+  height: functions.rem(6);
+  overflow: hidden;
+  border-radius: functions.rem(3);
+  background-color: $track;
+
+  i {
+    display: block;
+    height: 100%;
+    background-color: $blue;
+    transform-origin: left;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Short phones (e.g. iPhone SE), as on the search screen
+// ---------------------------------------------------------------------------
+@media (max-height: 800px) {
+  .visual,
+  .dial {
+    height: functions.rem(152);
+  }
+
+  .dial {
+    width: functions.rem(152);
+  }
+}
+
+@include facelift.short-screen {
+  .section-title {
+    margin-top: functions.rem(16);
+  }
+
+  .visual,
+  .dial {
+    height: functions.rem(144);
+  }
+
+  .dial {
+    width: functions.rem(144);
+  }
+
+  .avatar.is-large {
+    width: functions.rem(100);
+    height: functions.rem(100);
+  }
+
+  .slot {
+    margin-top: clamp(#{functions.rem(32)}, 7vh, #{functions.rem(48)});
+  }
+}
+
+@media (max-height: 600px) {
+  .slot {
+    margin-top: functions.rem(32);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($opponent, 0.35);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(20) rgba($opponent, 0);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(functions.rem(12));
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes leave {
+  to {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+@keyframes meet-left {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(-56));
+  }
+}
+
+@keyframes meet-right {
+  from {
+    opacity: 0;
+    transform: translateX(functions.rem(56));
+  }
+}
+
+@keyframes ripple {
+  from {
+    opacity: 0.6;
+    transform: scale(0.6);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
