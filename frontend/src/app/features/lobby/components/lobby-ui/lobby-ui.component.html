@@ -13,10 +13,7 @@
   }
 
   @if (design() === 'facelift') {
-    <main
-      class="main-area is-facelift"
-      [class.is-stage]="state() === 'SEARCHING' && searchLayout() === 'stage'"
-    >
+    <main class="main-area is-facelift" [class.is-stage]="fullscreen()">
       <div class="centered-content">
         @switch (state()) {
           @case ('CHOOSE_MODE') {

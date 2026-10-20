@@ -18,7 +18,11 @@ import { FaceliftActionsComponent } from '../next/facelift/facelift-actions.comp
 import { FaceliftSearchingComponent } from '../next/facelift/facelift-searching.component';
 import { FaceliftWaitingComponent } from '../next/facelift/facelift-waiting.component';
 import { FaceliftMatchFoundComponent } from '../next/facelift/facelift-match-found.component';
-import type { LobbyDesign, SearchLayout } from '../next/lobby-design';
+import {
+  FULLSCREEN_SEARCH,
+  type LobbyDesign,
+  type SearchLayout,
+} from '../next/lobby-design';
 import '@css-ch/components/button';
 import '@css-ch/components/flyout';
 
@@ -59,8 +63,14 @@ export class LobbyUiComponent {
   protected readonly hasNavigation = computed(
     () =>
       this.state() !== 'FOUND' &&
-      // TEMPORARY: the proposal «Bühne» uses the whole screen.
-      !(this.state() === 'SEARCHING' && this.searchLayout() === 'stage'),
+      // TEMPORARY: some search proposals use the whole screen.
+      !this.fullscreen(),
+  );
+
+  protected readonly fullscreen = computed(
+    () =>
+      this.state() === 'SEARCHING' &&
+      FULLSCREEN_SEARCH.includes(this.searchLayout()),
   );
 
   readonly navigateBack = output<void>();

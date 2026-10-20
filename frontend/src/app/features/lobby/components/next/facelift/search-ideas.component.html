@@ -1,0 +1,93 @@
+@switch (layout()) {
+  @case ('slot') {
+    <section class="center" role="status">
+      <div class="duo" aria-hidden="true">
+        <span class="avatar">{{ initial() }}</span>
+        <span class="vs">vs</span>
+        <span class="slot">
+          <span class="avatar rolling" [style.background-color]="slotColor()">{{
+            slotLetter()
+          }}</span>
+        </span>
+      </div>
+      <h2 class="title">Gegner wird ausgelost&nbsp;…</h2>
+      <p class="text">Gleich steht fest, gegen wen du spielst</p>
+      <css-button class="compact" (click)="cancelSearch.emit()">
+        <css-icon icon="close" slot="prefix"></css-icon>
+        Abbrechen
+      </css-button>
+    </section>
+  }
+  @case ('warmup') {
+    <section class="warmup">
+      <div class="status-row" role="status">
+        <span class="pulse" aria-hidden="true"></span>
+        <span class="status-text">Suche Gegner&nbsp;…</span>
+        <span class="status-time">{{ elapsed() }}</span>
+        <css-button
+          variant="plain"
+          class="status-cancel"
+          (click)="cancelSearch.emit()"
+        >
+          Abbrechen
+        </css-button>
+      </div>
+
+      <div class="warmup-body">
+        <span class="warmup-label">Aufwärmen · ohne Punkte</span>
+        <h2 class="warmup-question">{{ question().text }}</h2>
+        <div class="answers">
+          @for (option of question().options; track $index) {
+            <button
+              type="button"
+              class="answer"
+              [class.is-correct]="picked() !== null && $index === question().correct"
+              [class.is-wrong]="picked() === $index && $index !== question().correct"
+              [disabled]="picked() !== null"
+              (click)="pick($index)"
+            >
+              <span class="answer-letter" aria-hidden="true">{{
+                letters[$index]
+              }}</span>
+              <span class="answer-text">{{ option }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </section>
+  }
+  @case ('logo') {
+    <section class="center" role="status">
+      <span class="logo-loader" aria-hidden="true">
+        <app-logo-mark class="loader-mark" />
+      </span>
+      <h2 class="title">Suche Gegner&nbsp;…</h2>
+      <p class="text">Warte auf einen weiteren Spieler</p>
+      <p class="time">{{ elapsed() }}</p>
+      <css-button class="compact" (click)="cancelSearch.emit()">
+        <css-icon icon="close" slot="prefix"></css-icon>
+        Abbrechen
+      </css-button>
+    </section>
+  }
+  @case ('split') {
+    <section class="split" role="status">
+      <div class="half me">
+        <span class="avatar big inverse">{{ initial() }}</span>
+        <span class="half-label">Du</span>
+        <span class="half-name">{{ playerName() }}</span>
+      </div>
+      <div class="half opponent">
+        <span class="avatar big is-unknown">?</span>
+        <span class="half-label">Gegner</span>
+        <span class="half-name">wird gesucht&nbsp;…</span>
+        <span class="half-time">{{ elapsed() }}</span>
+        <css-button class="compact" (click)="cancelSearch.emit()">
+          <css-icon icon="close" slot="prefix"></css-icon>
+          Abbrechen
+        </css-button>
+      </div>
+      <span class="split-vs" aria-hidden="true"><span>VS</span></span>
+    </section>
+  }
+}

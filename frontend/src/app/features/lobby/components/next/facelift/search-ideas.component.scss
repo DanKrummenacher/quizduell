@@ -1,0 +1,416 @@
+// TEMPORARY: more search proposals with new ideas.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
+@use 'facelift';
+
+$opponent: #00a4e0;
+$green: #00875e;
+$red: #d53419;
+$light: #e5ecf5;
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+:host(.warmup),
+:host(.split) {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  @include facelift.section-title;
+  margin: functions.rem(32) 0 functions.rem(8);
+}
+
+.text {
+  @include facelift.body-text;
+}
+
+.compact {
+  display: block;
+  width: fit-content;
+  margin: functions.rem(40) auto 0;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: functions.rem(72);
+  height: functions.rem(72);
+  border-radius: 50%;
+  background-color: colors.$dt-color-darkblue-100;
+  color: colors.$dt-color-white-100;
+  font-size: functions.rem(28);
+  font-weight: miscs.$css-ui-font-weight-bold;
+
+  &.big {
+    width: functions.rem(88);
+    height: functions.rem(88);
+    font-size: functions.rem(34);
+  }
+
+  &.inverse {
+    background-color: colors.$dt-color-white-100;
+    color: colors.$dt-color-darkblue-100;
+  }
+
+  &.is-unknown {
+    border: functions.rem(2) dashed $opponent;
+    background: none;
+    color: $opponent;
+    animation: fade 1.6s ease-in-out infinite;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 11 · Gegner wird ausgelost: faces roll like a slot machine
+// ---------------------------------------------------------------------------
+.duo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(20);
+}
+
+.vs {
+  font-size: functions.rem(15);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: facelift.$muted;
+}
+
+.slot {
+  padding: functions.rem(4);
+  border: functions.rem(2) solid $opponent;
+  border-radius: 50%;
+}
+
+.rolling {
+  transition: background-color 0.1s linear;
+  animation: roll 0.15s linear infinite;
+}
+
+// ---------------------------------------------------------------------------
+// 12 · Aufwärmrunde: a question to warm up while waiting
+// ---------------------------------------------------------------------------
+.warmup {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding-top: functions.rem(16);
+  text-align: left;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(12);
+  padding: functions.rem(8) functions.rem(8) functions.rem(8) functions.rem(16);
+  border-radius: functions.rem(999);
+  background-color: colors.$dt-color-white-100;
+  box-shadow: 0 functions.rem(2) functions.rem(8) rgba(0, 50, 125, 0.08);
+}
+
+.pulse {
+  flex: none;
+  width: functions.rem(10);
+  height: functions.rem(10);
+  border-radius: 50%;
+  background-color: $opponent;
+  animation: pulse 1.6s ease-out infinite;
+}
+
+.status-text {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  font-size: functions.rem(15);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: colors.$dt-color-darkblue-100;
+}
+
+.status-time {
+  font-size: functions.rem(15);
+  font-variant-numeric: tabular-nums;
+  color: facelift.$muted;
+}
+
+.warmup-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: functions.rem(24);
+}
+
+.warmup-label {
+  font-size: functions.rem(12);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $opponent;
+}
+
+.warmup-question {
+  margin: functions.rem(8) 0 functions.rem(24);
+  font-size: functions.rem(22);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1.3;
+  color: colors.$dt-color-darkblue-100;
+}
+
+.answers {
+  display: grid;
+  gap: functions.rem(12);
+}
+
+// As the answers in the quiz: letter block on the left.
+.answer {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(16);
+  height: functions.rem(56);
+  padding: 0;
+  overflow: hidden;
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(4);
+  background-color: colors.$dt-color-white-100;
+  color: colors.$dt-color-darkblue-100;
+  font: inherit;
+  font-size: functions.rem(16);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  text-align: left;
+  @include interaction.card;
+
+  &.is-correct {
+    background-color: $green;
+    color: colors.$dt-color-white-100;
+  }
+
+  &.is-wrong {
+    background-color: $red;
+    color: colors.$dt-color-white-100;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.answer-letter {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  width: functions.rem(52);
+  background-color: colors.$dt-color-darkblue-100;
+  color: colors.$dt-color-white-100;
+
+  .is-correct &,
+  .is-wrong & {
+    background-color: rgba(255, 255, 255, 0.16);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 13 · Logo als Lader: the logo shapes light up one after the other
+// ---------------------------------------------------------------------------
+.logo-loader {
+  display: grid;
+  place-items: center;
+  width: functions.rem(112);
+  height: functions.rem(112);
+  margin: 0 auto;
+}
+
+.loader-mark {
+  width: functions.rem(112);
+  height: functions.rem(112);
+  animation: spin 8s linear infinite;
+
+  ::ng-deep svg g > * {
+    animation: glow 1.6s ease-in-out infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  @for $i from 1 through 8 {
+    ::ng-deep svg g > :nth-child(#{$i}) {
+      animation-delay: #{($i - 1) * 0.2}s;
+    }
+  }
+}
+
+.time {
+  margin: functions.rem(16) 0 0;
+  font-size: functions.rem(16);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  font-variant-numeric: tabular-nums;
+  color: colors.$dt-color-darkblue-100;
+}
+
+// ---------------------------------------------------------------------------
+// 14 · Geteilter Bildschirm: the duel band as the whole screen
+// ---------------------------------------------------------------------------
+.split {
+  position: relative;
+  flex-grow: 1;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+}
+
+.half {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(2);
+  min-height: 0;
+  padding: functions.rem(16) functions.rem(20);
+
+  .avatar {
+    margin-bottom: functions.rem(8);
+  }
+
+  &.me {
+    z-index: 1;
+    margin-bottom: functions.rem(-24);
+    padding-bottom: functions.rem(40);
+    background-color: colors.$dt-color-darkblue-100;
+    color: colors.$dt-color-white-100;
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - #{functions.rem(48)}), 0 100%);
+  }
+
+  &.opponent {
+    padding-top: functions.rem(40);
+    background-color: $light;
+    color: colors.$dt-color-darkblue-100;
+  }
+}
+
+.half-label {
+  font-size: functions.rem(13);
+  opacity: 0.8;
+}
+
+.half-name {
+  font-size: functions.rem(22);
+  font-weight: miscs.$css-ui-font-weight-bold;
+}
+
+.opponent .half-name {
+  font-weight: miscs.$css-ui-font-weight-regular;
+  color: facelift.$muted;
+}
+
+.half-time {
+  margin-top: functions.rem(8);
+  font-size: functions.rem(16);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  font-variant-numeric: tabular-nums;
+  color: $opponent;
+}
+
+.opponent .compact {
+  margin-top: functions.rem(16);
+}
+
+// The diamond sits exactly on the dividing line.
+.split-vs {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: functions.rem(56);
+  height: functions.rem(56);
+  transform: translate(-50%, -50%) rotate(45deg);
+  border: functions.rem(3) solid colors.$dt-color-pepper-bright;
+  background-color: $opponent;
+
+  span {
+    transform: rotate(-45deg);
+    font-size: functions.rem(16);
+    font-weight: miscs.$css-ui-font-weight-bold;
+    color: colors.$dt-color-white-100;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Short phones (e.g. iPhone SE)
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .warmup-question {
+    margin-bottom: functions.rem(16);
+    font-size: functions.rem(20);
+  }
+
+  .answer {
+    height: functions.rem(48);
+  }
+
+  .avatar.big {
+    width: functions.rem(56);
+    height: functions.rem(56);
+    font-size: functions.rem(24);
+  }
+
+  .half-name {
+    font-size: functions.rem(18);
+  }
+
+  .compact {
+    margin-top: functions.rem(24);
+  }
+}
+
+@keyframes roll {
+  from {
+    transform: translateY(-6%);
+  }
+
+  to {
+    transform: translateY(6%);
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+
+  30% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fade {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 164, 224, 0.5);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(8) rgba(0, 164, 224, 0);
+  }
+}

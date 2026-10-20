@@ -26,7 +26,11 @@ export type SearchLayout =
   | 'stage'
   | 'seats'
   | 'steps'
-  | 'sheet';
+  | 'sheet'
+  | 'slot'
+  | 'warmup'
+  | 'logo'
+  | 'split';
 
 export const SEARCH_LAYOUTS: DesignOption<SearchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
@@ -40,6 +44,10 @@ export const SEARCH_LAYOUTS: DesignOption<SearchLayout>[] = [
   { value: 'seats', label: '8 · Zwei Plätze' },
   { value: 'steps', label: '9 · Ablauf in Schritten' },
   { value: 'sheet', label: '10 · Blatt über der Auswahl' },
+  { value: 'slot', label: '11 · Gegner wird ausgelost' },
+  { value: 'warmup', label: '12 · Aufwärmrunde' },
+  { value: 'logo', label: '13 · Logo als Lader' },
+  { value: 'split', label: '14 · Geteilter Bildschirm' },
 ];
 
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [
@@ -57,4 +65,15 @@ export const SEARCH_CONCEPTS: readonly SearchLayout[] = [
   'seats',
   'steps',
   'sheet',
+  'slot',
+  'warmup',
+  'logo',
+  'split',
+];
+
+/** Search proposals that use the whole screen (no greeting, no back link). */
+export const FULLSCREEN_SEARCH: readonly SearchLayout[] = [
+  'stage',
+  'warmup',
+  'split',
 ];

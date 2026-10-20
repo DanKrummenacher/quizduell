@@ -12,6 +12,7 @@ import '@css-ch/components/button';
 import '@css-ch/components/icon';
 import type { SearchLayout } from '../lobby-design';
 import { FaceliftModeComponent } from './facelift-mode.component';
+import { SearchIdeasComponent } from './search-ideas.component';
 
 /**
  * TEMPORARY: search proposals with their own page structure (stage, two
@@ -19,7 +20,7 @@ import { FaceliftModeComponent } from './facelift-mode.component';
  */
 @Component({
   selector: 'app-search-concept',
-  imports: [FaceliftModeComponent],
+  imports: [FaceliftModeComponent, SearchIdeasComponent],
   templateUrl: './search-concept.component.html',
   styleUrl: './search-concept.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

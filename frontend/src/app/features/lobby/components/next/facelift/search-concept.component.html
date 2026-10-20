@@ -89,4 +89,11 @@
       <css-button stretch (click)="cancelSearch.emit()">Abbrechen</css-button>
     </section>
   }
+  @default {
+    <app-search-ideas
+      [layout]="layout()"
+      [playerName]="playerName()"
+      (cancelSearch)="cancelSearch.emit()"
+    />
+  }
 }

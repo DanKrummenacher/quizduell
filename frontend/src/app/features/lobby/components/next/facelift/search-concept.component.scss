@@ -13,9 +13,16 @@ $track: #dfe3ea;
   text-align: center;
 }
 
-:host(.stage) {
+:host(.stage),
+:host(.warmup),
+:host(.split) {
   flex-grow: 1;
   display: flex;
+  flex-direction: column;
+}
+
+app-search-ideas {
+  flex-grow: 1;
 }
 
 .title {
