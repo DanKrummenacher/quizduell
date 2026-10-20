@@ -51,10 +51,22 @@ export type MatchLayout =
   | 'z-ring-under'
   | 'z-behind'
   | 'z-halves'
-  | 'z-join';
+  | 'z-join'
+  | 'f-base'
+  | 'f-label'
+  | 'f-circle'
+  | 'f-names'
+  | 'f-found'
+  | 'f-header';
 
 export const MATCH_LAYOUTS: DesignOption<MatchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
+  { value: 'f-base', label: 'F1 · Z1, Zahl wie der Button der Suche' },
+  { value: 'f-label', label: 'F2 · Z1 mit «Start in» über der Zahl' },
+  { value: 'f-circle', label: 'F3 · Z1, Zahl in einem feinen Kreis' },
+  { value: 'f-names', label: 'F4 · Z1 mit beiden Namen' },
+  { value: 'f-found', label: 'F5 · Z1 mit «Gegner gefunden!»' },
+  { value: 'f-header', label: 'F6 · Z1, Begrüssung bleibt oben' },
   { value: 'z-num-below', label: 'Z1 · Zahl ganz unten' },
   { value: 'z-num-under', label: 'Z2 · Zahl unter den Profilen' },
   { value: 'z-ring-under', label: 'Z3 · Kleiner Ring unter den Profilen' },
@@ -86,6 +98,16 @@ export const FULLSCREEN_MATCH: readonly MatchLayout[] = [
   'split',
   'flash',
   'y-dark',
+];
+
+/** Final refinements of Z1. */
+export const MATCH_POLISH: readonly MatchLayout[] = [
+  'f-base',
+  'f-label',
+  'f-circle',
+  'f-names',
+  'f-found',
+  'f-header',
 ];
 
 /** Proposals with exactly one countdown (no extra line below). */

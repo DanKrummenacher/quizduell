@@ -1,4 +1,11 @@
-@if (isClean()) {
+@if (isPolish()) {
+  <app-match-polish
+    [layout]="layout()"
+    [playerName]="playerName()"
+    [opponentName]="opponentName()"
+    [durationMs]="durationMs()"
+  />
+} @else if (isClean()) {
   <app-match-clean
     [layout]="layout()"
     [playerName]="playerName()"

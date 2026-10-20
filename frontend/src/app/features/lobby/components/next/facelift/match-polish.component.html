@@ -1,0 +1,74 @@
+@for (run of [round()]; track run) {
+  <section role="status" [class.is-done]="seconds() === 0">
+    <span class="visually-hidden">
+      @if (seconds() > 0) {
+        Das Duell beginnt in {{ seconds() }} Sekunden
+      } @else {
+        Los geht’s!
+      }
+    </span>
+
+    <div class="visual" aria-hidden="true">
+      <div class="duo">
+        <span class="glow"></span>
+        <span class="avatar is-left">{{ myInitial() }}</span>
+        <span class="avatar is-right is-opponent">{{ opponentInitial() }}</span>
+        <span class="badge"><css-icon icon="checkmark" size="sm"></css-icon></span>
+      </div>
+    </div>
+
+    @switch (layout()) {
+      @case ('f-found') {
+        <h2 class="section-title">Gegner gefunden!</h2>
+        <p class="body-text">
+          Du spielst gegen <strong>{{ opponentName() }}</strong>
+        </p>
+      }
+      @case ('f-names') {
+        <h2 class="section-title">Verbunden!</h2>
+        <p class="names">
+          <span>{{ playerName() }}</span>
+          <span class="names-vs">vs</span>
+          <span>{{ opponentName() }}</span>
+        </p>
+      }
+      @default {
+        <h2 class="section-title">Verbunden!</h2>
+        <p class="body-text">
+          Du spielst gegen <strong>{{ opponentName() }}</strong>
+        </p>
+      }
+    }
+
+    <!-- The countdown, where the search had its cancel button. -->
+    <div class="count" aria-hidden="true">
+      @if (layout() === 'f-label') {
+        <span class="count-label">{{ seconds() > 0 ? 'Start in' : '' }}</span>
+      }
+      <span class="count-box" [class.is-circle]="layout() === 'f-circle'">
+        @if (layout() === 'f-circle') {
+          <svg viewBox="0 0 80 80">
+            <circle class="circle-track" cx="40" cy="40" r="37" />
+            <circle
+              class="circle-fill"
+              cx="40"
+              cy="40"
+              r="37"
+              pathLength="1"
+              [attr.stroke-dashoffset]="1 - left()"
+            />
+          </svg>
+        }
+        <span class="roll">
+          @for (second of [seconds()]; track second) {
+            @if (second > 0) {
+              <span class="roll-number">{{ second }}</span>
+            } @else {
+              <span class="roll-number is-go">Los!</span>
+            }
+          }
+        </span>
+      </span>
+    </div>
+  </section>
+}

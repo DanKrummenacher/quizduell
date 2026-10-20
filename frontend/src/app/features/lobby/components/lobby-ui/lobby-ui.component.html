@@ -6,6 +6,7 @@
       <app-lobby-header
         [playerName]="playerName()"
         [modern]="design() === 'facelift'"
+        [canGoBack]="state() !== 'FOUND'"
         (navigateBack)="navigateBack.emit()"
       >
       </app-lobby-header>

@@ -65,7 +65,12 @@ export class LobbyUiComponent {
   );
 
   /** Greeting and back navigation, hidden while the duel is about to start. */
-  protected readonly hasNavigation = computed(() => this.state() !== 'FOUND');
+  protected readonly hasNavigation = computed(
+    () =>
+      this.state() !== 'FOUND' ||
+      // TEMPORARY: proposal that keeps the greeting when the opponent is found.
+      this.matchLayout() === 'f-header',
+  );
 
   readonly navigateBack = output<void>();
   readonly selectQuickGame = output<void>();
