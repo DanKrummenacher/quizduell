@@ -1,198 +1,21 @@
-@switch (layout()) {
-  @case ('info') {
-    <h2 class="section-title tight">Spielmodus</h2>
-    <ul class="facts">
-      @for (fact of facts(); track fact) {
-        <li class="fact">{{ fact }}</li>
-      }
-    </ul>
-    <button type="button" class="choice-card" (click)="selectQuickGame.emit()">
-      <span class="choice-block" aria-hidden="true">
-        <css-icon icon="lightning-strike" size="lg"></css-icon>
-      </span>
-      <span class="choice-text">
-        <span class="choice-title">Schnellspiel 1vs1</span>
-        <span class="choice-description">Spiele gegen einen zufälligen Gegner</span>
-      </span>
-    </button>
-    <button type="button" class="choice-card" (click)="selectFriendGame.emit()">
-      <span class="choice-block" aria-hidden="true">
-        <css-icon icon="conference" size="lg"></css-icon>
-      </span>
-      <span class="choice-text">
-        <span class="choice-title">Freund herausfordern</span>
-        <span class="choice-description">Erstelle oder tritt einem Spiel bei</span>
-      </span>
-    </button>
-  }
-  @case ('buttons') {
-    <h2 class="section-title">Wie möchtest du spielen?</h2>
-    <div class="button-stack">
-      <css-button stretch variant="primary" (click)="selectQuickGame.emit()">
-        <css-icon icon="lightning-strike" slot="prefix"></css-icon>
-        Schnellspiel starten
-      </css-button>
-      <css-button stretch (click)="selectFriendGame.emit()">
-        <css-icon icon="conference" slot="prefix"></css-icon>
-        Freund herausfordern
-      </css-button>
-    </div>
-    <p class="button-hint">Schnellspiel: gegen einen zufälligen Gegner</p>
-  }
-  @case ('band') {
-    <app-mode-band class="band" [playerName]="playerName()" />
-    <h2 class="visually-hidden">Spielmodus</h2>
-    <button
-      type="button"
-      class="choice-card compact"
-      (click)="selectQuickGame.emit()"
-    >
-      <span class="choice-block" aria-hidden="true">
-        <css-icon icon="lightning-strike" size="lg"></css-icon>
-      </span>
-      <span class="choice-text">
-        <span class="choice-title">Gegen einen zufälligen Gegner</span>
-        <span class="choice-description">Schnellspiel 1vs1</span>
-      </span>
-    </button>
-    <button
-      type="button"
-      class="choice-card compact"
-      (click)="selectFriendGame.emit()"
-    >
-      <span class="choice-block" aria-hidden="true">
-        <css-icon icon="conference" size="lg"></css-icon>
-      </span>
-      <span class="choice-text">
-        <span class="choice-title">Gegen einen Freund</span>
-        <span class="choice-description">Mit Code spielen</span>
-      </span>
-    </button>
-  }
-  @case ('toggle') {
-    <h2 class="section-title">Spielmodus</h2>
-    <div class="segments" role="radiogroup" aria-label="Spielmodus">
-      <button
-        type="button"
-        role="radio"
-        class="segment"
-        [attr.aria-checked]="chosen() === 'quick'"
-        (click)="chosen.set('quick')"
-      >
-        <css-icon icon="lightning-strike" aria-hidden="true"></css-icon>
-        Schnellspiel
-      </button>
-      <button
-        type="button"
-        role="radio"
-        class="segment"
-        [attr.aria-checked]="chosen() === 'friend'"
-        (click)="chosen.set('friend')"
-      >
-        <css-icon icon="conference" aria-hidden="true"></css-icon>
-        Mit Freund
-      </button>
-    </div>
-    <p class="segment-text">
-      {{
-        chosen() === 'quick'
-          ? 'Du spielst sofort gegen einen zufälligen Gegner.'
-          : 'Erstelle ein Spiel mit Code oder tritt einem bei.'
-      }}
-    </p>
-    <css-button stretch variant="primary" class="start" (click)="start()">
-      Los geht’s
-    </css-button>
-  }
-  @case ('tiles') {
-    <h2 class="section-title">Spielmodus</h2>
-    <div class="tiles">
-      <button type="button" class="tile" (click)="selectQuickGame.emit()">
-        <span class="tile-symbol" aria-hidden="true">
-          <css-icon icon="lightning-strike" size="lg"></css-icon>
-        </span>
-        <span class="choice-title">Schnellspiel</span>
-        <span class="choice-description">Gegen einen zufälligen Gegner</span>
-      </button>
-      <button type="button" class="tile" (click)="selectFriendGame.emit()">
-        <span class="tile-symbol" aria-hidden="true">
-          <css-icon icon="conference" size="lg"></css-icon>
-        </span>
-        <span class="choice-title">Mit Freund</span>
-        <span class="choice-description">Spiel erstellen oder beitreten</span>
-      </button>
-    </div>
-  }
-  @case ('focus') {
-    <h2 class="section-title">Spielmodus</h2>
-    <button type="button" class="hero" (click)="selectQuickGame.emit()">
-      <span class="hero-symbol" aria-hidden="true">
-        <css-icon icon="lightning-strike" size="lg"></css-icon>
-      </span>
-      <span class="hero-text">
-        <span class="hero-title">Schnellspiel 1vs1</span>
-        <span class="hero-description">Gegen einen zufälligen Gegner</span>
-      </span>
-      <css-icon icon="arrow-right" class="hero-arrow" aria-hidden="true"></css-icon>
-    </button>
-    <button
-      type="button"
-      class="choice-card secondary"
-      (click)="selectFriendGame.emit()"
-    >
-      <span class="choice-block" aria-hidden="true">
-        <css-icon icon="conference" size="lg"></css-icon>
-      </span>
-      <span class="choice-text">
-        <span class="choice-title">Freund herausfordern</span>
-        <span class="choice-description">Erstelle oder tritt einem Spiel bei</span>
-      </span>
-    </button>
-  }
-  @default {
-    @if (layout() === 'facelift') {
-      <h2 class="section-title">Spielmodus</h2>
-    }
-    <button type="button" class="choice-card" (click)="selectQuickGame.emit()">
-      <span class="choice-block" aria-hidden="true">
-        <css-icon icon="lightning-strike" size="lg"></css-icon>
-      </span>
-      <span class="choice-text">
-        <span class="choice-title">Schnellspiel 1vs1</span>
-        <span class="choice-description">{{
-          layout() === 'refined'
-            ? 'Gegen einen zufälligen Gegner'
-            : 'Spiele gegen einen zufälligen Gegner'
-        }}</span>
-      </span>
-      @if (layout() === 'refined') {
-        <css-icon
-          icon="angle-right"
-          class="choice-chevron"
-          aria-hidden="true"
-        ></css-icon>
-      }
-    </button>
+<h2 class="section-title">Spielmodus</h2>
 
-    <button type="button" class="choice-card" (click)="selectFriendGame.emit()">
-      <span class="choice-block" aria-hidden="true">
-        <css-icon icon="conference" size="lg"></css-icon>
-      </span>
-      <span class="choice-text">
-        <span class="choice-title">Freund herausfordern</span>
-        <span class="choice-description">{{
-          layout() === 'refined'
-            ? 'Spiel erstellen oder beitreten'
-            : 'Erstelle oder tritt einem Spiel bei'
-        }}</span>
-      </span>
-      @if (layout() === 'refined') {
-        <css-icon
-          icon="angle-right"
-          class="choice-chevron"
-          aria-hidden="true"
-        ></css-icon>
-      }
-    </button>
-  }
-}
+<button type="button" class="choice-card" (click)="selectQuickGame.emit()">
+  <span class="choice-block" aria-hidden="true">
+    <css-icon icon="lightning-strike" size="lg"></css-icon>
+  </span>
+  <span class="choice-text">
+    <span class="choice-title">Schnellspiel 1vs1</span>
+    <span class="choice-description">Spiele gegen einen zufälligen Gegner</span>
+  </span>
+</button>
+
+<button type="button" class="choice-card" (click)="selectFriendGame.emit()">
+  <span class="choice-block" aria-hidden="true">
+    <css-icon icon="conference" size="lg"></css-icon>
+  </span>
+  <span class="choice-text">
+    <span class="choice-title">Freund herausfordern</span>
+    <span class="choice-description">Erstelle oder tritt einem Spiel bei</span>
+  </span>
+</button>

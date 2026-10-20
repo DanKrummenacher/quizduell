@@ -3,10 +3,10 @@ import { Component, model } from '@angular/core';
 import type { LobbyState } from '../../lobby.types';
 import {
   LOBBY_DESIGNS,
-  MODE_LAYOUTS,
   PREVIEW_SCREENS,
+  SEARCH_LAYOUTS,
   type LobbyDesign,
-  type ModeLayout,
+  type SearchLayout,
 } from './lobby-design';
 
 @Component({
@@ -23,9 +23,9 @@ import {
         </select>
       </label>
       <label>
-        Spielmodus-Seite
-        <select [value]="mode()" (change)="mode.set($any(value($event)))">
-          @for (option of modes; track option.value) {
+        Suche-Seite
+        <select [value]="search()" (change)="search.set($any(value($event)))">
+          @for (option of searches; track option.value) {
             <option [value]="option.value">{{ option.label }}</option>
           }
         </select>
@@ -77,11 +77,11 @@ import {
 export class LobbyDesignPanelComponent {
   readonly design = model<LobbyDesign>('today');
   readonly screen = model<LobbyState | null>(null);
-  readonly mode = model<ModeLayout>('facelift');
+  readonly search = model<SearchLayout>('facelift');
 
   protected readonly designs = LOBBY_DESIGNS;
   protected readonly screens = PREVIEW_SCREENS;
-  protected readonly modes = MODE_LAYOUTS;
+  protected readonly searches = SEARCH_LAYOUTS;
 
   protected value(event: Event): string {
     return (event.target as HTMLSelectElement).value;

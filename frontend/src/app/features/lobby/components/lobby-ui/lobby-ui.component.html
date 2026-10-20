@@ -15,18 +15,12 @@
   @if (design() === 'facelift') {
     <main
       class="main-area is-facelift"
-      [class.is-top]="
-        state() === 'CHOOSE_MODE' &&
-        (modeLayout() === 'refined' || modeLayout() === 'band')
-      "
+      [class.is-stage]="state() === 'SEARCHING' && searchLayout() === 'stage'"
     >
       <div class="centered-content">
         @switch (state()) {
           @case ('CHOOSE_MODE') {
             <app-facelift-mode
-              [layout]="modeLayout()"
-              [playerName]="playerName()"
-              [facts]="gameFacts()"
               (selectQuickGame)="selectQuickGame.emit()"
               (selectFriendGame)="selectFriendGame.emit()"
             />
@@ -39,7 +33,11 @@
             />
           }
           @case ('SEARCHING') {
-            <app-facelift-searching (cancelSearch)="cancelSearch.emit()" />
+            <app-facelift-searching
+              [layout]="searchLayout()"
+              [playerName]="playerName()"
+              (cancelSearch)="cancelSearch.emit()"
+            />
           }
           @case ('WAITING') {
             <app-facelift-waiting [roomCode]="roomCode()" />

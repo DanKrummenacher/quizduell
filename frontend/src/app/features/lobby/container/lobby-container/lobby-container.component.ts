@@ -16,11 +16,10 @@ import {
 } from '../../../../core/game/game-screen';
 import { GameClient } from '../../../../core/game/game-client.service';
 import { IdleResetService } from '../../../../core/platform/idle-reset.service';
-import { PublicInfoService } from '../../../../core/info/public-info.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
 import { LobbyUiComponent } from '../../components/lobby-ui/lobby-ui.component';
 import { LobbyDesignPanelComponent } from '../../components/next/design-preview-panel.component';
-import type { LobbyDesign, ModeLayout } from '../../components/next/lobby-design';
+import type { LobbyDesign, SearchLayout } from '../../components/next/lobby-design';
 import type { LobbyState } from '../../lobby.types';
 
 @Component({
@@ -32,7 +31,6 @@ export class LobbyContainerComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly gameClient = inject(GameClient);
   private readonly idleReset = inject(IdleResetService);
-  private readonly publicInfo = inject(PublicInfoService);
 
   readonly playerName = inject(PlayerNameStore).name;
   readonly menuState = signal<'CHOOSE_MODE' | 'CHOOSE_ACTION'>('CHOOSE_MODE');
@@ -46,16 +44,7 @@ export class LobbyContainerComponent implements OnDestroy {
   readonly showDesignPreview = isDevMode();
   readonly design = signal<LobbyDesign>('facelift');
   readonly previewScreen = signal<LobbyState | null>(null);
-  readonly modeLayout = signal<ModeLayout>('facelift');
-  /** TEMPORARY: the rules of a duel, for the proposal «Mit Spielinfos». */
-  readonly gameFacts = computed(() => {
-    const info = this.publicInfo.info();
-    return [
-      `${info.questionsPerGame} Fragen`,
-      `${info.questionDurationSec} s pro Frage`,
-      '1 gegen 1',
-    ];
-  });
+  readonly searchLayout = signal<SearchLayout>('facelift');
 
   readonly lobbyState = computed<LobbyState>(
     () => this.previewScreen() ?? this.realLobbyState(),

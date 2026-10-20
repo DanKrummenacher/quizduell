@@ -14,26 +14,32 @@ export const LOBBY_DESIGNS: DesignOption<LobbyDesign>[] = [
   { value: 'facelift', label: 'Facelift' },
 ];
 
-/** Proposals for the mode screen, on top of the facelift. */
-export type ModeLayout =
+/** Proposals for the search screen, on top of the facelift. */
+export type SearchLayout =
   | 'facelift'
-  | 'refined'
-  | 'tiles'
-  | 'focus'
-  | 'info'
-  | 'buttons'
+  | 'radar'
+  | 'duo'
   | 'band'
-  | 'toggle';
+  | 'tips'
+  | 'bar'
+  | 'orbit'
+  | 'stage'
+  | 'seats'
+  | 'steps'
+  | 'sheet';
 
-export const MODE_LAYOUTS: DesignOption<ModeLayout>[] = [
+export const SEARCH_LAYOUTS: DesignOption<SearchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
-  { value: 'refined', label: '1 · Feinschliff' },
-  { value: 'tiles', label: '2 · Zwei Kacheln' },
-  { value: 'focus', label: '3 · Schnellspiel im Fokus' },
-  { value: 'info', label: '4 · Mit Spielinfos' },
-  { value: 'buttons', label: '5 · Zwei Knöpfe' },
-  { value: 'band', label: '6 · Duell-Vorschau' },
-  { value: 'toggle', label: '7 · Umschalter' },
+  { value: 'radar', label: '1 · Radar' },
+  { value: 'duo', label: '2 · Du gegen ?' },
+  { value: 'band', label: '3 · Duell-Band' },
+  { value: 'tips', label: '4 · Tipps beim Warten' },
+  { value: 'bar', label: '5 · Ruhig mit Ladebalken' },
+  { value: 'orbit', label: '6 · Umlaufbahn' },
+  { value: 'stage', label: '7 · Bühne (Vollbild)' },
+  { value: 'seats', label: '8 · Zwei Plätze' },
+  { value: 'steps', label: '9 · Ablauf in Schritten' },
+  { value: 'sheet', label: '10 · Blatt über der Auswahl' },
 ];
 
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [
@@ -43,4 +49,12 @@ export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [
   { value: 'SEARCHING', label: '3 · Schnellspiel: Suche' },
   { value: 'WAITING', label: '4 · Code teilen' },
   { value: 'FOUND', label: '5 · Start-Countdown' },
+];
+
+/** Search proposals with their own, new page structure. */
+export const SEARCH_CONCEPTS: readonly SearchLayout[] = [
+  'stage',
+  'seats',
+  'steps',
+  'sheet',
 ];

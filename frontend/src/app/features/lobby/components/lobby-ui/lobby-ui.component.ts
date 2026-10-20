@@ -18,7 +18,7 @@ import { FaceliftActionsComponent } from '../next/facelift/facelift-actions.comp
 import { FaceliftSearchingComponent } from '../next/facelift/facelift-searching.component';
 import { FaceliftWaitingComponent } from '../next/facelift/facelift-waiting.component';
 import { FaceliftMatchFoundComponent } from '../next/facelift/facelift-match-found.component';
-import type { LobbyDesign, ModeLayout } from '../next/lobby-design';
+import type { LobbyDesign, SearchLayout } from '../next/lobby-design';
 import '@css-ch/components/button';
 import '@css-ch/components/flyout';
 
@@ -53,11 +53,15 @@ export class LobbyUiComponent {
   readonly notice = input<string | null>(null);
   // TEMPORARY: lobby designs under review.
   readonly design = input<LobbyDesign>('today');
-  readonly modeLayout = input<ModeLayout>('facelift');
-  readonly gameFacts = input<string[]>([]);
+  readonly searchLayout = input<SearchLayout>('facelift');
 
   /** Greeting and back navigation, hidden while the duel is about to start. */
-  protected readonly hasNavigation = computed(() => this.state() !== 'FOUND');
+  protected readonly hasNavigation = computed(
+    () =>
+      this.state() !== 'FOUND' &&
+      // TEMPORARY: the proposal «Bühne» uses the whole screen.
+      !(this.state() === 'SEARCHING' && this.searchLayout() === 'stage'),
+  );
 
   readonly navigateBack = output<void>();
   readonly selectQuickGame = output<void>();

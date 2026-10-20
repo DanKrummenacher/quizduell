@@ -8,8 +8,7 @@
   [opponentLeft]="opponentLeft()"
   [notice]="notice()"
   [design]="design()"
-  [modeLayout]="modeLayout()"
-  [gameFacts]="gameFacts()"
+  [searchLayout]="searchLayout()"
   (navigateBack)="handleBack()"
   (selectQuickGame)="handleSelectQuickGame()"
   (selectFriendGame)="handleSelectFriendGame()"
@@ -26,6 +25,6 @@
   <app-lobby-design-panel
     [(design)]="design"
     [(screen)]="previewScreen"
-    [(mode)]="modeLayout"
+    [(search)]="searchLayout"
   />
 }
