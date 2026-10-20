@@ -7,21 +7,27 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import '@css-ch/components/button';
 import '@css-ch/components/icon';
 import type { WaitingLayout } from '../lobby-design';
 
 const COPIED_FEEDBACK_MS = 1500;
 
-/** TEMPORARY: clearly different approaches for «Spiel erstellt». */
+/**
+ * TEMPORARY: final candidates for «Spiel erstellt», built exactly like the
+ * final search and match screens: visual, title, text, the code, then one
+ * action at the same place.
+ */
 @Component({
-  selector: 'app-waiting-new',
-  templateUrl: './waiting-new.component.html',
-  styleUrl: './waiting-new.component.scss',
+  selector: 'app-waiting-final',
+  imports: [NgTemplateOutlet],
+  templateUrl: './waiting-final.component.html',
+  styleUrl: './waiting-final.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: { '[class]': 'layout()' },
 })
-export class WaitingNewComponent {
+export class WaitingFinalComponent {
   readonly layout = input.required<WaitingLayout>();
   readonly roomCode = input.required<string>();
   readonly playerName = input('');
@@ -40,6 +46,10 @@ export class WaitingNewComponent {
   protected readonly filledTicks = computed(() => {
     const seconds = this.seconds();
     return seconds > 0 && seconds % 60 === 0 ? 60 : seconds % 60;
+  });
+  protected readonly elapsed = computed(() => {
+    const seconds = this.seconds();
+    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
   });
 
   constructor() {

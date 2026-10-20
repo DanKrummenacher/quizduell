@@ -3,13 +3,13 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, input, signal } from '@angular/core'
 import '@css-ch/components/button';
 import '@css-ch/components/icon';
 import type { WaitingLayout } from '../lobby-design';
-import { WaitingNewComponent } from './waiting-new.component';
+import { WaitingFinalComponent } from './waiting-final.component';
 
 const COPIED_FEEDBACK_MS = 1000;
 
 @Component({
   selector: 'app-facelift-waiting',
-  imports: [WaitingNewComponent],
+  imports: [WaitingFinalComponent],
   templateUrl: './facelift-waiting.component.html',
   styleUrl: './facelift-waiting.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
