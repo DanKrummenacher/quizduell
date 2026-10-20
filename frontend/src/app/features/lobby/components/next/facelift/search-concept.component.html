@@ -90,10 +90,18 @@
     </section>
   }
   @default {
-    <app-search-ideas
-      [layout]="layout()"
-      [playerName]="playerName()"
-      (cancelSearch)="cancelSearch.emit()"
-    />
+    @if (isMore()) {
+      <app-search-more
+        [layout]="layout()"
+        [playerName]="playerName()"
+        (cancelSearch)="cancelSearch.emit()"
+      />
+    } @else {
+      <app-search-ideas
+        [layout]="layout()"
+        [playerName]="playerName()"
+        (cancelSearch)="cancelSearch.emit()"
+      />
+    }
   }
 }

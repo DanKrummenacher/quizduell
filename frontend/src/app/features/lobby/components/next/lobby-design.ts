@@ -30,7 +30,11 @@ export type SearchLayout =
   | 'slot'
   | 'warmup'
   | 'logo'
-  | 'split';
+  | 'split'
+  | 'pulse'
+  | 'ticket'
+  | 'type'
+  | 'chat';
 
 export const SEARCH_LAYOUTS: DesignOption<SearchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
@@ -48,6 +52,10 @@ export const SEARCH_LAYOUTS: DesignOption<SearchLayout>[] = [
   { value: 'warmup', label: '12 · Aufwärmrunde' },
   { value: 'logo', label: '13 · Logo als Lader' },
   { value: 'split', label: '14 · Geteilter Bildschirm' },
+  { value: 'pulse', label: '15 · Puls mit Zeitring' },
+  { value: 'ticket', label: '16 · Duell-Ticket' },
+  { value: 'type', label: '17 · Grosse Schrift' },
+  { value: 'chat', label: '18 · Chat' },
 ];
 
 export const PREVIEW_SCREENS: DesignOption<LobbyState | ''>[] = [
@@ -69,6 +77,10 @@ export const SEARCH_CONCEPTS: readonly SearchLayout[] = [
   'warmup',
   'logo',
   'split',
+  'pulse',
+  'ticket',
+  'type',
+  'chat',
 ];
 
 /** Search proposals that use the whole screen (no greeting, no back link). */
@@ -76,4 +88,14 @@ export const FULLSCREEN_SEARCH: readonly SearchLayout[] = [
   'stage',
   'warmup',
   'split',
+  'type',
+  'chat',
+];
+
+/** Search proposals in the third concept component. */
+export const SEARCH_MORE: readonly SearchLayout[] = [
+  'pulse',
+  'ticket',
+  'type',
+  'chat',
 ];

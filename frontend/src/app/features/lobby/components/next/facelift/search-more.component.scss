@@ -1,0 +1,573 @@
+// TEMPORARY: further search proposals.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'facelift';
+
+$opponent: #00a4e0;
+$track: #dfe3ea;
+
+:host {
+  display: block;
+  text-align: center;
+}
+
+:host(.type),
+:host(.chat) {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  @include facelift.section-title;
+  margin: functions.rem(32) 0 functions.rem(8);
+}
+
+.text {
+  @include facelift.body-text;
+}
+
+.compact {
+  display: block;
+  width: fit-content;
+  margin: functions.rem(40) auto 0;
+}
+
+// ---------------------------------------------------------------------------
+// 15 · Puls: the waiting time in a ring that fills once per minute
+// ---------------------------------------------------------------------------
+.ring {
+  position: relative;
+  width: functions.rem(184);
+  height: functions.rem(184);
+  margin: 0 auto;
+  border-radius: 50%;
+  animation: beat 1.6s ease-out infinite;
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  circle {
+    fill: none;
+    stroke-width: 8;
+  }
+}
+
+.ring-track {
+  stroke: $track;
+}
+
+.ring-fill {
+  stroke: colors.$dt-color-darkblue-100;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-time {
+  font-size: functions.rem(44);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  font-variant-numeric: tabular-nums;
+  color: colors.$dt-color-darkblue-100;
+}
+
+.ring-label {
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+// ---------------------------------------------------------------------------
+// 16 · Duell-Ticket
+// ---------------------------------------------------------------------------
+.ticket {
+  overflow: hidden;
+  border-radius: functions.rem(12);
+  background-color: colors.$dt-color-white-100;
+  box-shadow: 0 functions.rem(8) functions.rem(24) rgba(0, 50, 125, 0.12);
+  text-align: left;
+}
+
+.ticket-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: functions.rem(16) functions.rem(20);
+  background-color: colors.$dt-color-darkblue-100;
+  color: colors.$dt-color-white-100;
+}
+
+.ticket-label {
+  font-size: functions.rem(12);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.ticket-mode {
+  font-size: functions.rem(18);
+  font-weight: miscs.$css-ui-font-weight-bold;
+}
+
+.ticket-players,
+.ticket-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: functions.rem(12);
+  padding: functions.rem(20);
+
+  > div {
+    min-width: 0;
+  }
+
+  .is-right {
+    text-align: right;
+  }
+}
+
+.ticket-key {
+  display: block;
+  margin-bottom: functions.rem(4);
+  font-size: functions.rem(12);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: facelift.$muted;
+}
+
+.ticket-value {
+  display: block;
+  overflow: hidden;
+  font-size: functions.rem(18);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: colors.$dt-color-darkblue-100;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &.is-open {
+    color: $opponent;
+    animation: fade 1.6s ease-in-out infinite;
+  }
+
+  &.is-time {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.ticket-vs {
+  font-size: functions.rem(13);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  text-transform: uppercase;
+  color: facelift.$muted;
+}
+
+// Perforation with a notch on each side, as on a real ticket.
+.ticket-cut {
+  position: relative;
+  height: 0;
+  margin: 0 functions.rem(16);
+  border-top: functions.rem(2) dashed $track;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: functions.rem(-13);
+    width: functions.rem(24);
+    height: functions.rem(24);
+    border-radius: 50%;
+    background-color: colors.$dt-color-pepper-bright;
+  }
+
+  &::before {
+    left: functions.rem(-28);
+  }
+
+  &::after {
+    right: functions.rem(-28);
+  }
+}
+
+.ticket-status {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(8);
+  font-size: functions.rem(16);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: colors.$dt-color-darkblue-100;
+
+  i {
+    width: functions.rem(10);
+    height: functions.rem(10);
+    border-radius: 50%;
+    background-color: $opponent;
+    animation: ping 1.6s ease-out infinite;
+  }
+}
+
+// A decorative barcode at the bottom.
+.ticket-code {
+  display: block;
+  height: functions.rem(28);
+  margin: 0 functions.rem(20) functions.rem(20);
+  background: repeating-linear-gradient(
+    90deg,
+    colors.$dt-color-darkblue-100 0 2px,
+    transparent 2px 5px,
+    colors.$dt-color-darkblue-100 5px 6px,
+    transparent 6px 10px
+  );
+  opacity: 0.85;
+}
+
+// ---------------------------------------------------------------------------
+// 17 · Grosse Schrift: editorial, the words are the design
+// ---------------------------------------------------------------------------
+.type {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: functions.rem(24) functions.rem(24) functions.rem(32);
+  text-align: left;
+}
+
+.type-label {
+  font-size: functions.rem(13);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $opponent;
+}
+
+.type-title {
+  margin: functions.rem(12) 0 0;
+  font-size: functions.rem(64);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: colors.$dt-color-darkblue-100;
+}
+
+.dots i {
+  font-style: normal;
+  color: $opponent;
+  animation: fade 1.2s ease-in-out infinite;
+
+  &:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+}
+
+// A short line that runs back and forth.
+.type-rule {
+  position: relative;
+  display: block;
+  height: functions.rem(4);
+  margin: functions.rem(32) 0 functions.rem(16);
+  overflow: hidden;
+  background-color: $track;
+
+  i {
+    position: absolute;
+    top: 0;
+    left: -30%;
+    width: 30%;
+    height: 100%;
+    background-color: colors.$dt-color-darkblue-100;
+    animation: run 1.6s ease-in-out infinite;
+  }
+}
+
+.type-time {
+  margin: 0;
+  font-size: functions.rem(40);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  font-variant-numeric: tabular-nums;
+  color: $opponent;
+}
+
+.type-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: functions.rem(12);
+  margin-top: functions.rem(48);
+}
+
+.type-foot css-button {
+  flex: none;
+  width: fit-content;
+}
+
+.type-player {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(12);
+  min-width: 0;
+  font-size: functions.rem(16);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: colors.$dt-color-darkblue-100;
+}
+
+.type-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: functions.rem(40);
+  height: functions.rem(40);
+  border-radius: 50%;
+  background-color: colors.$dt-color-darkblue-100;
+  color: colors.$dt-color-white-100;
+}
+
+// ---------------------------------------------------------------------------
+// 18 · Chat: the app talks to you while it searches
+// ---------------------------------------------------------------------------
+.chat {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: functions.rem(16) functions.rem(20) functions.rem(24);
+  text-align: left;
+}
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(12);
+  padding-bottom: functions.rem(16);
+  border-bottom: functions.rem(1) solid $track;
+}
+
+.chat-logo {
+  width: functions.rem(44);
+  height: functions.rem(44);
+}
+
+.chat-name {
+  display: block;
+  font-size: functions.rem(16);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: colors.$dt-color-darkblue-100;
+}
+
+.chat-sub {
+  font-size: functions.rem(13);
+  font-variant-numeric: tabular-nums;
+  color: facelift.$muted;
+}
+
+.chat-log {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: functions.rem(8);
+  padding: functions.rem(24) 0;
+}
+
+.bubble {
+  max-width: 80%;
+  margin: 0;
+  padding: functions.rem(12) functions.rem(16);
+  border-radius: functions.rem(18) functions.rem(18) functions.rem(18)
+    functions.rem(4);
+  background-color: colors.$dt-color-white-100;
+  box-shadow: 0 functions.rem(1) functions.rem(3) rgba(0, 50, 125, 0.1);
+  font-size: functions.rem(16);
+  line-height: 1.4;
+  color: colors.$dt-color-darkblue-100;
+  animation: pop 0.25s ease-out;
+
+  &.is-me {
+    align-self: flex-end;
+    margin-bottom: functions.rem(8);
+    border-radius: functions.rem(18) functions.rem(18) functions.rem(4)
+      functions.rem(18);
+    background-color: colors.$dt-color-darkblue-100;
+    color: colors.$dt-color-white-100;
+  }
+
+  &.is-typing {
+    display: flex;
+    gap: functions.rem(4);
+    width: fit-content;
+
+    i {
+      width: functions.rem(8);
+      height: functions.rem(8);
+      border-radius: 50%;
+      background-color: facelift.$border;
+      animation: hop 1.2s ease-in-out infinite;
+
+      &:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+
+      &:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+    }
+  }
+}
+
+.chat-reply {
+  display: flex;
+  justify-content: center;
+}
+
+// A quick reply as in a messenger.
+.reply {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(8);
+  min-height: functions.rem(44);
+  padding: 0 functions.rem(20);
+  border: functions.rem(1) solid colors.$dt-color-darkblue-100;
+  border-radius: functions.rem(999);
+  background-color: colors.$dt-color-white-100;
+  color: colors.$dt-color-darkblue-100;
+  font: inherit;
+  font-size: functions.rem(15);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  cursor: pointer;
+
+  &:hover {
+    background-color: colors.$dt-color-darkblue-100;
+    color: colors.$dt-color-white-100;
+  }
+
+  &:focus-visible {
+    outline: functions.rem(2) solid $opponent;
+    outline-offset: functions.rem(2);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Short phones (e.g. iPhone SE)
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .ring {
+    width: functions.rem(152);
+    height: functions.rem(152);
+  }
+
+  .ring-time {
+    font-size: functions.rem(36);
+  }
+
+  .compact {
+    margin-top: functions.rem(24);
+  }
+
+  .type-title {
+    font-size: functions.rem(52);
+  }
+
+  .type-rule {
+    margin-top: functions.rem(24);
+  }
+
+  .type-foot {
+    margin-top: functions.rem(32);
+  }
+
+  .ticket-players,
+  .ticket-foot {
+    padding: functions.rem(16) functions.rem(20);
+  }
+
+  .ticket-code {
+    height: functions.rem(20);
+    margin-bottom: functions.rem(16);
+  }
+
+  .chat-log {
+    gap: functions.rem(6);
+    padding: functions.rem(12) 0;
+  }
+
+  .bubble {
+    padding: functions.rem(8) functions.rem(14);
+    font-size: functions.rem(15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring,
+  .bubble,
+  .type-rule i {
+    animation: none;
+  }
+}
+
+@keyframes beat {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 164, 224, 0.35);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(20) rgba(0, 164, 224, 0);
+  }
+}
+
+@keyframes ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 164, 224, 0.5);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(8) rgba(0, 164, 224, 0);
+  }
+}
+
+@keyframes fade {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes run {
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateY(functions.rem(8));
+  }
+}
+
+@keyframes hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+
+  30% {
+    transform: translateY(functions.rem(-4));
+  }
+}
