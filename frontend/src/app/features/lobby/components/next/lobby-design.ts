@@ -17,6 +17,14 @@ export const LOBBY_DESIGNS: DesignOption<LobbyDesign>[] = [
 /** Proposals for the search screen, on top of the facelift. */
 export type SearchLayout =
   | 'facelift'
+  | 'bar-below'
+  | 'bar-end'
+  | 'bar-label'
+  | 'bar-card'
+  | 'ring-symbol'
+  | 'ring-ticks'
+  | 'ring-spin'
+  | 'ring-dark'
   | 'radar'
   | 'duo'
   | 'band'
@@ -38,6 +46,14 @@ export type SearchLayout =
 
 export const SEARCH_LAYOUTS: DesignOption<SearchLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
+  { value: 'bar-below', label: 'A1 · Balken, Zeit darunter' },
+  { value: 'bar-end', label: 'A2 · Balken, Zeit am Ende' },
+  { value: 'bar-label', label: 'A3 · Wartezeit über dem Balken' },
+  { value: 'bar-card', label: 'A4 · Balken in einer Karte' },
+  { value: 'ring-symbol', label: 'B1 · Ring um das Symbol' },
+  { value: 'ring-ticks', label: 'B2 · Ring mit Sekundenstrichen' },
+  { value: 'ring-spin', label: 'B3 · Drehender Ring' },
+  { value: 'ring-dark', label: 'B4 · Dunkle Scheibe' },
   { value: 'radar', label: '1 · Radar' },
   { value: 'duo', label: '2 · Du gegen ?' },
   { value: 'band', label: '3 · Duell-Band' },
@@ -98,4 +114,16 @@ export const SEARCH_MORE: readonly SearchLayout[] = [
   'ticket',
   'type',
   'chat',
+];
+
+/** Final proposals: facelift with a loading bar, and the time ring. */
+export const SEARCH_FINAL: readonly SearchLayout[] = [
+  'bar-below',
+  'bar-end',
+  'bar-label',
+  'bar-card',
+  'ring-symbol',
+  'ring-ticks',
+  'ring-spin',
+  'ring-dark',
 ];

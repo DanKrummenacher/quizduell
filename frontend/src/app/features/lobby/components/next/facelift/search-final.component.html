@@ -1,0 +1,143 @@
+<div role="status">
+  @switch (layout()) {
+    @case ('bar-below') {
+      <span class="symbol" aria-hidden="true">
+        <css-icon icon="search" size="lg"></css-icon>
+      </span>
+      <h2 class="title">Suche Gegner&nbsp;…</h2>
+      <p class="text">Warte auf einen weiteren Spieler</p>
+      <span class="bar" aria-hidden="true"><i></i></span>
+      <p class="time">{{ elapsed() }}</p>
+    }
+    @case ('bar-end') {
+      <span class="symbol" aria-hidden="true">
+        <css-icon icon="search" size="lg"></css-icon>
+      </span>
+      <h2 class="title">Suche Gegner&nbsp;…</h2>
+      <p class="text">Warte auf einen weiteren Spieler</p>
+      <div class="bar-row">
+        <span class="bar" aria-hidden="true"><i></i></span>
+        <span class="time">{{ elapsed() }}</span>
+      </div>
+    }
+    @case ('bar-label') {
+      <span class="symbol" aria-hidden="true">
+        <css-icon icon="search" size="lg"></css-icon>
+      </span>
+      <h2 class="title">Suche Gegner&nbsp;…</h2>
+      <p class="text">Warte auf einen weiteren Spieler</p>
+      <div class="bar-block">
+        <div class="bar-head">
+          <span>Wartezeit</span>
+          <span class="time">{{ elapsed() }}</span>
+        </div>
+        <span class="bar" aria-hidden="true"><i></i></span>
+      </div>
+    }
+    @case ('bar-card') {
+      <span class="symbol" aria-hidden="true">
+        <css-icon icon="search" size="lg"></css-icon>
+      </span>
+      <h2 class="title">Suche Gegner&nbsp;…</h2>
+      <p class="text">Warte auf einen weiteren Spieler</p>
+      <div class="bar-card">
+        <div class="bar-head">
+          <span class="live"><i aria-hidden="true"></i>Suche läuft</span>
+          <span class="time">{{ elapsed() }}</span>
+        </div>
+        <span class="bar" aria-hidden="true"><i></i></span>
+      </div>
+    }
+    @case ('ring-symbol') {
+      <div class="ring small">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="ring-track" cx="100" cy="100" r="92" />
+          <circle
+            class="ring-fill"
+            cx="100"
+            cy="100"
+            r="92"
+            [attr.stroke-dasharray]="ring"
+            [attr.stroke-dashoffset]="ringOffset()"
+          />
+        </svg>
+        <span class="symbol ring-center" aria-hidden="true">
+          <css-icon icon="search" size="lg"></css-icon>
+        </span>
+      </div>
+      <h2 class="title">Suche Gegner&nbsp;…</h2>
+      <p class="text">Warte auf einen weiteren Spieler</p>
+      <p class="time big">{{ elapsed() }}</p>
+    }
+    @case ('ring-ticks') {
+      <div class="ring">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          @for (angle of ticks; track angle) {
+            <line
+              class="tick"
+              [class.is-on]="$index < litTicks()"
+              x1="100"
+              y1="6"
+              x2="100"
+              y2="20"
+              [attr.transform]="'rotate(' + angle + ' 100 100)'"
+            />
+          }
+        </svg>
+        <div class="ring-center">
+          <span class="ring-time">{{ elapsed() }}</span>
+          <span class="ring-label">Wartezeit</span>
+        </div>
+      </div>
+      <h2 class="title">Suche Gegner&nbsp;…</h2>
+      <p class="text">Warte auf einen weiteren Spieler</p>
+    }
+    @case ('ring-spin') {
+      <div class="ring">
+        <svg class="spin" viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="ring-track" cx="100" cy="100" r="92" />
+          <circle
+            class="ring-arc"
+            cx="100"
+            cy="100"
+            r="92"
+            [attr.stroke-dasharray]="ring"
+          />
+        </svg>
+        <div class="ring-center">
+          <span class="ring-time">{{ elapsed() }}</span>
+          <span class="ring-label">Suche läuft</span>
+        </div>
+      </div>
+      <h2 class="title">Suche Gegner&nbsp;…</h2>
+      <p class="text">Warte auf einen weiteren Spieler</p>
+    }
+    @case ('ring-dark') {
+      <div class="ring is-dark">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <circle class="ring-disc" cx="100" cy="100" r="100" />
+          <circle class="ring-track" cx="100" cy="100" r="84" />
+          <circle
+            class="ring-fill"
+            cx="100"
+            cy="100"
+            r="84"
+            [attr.stroke-dasharray]="darkRing"
+            [attr.stroke-dashoffset]="darkOffset()"
+          />
+        </svg>
+        <div class="ring-center">
+          <css-icon icon="search" size="md"></css-icon>
+          <span class="ring-time">{{ elapsed() }}</span>
+        </div>
+      </div>
+      <h2 class="title">Suche Gegner&nbsp;…</h2>
+      <p class="text">Warte auf einen weiteren Spieler</p>
+    }
+  }
+</div>
+
+<css-button class="compact" (click)="cancelSearch.emit()">
+  <css-icon icon="close" slot="prefix"></css-icon>
+  Abbrechen
+</css-button>
