@@ -1,0 +1,153 @@
+<!-- Building blocks of the favourites. -->
+<ng-template #startText>
+  @if (seconds() > 0) {
+    Das Duell beginnt in {{ seconds() }}&nbsp;s
+  } @else {
+    Los geht’s!
+  }
+</ng-template>
+
+<!-- M8: the players move together; the badge holds a check or the number. -->
+<ng-template #duo let-size="size" let-count="count">
+  <div class="duo" [class.is-small]="size === 'small'" aria-hidden="true">
+    <span class="avatar is-left">{{ myInitial() }}</span>
+    <span class="avatar is-right is-opponent">{{ opponentInitial() }}</span>
+    <span class="badge" [class.is-count]="count && seconds() > 0">
+      @if (count && seconds() > 0) {
+        @for (second of [seconds()]; track second) {
+          <span class="badge-number">{{ second }}</span>
+        }
+      } @else {
+        <css-icon icon="checkmark" size="sm"></css-icon>
+      }
+    </span>
+  </div>
+</ng-template>
+
+<!-- M4: the big number that pops up each second. -->
+<ng-template #number let-size="size">
+  @for (second of [seconds()]; track second) {
+    <span
+      class="number"
+      [class.is-ring]="size === 'ring'"
+      [class.is-go]="second === 0"
+      >{{ second > 0 ? second : 'Los!' }}</span
+    >
+  }
+</ng-template>
+
+<!-- M2: the ring of the search, now running down. -->
+<ng-template #dial let-content="content" let-size="size">
+  <div class="dial" [class.is-large]="size === 'large'">
+    <svg viewBox="0 0 200 200" aria-hidden="true">
+      @for (angle of ticks; track angle) {
+        <line
+          class="tick"
+          [class.is-filled]="$index < filledTicks()"
+          x1="100"
+          y1="8"
+          x2="100"
+          y2="22"
+          [attr.transform]="'rotate(' + angle + ' 100 100)'"
+        />
+      }
+    </svg>
+    <div class="dial-center">
+      <ng-container *ngTemplateOutlet="content" />
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #duoInRing>
+  <ng-container *ngTemplateOutlet="duo; context: { size: 'small' }" />
+</ng-template>
+
+<ng-template #numberInRing>
+  <ng-container *ngTemplateOutlet="number; context: { size: 'ring' }" />
+</ng-template>
+
+<ng-template #checkThenNumber>
+  @if (showCheck()) {
+    <span class="check"><css-icon icon="checkmark" size="lg"></css-icon></span>
+    <span class="dial-label">Gefunden</span>
+  } @else {
+    <ng-container *ngTemplateOutlet="number; context: { size: 'ring' }" />
+    @if (seconds() > 0) {
+      <span class="dial-label">Start</span>
+    }
+  }
+</ng-template>
+
+@for (run of [round()]; track run) {
+  <section role="status">
+    @switch (layout()) {
+      @case ('k-badge') {
+        <ng-container *ngTemplateOutlet="duo; context: { count: true }" />
+        <h2 class="title">Verbunden!</h2>
+        <p class="text">
+          Du spielst gegen <strong>{{ opponentName() }}</strong>
+        </p>
+        <p class="start"><ng-container *ngTemplateOutlet="startText" /></p>
+      }
+      @case ('k-ring-duo') {
+        <ng-container
+          *ngTemplateOutlet="dial; context: { content: duoInRing, size: 'large' }"
+        />
+        <h2 class="title">Gegner gefunden!</h2>
+        <p class="text">
+          Du spielst gegen <strong>{{ opponentName() }}</strong>
+        </p>
+        <p class="start"><ng-container *ngTemplateOutlet="startText" /></p>
+      }
+      @case ('k-duo-count') {
+        <ng-container *ngTemplateOutlet="duo" />
+        <p class="versus">
+          Du gegen <strong>{{ opponentName() }}</strong>
+        </p>
+        <div class="big"><ng-container *ngTemplateOutlet="number" /></div>
+        <p class="text">Mach dich bereit für die erste Frage</p>
+      }
+      @case ('k-all') {
+        <ng-container *ngTemplateOutlet="duo; context: { size: 'small' }" />
+        <p class="versus">
+          Du gegen <strong>{{ opponentName() }}</strong>
+        </p>
+        <div class="space">
+          <ng-container
+            *ngTemplateOutlet="dial; context: { content: numberInRing }"
+          />
+        </div>
+        <p class="text">Mach dich bereit für die erste Frage</p>
+      }
+      @case ('k-check-ring') {
+        <ng-container
+          *ngTemplateOutlet="dial; context: { content: checkThenNumber }"
+        />
+        <h2 class="title">Gegner gefunden!</h2>
+        <p class="text">
+          Du spielst gegen <strong>{{ opponentName() }}</strong>
+        </p>
+      }
+      @case ('k-count-duo') {
+        <span class="eyebrow">Gegner gefunden</span>
+        <div class="big"><ng-container *ngTemplateOutlet="number" /></div>
+        <div class="players">
+          <div class="player">
+            <span class="avatar is-left">{{ myInitial() }}</span>
+            <span class="player-name">{{ playerName() }}</span>
+          </div>
+          <span class="vs" aria-hidden="true">vs</span>
+          <div class="player">
+            <span class="avatar is-right is-opponent">{{ opponentInitial() }}</span>
+            <span class="player-name">{{ opponentName() }}</span>
+          </div>
+        </div>
+      }
+    }
+    @if (layout() !== 'k-badge' && layout() !== 'k-ring-duo') {
+      <span class="visually-hidden"
+        ><ng-container *ngTemplateOutlet="startText"
+      /></span>
+    }
+  </section>
+}

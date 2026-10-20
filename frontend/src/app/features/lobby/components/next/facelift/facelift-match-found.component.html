@@ -1,4 +1,11 @@
-@if (isMore()) {
+@if (isFinal()) {
+  <app-match-final
+    [layout]="layout()"
+    [playerName]="playerName()"
+    [opponentName]="opponentName()"
+    [durationMs]="durationMs()"
+  />
+} @else if (isMore()) {
   <app-match-more
     [layout]="layout()"
     [playerName]="playerName()"
