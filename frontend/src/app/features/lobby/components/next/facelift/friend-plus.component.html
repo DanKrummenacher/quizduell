@@ -136,8 +136,8 @@
           class="compact is-switch"
           (click)="joinOpen.set(true)"
         >
+          <css-icon icon="link" slot="prefix"></css-icon>
           Ich habe einen Code
-          <css-icon icon="angle-right-circle" slot="suffix"></css-icon>
         </css-button>
       </section>
       <section class="face is-back" [attr.inert]="joinOpen() ? null : true">
