@@ -36,10 +36,20 @@ export type FriendLayout =
   | 'fr-live'
   | 'fr-flip'
   | 'fr-story'
-  | 'fr-best';
+  | 'fr-best'
+  | 'fr-seats'
+  | 'fr-message'
+  | 'fr-halves'
+  | 'fr-list'
+  | 'fr-flow';
 
 export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'facelift', label: 'Facelift (aktuell)' },
+  { value: 'fr-seats', label: '21 · Zwei Plätze' },
+  { value: 'fr-message', label: '22 · Einladung als Nachricht' },
+  { value: 'fr-halves', label: '23 · Zwei grosse Flächen' },
+  { value: 'fr-list', label: '24 · Ruhige Liste' },
+  { value: 'fr-flow', label: '25 · Ablauf als kleine Grafik' },
   {
     value: 'fr-best',
     label: '20 · Das Beste vereint (Schritte, Einfügen, Prüfung)',
@@ -63,6 +73,15 @@ export const FRIEND_LAYOUTS: DesignOption<FriendLayout>[] = [
   { value: 'fr-stepper', label: '14 · Schritte mit Fortschritt' },
   { value: 'fr-columns', label: '15 · Zwei Aktionskarten' },
   { value: 'fr-join-first', label: '5 · Beitreten zuerst, Erstellen als «oder»' },
+];
+
+/** Fifth round of friend proposals. */
+export const FRIEND_FIVE: readonly FriendLayout[] = [
+  'fr-seats',
+  'fr-message',
+  'fr-halves',
+  'fr-list',
+  'fr-flow',
 ];
 
 /** Fourth round of friend proposals. */

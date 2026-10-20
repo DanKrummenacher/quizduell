@@ -1,0 +1,202 @@
+<!-- The code as four boxes; one real field lies over them. -->
+<ng-template #codeBoxes>
+  <div class="code-boxes" [class.has-error]="errorMessage()">
+    <label class="visually-hidden" for="friendCode">Code</label>
+    <input
+      id="friendCode"
+      class="code-field"
+      type="text"
+      autocomplete="off"
+      autocapitalize="characters"
+      spellcheck="false"
+      [attr.maxlength]="codeLength"
+      [attr.aria-invalid]="errorMessage() ? true : null"
+      [attr.aria-describedby]="errorMessage() ? 'friendCodeError' : null"
+      (input)="onCodeInput($event)"
+      (keydown)="onCodeKeydown($event)"
+      (focus)="focused.set(true)"
+      (blur)="focused.set(false)"
+    />
+    @for (slot of slots; track slot) {
+      <span
+        class="code-box"
+        [class.is-filled]="code().length > slot"
+        [class.is-active]="focused() && code().length === slot"
+        aria-hidden="true"
+        >{{ code()[slot] ?? '' }}</span
+      >
+    }
+  </div>
+  @if (errorMessage()) {
+    <p id="friendCodeError" class="code-error" role="alert">{{ errorMessage() }}</p>
+  }
+</ng-template>
+
+<ng-template #joinRow>
+  <div class="join-row">
+    <ng-container *ngTemplateOutlet="codeBoxes" />
+    <css-button
+      variant="primary"
+      ariaLabel="Beitreten"
+      class="square-button"
+      (click)="submitJoin()"
+    >
+      <css-icon icon="arrow-right-circle" slot="prefix"></css-icon>
+    </css-button>
+  </div>
+</ng-template>
+
+@switch (layout()) {
+  @case ('fr-seats') {
+    <!-- 21: two seats; yours is taken, the other one waits for your friend. -->
+    <h2 class="section-title">Freund herausfordern</h2>
+    <div class="seats">
+      <div class="seat">
+        <span class="seat-avatar" aria-hidden="true">{{ initial() }}</span>
+        <span class="seat-name">{{ playerName() }}</span>
+        <span class="seat-ready">Bereit</span>
+      </div>
+      <div class="seat is-open">
+        <span class="seat-avatar is-open" aria-hidden="true">?</span>
+        <span class="seat-name">Dein Freund</span>
+        <css-button
+          variant="primary"
+          class="seat-button"
+          (click)="createGame.emit()"
+        >
+          Einladen
+        </css-button>
+      </div>
+    </div>
+    @if (!joinOpen()) {
+      <css-button variant="plain" class="compact" (click)="joinOpen.set(true)">
+        <css-icon icon="link" slot="prefix"></css-icon>
+        Ich habe einen Code
+      </css-button>
+    } @else {
+      <div class="seat-join">
+        <ng-container *ngTemplateOutlet="joinRow" />
+      </div>
+    }
+  }
+  @case ('fr-message') {
+    <!-- 22: shows what your friend gets, before you create the game. -->
+    <h2 class="section-title">Freund herausfordern</h2>
+    <button type="button" class="message-card" (click)="createGame.emit()">
+      <span class="message-label">So bekommt dein Freund die Einladung</span>
+      <span class="bubble" aria-hidden="true">
+        <span class="bubble-text">Spiel ein Duell gegen mich auf playduelio!</span>
+        <span class="bubble-code">Code:&nbsp;<b>• • • •</b></span>
+      </span>
+      <span class="message-action">
+        <css-icon icon="add" size="sm" aria-hidden="true"></css-icon>
+        Spiel erstellen und Code erhalten
+      </span>
+    </button>
+    <div class="plain-join">
+      <span class="plain-title">Code bekommen?</span>
+      <ng-container *ngTemplateOutlet="joinRow" />
+    </div>
+  }
+  @case ('fr-halves') {
+    <!-- 23: two large areas, joined by an «oder» on the seam. -->
+    <h2 class="section-title">Freund herausfordern</h2>
+    <div class="halves">
+      <button type="button" class="half is-dark" (click)="createGame.emit()">
+        <css-icon icon="add" size="lg" aria-hidden="true"></css-icon>
+        <span class="half-title">Spiel erstellen</span>
+        <span class="half-text">Du bekommst einen Code für deinen Freund</span>
+      </button>
+      <span class="seam" aria-hidden="true">oder</span>
+      <div class="half is-light">
+        <span class="half-title">Mit Code beitreten</span>
+        <ng-container *ngTemplateOutlet="joinRow" />
+      </div>
+    </div>
+  }
+  @case ('fr-list') {
+    <!-- 24: a calm list, as in the settings of a phone. -->
+    <h2 class="list-title">Wer soll gegen dich spielen?</h2>
+    <div class="list">
+      <button type="button" class="list-row" (click)="createGame.emit()">
+        <span class="list-icon" aria-hidden="true"
+          ><css-icon icon="add"></css-icon
+        ></span>
+        <span class="list-text">
+          <span class="list-name">Neues Spiel erstellen</span>
+          <span class="list-hint">Du bekommst einen Code für deinen Freund</span>
+        </span>
+        <css-icon
+          class="list-arrow"
+          icon="angle-right"
+          aria-hidden="true"
+        ></css-icon>
+      </button>
+      <button
+        type="button"
+        class="list-row"
+        [attr.aria-expanded]="joinOpen()"
+        (click)="joinOpen.set(!joinOpen())"
+      >
+        <span class="list-icon is-light" aria-hidden="true"
+          ><css-icon icon="link"></css-icon
+        ></span>
+        <span class="list-text">
+          <span class="list-name">Mit Code beitreten</span>
+          <span class="list-hint">Du hast einen Code bekommen</span>
+        </span>
+        <css-icon
+          class="list-arrow"
+          [attr.icon]="joinOpen() ? 'angle-up' : 'angle-down'"
+          aria-hidden="true"
+        ></css-icon>
+      </button>
+      @if (joinOpen()) {
+        <div class="list-join">
+          <ng-container *ngTemplateOutlet="joinRow" />
+        </div>
+      }
+    </div>
+  }
+  @case ('fr-flow') {
+    <!-- 25: the way of a game with a friend as a small picture. -->
+    <h2 class="section-title">Freund herausfordern</h2>
+    <div class="flow" aria-hidden="true">
+      <span class="flow-node">
+        <span class="flow-avatar">{{ initial() }}</span>
+        <span class="flow-label">Du</span>
+      </span>
+      <span class="flow-line"><i></i></span>
+      <span class="flow-node">
+        <span class="flow-code">• • • •</span>
+        <span class="flow-label">Code</span>
+      </span>
+      <span class="flow-line"><i></i></span>
+      <span class="flow-node">
+        <span class="flow-avatar is-open">?</span>
+        <span class="flow-label">Freund</span>
+      </span>
+    </div>
+    <p class="body-text">
+      Du erstellst ein Spiel und schickst den Code deinem Freund
+    </p>
+    <css-button
+      variant="primary"
+      class="compact is-main"
+      (click)="createGame.emit()"
+    >
+      <css-icon icon="add" slot="prefix"></css-icon>
+      Spiel erstellen
+    </css-button>
+    @if (!joinOpen()) {
+      <css-button variant="plain" class="compact" (click)="joinOpen.set(true)">
+        <css-icon icon="link" slot="prefix"></css-icon>
+        Ich habe einen Code
+      </css-button>
+    } @else {
+      <div class="flow-join">
+        <ng-container *ngTemplateOutlet="joinRow" />
+      </div>
+    }
+  }
+}
