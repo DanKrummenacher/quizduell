@@ -337,10 +337,15 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @include facelift.short-screen {
+  :host(.is-logo) {
+    --gap-facts: #{functions.rem(28)};
+    --gap-form: #{functions.rem(36)};
+  }
+
   .logo {
-    width: functions.rem(56);
-    height: functions.rem(56);
-    margin-bottom: functions.rem(16);
+    width: functions.rem(44);
+    height: functions.rem(44);
+    margin-bottom: functions.rem(10);
   }
 }
 

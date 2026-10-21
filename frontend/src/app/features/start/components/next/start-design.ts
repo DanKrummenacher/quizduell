@@ -8,6 +8,11 @@ export type StartLayout =
   | 'p-logo'
   | 'p-live'
   | 'p-shapes'
+  | 'p-aurora'
+  | 'p-grid'
+  | 'p-spotlight'
+  | 'p-kinetic'
+  | 'p-holo'
   | 'f-clean'
   | 'f-inline'
   | 'f-stats'
@@ -77,6 +82,11 @@ export const START_LAYOUTS: StartOption[] = [
   { value: 'p-logo', label: 'Facelift + Logo-Animation' },
   { value: 'p-live', label: 'Facelift + lebendige Symbole' },
   { value: 'p-shapes', label: 'Facelift + schwebende Formen' },
+  { value: 'p-aurora', label: 'Facelift + Aurora & Glas' },
+  { value: 'p-grid', label: 'Facelift + Raster & Lichtstrahl' },
+  { value: 'p-spotlight', label: 'Facelift + Spotlight & 3D' },
+  { value: 'p-kinetic', label: 'Facelift + Kinetic Intro' },
+  { value: 'p-holo', label: 'Facelift + Holo-Symbole' },
   { value: 'l-product', label: 'Landing L1 · Produkt' },
   { value: 'l-kinetic', label: 'Landing L2 · Kinetic Type' },
   { value: 'l-arena', label: 'Landing L3 · Arena' },

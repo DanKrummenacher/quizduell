@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   CUSTOM_ELEMENTS_SCHEMA,
   input,
   type OnInit,
@@ -12,12 +13,28 @@ import '@css-ch/components/input-text';
 import { shapeRing } from '../../../../core/branding/logo-shapes';
 import { PLAYER_NAME_MAX_LENGTH } from '../../../../core/contracts/game.contract';
 import { BrandHeaderComponent } from '../../../../core/ui/brand-header/brand-header.component';
+import {
+  StartBackdropComponent,
+  type StartBackdropKind,
+} from './start-backdrop.component';
 
 /**
  * TEMPORARY: «pure» is the facelift of today's start page; the others add
  * motion on top of the very same page.
  */
-export type StartFaceliftVariant = 'pure' | 'intro' | 'logo' | 'live' | 'shapes';
+export type StartFaceliftVariant =
+  | 'pure'
+  | 'intro'
+  | 'logo'
+  | 'live'
+  | 'shapes'
+  | 'aurora'
+  | 'grid'
+  | 'spotlight'
+  | 'kinetic'
+  | 'holo';
+
+const TITLE = 'Teste dein Wissen im direkten Duell';
 
 /**
  * The start page in the design system of the lobby: the same content as
@@ -26,9 +43,13 @@ export type StartFaceliftVariant = 'pure' | 'intro' | 'logo' | 'live' | 'shapes'
  */
 @Component({
   selector: 'app-start-facelift',
-  imports: [BrandHeaderComponent],
+  imports: [BrandHeaderComponent, StartBackdropComponent],
   templateUrl: './start-facelift.component.html',
-  styleUrl: './start-facelift.component.scss',
+  // TEMPORARY: the second file holds the variants on top of the facelift.
+  styleUrls: [
+    './start-facelift.component.scss',
+    './start-facelift-fx.component.scss',
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: { '[class]': "'is-' + variant()" },
 })
@@ -41,6 +62,14 @@ export class StartFaceliftComponent implements OnInit {
   readonly startGame = output<string>();
 
   protected readonly maxLength = PLAYER_NAME_MAX_LENGTH;
+  protected readonly titleWords = TITLE.split(' ');
+  /** TEMPORARY (variants): the layer behind the page, if any. */
+  protected readonly backdrop = computed<StartBackdropKind | null>(() => {
+    const variant = this.variant();
+    return variant === 'aurora' || variant === 'grid' || variant === 'spotlight'
+      ? variant
+      : null;
+  });
   protected readonly ring = shapeRing();
   protected readonly playerName = signal('');
   protected readonly errorMessage = signal('');
