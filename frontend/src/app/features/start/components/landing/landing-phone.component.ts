@@ -18,4 +18,7 @@ import { LogoMarkComponent } from '../../../../core/ui/logo-mark/logo-mark.compo
 export class LandingPhoneComponent {
   readonly initial = input('');
   readonly questions = input(3);
+  /** Which screen of the game the phone shows. */
+  readonly screen = input<'name' | 'search' | 'quiz' | 'result'>('quiz');
+  readonly name = input('');
 }

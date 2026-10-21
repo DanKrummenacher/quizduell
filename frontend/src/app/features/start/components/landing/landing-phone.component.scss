@@ -205,6 +205,160 @@ $loop: 9s;
   animation: check $loop ease infinite;
 }
 
+// ---------------------------------------------------------------------------
+// The other screens of the game
+// ---------------------------------------------------------------------------
+.name-screen,
+.search-screen,
+.result-screen {
+  position: absolute;
+  inset: 34cqw 7cqw 16cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.name-title,
+.search-title,
+.result-title {
+  margin: 0;
+  font-size: 7.5cqw;
+  font-weight: $bold;
+  color: $blue;
+}
+
+.name-field {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 14cqw;
+  box-sizing: border-box;
+  margin-top: 8cqw;
+  padding: 0 4cqw;
+  border: 1px solid $blue;
+  border-radius: 1.5cqw;
+  background-color: $white;
+  font-size: 5.5cqw;
+  color: $blue;
+
+  i {
+    width: 0.6cqw;
+    height: 6.5cqw;
+    margin-left: 0.8cqw;
+    background-color: $opponent;
+    animation: caret 1s steps(1) infinite;
+  }
+}
+
+.name-button {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 13cqw;
+  margin-top: 4cqw;
+  border-radius: 999px;
+  background-color: $blue;
+  font-size: 4.5cqw;
+  font-weight: $bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $white;
+}
+
+.search-ring {
+  width: 44cqw;
+  height: 44cqw;
+  margin-bottom: 8cqw;
+  border-radius: 50%;
+  background: conic-gradient($blue 0 35%, #dfe3ea 35%);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3cqw), #000 0);
+  animation: turn 1.6s linear infinite;
+}
+
+.search-time {
+  margin: 2cqw 0 0;
+  font-size: 4.5cqw;
+  color: $muted;
+}
+
+.result-title {
+  font-size: 9cqw;
+  color: $green;
+}
+
+.result-score {
+  margin: 4cqw 0 0;
+  font-size: 22cqw;
+  font-weight: $bold;
+  line-height: 1;
+  color: $blue;
+
+  span {
+    margin-inline: 2cqw;
+    color: $opponent;
+  }
+}
+
+.result-text {
+  margin: 4cqw 0 0;
+  font-size: 5cqw;
+  color: $muted;
+}
+
+.confetti {
+  position: absolute;
+  top: -10cqw;
+  left: calc(8% + var(--i) * 11%);
+  width: 2.4cqw;
+  height: 4cqw;
+  border-radius: 0.6cqw;
+  background-color: $opponent;
+  animation: fall calc(2.4s + var(--i) * 0.2s) calc(var(--i) * -0.4s) linear infinite;
+
+  &:nth-child(odd) {
+    background-color: $green;
+  }
+
+  &:nth-child(3n) {
+    background-color: $blue;
+  }
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(120cqw) rotate(540deg);
+  }
+}
+
+// A new screen fades in.
+.name-screen,
+.search-screen,
+.result-screen,
+.players {
+  animation: screen-in 0.45s ease both;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(3cqw);
+  }
+}
+
 // The opponent is still thinking.
 .opponent {
   position: absolute;

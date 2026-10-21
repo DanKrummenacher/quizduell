@@ -1,0 +1,63 @@
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<app-landing-nav [dark]="true" />
+
+<main>
+  <section class="hero">
+    <div class="copy">
+      <p class="kicker">Quiz-Duell · Echtzeit</p>
+      <h1 class="headline">Das Duell der <span class="shine">Köpfe.</span></h1>
+      <p class="lead">
+        {{ questions() }} Fragen. {{ seconds() }} Sekunden pro Frage. Ein Gegner, der
+        genauso schnell sein will wie du.
+      </p>
+      <app-landing-name-form
+        [dark]="true"
+        [initialName]="initialName()"
+        [notice]="notice()"
+        (startGame)="startGame.emit($event)"
+      />
+    </div>
+
+    <div class="scene" aria-hidden="true">
+      <div class="card">
+        <span class="card-gloss"></span>
+        <span class="card-top"
+          ><span>Frage 1 / {{ questions() }}</span
+          ><span class="card-time"
+            ><css-icon icon="time-limit" size="sm"></css-icon>{{ seconds() }} s</span
+          ></span
+        >
+        <span class="card-bar"><i></i></span>
+        <span class="card-question">Wie viele Kantone hat die Schweiz?</span>
+        <span class="card-answers">
+          <span><b>A</b>23</span>
+          <span><b>B</b>24</span>
+          <span class="is-right"><b>C</b>26</span>
+          <span><b>D</b>28</span>
+        </span>
+      </div>
+      <span class="orbit"><i></i></span>
+    </div>
+  </section>
+
+  <section class="features" aria-label="Was playduelio ausmacht">
+    <article class="feature">
+      <span class="feature-number">01</span>
+      <h2>Echtzeit</h2>
+      <p>Beide sehen dieselbe Frage zur selben Zeit. Kein Warten, kein Schummeln.</p>
+    </article>
+    <article class="feature">
+      <span class="feature-number">02</span>
+      <h2>Tempo zählt</h2>
+      <p>
+        {{ seconds() }} Sekunden pro Frage. Richtig und schnell bringt die Punkte.
+      </p>
+    </article>
+    <article class="feature">
+      <span class="feature-number">03</span>
+      <h2>Sofort los</h2>
+      <p>Kein Account, kein Download. Name eingeben und spielen.</p>
+    </article>
+  </section>
+</main>

@@ -43,7 +43,11 @@ export type StartLayout =
   | 'l-product'
   | 'l-kinetic'
   | 'l-arena'
-  | 'l-world';
+  | 'l-world'
+  | 'l-story'
+  | 'l-bento'
+  | 'l-aurora'
+  | 'l-ring';
 
 /** The visuals of round 3. */
 export type StartVisual = 'product' | 'race' | 'wall';
@@ -63,6 +67,10 @@ export const START_LAYOUTS: StartOption[] = [
   { value: 'l-kinetic', label: 'Landing L2 · Kinetic Type' },
   { value: 'l-arena', label: 'Landing L3 · Arena' },
   { value: 'l-world', label: 'Landing L4 · Markenwelt' },
+  { value: 'l-story', label: 'Landing L5 · Scroll-Story' },
+  { value: 'l-bento', label: 'Landing L6 · Bento Pro' },
+  { value: 'l-aurora', label: 'Landing L7 · Aurora' },
+  { value: 'l-ring', label: 'Landing L8 · Countdown-Ring' },
   { value: 'e-attract', label: 'R5 · E1 Attract-Modus' },
   { value: 'e-question', label: 'R5 · E2 Frage 0: Wie heisst du?' },
   { value: 'e-slides', label: 'R5 · E3 Onboarding-Slides' },

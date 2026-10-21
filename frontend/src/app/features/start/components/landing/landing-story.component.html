@@ -1,0 +1,69 @@
+<app-landing-nav />
+
+<main>
+  <section class="hero">
+    <p class="kicker">In einer Minute zum Duell</p>
+    <h1 class="headline">Vom Namen<br />zum <span class="accent">Sieg.</span></h1>
+    <p class="lead">
+      playduelio ist das Quiz-Duell in Echtzeit. {{ questions() }} Fragen,
+      {{ seconds() }} Sekunden pro Frage, ein Gegner.
+    </p>
+    <app-landing-name-form
+      [initialName]="initialName()"
+      [notice]="notice()"
+      (nameChange)="name.set($event)"
+      (startGame)="startGame.emit($event)"
+    />
+    <span class="scroll-hint" aria-hidden="true">So funktioniert’s<i></i></span>
+  </section>
+
+  <section class="story" aria-label="So funktioniert’s">
+    <div class="steps">
+      @for (step of steps(); track step.screen) {
+        <article
+          #step
+          class="step"
+          [class.is-active]="active() === $index"
+          [attr.data-index]="$index"
+        >
+          <span class="step-number">0{{ $index + 1 }}</span>
+          <h2 class="step-title">{{ step.title }}</h2>
+          <p class="step-text">{{ step.text }}</p>
+          <app-landing-phone
+            class="step-phone"
+            [screen]="step.screen"
+            [name]="cleanName()"
+            [initial]="cleanName().charAt(0).toUpperCase()"
+            [questions]="questions()"
+          />
+        </article>
+      }
+    </div>
+    <div class="device">
+      <div class="device-sticky">
+        <span class="device-glow" aria-hidden="true"></span>
+        <app-landing-phone
+          [screen]="activeScreen()"
+          [name]="cleanName()"
+          [initial]="cleanName().charAt(0).toUpperCase()"
+          [questions]="questions()"
+        />
+        <ol class="progress" aria-hidden="true">
+          @for (step of steps(); track step.screen) {
+            <li [class.is-active]="active() === $index"></li>
+          }
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="final" aria-labelledby="storyFinal">
+    <h2 id="storyFinal" class="final-title">Jetzt bist du dran.</h2>
+    <app-landing-name-form
+      fieldId="playerNameBottom"
+      [initialName]="initialName()"
+      [notice]="notice()"
+      (startGame)="startGame.emit($event)"
+    />
+  </section>
+</main>

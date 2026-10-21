@@ -26,6 +26,42 @@
         (startGame)="handleStart($event)"
       />
     }
+    @case ('l-story') {
+      <app-landing-story
+        [questions]="info().questionsPerGame"
+        [seconds]="info().questionDurationSec"
+        [initialName]="initialName"
+        [notice]="notice()"
+        (startGame)="handleStart($event)"
+      />
+    }
+    @case ('l-bento') {
+      <app-landing-bento
+        [questions]="info().questionsPerGame"
+        [seconds]="info().questionDurationSec"
+        [initialName]="initialName"
+        [notice]="notice()"
+        (startGame)="handleStart($event)"
+      />
+    }
+    @case ('l-aurora') {
+      <app-landing-aurora
+        [questions]="info().questionsPerGame"
+        [seconds]="info().questionDurationSec"
+        [initialName]="initialName"
+        [notice]="notice()"
+        (startGame)="handleStart($event)"
+      />
+    }
+    @case ('l-ring') {
+      <app-landing-ring
+        [questions]="info().questionsPerGame"
+        [seconds]="info().questionDurationSec"
+        [initialName]="initialName"
+        [notice]="notice()"
+        (startGame)="handleStart($event)"
+      />
+    }
     @case ('l-world') {
       <app-landing-world
         [questions]="info().questionsPerGame"

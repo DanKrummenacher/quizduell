@@ -1,0 +1,252 @@
+// TEMPORARY (landing concepts) · L5 Scroll-Story.
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'landing' as *;
+
+:host {
+  @include full-bleed;
+  background:
+    radial-gradient(
+      56rem 32rem at 10% -6rem,
+      rgba($opponent, 0.14),
+      transparent 70%
+    ),
+    $page;
+}
+
+// ---------------------------------------------------------------------------
+// Hero
+// ---------------------------------------------------------------------------
+.hero {
+  @include container;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: calc(100dvh - #{functions.rem(64)});
+  justify-content: center;
+  padding-block: functions.rem(40);
+}
+
+.kicker {
+  @include kicker;
+  @include rise(0.05s);
+}
+
+.headline {
+  @include rise(0.12s);
+  margin: functions.rem(16) 0 0;
+  font-size: clamp(#{functions.rem(56)}, 12vw, #{functions.rem(144)});
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  color: $blue;
+}
+
+.accent {
+  background: linear-gradient(100deg, $mid, $opponent);
+  background-clip: text;
+  color: transparent;
+}
+
+.lead {
+  @include rise(0.2s);
+  max-width: functions.rem(520);
+  margin: functions.rem(24) 0 functions.rem(32);
+  font-size: clamp(#{functions.rem(17)}, 2vw, #{functions.rem(21)});
+  font-weight: 300;
+  line-height: 1.45;
+  color: $muted;
+}
+
+app-landing-name-form {
+  @include rise(0.28s);
+}
+
+.scroll-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(10);
+  margin-top: functions.rem(40);
+  font-size: functions.rem(13);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $muted;
+
+  i {
+    width: functions.rem(1);
+    height: functions.rem(32);
+    background: linear-gradient($muted, transparent);
+    animation: hint 1.8s ease-in-out infinite;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The story
+// ---------------------------------------------------------------------------
+.story {
+  @include container;
+}
+
+.step {
+  @include reveal;
+  display: grid;
+  justify-items: start;
+  gap: functions.rem(8);
+  padding-block: functions.rem(48);
+  border-top: functions.rem(1) solid $line;
+}
+
+.step-number {
+  font-size: functions.rem(14);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: $opponent;
+}
+
+.step-title {
+  margin: 0;
+  font-size: clamp(#{functions.rem(32)}, 5vw, #{functions.rem(56)});
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: $blue;
+  transition: color 0.3s ease;
+}
+
+.step-text {
+  max-width: functions.rem(420);
+  margin: 0;
+  font-size: functions.rem(18);
+  font-weight: 300;
+  line-height: 1.45;
+  color: $muted;
+}
+
+.step-phone {
+  --phone-width: min(16rem, 70vw);
+
+  justify-self: center;
+  margin-top: functions.rem(24);
+}
+
+// On phones every step shows its own screen; the sticky phone is for wide
+// screens only.
+.device {
+  display: none;
+}
+
+// ---------------------------------------------------------------------------
+// Last call
+// ---------------------------------------------------------------------------
+.final {
+  @include container(functions.rem(760));
+  @include reveal;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: functions.rem(72)
+    calc(#{functions.rem(96)} + var(--app-safe-bottom));
+  text-align: center;
+
+  app-landing-name-form {
+    animation: none;
+    text-align: left;
+  }
+}
+
+.final-title {
+  @include section-title;
+  margin-bottom: functions.rem(28);
+}
+
+// ---------------------------------------------------------------------------
+// Wide screens: the phone stays, the steps scroll by
+// ---------------------------------------------------------------------------
+@media (min-width: $wide) {
+  .story {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: functions.rem(64);
+  }
+
+  .step {
+    align-content: center;
+    min-height: 70vh;
+    padding-block: 0;
+    border-top: 0;
+    opacity: 0.3;
+    transition: opacity 0.4s ease;
+    animation: none;
+
+    &.is-active {
+      opacity: 1;
+    }
+  }
+
+  .step-phone {
+    display: none;
+  }
+
+  .device {
+    display: block;
+  }
+
+  .device-sticky {
+    position: sticky;
+    top: calc(50vh - 18rem);
+    display: grid;
+    justify-items: center;
+    padding-block: functions.rem(40);
+  }
+
+  .device-glow {
+    position: absolute;
+    top: 0;
+    width: 34rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba($opponent, 0.2), transparent);
+  }
+
+  app-landing-phone {
+    --phone-width: 16.5rem;
+
+    position: relative;
+  }
+
+  .progress {
+    display: flex;
+    gap: functions.rem(8);
+    margin: functions.rem(24) 0 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      width: functions.rem(8);
+      height: functions.rem(8);
+      border-radius: functions.rem(4);
+      background-color: $line;
+      transition:
+        width 0.3s ease,
+        background-color 0.3s ease;
+
+      &.is-active {
+        width: functions.rem(28);
+        background-color: $blue;
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint i {
+    animation: none;
+  }
+}
+
+@keyframes hint {
+  50% {
+    transform: translateY(functions.rem(8));
+    opacity: 0.4;
+  }
+}
