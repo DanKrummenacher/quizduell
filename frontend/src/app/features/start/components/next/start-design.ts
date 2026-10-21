@@ -2,35 +2,36 @@
 
 export type StartLayout =
   | 'today'
-  | 'f-clean'
-  | 'f-inline'
-  | 'f-stats'
-  | 'f-steps'
-  | 'f-card'
-  | 'f-duel'
-  | 'f-stage'
-  | 'f-player'
-  | 'f-teaser'
-  | 'f-ask'
-  | 'f-icon';
+  | 'n-facelift'
+  | 'n-logo'
+  | 'n-versus'
+  | 'n-marquee'
+  | 'n-timer'
+  | 'n-score'
+  | 'n-cards'
+  | 'n-sheet'
+  | 'n-chat'
+  | 'n-poster';
+
+/** The visuals with their own component. */
+export type StartVisual = 'logo' | 'versus' | 'timer' | 'score' | 'cards';
 
 export interface StartOption {
   value: StartLayout;
   label: string;
 }
 
-/** From small refinements of today's page to new approaches. */
+/** From a refined facelift to whole new approaches. */
 export const START_LAYOUTS: StartOption[] = [
   { value: 'today', label: 'Heute' },
-  { value: 'f-clean', label: 'Klein 1 · Facelift' },
-  { value: 'f-inline', label: 'Klein 2 · Fakten als Zeile' },
-  { value: 'f-stats', label: 'Mittel 1 · Zahlen-Karte' },
-  { value: 'f-steps', label: 'Mittel 2 · So geht’s' },
-  { value: 'f-card', label: 'Mittel 3 · Formular als Karte' },
-  { value: 'f-duel', label: 'Gross 1 · Du gegen ?' },
-  { value: 'f-stage', label: 'Gross 2 · Dunkle Bühne' },
-  { value: 'f-player', label: 'Gross 3 · Deine Spielerkarte' },
-  { value: 'f-teaser', label: 'Gross 4 · Beispielfrage' },
-  { value: 'f-ask', label: 'Gross 5 · Wie heisst du?' },
-  { value: 'f-icon', label: 'Gross 6 · App-Icon' },
+  { value: 'n-facelift', label: 'N1 · Facelift, neu gedacht' },
+  { value: 'n-logo', label: 'N2 · Logo-Intro (animiert)' },
+  { value: 'n-versus', label: 'N3 · Versus-Poster' },
+  { value: 'n-marquee', label: 'N4 · Laufende Fragen' },
+  { value: 'n-timer', label: 'N5 · 20-Sekunden-Ring' },
+  { value: 'n-score', label: 'N6 · Anzeigetafel' },
+  { value: 'n-cards', label: 'N7 · Fragen-Stapel' },
+  { value: 'n-sheet', label: 'N8 · Dunkel mit Bottom-Sheet' },
+  { value: 'n-chat', label: 'N9 · Chat-Begrüssung' },
+  { value: 'n-poster', label: 'N10 · Typo-Poster' },
 ];

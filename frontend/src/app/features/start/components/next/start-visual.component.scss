@@ -1,0 +1,502 @@
+// TEMPORARY: the large visuals of the start page proposals. Each one is
+// at most 176 px high, 128 px on short phones.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use '../../../lobby/components/next/facelift/facelift';
+
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$page: colors.$dt-color-pepper-bright;
+$opponent: #00a4e0;
+$green: #00875e;
+$track: #dfe3ea;
+$bold: miscs.$css-ui-font-weight-bold;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+
+:host {
+  --size: #{functions.rem(176)};
+
+  display: block;
+}
+
+// ---------------------------------------------------------------------------
+// Logo intro
+// ---------------------------------------------------------------------------
+.logo-stage {
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  margin: 0 auto;
+}
+
+.logo-glow {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    rgba($opponent, 0.28),
+    rgba($opponent, 0)
+  );
+  animation: breathe 3.2s 1.2s ease-in-out infinite;
+}
+
+.logo-ring {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: turn 24s 1.2s linear infinite;
+}
+
+.shape {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: shape-in 0.5s $spring both;
+  animation-delay: calc(var(--i) * 0.09s);
+}
+
+// ---------------------------------------------------------------------------
+// Versus poster
+// ---------------------------------------------------------------------------
+.versus {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: var(--size);
+  overflow: hidden;
+  border-radius: functions.rem(16);
+}
+
+.side {
+  display: grid;
+  place-items: center;
+
+  &.is-me {
+    position: relative;
+    z-index: 1;
+    padding-right: 14%;
+    background: linear-gradient(135deg, #001f52, $blue);
+    clip-path: polygon(0 0, 100% 0, 80% 100%, 0 100%);
+    margin-right: -20%;
+    animation: from-left 0.6s $spring both;
+  }
+
+  &.is-opponent {
+    padding-left: 14%;
+    background: linear-gradient(135deg, $opponent, #0078bb);
+    animation: from-right 0.6s $spring both;
+  }
+}
+
+.versus-avatar {
+  display: grid;
+  place-items: center;
+  width: functions.rem(80);
+  height: functions.rem(80);
+  border: functions.rem(3) solid rgba($white, 0.9);
+  border-radius: 50%;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  color: $white;
+
+  .is-opponent & {
+    border-style: dashed;
+  }
+}
+
+.versus-badge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: functions.rem(52);
+  height: functions.rem(52);
+  z-index: 2;
+  margin: functions.rem(-26) 0 0 functions.rem(-26);
+  border-radius: 50%;
+  background-color: $white;
+  box-shadow: 0 functions.rem(6) functions.rem(18) rgba(0, 20, 60, 0.35);
+  font-size: functions.rem(18);
+  font-style: italic;
+  font-weight: $bold;
+  color: $blue;
+  animation: pop 0.4s 0.45s $spring both;
+}
+
+// ---------------------------------------------------------------------------
+// 20-second ring
+// ---------------------------------------------------------------------------
+.timer {
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  margin: 0 auto;
+}
+
+.tick {
+  position: absolute;
+  inset: 0;
+  transform: rotate(var(--a));
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: functions.rem(3);
+    height: functions.rem(12);
+    margin-left: functions.rem(-1.5);
+    border-radius: functions.rem(2);
+    background-color: $track;
+    transition: background-color 0.3s ease;
+  }
+
+  &.is-filled::before {
+    background-color: $blue;
+  }
+}
+
+.timer-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-number {
+  font-size: functions.rem(48);
+  font-weight: $bold;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: $blue;
+}
+
+.timer-unit {
+  margin-top: functions.rem(4);
+  font-size: functions.rem(13);
+  color: facelift.$muted;
+}
+
+// ---------------------------------------------------------------------------
+// Scoreboard
+// ---------------------------------------------------------------------------
+.score {
+  display: grid;
+  justify-items: center;
+  gap: functions.rem(12);
+  padding: functions.rem(16) functions.rem(16) functions.rem(18);
+  border-radius: functions.rem(16);
+  background:
+    radial-gradient(circle at 50% 0%, rgba($opponent, 0.3), transparent 65%), #001f52;
+  color: $white;
+}
+
+.score-round {
+  font-size: functions.rem(12);
+  font-weight: $bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $opponent;
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: 100%;
+}
+
+.score-player {
+  display: grid;
+  justify-items: center;
+  gap: functions.rem(6);
+  font-size: functions.rem(13);
+  color: rgba($white, 0.8);
+}
+
+.score-avatar {
+  display: grid;
+  place-items: center;
+  width: functions.rem(48);
+  height: functions.rem(48);
+  box-sizing: border-box;
+  border-radius: 50%;
+  background-color: $white;
+  font-size: functions.rem(18);
+  font-weight: $bold;
+  color: $blue;
+
+  &.is-open {
+    border: functions.rem(2) dashed $opponent;
+    background: none;
+    color: $opponent;
+  }
+}
+
+.score-points {
+  font-size: functions.rem(48);
+  font-weight: $bold;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+
+  i {
+    margin: 0 functions.rem(6);
+    font-style: normal;
+    color: $opponent;
+    animation: blink 1s steps(1) infinite;
+  }
+}
+
+.score-rounds {
+  display: flex;
+  gap: functions.rem(6);
+
+  i {
+    width: functions.rem(24);
+    height: functions.rem(4);
+    border-radius: functions.rem(2);
+    background-color: rgba($white, 0.2);
+
+    &.is-current {
+      background-color: $opponent;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Fanned stack of question cards
+// ---------------------------------------------------------------------------
+.stack {
+  position: relative;
+  height: var(--size);
+  margin: 0 auto;
+  max-width: functions.rem(300);
+}
+
+.card {
+  position: absolute;
+  inset: functions.rem(8) functions.rem(16);
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: functions.rem(8);
+  background-color: $white;
+  box-shadow: 0 functions.rem(8) functions.rem(24) rgba(0, 50, 125, 0.12);
+
+  &.is-left {
+    transform: rotate(-7deg) translateX(-6%);
+    animation: fan-left 0.6s $spring both;
+  }
+
+  &.is-right {
+    transform: rotate(7deg) translateX(6%);
+    animation: fan-right 0.6s $spring both;
+  }
+
+  &.is-front {
+    display: flex;
+    flex-direction: column;
+    gap: functions.rem(6);
+    padding: functions.rem(14);
+    animation: float 4s 0.6s ease-in-out infinite;
+  }
+}
+
+.card-label {
+  font-size: functions.rem(11);
+  font-weight: $bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $opponent;
+}
+
+.card-question {
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  line-height: 1.25;
+  color: $blue;
+}
+
+.card-answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: functions.rem(6);
+  margin-top: auto;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: functions.rem(6);
+    overflow: hidden;
+    border: functions.rem(1) solid facelift.$border;
+    border-radius: functions.rem(4);
+    font-size: functions.rem(12);
+    color: $blue;
+  }
+
+  b {
+    display: grid;
+    place-items: center;
+    width: functions.rem(22);
+    height: functions.rem(26);
+    background-color: $blue;
+    color: $white;
+  }
+
+  .is-right {
+    animation: right 4s 1.2s ease infinite;
+
+    b {
+      animation: right-block 4s 1.2s ease infinite;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Short phones
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  :host {
+    --size: #{functions.rem(144)};
+  }
+
+  .versus-avatar {
+    width: functions.rem(64);
+    height: functions.rem(64);
+    font-size: functions.rem(24);
+  }
+}
+
+@media (max-height: 600px) {
+  :host {
+    --size: #{functions.rem(120)};
+  }
+
+  .timer-number {
+    font-size: functions.rem(36);
+  }
+
+  .score {
+    gap: functions.rem(8);
+    padding-block: functions.rem(12);
+  }
+
+  .score-avatar {
+    width: functions.rem(40);
+    height: functions.rem(40);
+  }
+
+  .score-points {
+    font-size: functions.rem(40);
+  }
+
+  .card-answers span:nth-child(n + 3) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before {
+    animation: none !important;
+  }
+}
+
+@keyframes shape-in {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(1.12);
+    opacity: 0.7;
+  }
+}
+
+@keyframes from-left {
+  from {
+    transform: translateX(-30%);
+    opacity: 0;
+  }
+}
+
+@keyframes from-right {
+  from {
+    transform: translateX(30%);
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes fan-left {
+  from {
+    transform: none;
+  }
+}
+
+@keyframes fan-right {
+  from {
+    transform: none;
+  }
+}
+
+@keyframes float {
+  50% {
+    transform: translateY(functions.rem(-6));
+  }
+}
+
+@keyframes right {
+  0%,
+  15%,
+  90%,
+  100% {
+    border-color: facelift.$border;
+    background-color: $white;
+  }
+
+  25%,
+  80% {
+    border-color: $green;
+    background-color: rgba($green, 0.08);
+  }
+}
+
+@keyframes right-block {
+  0%,
+  15%,
+  90%,
+  100% {
+    background-color: $blue;
+  }
+
+  25%,
+  80% {
+    background-color: $green;
+  }
+}

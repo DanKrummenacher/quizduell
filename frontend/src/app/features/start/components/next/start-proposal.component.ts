@@ -15,6 +15,7 @@ import { PLAYER_NAME_MAX_LENGTH } from '../../../../core/contracts/game.contract
 import { BrandHeaderComponent } from '../../../../core/ui/brand-header/brand-header.component';
 import { LogoMarkComponent } from '../../../../core/ui/logo-mark/logo-mark.component';
 import type { StartLayout } from './start-design';
+import { StartVisualComponent } from './start-visual.component';
 
 /**
  * TEMPORARY: proposals for the start page in the design of the lobby
@@ -22,7 +23,12 @@ import type { StartLayout } from './start-design';
  */
 @Component({
   selector: 'app-start-proposal',
-  imports: [BrandHeaderComponent, LogoMarkComponent, NgTemplateOutlet],
+  imports: [
+    BrandHeaderComponent,
+    LogoMarkComponent,
+    NgTemplateOutlet,
+    StartVisualComponent,
+  ],
   templateUrl: './start-proposal.component.html',
   styleUrl: './start-proposal.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -37,6 +43,21 @@ export class StartProposalComponent implements OnInit {
   readonly startGame = output<string>();
 
   protected readonly maxLength = PLAYER_NAME_MAX_LENGTH;
+  /** N4: sample questions that run by. */
+  protected readonly marqueeRows = [
+    [
+      'Wie viele Kantone hat die Schweiz?',
+      'Welcher Planet ist der grösste?',
+      'Wer malte die Mona Lisa?',
+      'Wie hoch ist das Matterhorn?',
+    ],
+    [
+      'Was ist die Hauptstadt von Kanada?',
+      'Wie viele Beine hat eine Spinne?',
+      'Welches Element hat das Zeichen O?',
+      'In welchem Jahr fiel die Berliner Mauer?',
+    ],
+  ];
   protected readonly playerName = signal('');
   protected readonly errorMessage = signal('');
 
