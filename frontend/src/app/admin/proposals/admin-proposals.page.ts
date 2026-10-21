@@ -8,6 +8,10 @@ import { ClassicComponent } from './classic/classic.component';
 import { CockpitComponent } from './cockpit/cockpit.component';
 import { MonitorComponent } from './monitor/monitor.component';
 import { PocketComponent } from './pocket/pocket.component';
+import { TasksComponent } from './tasks/tasks.component';
+import { WriterComponent } from './writer/writer.component';
+import { InsightsComponent } from './insights/insights.component';
+import { WidgetsComponent } from './widgets/widgets.component';
 import { ProposalPro } from './pro';
 import { ProposalStore } from './proposal-store';
 import { ReviewComponent } from './review/review.component';
@@ -30,6 +34,10 @@ const PROPOSALS = [
   { value: 'j', label: 'J · Workspace' },
   { value: 'k', label: 'K · Pocket' },
   { value: 'l', label: 'L · Klassik' },
+  { value: 'm', label: 'M · Aufgaben' },
+  { value: 'n', label: 'N · Schreibmodus' },
+  { value: 'o', label: 'O · Insights' },
+  { value: 'p', label: 'P · Widgets' },
 ];
 
 @Component({
@@ -47,6 +55,10 @@ const PROPOSALS = [
     StageComponent,
     StudioComponent,
     WorkspaceComponent,
+    TasksComponent,
+    WriterComponent,
+    InsightsComponent,
+    WidgetsComponent,
   ],
   providers: [ProposalStore, ProposalPro],
   template: `
@@ -83,6 +95,18 @@ const PROPOSALS = [
       }
       @case ('l') {
         <app-classic (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('m') {
+        <app-tasks (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('n') {
+        <app-writer (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('o') {
+        <app-insights (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('p') {
+        <app-widgets (openGame)="openGame()" (logout)="logout()" />
       }
       @default {
         <app-cockpit (openGame)="openGame()" (logout)="logout()" />

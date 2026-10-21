@@ -1,0 +1,286 @@
+<header class="top">
+  <span class="lockup">
+    <app-logo-mark class="logo" />
+    <span class="wordmark"><span class="light">play</span>duelio</span>
+  </span>
+  <nav class="tabs" aria-label="Admin-Navigation">
+    <button
+      type="button"
+      class="tab"
+      [class.active]="view() === 'tasks'"
+      (click)="view.set('tasks')"
+    >
+      Aufgaben
+      @if (inbox.open().length) {
+        <span class="count">{{ inbox.open().length }}</span>
+      }
+    </button>
+    <button
+      type="button"
+      class="tab"
+      [class.active]="view() === 'questions'"
+      (click)="view.set('questions')"
+    >
+      Alle Fragen
+    </button>
+    <button type="button" class="tab" (click)="rulesOpen.set(true)">
+      Spielregeln
+      @if (store.dirty()) {
+        <span class="dot-alert"></span>
+      }
+    </button>
+  </nav>
+  <div class="tools">
+    @if (store.stats(); as s) {
+      <span class="live" [class.warning]="store.ready() === false">
+        <span class="dot"></span>{{ s.playersOnline }} Geräte ·
+        {{ s.activeGames }} Duelle
+      </span>
+    }
+    <button
+      type="button"
+      class="tool"
+      aria-label="Zum Spiel"
+      title="Zum Spiel"
+      (click)="openGame.emit()"
+    >
+      <css-icon icon="home" size="sm"></css-icon>
+    </button>
+    <button
+      type="button"
+      class="tool"
+      aria-label="Abmelden"
+      title="Abmelden"
+      (click)="logout.emit()"
+    >
+      <css-icon icon="logout" size="sm"></css-icon>
+    </button>
+  </div>
+</header>
+
+@if (view() === 'questions') {
+  <main class="page">
+    <app-ws-questions />
+  </main>
+} @else {
+  <main class="inbox">
+    <!-- The list of tasks -->
+    <section class="list" aria-label="Aufgaben">
+      <div class="list-head">
+        <div class="switch" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="!showDone()"
+            (click)="showDone.set(false)"
+          >
+            Offen {{ inbox.open().length }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="showDone()"
+            (click)="showDone.set(true)"
+          >
+            Erledigt {{ inbox.closed().length }}
+          </button>
+        </div>
+        @if (!showDone() && kinds().length > 1) {
+          <div class="kinds">
+            <button
+              type="button"
+              class="kind"
+              [class.on]="kind() === null"
+              (click)="kind.set(null)"
+            >
+              Alle
+            </button>
+            @for (k of kinds(); track k.kind) {
+              <button
+                type="button"
+                class="kind"
+                [class.on]="kind() === k.kind"
+                (click)="kind.set(k.kind)"
+              >
+                {{ k.label }} <span>{{ k.count }}</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+      <ul class="items">
+        @for (task of list(); track task.key) {
+          <li>
+            <button
+              type="button"
+              class="item"
+              [class.active]="selected()?.key === task.key"
+              [attr.aria-current]="selected()?.key === task.key ? 'true' : null"
+              (click)="select(task)"
+            >
+              <span class="badge" [class]="task.kind">{{ labels[task.kind] }}</span>
+              <span class="item-title">{{ task.title }}</span>
+              <span class="item-reason">{{ task.reason }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <!-- The selected task with its actions -->
+    <section class="detail" aria-live="polite">
+      @if (selected(); as task) {
+        <div class="detail-head">
+          <span class="badge" [class]="task.kind">{{ labels[task.kind] }}</span>
+          <span class="pos">{{ position() + 1 }} von {{ list().length }}</span>
+        </div>
+        <h1 class="detail-title">{{ task.title }}</h1>
+        <p class="reason">{{ task.reason }}</p>
+
+        @switch (task.kind) {
+          @case ('not-ready') {
+            <div class="actions">
+              @if (task.questions.length) {
+                <button
+                  type="button"
+                  class="action primary"
+                  (click)="activateAll(task.questions)"
+                >
+                  {{ task.questions.length }} pausierte Fragen aktivieren
+                </button>
+              }
+              <button type="button" class="action" (click)="store.openEditor(null)">
+                Neue Frage
+              </button>
+              <button type="button" class="action" (click)="store.importSamples()">
+                Beispielfragen laden
+              </button>
+            </div>
+          }
+          @case ('rules') {
+            <div class="changes">
+              @for (change of pro.settingChanges(); track change.label) {
+                <div class="change">
+                  <span>{{ change.label }}</span>
+                  <span
+                    ><s>{{ change.before }}</s> →
+                    <strong>{{ change.after }}</strong></span
+                  >
+                </div>
+              }
+            </div>
+            <div class="actions">
+              <button
+                type="button"
+                class="action primary"
+                [disabled]="!store.valid()"
+                (click)="reviewing.set(true)"
+              >
+                Speichern
+              </button>
+              <button type="button" class="action" (click)="rulesOpen.set(true)">
+                Weiter anpassen
+              </button>
+              <button type="button" class="action" (click)="store.discardSettings()">
+                Verwerfen
+              </button>
+            </div>
+          }
+          @default {
+            @for (q of task.questions; track q.id) {
+              @let r = rate(q);
+              <article class="question">
+                <div class="q-meta">
+                  <span>{{ q.category || 'Ohne Kategorie' }}</span>
+                  <span>{{
+                    r === null
+                      ? 'noch nie gestellt'
+                      : r + ' % richtig · ' + q.timesAsked + '× gestellt'
+                  }}</span>
+                  <span class="state" [class.on]="q.active">{{
+                    q.active ? 'Aktiv' : 'Pausiert'
+                  }}</span>
+                </div>
+                <p class="q-text">{{ q.text }}</p>
+                <ol class="answers">
+                  @for (option of q.options; track $index; let i = $index) {
+                    <li class="answer" [class.correct]="i === q.correctIndex">
+                      <span class="letter">{{ letters[i] }}</span
+                      >{{ option }}
+                    </li>
+                  }
+                </ol>
+                <div class="actions">
+                  <button
+                    type="button"
+                    class="action primary"
+                    (click)="store.openEditor(q)"
+                  >
+                    Bearbeiten <kbd>E</kbd>
+                  </button>
+                  @if (q.active) {
+                    <button
+                      type="button"
+                      class="action"
+                      (click)="setActive(q, false)"
+                    >
+                      Pausieren <kbd>P</kbd>
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="action"
+                      (click)="setActive(q, true)"
+                    >
+                      Aktivieren <kbd>A</kbd>
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    class="action danger"
+                    (click)="store.confirm.set({ kind: 'delete', question: q })"
+                  >
+                    Löschen
+                  </button>
+                </div>
+              </article>
+            }
+          }
+        }
+
+        <div class="foot">
+          @if (showDone()) {
+            <button type="button" class="link" (click)="inbox.reopen(task)">
+              Wieder öffnen
+            </button>
+          } @else if (task.kind !== 'not-ready' && task.kind !== 'rules') {
+            <button type="button" class="link" (click)="done(task)">
+              Passt so – als erledigt markieren <kbd>D</kbd>
+            </button>
+          }
+          <span class="keys"><kbd>J</kbd> <kbd>K</kbd> nächste / vorherige</span>
+        </div>
+      } @else {
+        <div class="empty">
+          <span class="empty-icon"
+            ><css-icon icon="checkmark" size="xl"></css-icon
+          ></span>
+          <h1>{{ showDone() ? 'Noch nichts erledigt' : 'Alles erledigt' }}</h1>
+          <p>
+            {{
+              showDone()
+                ? 'Erledigte Aufgaben erscheinen hier.'
+                : 'Das Quiz ist in gutem Zustand. Neue Aufgaben erscheinen von selbst.'
+            }}
+          </p>
+        </div>
+      }
+    </section>
+  </main>
+}
+
+<app-rules-drawer [open]="rulesOpen()" (dismiss)="rulesOpen.set(false)" />
+@if (reviewing()) {
+  <app-save-rules-dialog (dismiss)="reviewing.set(false)" />
+}
+<app-proposal-dialogs />

@@ -1,0 +1,561 @@
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
+@use '../kit';
+
+$ink: kit.$blue;
+$grid: #e6ebf2;
+$series: #0078bb;
+$selected: kit.$blue;
+
+:host {
+  display: block;
+  min-height: 100dvh;
+  padding-top: var(--app-safe-top);
+  background-color: #f5f7fa;
+}
+
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: functions.rem(16) functions.rem(24);
+  height: functions.rem(60);
+  padding: 0 functions.rem(16);
+  border-bottom: functions.rem(1) solid kit.$line;
+  background-color: kit.$white;
+
+  @media (min-width: 900px) {
+    padding: 0 functions.rem(24);
+  }
+}
+
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(8);
+
+  .logo {
+    width: functions.rem(26);
+    height: functions.rem(26);
+  }
+}
+
+.wordmark {
+  font-size: functions.rem(18);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: $ink;
+
+  .light {
+    font-weight: miscs.$css-ui-font-weight-regular;
+  }
+
+  @media (max-width: 700px) {
+    display: none;
+  }
+}
+
+.tabs {
+  display: flex;
+  align-self: stretch;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab {
+  flex: none;
+  padding: 0 functions.rem(12);
+  border: 0;
+  border-bottom: functions.rem(3) solid transparent;
+  background: none;
+  font: inherit;
+  font-size: functions.rem(15);
+  color: kit.$muted;
+  cursor: pointer;
+
+  &.active {
+    border-bottom-color: $ink;
+    font-weight: miscs.$css-ui-font-weight-bold;
+    color: $ink;
+  }
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(4);
+  margin-left: auto;
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(8);
+  margin-right: functions.rem(8);
+  font-size: functions.rem(13);
+  color: kit.$muted;
+
+  .dot {
+    @include kit.live-dot(kit.$green);
+  }
+
+  &.warning .dot {
+    @include kit.live-dot(kit.$red);
+  }
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+}
+
+.tool {
+  display: grid;
+  place-items: center;
+  width: functions.rem(36);
+  height: functions.rem(36);
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: $ink;
+  @include interaction.chip;
+}
+
+.page {
+  max-width: functions.rem(1240);
+  margin: 0 auto;
+  padding: functions.rem(20) functions.rem(16) functions.rem(64);
+
+  @media (min-width: 900px) {
+    padding: functions.rem(28) functions.rem(32) functions.rem(64);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Filters and figures
+// ---------------------------------------------------------------------------
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: functions.rem(6);
+  margin-bottom: functions.rem(20);
+}
+
+.chip {
+  padding: functions.rem(6) functions.rem(12);
+  border: functions.rem(1) solid #c9d3e2;
+  border-radius: functions.rem(16);
+  background-color: kit.$white;
+  font: inherit;
+  font-size: functions.rem(13);
+  color: $ink;
+  @include interaction.chip;
+
+  &.on {
+    border-color: $ink;
+    background-color: $ink;
+    color: kit.$white;
+  }
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(6);
+  margin-left: functions.rem(8);
+  font-size: functions.rem(13);
+  color: $ink;
+  cursor: pointer;
+
+  input {
+    accent-color: $ink;
+  }
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: functions.rem(12);
+  margin-bottom: functions.rem(16);
+
+  @media (min-width: 900px) {
+    grid-template-columns: 1.5fr repeat(3, minmax(0, 1fr));
+  }
+}
+
+.hero,
+.tile {
+  display: grid;
+  align-content: start;
+  gap: functions.rem(4);
+  padding: functions.rem(16) functions.rem(20);
+  border: functions.rem(1) solid $grid;
+  border-radius: functions.rem(8);
+  background-color: kit.$white;
+}
+
+.hero {
+  grid-column: 1 / -1;
+
+  @media (min-width: 900px) {
+    grid-column: auto;
+  }
+}
+
+.label {
+  font-size: functions.rem(13);
+  color: kit.$muted;
+}
+
+.hero-value {
+  font-size: functions.rem(52);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1;
+  color: $ink;
+}
+
+.sub {
+  font-size: functions.rem(13);
+  color: kit.$muted;
+}
+
+.tile strong {
+  font-size: functions.rem(26);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: $ink;
+}
+
+// ---------------------------------------------------------------------------
+// Charts
+// ---------------------------------------------------------------------------
+.grid {
+  display: grid;
+  gap: functions.rem(16);
+
+  @media (min-width: 1000px) {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.chart {
+  position: relative;
+  min-width: 0;
+  padding: functions.rem(18) functions.rem(20) functions.rem(16);
+  border: functions.rem(1) solid $grid;
+  border-radius: functions.rem(8);
+  background-color: kit.$white;
+
+  h2 {
+    margin: 0;
+    font-size: functions.rem(16);
+    font-weight: miscs.$css-ui-font-weight-bold;
+    color: $ink;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: functions.rem(8);
+    overflow: visible;
+  }
+
+  &.wide {
+    @media (min-width: 1000px) {
+      grid-column: span 1;
+    }
+  }
+}
+
+.desc {
+  margin: functions.rem(4) 0 0;
+  font-size: functions.rem(13);
+  color: kit.$muted;
+}
+
+.grid-line {
+  stroke: $grid;
+  stroke-width: 1;
+}
+
+.base {
+  stroke: #c9d3e2;
+  stroke-width: 1;
+}
+
+.axis {
+  font-size: 12px;
+  fill: kit.$muted;
+}
+
+.x-label {
+  display: block;
+  margin-top: functions.rem(2);
+  font-size: functions.rem(12);
+  color: kit.$muted;
+  text-align: center;
+}
+
+.hit {
+  fill: transparent;
+}
+
+.bar-hit,
+.dot-hit {
+  cursor: pointer;
+  outline: none;
+
+  &:focus-visible .bar,
+  &:focus-visible .dot {
+    stroke: $ink;
+    stroke-width: 2;
+  }
+}
+
+.bar {
+  fill: $series;
+  transition: fill 0.15s ease;
+
+  .bar-hit:hover & {
+    fill: #3a95c9;
+  }
+
+  &.selected {
+    fill: $selected;
+  }
+}
+
+.zone {
+  fill: rgba(213, 52, 25, 0.06);
+
+  &.easy {
+    fill: rgba(0, 135, 94, 0.06);
+  }
+}
+
+.zone-label {
+  font-size: 11px;
+  fill: kit.$muted;
+}
+
+.dot {
+  fill: $series;
+  stroke: kit.$white;
+  stroke-width: 2;
+  transition: r 0.15s ease;
+
+  &.off {
+    fill: #a6b4c9;
+  }
+
+  .dot-hit:hover & {
+    r: 7;
+  }
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  gap: functions.rem(2);
+  max-width: functions.rem(260);
+  padding: functions.rem(8) functions.rem(10);
+  border: functions.rem(1) solid $grid;
+  border-radius: functions.rem(6);
+  background-color: kit.$white;
+  box-shadow: 0 functions.rem(6) functions.rem(18) rgba(0, 50, 125, 0.16);
+  font-size: functions.rem(13);
+  color: kit.$muted;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - #{functions.rem(12)}));
+
+  strong {
+    font-size: functions.rem(15);
+    color: $ink;
+  }
+}
+
+// Horizontal bars, built in HTML
+.hbars {
+  display: grid;
+  gap: functions.rem(4);
+  margin: functions.rem(16) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hbar {
+  display: grid;
+  gap: functions.rem(6);
+  width: 100%;
+  padding: functions.rem(8);
+  border: 0;
+  border-radius: functions.rem(6);
+  background: none;
+  font: inherit;
+  text-align: left;
+  @include interaction.chip;
+
+  &.selected {
+    background-color: kit.$fill;
+
+    .hbar-fill {
+      background-color: $selected;
+    }
+  }
+}
+
+.hbar-label {
+  font-size: functions.rem(14);
+  color: $ink;
+
+  small {
+    margin-left: functions.rem(6);
+    color: kit.$muted;
+  }
+}
+
+.hbar-track {
+  position: relative;
+  display: block;
+  height: functions.rem(14);
+  margin-right: functions.rem(48);
+}
+
+.hbar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 0 functions.rem(4) functions.rem(4) 0;
+  background-color: $series;
+}
+
+.hbar-value {
+  position: absolute;
+  top: 50%;
+  padding-left: functions.rem(8);
+  font-size: functions.rem(13);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: $ink;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.recs ul {
+  display: grid;
+  gap: functions.rem(10);
+  margin: functions.rem(14) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recs li {
+  padding: functions.rem(12) functions.rem(14);
+  border-left: functions.rem(3) solid $series;
+  border-radius: 0 functions.rem(6) functions.rem(6) 0;
+  background-color: #f6f9fc;
+
+  p {
+    margin: 0 0 functions.rem(6);
+    font-size: functions.rem(14);
+    line-height: 1.45;
+    color: $ink;
+  }
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: functions.rem(13);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: $ink;
+  cursor: pointer;
+}
+
+// ---------------------------------------------------------------------------
+// Table
+// ---------------------------------------------------------------------------
+.table-card {
+  margin-top: functions.rem(16);
+  border: functions.rem(1) solid $grid;
+  border-radius: functions.rem(8);
+  background-color: kit.$white;
+  overflow-x: auto;
+  scroll-margin-top: functions.rem(80);
+}
+
+.table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: functions.rem(14) functions.rem(16);
+
+  h2 {
+    margin: 0;
+    font-size: functions.rem(16);
+    color: $ink;
+
+    span {
+      margin-left: functions.rem(6);
+      font-weight: miscs.$css-ui-font-weight-regular;
+      color: kit.$muted;
+    }
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: functions.rem(14);
+  color: $ink;
+}
+
+th,
+td {
+  padding: functions.rem(10) functions.rem(16);
+  border-top: functions.rem(1) solid $grid;
+  text-align: left;
+}
+
+th {
+  font-size: functions.rem(12);
+  color: kit.$muted;
+}
+
+.q small {
+  display: block;
+  color: kit.$green;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+
+  &.low {
+    font-weight: miscs.$css-ui-font-weight-bold;
+    color: kit.$red;
+  }
+}
+
+.state {
+  padding: functions.rem(2) functions.rem(10);
+  border: functions.rem(1) solid $grid;
+  border-radius: functions.rem(10);
+  background: none;
+  font: inherit;
+  font-size: functions.rem(12);
+  color: kit.$muted;
+  cursor: pointer;
+
+  &.on {
+    color: kit.$green;
+  }
+}
+
+.empty {
+  color: kit.$muted;
+  text-align: center;
+}

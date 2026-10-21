@@ -1,0 +1,379 @@
+<header class="top">
+  <span class="lockup">
+    <app-logo-mark class="logo" [inverse]="true" />
+    <span class="wordmark"><span class="light">play</span>duelio</span>
+  </span>
+  <h1 class="title">Mein Dashboard</h1>
+  <div class="tools">
+    @if (editing()) {
+      <button type="button" class="tool" (click)="reset()">Zurücksetzen</button>
+      <button type="button" class="tool strong" (click)="editing.set(false)">
+        Fertig
+      </button>
+    } @else {
+      <button type="button" class="tool" (click)="editing.set(true)">
+        <css-icon icon="resize" size="sm"></css-icon><span>Anpassen</span>
+      </button>
+      <button
+        type="button"
+        class="tool icon"
+        aria-label="Zum Spiel"
+        title="Zum Spiel"
+        (click)="openGame.emit()"
+      >
+        <css-icon icon="home" size="sm"></css-icon>
+      </button>
+      <button
+        type="button"
+        class="tool icon"
+        aria-label="Abmelden"
+        title="Abmelden"
+        (click)="logout.emit()"
+      >
+        <css-icon icon="logout" size="sm"></css-icon>
+      </button>
+    }
+  </div>
+</header>
+
+<main class="board" [class.editing]="editing()">
+  @if (editing()) {
+    <p class="edit-hint">
+      Widgets ziehen oder mit den Pfeilen verschieben, Grösse wechseln, entfernen.
+      Die Anordnung bleibt in diesem Browser gespeichert.
+    </p>
+  }
+
+  <div class="grid">
+    @for (w of layout(); track w.id; let i = $index) {
+      <section
+        class="widget"
+        [class]="'size-' + w.size + ' w-' + w.id"
+        [class.dragging]="dragging() === i"
+        [attr.draggable]="editing()"
+        [attr.aria-label]="titles[w.id]"
+        (dragstart)="dragStart($event, i)"
+        (dragover)="dragOver($event)"
+        (drop)="drop($event, i)"
+        (dragend)="dragging.set(null)"
+      >
+        <div class="w-head">
+          <h2>{{ titles[w.id] }}</h2>
+          @if (editing()) {
+            <div class="w-tools">
+              <button
+                type="button"
+                aria-label="Nach vorne"
+                [disabled]="i === 0"
+                (click)="shift(i, -1)"
+              >
+                <css-icon icon="angle-left" size="sm"></css-icon>
+              </button>
+              <button
+                type="button"
+                aria-label="Nach hinten"
+                [disabled]="i === layout().length - 1"
+                (click)="shift(i, 1)"
+              >
+                <css-icon icon="angle-right" size="sm"></css-icon>
+              </button>
+              <button
+                type="button"
+                class="size"
+                aria-label="Grösse wechseln"
+                (click)="resize(i)"
+              >
+                {{ w.size.toUpperCase() }}
+              </button>
+              <button type="button" aria-label="Entfernen" (click)="remove(i)">
+                <css-icon icon="close" size="sm"></css-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="w-body" [attr.inert]="editing() ? '' : null">
+          @switch (w.id) {
+            @case ('status') {
+              @if (store.stats(); as s) {
+                <div class="big" [class.bad]="!store.ready()">
+                  <span class="big-icon"
+                    ><css-icon
+                      [icon]="store.ready() ? 'checkmark' : 'priority-warning'"
+                    ></css-icon
+                  ></span>
+                  <div>
+                    <strong>{{ store.ready() ? 'Ja' : 'Nein' }}</strong>
+                    <span
+                      >{{ s.activeQuestions }} aktive Fragen, nötig
+                      {{ s.requiredQuestions }}</span
+                    >
+                  </div>
+                </div>
+              }
+            }
+            @case ('live') {
+              @if (store.stats(); as s) {
+                <dl class="trio">
+                  <div>
+                    <dt>Geräte</dt>
+                    <dd>{{ s.playersOnline }}</dd>
+                  </div>
+                  <div>
+                    <dt>Duelle</dt>
+                    <dd>{{ s.activeGames }}</dd>
+                  </div>
+                  <div>
+                    <dt>Suchen</dt>
+                    <dd>{{ s.playersSearching }}</dd>
+                  </div>
+                </dl>
+                <span class="pulse"><span class="dot"></span>Live</span>
+              }
+            }
+            @case ('today') {
+              @if (store.stats(); as s) {
+                <strong class="number">{{ s.gamesToday }}</strong>
+                <span class="muted"
+                  >Duelle heute · {{ s.gamesTotal }} insgesamt</span
+                >
+              }
+            }
+            @case ('quick') {
+              @let d = quick();
+              @let e = quickErrors();
+              <form class="quick" (submit)="$event.preventDefault(); addQuick()">
+                <input
+                  class="field"
+                  [class.bad]="!!e.text"
+                  placeholder="Frage"
+                  aria-label="Frage"
+                  [value]="d.text"
+                  (input)="quick.set({ ...d, text: typed($event) })"
+                />
+                <div class="quick-answers">
+                  @for (option of d.options; track $index; let i = $index) {
+                    <label
+                      class="quick-answer"
+                      [class.correct]="d.correctIndex === i"
+                    >
+                      <input
+                        type="radio"
+                        name="quick-correct"
+                        [checked]="d.correctIndex === i"
+                        [attr.aria-label]="'Antwort ' + letters[i] + ' ist richtig'"
+                        (change)="quick.set({ ...d, correctIndex: i })"
+                      />
+                      <span class="l">{{ letters[i] }}</span>
+                      <input
+                        class="field"
+                        [class.bad]="!!e.optionErrors?.[i]"
+                        [placeholder]="'Antwort ' + letters[i]"
+                        [attr.aria-label]="'Antwort ' + letters[i]"
+                        [value]="option"
+                        (input)="setQuickOption(i, typed($event))"
+                      />
+                    </label>
+                  }
+                </div>
+                <div class="quick-foot">
+                  <input
+                    class="field cat"
+                    list="widget-categories"
+                    placeholder="Kategorie"
+                    aria-label="Kategorie"
+                    [value]="d.category"
+                    (input)="quick.set({ ...d, category: typed($event) })"
+                  />
+                  <datalist id="widget-categories">
+                    @for (name of store.categories(); track name) {
+                      <option [value]="name"></option>
+                    }
+                  </datalist>
+                  <button type="submit" class="primary" [disabled]="quickSaving()">
+                    {{ quickSaving() ? 'Speichert …' : 'Hinzufügen' }}
+                  </button>
+                </div>
+                @if (e.text || e.options) {
+                  <span class="error">{{ e.text ?? e.options }}</span>
+                }
+                <span class="muted small"
+                  >Punkt links wählt die richtige Antwort.</span
+                >
+              </form>
+            }
+            @case ('questions') {
+              <input
+                class="field"
+                type="search"
+                placeholder="Fragen suchen"
+                aria-label="Fragen suchen"
+                [value]="search()"
+                (input)="search.set(typed($event))"
+              />
+              <ul class="rows">
+                @for (q of found(); track q.id) {
+                  <li class="row">
+                    <button
+                      type="button"
+                      class="row-main"
+                      (click)="store.openEditor(q)"
+                    >
+                      <span class="row-text">{{ q.text }}</span>
+                      <span class="muted small"
+                        >{{ q.category || 'Ohne Kategorie' }} ·
+                        {{ rate(q) === null ? 'neu' : rate(q) + ' %' }}</span
+                      >
+                    </button>
+                    <css-switch
+                      [label]="q.active ? 'An' : 'Aus'"
+                      [checked]="q.active"
+                      (change)="store.setActive(q, checked($event))"
+                    ></css-switch>
+                  </li>
+                }
+              </ul>
+              <button type="button" class="link" (click)="store.openEditor(null)">
+                + Neue Frage im Editor
+              </button>
+            }
+            @case ('rules') {
+              @if (store.form(); as f) {
+                <div class="rules">
+                  @for (item of ruleFields; track item.key) {
+                    <css-input-stepper
+                      [label]="item.label"
+                      [value]="'' + f[item.key]"
+                      [attr.min-number]="store.limit(item.key).min"
+                      [attr.max-number]="store.limit(item.key).max"
+                      [attr.error-message]="store.errors()[item.key] ?? null"
+                      (change)="setNumber(item.key, $event)"
+                    ></css-input-stepper>
+                  }
+                  <css-switch
+                    label="Tempo-Bonus"
+                    [checked]="f.speedBonusEnabled"
+                    (change)="store.setSpeedBonus(checked($event))"
+                  ></css-switch>
+                </div>
+                <div class="rules-foot">
+                  <span class="muted"
+                    >Duell max. {{ duration(store.gameSeconds()) }}</span
+                  >
+                  @if (store.dirty()) {
+                    <button
+                      type="button"
+                      class="ghost"
+                      (click)="store.discardSettings()"
+                    >
+                      Verwerfen
+                    </button>
+                    <button
+                      type="button"
+                      class="primary"
+                      [disabled]="!store.valid()"
+                      (click)="reviewing.set(true)"
+                    >
+                      Speichern
+                    </button>
+                  }
+                </div>
+              }
+            }
+            @case ('categories') {
+              <ul class="rows">
+                @for (c of store.categoryStats(); track c.name) {
+                  <li class="row">
+                    <span class="row-main static">
+                      <span class="row-text">{{ c.name || 'Ohne Kategorie' }}</span>
+                      <span class="muted small"
+                        >{{ c.active }}/{{ c.total }} aktiv</span
+                      >
+                    </span>
+                    <css-switch
+                      [label]="c.active ? 'An' : 'Aus'"
+                      [checked]="c.active > 0"
+                      (change)="pro.setCategoryActive(c.name, checked($event))"
+                    ></css-switch>
+                  </li>
+                }
+              </ul>
+            }
+            @case ('quality') {
+              <ul class="rows">
+                @for (issue of pro.issues(); track issue.kind) {
+                  <li class="row">
+                    <span class="row-main static">
+                      <span class="row-text">{{ issue.title }}</span>
+                    </span>
+                    <span class="count" [class.zero]="!issue.ids.length">{{
+                      issue.ids.length
+                    }}</span>
+                  </li>
+                }
+              </ul>
+            }
+            @case ('recent') {
+              <ul class="rows">
+                @for (q of recent(); track q.id) {
+                  <li class="row">
+                    <button
+                      type="button"
+                      class="row-main"
+                      (click)="store.openEditor(q)"
+                    >
+                      <span class="row-text">{{ q.text }}</span>
+                      <span class="muted small">{{ date(q.updatedAt) }}</span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+            @case ('files') {
+              <div class="buttons">
+                <button type="button" class="ghost" (click)="importing.set(true)">
+                  CSV importieren
+                </button>
+                <button type="button" class="ghost" (click)="pro.exportCsv()">
+                  CSV exportieren
+                </button>
+                <button type="button" class="ghost" (click)="store.importSamples()">
+                  Beispielfragen
+                </button>
+                <button
+                  type="button"
+                  class="ghost danger"
+                  (click)="store.confirm.set({ kind: 'delete-all' })"
+                >
+                  Alle löschen
+                </button>
+              </div>
+            }
+          }
+        </div>
+      </section>
+    }
+  </div>
+
+  @if (editing() && hidden().length) {
+    <section class="gallery" aria-label="Widget hinzufügen">
+      <h2>Widget hinzufügen</h2>
+      <div class="gallery-grid">
+        @for (w of hidden(); track w.id) {
+          <button type="button" class="gallery-item" (click)="add(w.id)">
+            <strong>+ {{ w.title }}</strong>
+            <span>{{ w.text }}</span>
+          </button>
+        }
+      </div>
+    </section>
+  }
+</main>
+
+@if (importing()) {
+  <app-import-dialog (dismiss)="importing.set(false)" />
+}
+@if (reviewing()) {
+  <app-save-rules-dialog (dismiss)="reviewing.set(false)" />
+}
+<app-proposal-dialogs />

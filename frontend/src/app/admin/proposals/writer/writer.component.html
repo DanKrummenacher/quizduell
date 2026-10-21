@@ -1,0 +1,186 @@
+<header class="top">
+  <span class="lockup">
+    <app-logo-mark class="logo" />
+    <span class="wordmark"><span class="light">play</span>duelio</span>
+    <span class="mode">Schreibmodus</span>
+  </span>
+  <div class="tools">
+    @if (store.stats(); as s) {
+      <span class="live" [class.warning]="store.ready() === false">
+        <span class="dot"></span>{{ s.activeQuestions }} aktiv ·
+        {{ s.activeGames }} Duelle laufen
+      </span>
+    }
+    <button type="button" class="tool" (click)="rulesOpen.set(true)">
+      <css-icon icon="settings" size="sm"></css-icon><span>Spielregeln</span>
+    </button>
+    <button
+      type="button"
+      class="tool icon"
+      aria-label="Zum Spiel"
+      title="Zum Spiel"
+      (click)="openGame.emit()"
+    >
+      <css-icon icon="home" size="sm"></css-icon>
+    </button>
+    <button
+      type="button"
+      class="tool icon"
+      aria-label="Abmelden"
+      title="Abmelden"
+      (click)="logout.emit()"
+    >
+      <css-icon icon="logout" size="sm"></css-icon>
+    </button>
+  </div>
+</header>
+
+<main class="desk">
+  <!-- The text -->
+  <section class="paper" aria-label="Text">
+    <div class="paper-bar">
+      <button type="button" class="chip" (click)="loadCatalogue()">
+        <css-icon icon="document" size="sm"></css-icon>Ganzen Katalog laden
+      </button>
+      <button type="button" class="chip" (click)="insertExample()">
+        <css-icon icon="add" size="sm"></css-icon>Vorlage einfügen
+      </button>
+      @if (text()) {
+        <button type="button" class="chip" (click)="clear()">Leeren</button>
+      }
+    </div>
+
+    <div class="editor-wrap">
+      <div #gutter class="gutter" aria-hidden="true">
+        @for (n of lines(); track n) {
+          <span>{{ n }}</span>
+        }
+      </div>
+      <textarea
+        #editor
+        class="editor"
+        spellcheck="false"
+        aria-label="Fragen als Text"
+        placeholder="? Wie viele Kantone hat die Schweiz?&#10;- 23&#10;- 24&#10;+ 26&#10;- 28"
+        [value]="text()"
+        (input)="setText(editor.value)"
+        (keydown)="onKey($event)"
+        (scroll)="gutter.scrollTop = editor.scrollTop"
+      ></textarea>
+    </div>
+
+    <dl class="legend">
+      <div>
+        <dt># Logik</dt>
+        <dd>Kategorie für die folgenden Fragen</dd>
+      </div>
+      <div>
+        <dt>? Frage</dt>
+        <dd>Beginnt eine Frage; <code>&#64;12</code> am Ende = bestehende Frage</dd>
+      </div>
+      <div>
+        <dt>+ / -</dt>
+        <dd>Richtige / falsche Antwort, genau vier</dd>
+      </div>
+      <div>
+        <dt>! pausiert</dt>
+        <dd>Frage nicht im Spiel</dd>
+      </div>
+    </dl>
+  </section>
+
+  <!-- The live check -->
+  <section class="check" aria-label="Prüfung">
+    <div class="check-head">
+      <h2>Was passiert</h2>
+      <div class="counts">
+        <span class="c new">{{ summary().new }} neu</span>
+        <span class="c changed">{{ summary().changed }} geändert</span>
+        <span class="c same">{{ summary().same }} unverändert</span>
+        @if (summary().error) {
+          <span class="c error">{{ summary().error }} mit Fehlern</span>
+        }
+      </div>
+    </div>
+
+    <ul class="blocks">
+      @for (block of blocks(); track block.line) {
+        @if (block.state !== 'same') {
+          <li>
+            <button
+              type="button"
+              class="block"
+              [class]="block.state"
+              (click)="reveal(block)"
+            >
+              <span class="block-head">
+                <span class="state">{{
+                  block.state === 'new'
+                    ? 'Neu'
+                    : block.state === 'changed'
+                      ? 'Geändert'
+                      : 'Fehler'
+                }}</span>
+                <span class="line"
+                  >Zeile {{ block.line
+                  }}{{ block.id ? ' · @' + block.id : '' }}</span
+                >
+              </span>
+              <span class="q">{{ block.draft.text || 'Ohne Text' }}</span>
+              <span class="answers">
+                @for (option of block.draft.options; track $index; let i = $index) {
+                  <span
+                    class="a"
+                    [class.correct]="
+                      i === block.draft.correctIndex && !block.errors.length
+                    "
+                  >
+                    <b>{{ letters[i] }}</b
+                    >{{ option || '–' }}
+                  </span>
+                }
+              </span>
+              @for (error of block.errors; track error) {
+                <span class="err">{{ error }}</span>
+              }
+              <span class="meta">
+                {{ block.draft.category || 'Ohne Kategorie'
+                }}{{ block.draft.active ? '' : ' · pausiert' }}
+              </span>
+            </button>
+          </li>
+        }
+      } @empty {
+        <li class="hint">
+          Schreib eine Frage oder lade den ganzen Katalog. Hier siehst du sofort, was
+          beim Übernehmen passiert.
+        </li>
+      }
+    </ul>
+
+    <div class="apply">
+      @if (applying(); as p) {
+        <span>Übernehme {{ p.done }} / {{ p.total }} …</span>
+      } @else {
+        <span class="apply-hint">
+          @if (summary().error) {
+            Fehlerhafte Fragen werden nicht übernommen.
+          } @else {
+            Nichts wird gelöscht. <kbd>⌘</kbd><kbd>S</kbd> übernimmt.
+          }
+        </span>
+      }
+      <button
+        type="button"
+        class="apply-button"
+        [disabled]="!(summary().new + summary().changed) || !!applying()"
+        (click)="apply()"
+      >
+        {{ summary().new + summary().changed }} übernehmen
+      </button>
+    </div>
+  </section>
+</main>
+
+<app-rules-drawer [open]="rulesOpen()" (dismiss)="rulesOpen.set(false)" />
+<app-proposal-dialogs />
