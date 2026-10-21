@@ -1,0 +1,499 @@
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
+@use '../kit';
+
+$grid: #d5deea;
+$status: functions.rem(36);
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding-top: var(--app-safe-top);
+  background-color: kit.$white;
+  font-size: functions.rem(14);
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: functions.rem(8);
+  padding: functions.rem(10) functions.rem(16);
+  border-bottom: functions.rem(1) solid $grid;
+}
+
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(8);
+
+  .logo {
+    width: functions.rem(24);
+    height: functions.rem(24);
+  }
+}
+
+.wordmark {
+  font-size: functions.rem(17);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$blue;
+
+  .light {
+    font-weight: miscs.$css-ui-font-weight-regular;
+  }
+}
+
+.file {
+  padding-left: functions.rem(10);
+  border-left: functions.rem(1) solid $grid;
+  color: kit.$muted;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: functions.rem(2);
+}
+
+.tool {
+  padding: functions.rem(6) functions.rem(10);
+  border: 0;
+  border-radius: functions.rem(4);
+  background: none;
+  font: inherit;
+  color: kit.$blue;
+  @include interaction.chip;
+}
+
+// ---------------------------------------------------------------------------
+// Rules line
+// ---------------------------------------------------------------------------
+.rules {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: functions.rem(6);
+  padding: functions.rem(8) functions.rem(16);
+  border-bottom: functions.rem(1) solid $grid;
+  background-color: #f7f9fc;
+}
+
+.fx {
+  padding: functions.rem(4) functions.rem(8);
+  border-radius: functions.rem(4);
+  background-color: kit.$blue;
+  font-size: functions.rem(12);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$white;
+}
+
+.rule {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(6);
+  height: functions.rem(32);
+  padding: 0 functions.rem(8);
+  border: functions.rem(1) solid $grid;
+  border-radius: functions.rem(4);
+  background-color: kit.$white;
+  color: kit.$muted;
+
+  input[type='number'] {
+    width: functions.rem(44);
+    border: 0;
+    outline: none;
+    background: none;
+    font: inherit;
+    font-weight: miscs.$css-ui-font-weight-bold;
+    color: kit.$blue;
+    text-align: right;
+  }
+
+  em {
+    font-style: normal;
+  }
+
+  &:focus-within {
+    border-color: kit.$blue;
+  }
+
+  &.bad {
+    border-color: kit.$red;
+  }
+
+  &.check {
+    cursor: pointer;
+    color: kit.$blue;
+  }
+}
+
+.rule-actions {
+  display: inline-flex;
+  gap: functions.rem(4);
+  margin-left: auto;
+}
+
+.mini {
+  height: functions.rem(32);
+  padding: 0 functions.rem(12);
+  border: functions.rem(1) solid kit.$blue;
+  border-radius: functions.rem(4);
+  background-color: kit.$white;
+  font: inherit;
+  color: kit.$blue;
+  cursor: pointer;
+
+  &.primary {
+    background-color: kit.$blue;
+    color: kit.$white;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.filterbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: functions.rem(8) functions.rem(16);
+  padding: functions.rem(8) functions.rem(16);
+}
+
+.find {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(6);
+  height: functions.rem(34);
+  padding: 0 functions.rem(10);
+  border: functions.rem(1) solid $grid;
+  border-radius: functions.rem(4);
+  color: kit.$blue;
+
+  input {
+    width: functions.rem(220);
+    border: 0;
+    outline: none;
+    font: inherit;
+    color: kit.$blue;
+  }
+
+  &:focus-within {
+    border-color: kit.$blue;
+  }
+}
+
+.tip {
+  font-size: functions.rem(12);
+  color: kit.$muted;
+
+  @media (hover: none) {
+    display: none;
+  }
+}
+
+kbd {
+  padding: 0 functions.rem(4);
+  border: functions.rem(1) solid $grid;
+  border-radius: functions.rem(3);
+  font: inherit;
+}
+
+// ---------------------------------------------------------------------------
+// The grid
+// ---------------------------------------------------------------------------
+.scroller {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding-bottom: calc(#{$status} + var(--app-safe-bottom) + #{functions.rem(16)});
+}
+
+.grid {
+  width: 100%;
+  min-width: functions.rem(1180);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th,
+td {
+  height: functions.rem(38);
+  padding: 0;
+  border-right: functions.rem(1) solid $grid;
+  border-bottom: functions.rem(1) solid $grid;
+  text-align: left;
+  vertical-align: middle;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 0 functions.rem(10);
+  background-color: #eef2f8;
+  font-size: functions.rem(12);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$muted;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: functions.rem(4);
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-transform: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+  }
+}
+
+.sort::after {
+  content: '↕';
+  font-style: normal;
+  opacity: 0.4;
+}
+
+[aria-sort='ascending'] .sort::after {
+  content: '↑';
+  opacity: 1;
+}
+
+[aria-sort='descending'] .sort::after {
+  content: '↓';
+  opacity: 1;
+}
+
+// The first column stays in view when scrolling sideways.
+.c-state {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: functions.rem(48);
+  background-color: #eef2f8;
+  text-align: center;
+
+  thead & {
+    z-index: 3;
+  }
+}
+
+.c-text {
+  min-width: functions.rem(320);
+}
+
+.c-answer {
+  width: functions.rem(150);
+
+  &.correct {
+    background-color: #e5f3ee;
+
+    .cell {
+      font-weight: miscs.$css-ui-font-weight-bold;
+      color: kit.$green;
+    }
+  }
+}
+
+.c-cat {
+  width: functions.rem(140);
+}
+
+.c-num {
+  width: functions.rem(84);
+  padding: 0 functions.rem(10);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: kit.$blue;
+
+  &.low {
+    color: kit.$red;
+    font-weight: miscs.$css-ui-font-weight-bold;
+  }
+}
+
+.c-act {
+  width: functions.rem(76);
+  padding: 0 functions.rem(4);
+  white-space: nowrap;
+}
+
+tbody tr {
+  &:hover td {
+    background-color: #fafcff;
+  }
+
+  &:hover .c-state {
+    background-color: #e6ecf5;
+  }
+
+  &.off .cell {
+    color: kit.$muted;
+  }
+
+  &.dirty .c-state {
+    box-shadow: inset functions.rem(3) 0 0 #ffc015;
+  }
+
+  &.new td {
+    background-color: #fffbea;
+  }
+}
+
+td.error {
+  box-shadow: inset 0 0 0 functions.rem(2) kit.$red;
+}
+
+.cell {
+  width: 100%;
+  height: functions.rem(37);
+  padding: 0 functions.rem(10);
+  border: 0;
+  outline: none;
+  background: none;
+  font: inherit;
+  color: kit.$blue;
+  text-overflow: ellipsis;
+
+  &:focus {
+    position: relative;
+    z-index: 1;
+    background-color: kit.$white;
+    box-shadow: inset 0 0 0 functions.rem(2) kit.$blue;
+  }
+}
+
+.answer {
+  display: flex;
+  align-items: center;
+  padding-left: functions.rem(8);
+}
+
+.pick {
+  flex: none;
+  width: functions.rem(14);
+  height: functions.rem(14);
+  padding: 0;
+  border: functions.rem(2) solid #8098be;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+
+  &[aria-pressed='true'] {
+    border-color: kit.$green;
+    background-color: kit.$green;
+    box-shadow: inset 0 0 0 functions.rem(2) kit.$white;
+  }
+}
+
+.state {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: functions.rem(37);
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: functions.rem(12);
+  color: kit.$muted;
+  cursor: pointer;
+
+  .row-no {
+    position: relative;
+    padding-left: functions.rem(12);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: functions.rem(7);
+      height: functions.rem(7);
+      margin-top: functions.rem(-3.5);
+      border: functions.rem(1) solid #8098be;
+      border-radius: 50%;
+    }
+  }
+
+  &.on .row-no::before {
+    border-color: kit.$green;
+    background-color: kit.$green;
+  }
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+  width: functions.rem(32);
+  height: functions.rem(32);
+  border: 0;
+  border-radius: functions.rem(4);
+  background: none;
+  color: kit.$blue;
+  @include interaction.chip;
+
+  &.save {
+    background-color: kit.$green;
+    color: kit.$white;
+  }
+}
+
+.add-row {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(6);
+  margin: functions.rem(8) functions.rem(16);
+  padding: functions.rem(6) functions.rem(10);
+  border: 0;
+  border-radius: functions.rem(4);
+  background: none;
+  font: inherit;
+  color: kit.$blue;
+  @include interaction.chip;
+}
+
+// ---------------------------------------------------------------------------
+// Status bar
+// ---------------------------------------------------------------------------
+.status {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: functions.rem(20);
+  height: calc(#{$status} + var(--app-safe-bottom));
+  padding: 0 functions.rem(16) var(--app-safe-bottom);
+  overflow-x: auto;
+  background-color: kit.$blue;
+  font-size: functions.rem(12);
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+}
+
+.unsaved {
+  color: #ffc015;
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(6);
+  margin-left: auto;
+
+  .dot {
+    @include kit.live-dot;
+  }
+
+  &.warning .dot {
+    @include kit.live-dot(#ffc015);
+  }
+}

@@ -1,0 +1,278 @@
+<header class="top">
+  <span class="lockup">
+    <app-logo-mark class="logo" />
+    <span class="wordmark"><span class="light">play</span>duelio</span>
+  </span>
+  <div class="top-links">
+    <button type="button" class="link" (click)="openGame.emit()">Zum Spiel</button>
+    <button type="button" class="link" (click)="logout.emit()">Abmelden</button>
+  </div>
+</header>
+
+<main class="main">
+  <!-- How ready the stand is -->
+  <section class="hero">
+    <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+      <circle class="ring-track" cx="60" cy="60" r="52" />
+      <circle
+        class="ring-value"
+        cx="60"
+        cy="60"
+        r="52"
+        [attr.stroke-dasharray]="ring().circumference"
+        [attr.stroke-dashoffset]="ring().offset"
+      />
+    </svg>
+    <div class="ring-text" aria-hidden="true">
+      <strong>{{ doneCount() }}/{{ steps().length }}</strong>
+      <span>erledigt</span>
+    </div>
+    <div class="hero-text">
+      <span class="eyebrow">Stand-Check</span>
+      <h1 class="title">
+        @if (doneCount() === steps().length) {
+          Alles bereit für die Messe
+        } @else {
+          Noch {{ steps().length - doneCount() }}
+          {{ steps().length - doneCount() === 1 ? 'Punkt' : 'Punkte' }} offen
+        }
+      </h1>
+      <p class="lead">Geh die Schritte durch – was erledigt ist, wird grün.</p>
+    </div>
+  </section>
+
+  <ol class="steps">
+    @for (step of steps(); track step.key; let i = $index) {
+      <li class="step" [class.done]="step.done" [class.open]="open() === step.key">
+        <button
+          type="button"
+          class="step-head"
+          [attr.aria-expanded]="open() === step.key"
+          (click)="toggleStep(step.key)"
+        >
+          <span class="number">
+            @if (step.done) {
+              <css-icon icon="checkmark" size="sm"></css-icon>
+            } @else {
+              {{ i + 1 }}
+            }
+          </span>
+          <span class="step-text">
+            <span class="step-title">{{ step.title }}</span>
+            <span class="step-summary">{{
+              step.done ? step.summary : step.todo
+            }}</span>
+          </span>
+          <css-icon class="chevron" icon="angle-down" size="sm"></css-icon>
+        </button>
+
+        @if (open() === step.key) {
+          <div class="step-body">
+            @switch (step.key) {
+              @case ('questions') {
+                <ul class="cats">
+                  @for (group of groups(); track group.name) {
+                    <li class="cat">
+                      <div class="cat-head">
+                        <button
+                          type="button"
+                          class="cat-toggle"
+                          [attr.aria-expanded]="openCategory() === group.name"
+                          (click)="
+                            openCategory.set(
+                              openCategory() === group.name ? null : group.name
+                            )
+                          "
+                        >
+                          <span class="cat-name">{{
+                            group.name || 'Ohne Kategorie'
+                          }}</span>
+                          <span class="cat-meta">
+                            {{ group.active }} von {{ group.total }} im Spiel
+                            @if (group.rate !== null) {
+                              · {{ group.rate }} % richtig
+                            }
+                          </span>
+                        </button>
+                        <css-switch
+                          label="Im Spiel"
+                          [checked]="group.active > 0"
+                          (change)="setGroup(group.questions, $event)"
+                        ></css-switch>
+                      </div>
+                      @if (openCategory() === group.name) {
+                        <ul class="qs">
+                          @for (q of group.questions; track q.id) {
+                            <li class="q" [class.off]="!q.active">
+                              <button
+                                type="button"
+                                class="q-text"
+                                (click)="store.openEditor(q)"
+                              >
+                                {{ q.text }}
+                              </button>
+                              <css-switch
+                                [label]="q.active ? 'An' : 'Aus'"
+                                [checked]="q.active"
+                                (change)="toggle(q, $event)"
+                              ></css-switch>
+                            </li>
+                          }
+                        </ul>
+                      }
+                    </li>
+                  }
+                </ul>
+                <div class="actions">
+                  <css-button variant="primary" (click)="store.openEditor(null)">
+                    <css-icon icon="add" slot="prefix"></css-icon>
+                    Neue Frage
+                  </css-button>
+                  <css-button
+                    [loading]="store.busy()"
+                    (click)="store.importSamples()"
+                  >
+                    <css-icon icon="download" slot="prefix"></css-icon>
+                    Beispielfragen
+                  </css-button>
+                  @if (store.counts().total > 0) {
+                    <css-button
+                      variant="plain"
+                      (click)="store.confirm.set({ kind: 'delete-all' })"
+                    >
+                      Alle löschen
+                    </css-button>
+                  }
+                </div>
+              }
+
+              @case ('rules') {
+                @if (store.form(); as f) {
+                  <p class="body-lead">
+                    Eine Runde: Ziehe die Enden, um die Zeit zum Antworten und für
+                    die Auflösung festzulegen.
+                  </p>
+                  <app-round-editor />
+                  <div class="rules-row">
+                    <css-input-stepper
+                      label="Runden pro Duell"
+                      [value]="'' + f.questionsPerGame"
+                      [attr.min-number]="store.limit('questionsPerGame').min"
+                      [attr.max-number]="store.limit('questionsPerGame').max"
+                      [attr.error-message]="store.errors().questionsPerGame ?? null"
+                      (change)="setNumber('questionsPerGame', $event)"
+                    ></css-input-stepper>
+                    <css-switch
+                      label="Tempo-Bonus"
+                      hint="Bis zu 100 Zusatzpunkte für schnelle Antworten"
+                      [checked]="f.speedBonusEnabled"
+                      (change)="setBonus($event)"
+                    ></css-switch>
+                  </div>
+                  @if (store.valid()) {
+                    <div class="whole">
+                      <span class="eyebrow">Das ganze Duell</span>
+                      <app-duel-timeline
+                        [segments]="store.timeline()"
+                        [seconds]="store.gameSeconds()"
+                        [showLabels]="f.questionsPerGame <= 5"
+                      />
+                    </div>
+                  }
+                  @if (store.questionWarning(); as warning) {
+                    <p class="warning">{{ warning }}</p>
+                  }
+                }
+              }
+
+              @case ('devices') {
+                @if (store.form(); as f) {
+                  <div class="rules-row">
+                    <css-input-stepper
+                      label="Zurück zum Start nach (Sekunden)"
+                      hint="Ohne Bedienung springt ein Gerät zur Startseite. 0 = aus."
+                      [value]="'' + f.idleResetSec"
+                      [attr.min-number]="store.limit('idleResetSec').min"
+                      [attr.max-number]="store.limit('idleResetSec').max"
+                      [attr.error-message]="store.errors().idleResetSec ?? null"
+                      (change)="setNumber('idleResetSec', $event)"
+                    ></css-input-stepper>
+                    <css-input-stepper
+                      label="Zeit für die Revanche (Sekunden)"
+                      hint="Nach dem Duell können beide eine Revanche fordern."
+                      [value]="'' + f.rematchTimeoutSec"
+                      [attr.min-number]="store.limit('rematchTimeoutSec').min"
+                      [attr.max-number]="store.limit('rematchTimeoutSec').max"
+                      [attr.error-message]="store.errors().rematchTimeoutSec ?? null"
+                      (change)="setNumber('rematchTimeoutSec', $event)"
+                    ></css-input-stepper>
+                  </div>
+                  <css-button (click)="openGame.emit()">
+                    <css-icon icon="ipad" slot="prefix"></css-icon>
+                    Startseite auf diesem Gerät öffnen
+                  </css-button>
+                }
+              }
+
+              @case ('live') {
+                @if (store.stats(); as s) {
+                  <dl class="live">
+                    <div>
+                      <dt>Geräte</dt>
+                      <dd>{{ s.playersOnline }}</dd>
+                    </div>
+                    <div>
+                      <dt>Duelle jetzt</dt>
+                      <dd>{{ s.activeGames }}</dd>
+                    </div>
+                    <div>
+                      <dt>Suchen Gegner</dt>
+                      <dd>{{ s.playersSearching }}</dd>
+                    </div>
+                    <div>
+                      <dt>Duelle heute</dt>
+                      <dd>{{ s.gamesToday }}</dd>
+                    </div>
+                  </dl>
+                  @if (store.hardest().length > 0) {
+                    <p class="body-lead">Am häufigsten falsch beantwortet:</p>
+                    <ul class="hard">
+                      @for (q of store.hardest(); track q.id) {
+                        <li>
+                          <button type="button" (click)="store.openEditor(q)">
+                            <strong>{{ rate(q) }} %</strong> {{ q.text }}
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+                }
+              }
+            }
+          </div>
+        }
+      </li>
+    }
+  </ol>
+
+  @if (store.dirty()) {
+    <div class="savebar" role="region" aria-label="Ungespeicherte Änderungen">
+      <span>Spielregeln geändert – gilt ab dem nächsten Duell</span>
+      <div class="savebar-actions">
+        <css-button [disabled]="store.saving()" (click)="store.discardSettings()"
+          >Verwerfen</css-button
+        >
+        <css-button
+          variant="primary"
+          [disabled]="!store.valid()"
+          [loading]="store.saving()"
+          (click)="store.saveSettings()"
+        >
+          Speichern
+        </css-button>
+      </div>
+    </div>
+  }
+</main>
+
+<app-proposal-dialogs />

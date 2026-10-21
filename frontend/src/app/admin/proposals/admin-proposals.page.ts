@@ -2,8 +2,14 @@
 import { Component, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
 import { AdminAuthService } from '../admin-auth.service';
+import { BoardComponent } from './board/board.component';
+import { CheckComponent } from './check/check.component';
 import { CockpitComponent } from './cockpit/cockpit.component';
+import { MonitorComponent } from './monitor/monitor.component';
 import { ProposalStore } from './proposal-store';
+import { ReviewComponent } from './review/review.component';
+import { SheetComponent } from './sheet/sheet.component';
+import { SpotlightComponent } from './spotlight/spotlight.component';
 import { StageComponent } from './stage/stage.component';
 import { StudioComponent } from './studio/studio.component';
 
@@ -11,11 +17,27 @@ const PROPOSALS = [
   { value: 'a', label: 'A · Cockpit' },
   { value: 'b', label: 'B · Messe-Leitstand' },
   { value: 'c', label: 'C · Fragen-Studio' },
+  { value: 'd', label: 'D · Spotlight' },
+  { value: 'e', label: 'E · Board' },
+  { value: 'f', label: 'F · Stand-Check' },
+  { value: 'g', label: 'G · Monitor' },
+  { value: 'h', label: 'H · Review' },
+  { value: 'i', label: 'I · Tabelle' },
 ];
 
 @Component({
   selector: 'app-admin-proposals-page',
-  imports: [CockpitComponent, StageComponent, StudioComponent],
+  imports: [
+    BoardComponent,
+    CheckComponent,
+    CockpitComponent,
+    MonitorComponent,
+    ReviewComponent,
+    SheetComponent,
+    SpotlightComponent,
+    StageComponent,
+    StudioComponent,
+  ],
   providers: [ProposalStore],
   template: `
     @switch (v()) {
@@ -24,6 +46,24 @@ const PROPOSALS = [
       }
       @case ('c') {
         <app-studio (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('d') {
+        <app-spotlight (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('e') {
+        <app-board (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('f') {
+        <app-check (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('g') {
+        <app-monitor (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('h') {
+        <app-review (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('i') {
+        <app-sheet (openGame)="openGame()" (logout)="logout()" />
       }
       @default {
         <app-cockpit (openGame)="openGame()" (logout)="logout()" />
@@ -51,6 +91,8 @@ const PROPOSALS = [
       position: fixed;
       right: 0.75rem;
       bottom: calc(var(--app-safe-bottom) + 5.5rem);
+      max-height: calc(100dvh - 7rem);
+      overflow-y: auto;
       z-index: 30;
       padding: 0.5rem 0.875rem;
       border: 1px solid #00327d;

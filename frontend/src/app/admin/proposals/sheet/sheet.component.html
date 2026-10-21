@@ -1,0 +1,268 @@
+<header class="top">
+  <span class="lockup">
+    <app-logo-mark class="logo" />
+    <span class="wordmark"><span class="light">play</span>duelio</span>
+    <span class="file">Fragen.tabelle</span>
+  </span>
+  <div class="tools">
+    <button type="button" class="tool" (click)="store.importSamples()">
+      Beispielfragen
+    </button>
+    <button
+      type="button"
+      class="tool"
+      (click)="store.confirm.set({ kind: 'delete-all' })"
+    >
+      Alle löschen
+    </button>
+    <button type="button" class="tool" (click)="openGame.emit()">Zum Spiel</button>
+    <button type="button" class="tool" (click)="logout.emit()">Abmelden</button>
+  </div>
+</header>
+
+<!-- The rules as a line of values, like a formula bar -->
+@if (store.form(); as f) {
+  <div class="rules" role="group" aria-label="Spielregeln">
+    <span class="fx">Regeln</span>
+    @for (item of fields; track item.key) {
+      <label
+        class="rule"
+        [class.bad]="!!store.errors()[item.key]"
+        [title]="item.hint"
+      >
+        <span>{{ item.short }}</span>
+        <input
+          type="number"
+          inputmode="numeric"
+          [min]="store.limit(item.key).min"
+          [max]="store.limit(item.key).max"
+          [value]="f[item.key]"
+          (input)="setSetting(item.key, $event)"
+        />
+        @if (item.unit) {
+          <em>{{ item.unit }}</em>
+        }
+      </label>
+    }
+    <label class="rule check">
+      <input
+        type="checkbox"
+        [checked]="f.speedBonusEnabled"
+        (change)="store.setSpeedBonus(!f.speedBonusEnabled)"
+      />
+      <span>Tempo-Bonus</span>
+    </label>
+    @if (store.dirty()) {
+      <span class="rule-actions">
+        <button type="button" class="mini" (click)="store.discardSettings()">
+          Verwerfen
+        </button>
+        <button
+          type="button"
+          class="mini primary"
+          [disabled]="!store.valid() || store.saving()"
+          (click)="store.saveSettings()"
+        >
+          Speichern
+        </button>
+      </span>
+    }
+  </div>
+}
+
+<div class="filterbar">
+  <label class="find">
+    <css-icon icon="search" size="sm"></css-icon>
+    <input
+      type="search"
+      placeholder="In allen Zellen suchen"
+      [value]="filter()"
+      (input)="filter.set(value($event))"
+    />
+  </label>
+  <span class="tip"
+    >Zelle anklicken und tippen · <kbd>Enter</kbd> speichert die Zeile ·
+    <kbd>Esc</kbd> verwirft</span
+  >
+</div>
+
+<div class="scroller">
+  <table class="grid">
+    <thead>
+      <tr>
+        <th class="c-state" scope="col">
+          <span class="visually-hidden">Aktiv</span>
+        </th>
+        <th class="c-text" scope="col" [attr.aria-sort]="sortState('text')">
+          <button type="button" (click)="toggleSort('text')">
+            Frage <i class="sort"></i>
+          </button>
+        </th>
+        @for (letter of letters; track letter) {
+          <th class="c-answer" scope="col">{{ letter }}</th>
+        }
+        <th class="c-cat" scope="col" [attr.aria-sort]="sortState('category')">
+          <button type="button" (click)="toggleSort('category')">
+            Kategorie <i class="sort"></i>
+          </button>
+        </th>
+        <th class="c-num" scope="col" [attr.aria-sort]="sortState('rate')">
+          <button type="button" (click)="toggleSort('rate')">
+            Quote <i class="sort"></i>
+          </button>
+        </th>
+        <th class="c-num" scope="col" [attr.aria-sort]="sortState('asked')">
+          <button type="button" (click)="toggleSort('asked')">
+            Gestellt <i class="sort"></i>
+          </button>
+        </th>
+        <th class="c-act" scope="col">
+          <span class="visually-hidden">Aktionen</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.id; let n = $index) {
+        @let active = row.question ? row.question.active : row.draft.active;
+        @let r = row.question ? rate(row.question) : null;
+        <tr
+          [class.dirty]="row.dirty"
+          [class.off]="!active"
+          [class.new]="row.id === 'new'"
+        >
+          <td class="c-state">
+            <button
+              type="button"
+              class="state"
+              [class.on]="active"
+              [attr.aria-pressed]="active"
+              [attr.aria-label]="
+                active ? 'Aktiv – pausieren' : 'Pausiert – aktivieren'
+              "
+              (click)="toggleActive(row)"
+            >
+              <span class="row-no">{{ row.id === 'new' ? '+' : n + 1 }}</span>
+            </button>
+          </td>
+          <td
+            class="c-text"
+            [class.error]="!!row.errors.text"
+            [title]="row.errors.text ?? ''"
+          >
+            <input
+              class="cell"
+              aria-label="Frage"
+              [value]="row.draft.text"
+              (input)="edit(row, { text: value($event) })"
+              (keydown)="onKey($event, row)"
+            />
+          </td>
+          @for (option of row.draft.options; track $index; let i = $index) {
+            <td
+              class="c-answer"
+              [class.correct]="row.draft.correctIndex === i"
+              [class.error]="!!row.errors.optionErrors?.[i]"
+              [title]="row.errors.optionErrors?.[i] ?? ''"
+            >
+              <span class="answer">
+                <button
+                  type="button"
+                  class="pick"
+                  [attr.aria-pressed]="row.draft.correctIndex === i"
+                  [attr.aria-label]="'Antwort ' + letters[i] + ' ist richtig'"
+                  (click)="edit(row, { correctIndex: i })"
+                ></button>
+                <input
+                  class="cell"
+                  [attr.aria-label]="'Antwort ' + letters[i]"
+                  [value]="option"
+                  (input)="editOption(row, i, value($event))"
+                  (keydown)="onKey($event, row)"
+                />
+              </span>
+            </td>
+          }
+          <td class="c-cat">
+            <input
+              class="cell"
+              aria-label="Kategorie"
+              list="sheet-categories"
+              [value]="row.draft.category"
+              (input)="edit(row, { category: value($event) })"
+              (keydown)="onKey($event, row)"
+            />
+          </td>
+          <td class="c-num" [class.low]="r !== null && r < 25">
+            {{ r === null ? '–' : r + ' %' }}
+          </td>
+          <td class="c-num">{{ row.question?.timesAsked ?? '–' }}</td>
+          <td class="c-act">
+            @if (row.dirty) {
+              <button
+                type="button"
+                class="icon save"
+                aria-label="Zeile speichern"
+                [disabled]="savingRow() === row.id"
+                (click)="save(row)"
+              >
+                <css-icon icon="checkmark" size="sm"></css-icon>
+              </button>
+              <button
+                type="button"
+                class="icon"
+                aria-label="Änderungen verwerfen"
+                (click)="revert(row)"
+              >
+                <css-icon icon="undo" size="sm"></css-icon>
+              </button>
+            } @else if (row.question) {
+              <button
+                type="button"
+                class="icon"
+                aria-label="Frage löschen"
+                (click)="
+                  store.confirm.set({ kind: 'delete', question: row.question })
+                "
+              >
+                <css-icon icon="trash" size="sm"></css-icon>
+              </button>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <datalist id="sheet-categories">
+    @for (category of store.categories(); track category) {
+      <option [value]="category"></option>
+    }
+  </datalist>
+  @if (!drafts().has('new')) {
+    <button type="button" class="add-row" (click)="addRow()">
+      <css-icon icon="add" size="sm"></css-icon>
+      Neue Zeile
+    </button>
+  }
+</div>
+
+<footer class="status" role="status">
+  <span>{{ rows().length }} Zeilen</span>
+  <span>{{ store.counts().active }} aktiv</span>
+  <span
+    >Ø
+    {{ store.overallRate() === null ? '–' : store.overallRate() + ' %' }}
+    richtig</span
+  >
+  @if (dirtyCount() > 0) {
+    <span class="unsaved">{{ dirtyCount() }} ungespeichert</span>
+  }
+  @if (store.stats(); as s) {
+    <span class="live" [class.warning]="store.ready() === false">
+      <span class="dot"></span>
+      {{ s.playersOnline }} Geräte · {{ s.activeGames }} Duelle ·
+      {{ s.gamesToday }} heute
+    </span>
+  }
+</footer>
+
+<app-proposal-dialogs />

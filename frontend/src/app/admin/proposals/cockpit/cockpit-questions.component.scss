@@ -70,9 +70,9 @@ $wide: 900px;
   border-top: functions.rem(1) solid kit.$line;
 
   @media (min-width: $wide) {
-    grid-template-columns: minmax(0, 1fr) functions.rem(150) functions.rem(
-        190
-      ) functions.rem(110) auto;
+    grid-template-columns:
+      minmax(0, 1fr) functions.rem(150) functions.rem(190)
+      functions.rem(110) auto;
     padding: functions.rem(12) functions.rem(16) functions.rem(12) functions.rem(20);
   }
 

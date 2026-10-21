@@ -10,7 +10,12 @@ import type {
 } from '../../core/contracts/admin.contract';
 import { AdminApi } from '../admin-api.service';
 import type { AdminMessage } from '../admin-message';
-import { type QuestionDraft, toInput } from '../questions/question-form';
+import {
+  draftFrom,
+  emptyDraft,
+  type QuestionDraft,
+  toInput,
+} from '../questions/question-form';
 
 /** Countdown before the first question and the points, see the game engine. */
 export const COUNTDOWN_SEC = 3;
@@ -126,6 +131,16 @@ export class ProposalStore {
   readonly message = signal<AdminMessage | null>(null);
   readonly busy = signal(false);
   readonly saving = signal(false);
+
+  /** The question in the editor dialog: null closed, id null for a new one. */
+  readonly editing = signal<{ draft: QuestionDraft; id: number | null } | null>(
+    null,
+  );
+  readonly editorError = signal('');
+  /** The open confirmation for deleting. */
+  readonly confirm = signal<
+    { kind: 'delete'; question: AdminQuestion } | { kind: 'delete-all' } | null
+  >(null);
 
   // Filters of the question list.
   readonly search = signal('');
@@ -432,6 +447,73 @@ export class ProposalStore {
     } finally {
       this.saving.set(false);
     }
+  }
+
+  /** Opens the editor dialog for a question, or a new one. */
+  openEditor(
+    question: AdminQuestion | null,
+    preset: Partial<QuestionDraft> = {},
+  ): void {
+    this.editorError.set('');
+    this.editing.set(
+      question
+        ? { draft: draftFrom(question), id: question.id }
+        : { draft: { ...emptyDraft(), ...preset }, id: null },
+    );
+  }
+
+  async saveEditing(draft: QuestionDraft): Promise<void> {
+    const editing = this.editing();
+    if (!editing) {
+      return;
+    }
+    this.saving.set(true);
+    try {
+      await this.saveQuestion(draft, editing.id);
+      this.editing.set(null);
+    } catch (error) {
+      this.editorError.set(apiErrorMessage(error));
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  async confirmAction(): Promise<void> {
+    const confirm = this.confirm();
+    if (!confirm) {
+      return;
+    }
+    const done =
+      confirm.kind === 'delete'
+        ? await this.deleteQuestion(confirm.question)
+        : await this.deleteAll();
+    if (done) {
+      this.confirm.set(null);
+    }
+  }
+
+  /** Moves a question to another category (null = none). */
+  async moveQuestion(
+    question: AdminQuestion,
+    category: string | null,
+  ): Promise<void> {
+    if ((question.category ?? null) === category) {
+      return;
+    }
+    try {
+      await this.saveQuestion(
+        { ...draftFrom(question), category: category ?? '' },
+        question.id,
+      );
+    } catch (error) {
+      this.flash('error', apiErrorMessage(error));
+    }
+  }
+
+  /** Saves the settings right away, e.g. after a quick toggle. */
+  async applyAndSave(values: Partial<AdminSettings>): Promise<void> {
+    this.applySettings(values);
+    await this.saveSettings();
   }
 
   limit(key: NumericKey): SettingsLimit {

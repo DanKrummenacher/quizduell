@@ -1,0 +1,180 @@
+<header class="top">
+  <span class="lockup">
+    <app-logo-mark class="logo" />
+    <span class="wordmark"><span class="light">play</span>duelio</span>
+  </span>
+  @if (store.stats(); as s) {
+    <span class="pulse" [class.warning]="store.ready() === false" role="status">
+      <span class="dot"></span>
+      {{ store.ready() ? 'Bereit' : 'Nicht spielbar' }} ·
+      {{ s.playersOnline }} Geräte · {{ s.activeGames }} Duelle
+    </span>
+  }
+</header>
+
+<main class="main">
+  <h1 class="title">Was möchtest du tun?</h1>
+
+  <div class="palette" [class.open]="query().trim() !== ''">
+    <label class="line">
+      <css-icon icon="search" class="line-icon"></css-icon>
+      <span class="visually-hidden">Befehl oder Suche</span>
+      <input
+        #field
+        class="field"
+        type="text"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Frage suchen, Regel ändern, Aktion ausführen …"
+        role="combobox"
+        aria-controls="spotlight-results"
+        [attr.aria-expanded]="groups().length > 0"
+        [attr.aria-activedescendant]="activeId() ? 'row-' + activeId() : null"
+        [value]="query()"
+        (input)="setQuery(field.value)"
+        (keydown)="onKey($event)"
+      />
+      <kbd class="kbd" aria-hidden="true">/</kbd>
+    </label>
+
+    <div class="results" id="spotlight-results" role="listbox">
+      @for (group of groups(); track group.title) {
+        <div class="group" role="group" [attr.aria-label]="group.title">
+          <span class="group-title">{{ group.title }}</span>
+          @for (row of group.rows; track row.id) {
+            <div
+              class="row"
+              role="option"
+              [id]="'row-' + row.id"
+              [class.active]="activeId() === row.id"
+              [attr.aria-selected]="activeId() === row.id"
+            >
+              @switch (row.kind) {
+                @case ('command') {
+                  <button type="button" class="row-main" (click)="run(row)">
+                    <span class="row-icon"
+                      ><css-icon [icon]="row.command.icon" size="sm"></css-icon
+                    ></span>
+                    <span class="row-text">
+                      <span class="row-title">{{ row.command.title }}</span>
+                      <span class="row-sub">{{ row.command.sub }}</span>
+                    </span>
+                    <css-icon class="enter" icon="arrow-right" size="sm"></css-icon>
+                  </button>
+                }
+                @case ('question') {
+                  @let q = row.question;
+                  @let r = rate(q);
+                  <button type="button" class="row-main" (click)="run(row)">
+                    <span class="row-icon letter">?</span>
+                    <span class="row-text">
+                      <span class="row-title">{{ q.text }}</span>
+                      <span class="row-sub">
+                        <span class="correct"
+                          >✓ {{ q.options[q.correctIndex] }}</span
+                        >
+                        · {{ q.category || 'Ohne Kategorie' }} ·
+                        {{ r === null ? 'noch nie gestellt' : r + ' % richtig' }}
+                      </span>
+                    </span>
+                  </button>
+                  <css-switch
+                    class="row-switch"
+                    [label]="q.active ? 'Aktiv' : 'Inaktiv'"
+                    [checked]="q.active"
+                    (change)="toggle(q, $event)"
+                  ></css-switch>
+                }
+                @case ('setting') {
+                  @if (store.form(); as f) {
+                    <span class="row-icon"
+                      ><css-icon icon="settings" size="sm"></css-icon
+                    ></span>
+                    <span class="row-text">
+                      <span class="row-title">{{ row.field.label }}</span>
+                      <span class="row-sub">{{ row.field.hint }}</span>
+                    </span>
+                    <css-input-stepper
+                      class="row-stepper"
+                      [label]="row.field.short"
+                      [value]="'' + f[row.field.key]"
+                      [attr.min-number]="store.limit(row.field.key).min"
+                      [attr.max-number]="store.limit(row.field.key).max"
+                      [attr.error-message]="store.errors()[row.field.key] ?? null"
+                      (change)="setNumber(row.field.key, $event)"
+                    ></css-input-stepper>
+                  }
+                }
+                @case ('bonus') {
+                  <span class="row-icon"
+                    ><css-icon icon="speed" size="sm"></css-icon
+                  ></span>
+                  <span class="row-text">
+                    <span class="row-title">Tempo-Bonus</span>
+                    <span class="row-sub"
+                      >Schnelle richtige Antworten geben bis zu 100
+                      Zusatzpunkte</span
+                    >
+                  </span>
+                  <css-switch
+                    class="row-switch"
+                    [label]="store.form()?.speedBonusEnabled ? 'An' : 'Aus'"
+                    [checked]="store.form()?.speedBonusEnabled ?? false"
+                    (change)="setBonus($event)"
+                  ></css-switch>
+                }
+              }
+            </div>
+          }
+        </div>
+      } @empty {
+        <p class="nothing">Nichts gefunden für «{{ query() }}».</p>
+      }
+    </div>
+
+    <div class="keys" aria-hidden="true">
+      <span><kbd>↑</kbd><kbd>↓</kbd> wählen</span>
+      <span><kbd>Enter</kbd> ausführen</span>
+      <span><kbd>Esc</kbd> leeren</span>
+      @if (store.saving()) {
+        <span class="saving">Speichert …</span>
+      }
+    </div>
+  </div>
+
+  @if (query().trim() === '') {
+    <p class="hints">
+      Probiere
+      @for (hint of hints; track hint) {
+        <button type="button" class="hint" (click)="typeHint(hint)">
+          {{ hint }}
+        </button>
+      }
+    </p>
+
+    @if (store.stats(); as s) {
+      <dl class="facts">
+        <div>
+          <dt>Fragen im Spiel</dt>
+          <dd>{{ s.activeQuestions }}</dd>
+        </div>
+        <div>
+          <dt>Duelle heute</dt>
+          <dd>{{ s.gamesToday }}</dd>
+        </div>
+        <div>
+          <dt>Ein Duell dauert</dt>
+          <dd>{{ duration(store.gameSeconds()) }}</dd>
+        </div>
+        <div>
+          <dt>Richtig beantwortet</dt>
+          <dd>
+            {{ store.overallRate() === null ? '–' : store.overallRate() + ' %' }}
+          </dd>
+        </div>
+      </dl>
+    }
+  }
+</main>
+
+<app-proposal-dialogs />

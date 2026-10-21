@@ -1,0 +1,421 @@
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
+@use '../kit';
+
+:host {
+  display: block;
+  min-height: 100dvh;
+  padding: var(--app-safe-top) var(--app-safe-right) var(--app-safe-bottom)
+    var(--app-safe-left);
+  overflow-x: clip;
+  background:
+    radial-gradient(50% 40% at 50% 45%, rgba(0, 164, 224, 0.12), transparent 70%),
+    kit.$page;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: functions.rem(16);
+}
+
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(10);
+
+  .logo {
+    width: functions.rem(28);
+    height: functions.rem(28);
+  }
+}
+
+.wordmark {
+  font-size: functions.rem(20);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$blue;
+
+  .light {
+    font-weight: miscs.$css-ui-font-weight-regular;
+  }
+}
+
+.tools {
+  display: flex;
+  gap: functions.rem(4);
+}
+
+.tool {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(6);
+  height: functions.rem(36);
+  padding: 0 functions.rem(10);
+  border: 0;
+  border-radius: functions.rem(18);
+  background: none;
+  font: inherit;
+  font-size: functions.rem(14);
+  color: kit.$blue;
+  @include interaction.chip;
+
+  @media (max-width: 640px) {
+    span {
+      display: none;
+    }
+  }
+}
+
+.main {
+  max-width: functions.rem(560);
+  margin: 0 auto;
+  padding: functions.rem(8) functions.rem(16) functions.rem(40);
+}
+
+.intro {
+  display: grid;
+  justify-items: center;
+  gap: functions.rem(16);
+}
+
+.title {
+  @include kit.page-title;
+  font-size: functions.rem(26);
+  text-align: center;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: functions.rem(6);
+}
+
+.filter {
+  padding: functions.rem(6) functions.rem(14);
+  border: functions.rem(1) solid kit.$border;
+  border-radius: functions.rem(16);
+  background-color: kit.$white;
+  font: inherit;
+  font-size: functions.rem(14);
+  color: kit.$blue;
+  @include interaction.chip;
+
+  &.on {
+    border-color: kit.$blue;
+    background-color: kit.$blue;
+    color: kit.$white;
+  }
+}
+
+.progress {
+  height: functions.rem(4);
+  margin-top: functions.rem(24);
+  border-radius: functions.rem(2);
+  background-color: kit.$line;
+  overflow: hidden;
+
+  .bar {
+    display: block;
+    height: 100%;
+    background-color: kit.$blue;
+    transition: width 0.3s ease;
+  }
+}
+
+.count {
+  margin: functions.rem(8) 0 0;
+  font-size: functions.rem(13);
+  color: kit.$muted;
+  text-align: center;
+}
+
+.keep-count {
+  color: kit.$green;
+}
+
+.pause-count {
+  color: kit.$red;
+}
+
+// ---------------------------------------------------------------------------
+// The stack of cards
+// ---------------------------------------------------------------------------
+.stack {
+  position: relative;
+  display: grid;
+  margin-top: functions.rem(20);
+  min-height: functions.rem(470);
+}
+
+.card {
+  grid-area: 1 / 1;
+  align-self: start;
+  position: relative;
+  padding: functions.rem(20);
+  border: functions.rem(1) solid kit.$border;
+  border-radius: functions.rem(8);
+  background-color: kit.$white;
+  box-shadow: 0 functions.rem(12) functions.rem(32) rgba(0, 50, 125, 0.14);
+  transform-origin: 50% 120%;
+  transition:
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.26s ease;
+  user-select: none;
+
+  &.is-top {
+    cursor: grab;
+    touch-action: pan-y;
+  }
+
+  &.dragging {
+    cursor: grabbing;
+    transition: none;
+  }
+
+  &.leaving {
+    opacity: 0;
+  }
+}
+
+.stamp {
+  position: absolute;
+  top: functions.rem(20);
+  right: functions.rem(20);
+  z-index: 1;
+  padding: functions.rem(4) functions.rem(12);
+  border: functions.rem(3) solid currentColor;
+  border-radius: functions.rem(4);
+  background-color: kit.$white;
+  font-size: functions.rem(18);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  text-transform: uppercase;
+  transform: rotate(8deg);
+
+  &.keep {
+    color: kit.$green;
+  }
+
+  &.pause {
+    right: auto;
+    left: functions.rem(20);
+    color: kit.$red;
+    transform: rotate(-8deg);
+  }
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: functions.rem(8);
+}
+
+.category {
+  @include kit.tag;
+}
+
+.status {
+  font-size: functions.rem(13);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$red;
+
+  &.on {
+    color: kit.$green;
+  }
+}
+
+.question {
+  margin: functions.rem(20) 0;
+  font-size: functions.rem(22);
+  font-weight: miscs.$css-ui-font-weight-regular;
+  line-height: 1.25;
+  color: kit.$blue;
+}
+
+.answers {
+  display: grid;
+  gap: functions.rem(8);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.answer {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(14);
+  min-height: functions.rem(50);
+  padding-right: functions.rem(12);
+  border: functions.rem(1) solid kit.$border;
+  border-radius: functions.rem(4);
+  overflow: hidden;
+  font-size: functions.rem(15);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$blue;
+
+  &.correct {
+    background-color: kit.$green;
+    color: kit.$white;
+
+    .letter {
+      background-color: rgba(255, 255, 255, 0.16);
+    }
+  }
+}
+
+.letter {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  flex: none;
+  width: functions.rem(44);
+  background-color: kit.$blue;
+  color: kit.$white;
+}
+
+.answer-text {
+  padding-block: functions.rem(8);
+}
+
+.stats {
+  display: grid;
+  gap: functions.rem(8);
+  margin-top: functions.rem(20);
+  font-size: functions.rem(14);
+  color: kit.$muted;
+
+  strong {
+    color: kit.$blue;
+  }
+}
+
+.meter {
+  @include kit.meter(kit.$green);
+
+  &.low::before {
+    background-color: kit.$red;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Decisions
+// ---------------------------------------------------------------------------
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: functions.rem(16);
+  margin-top: functions.rem(24);
+}
+
+.round {
+  display: grid;
+  place-items: center;
+  width: functions.rem(64);
+  height: functions.rem(64);
+  border: functions.rem(1) solid kit.$border;
+  border-radius: 50%;
+  background-color: kit.$white;
+  color: kit.$blue;
+  box-shadow: kit.$shadow;
+  cursor: pointer;
+  transition: transform 0.12s ease;
+
+  &:active:not(:disabled) {
+    transform: scale(0.92);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  &.small {
+    width: functions.rem(44);
+    height: functions.rem(44);
+    box-shadow: none;
+  }
+
+  &.pause {
+    border-color: kit.$red;
+    color: kit.$red;
+  }
+
+  &.keep {
+    border-color: kit.$green;
+    background-color: kit.$green;
+    color: kit.$white;
+  }
+
+  &.edit {
+    width: functions.rem(52);
+    height: functions.rem(52);
+  }
+}
+
+.keys {
+  margin: functions.rem(16) 0 0;
+  font-size: functions.rem(13);
+  color: kit.$muted;
+  text-align: center;
+
+  @media (hover: none) {
+    display: none;
+  }
+}
+
+kbd {
+  padding: functions.rem(1) functions.rem(6);
+  border: functions.rem(1) solid kit.$line;
+  border-bottom-width: functions.rem(2);
+  border-radius: functions.rem(4);
+  background-color: kit.$white;
+  font: inherit;
+}
+
+.done {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: functions.rem(12);
+  text-align: center;
+}
+
+.done-icon {
+  display: grid;
+  place-items: center;
+  width: functions.rem(72);
+  height: functions.rem(72);
+  border-radius: 50%;
+  background-color: kit.$green;
+  color: kit.$white;
+}
+
+.done-title {
+  @include kit.section-title;
+  font-size: functions.rem(22);
+}
+
+.done-text {
+  margin: 0;
+  color: kit.$muted;
+}
+
+.done-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: functions.rem(8);
+}
+
+.again {
+  padding: functions.rem(10) functions.rem(18);
+  border: functions.rem(1) solid kit.$blue;
+  border-radius: functions.rem(22);
+  background-color: kit.$white;
+  font: inherit;
+  color: kit.$blue;
+  @include interaction.chip;
+}

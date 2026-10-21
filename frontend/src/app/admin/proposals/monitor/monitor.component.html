@@ -1,0 +1,140 @@
+<div class="wall">
+  <header class="top">
+    <span class="lockup">
+      <app-logo-mark class="logo" [inverse]="true" />
+      <span class="wordmark"><span class="light">play</span>duelio</span>
+      <span class="tag">Live</span>
+    </span>
+    <span class="clock">{{
+      now().toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })
+    }}</span>
+    <span class="state" [class.warning]="store.ready() === false" role="status">
+      <span class="dot"></span>
+      {{ store.ready() === false ? 'Nicht spielbar' : 'Bereit für Besucher' }}
+    </span>
+  </header>
+
+  @if (store.stats(); as s) {
+    <div class="grid">
+      <!-- The main numbers -->
+      <section class="tile hero">
+        <span class="label">Laufende Duelle</span>
+        <strong class="big">{{ s.activeGames }}</strong>
+        <div class="sub">
+          <span
+            ><strong>{{ s.playersOnline }}</strong> Geräte verbunden</span
+          >
+          <span
+            ><strong>{{ s.playersSearching }}</strong> suchen Gegner</span
+          >
+        </div>
+      </section>
+
+      <section class="tile today">
+        <span class="label">Duelle heute</span>
+        <strong class="big">{{ s.gamesToday }}</strong>
+        <span class="delta" [class.up]="todayDelta() > 0">
+          {{ todayDelta() > 0 ? '+' + todayDelta() : '±0' }} seit
+          {{ since()?.at | date: 'HH:mm' }}
+        </span>
+      </section>
+
+      <!-- How it developed while the page is open -->
+      <section class="tile chart">
+        <div class="chart-head">
+          <span class="label">Verlauf seit {{ since()?.at | date: 'HH:mm' }}</span>
+          <span class="legend">
+            <span><i class="key devices"></i>Geräte</span>
+            <span><i class="key duels"></i>Duelle</span>
+          </span>
+        </div>
+        <svg
+          class="spark"
+          viewBox="0 0 100 40"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <path class="area" [attr.d]="lines().area" />
+          <path class="line devices" [attr.d]="lines().devices" />
+          <path class="line duels" [attr.d]="lines().duels" />
+        </svg>
+        <span class="chart-foot"
+          >Höchstens {{ peakDevices() }} Geräte gleichzeitig</span
+        >
+      </section>
+
+      <!-- Categories -->
+      <section class="tile cats">
+        <span class="label">Kategorien · richtig beantwortet</span>
+        <ul>
+          @for (c of store.categoryStats(); track c.name) {
+            <li>
+              <span class="cat-name">{{ c.name || 'Ohne' }}</span>
+              <span class="cat-bar" [style.--value]="c.rate ?? 0"></span>
+              <span class="cat-rate">{{
+                c.rate === null ? '–' : c.rate + ' %'
+              }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <!-- Key figures -->
+      <section class="tile figures">
+        <div>
+          <span class="label">Insgesamt</span>
+          <strong>{{ s.gamesTotal }}</strong>
+          <span class="unit">Duelle</span>
+        </div>
+        <div>
+          <span class="label">Im Spiel</span>
+          <strong>{{ s.activeQuestions }}</strong>
+          <span class="unit">Fragen</span>
+        </div>
+        <div>
+          <span class="label">Ein Duell</span>
+          <strong>{{ duration(store.gameSeconds()) }}</strong>
+          <span class="unit">höchstens</span>
+        </div>
+      </section>
+
+      <!-- The hardest questions, one after the other -->
+      <section class="tile ticker" aria-live="polite">
+        <span class="label">Am häufigsten falsch</span>
+        @for (q of tickerItems(); track q.id) {
+          <div class="ticker-body">
+            <strong class="ticker-rate">{{ rate(q) }} %</strong>
+            <div>
+              <p class="ticker-text">{{ q.text }}</p>
+              <p class="ticker-answer">Richtig: {{ q.options[q.correctIndex] }}</p>
+            </div>
+          </div>
+        } @empty {
+          <p class="ticker-text">Noch zu wenige Antworten.</p>
+        }
+      </section>
+    </div>
+  }
+
+  <!-- Few controls, out of the way -->
+  <nav class="dock" aria-label="Steuerung">
+    <button type="button" (click)="rulesOpen.set(true)">
+      <css-icon icon="settings" size="sm"></css-icon><span>Spielregeln</span>
+    </button>
+    <button type="button" (click)="store.openEditor(null)">
+      <css-icon icon="add" size="sm"></css-icon><span>Neue Frage</span>
+    </button>
+    <button type="button" (click)="fullscreen()">
+      <css-icon icon="fullscreen" size="sm"></css-icon><span>Vollbild</span>
+    </button>
+    <button type="button" (click)="openGame.emit()">
+      <css-icon icon="home" size="sm"></css-icon><span>Zum Spiel</span>
+    </button>
+    <button type="button" (click)="logout.emit()">
+      <css-icon icon="logout" size="sm"></css-icon><span>Abmelden</span>
+    </button>
+  </nav>
+</div>
+
+<app-rules-drawer [open]="rulesOpen()" (dismiss)="rulesOpen.set(false)" />
+<app-proposal-dialogs />
