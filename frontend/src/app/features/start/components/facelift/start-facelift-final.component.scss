@@ -180,15 +180,17 @@ $swap: cubic-bezier(0.65, 0, 0.35, 1);
     min-width: 0;
   }
 
-  // A calm sequence: the old phrase fades up and out, the width follows,
-  // the new phrase fades in from below, then the marker draws.
+  // A calm sequence: the old phrase is wiped away upwards, the width
+  // follows, the new phrase is revealed from below, then the marker draws.
+  // The text itself never moves, so it stays sharp the whole time (moving
+  // text is drawn blurred until it stops, especially in Safari).
   transition: width 0.6s 0.1s cubic-bezier(0.4, 0, 0.2, 1);
 
   .roll-word {
-    animation: phrase-in 0.7s 0.3s $expo both;
+    animation: phrase-in 0.7s 0.18s $expo both;
 
     &.is-out {
-      animation: phrase-out 0.45s cubic-bezier(0.4, 0, 1, 1) both;
+      animation: phrase-out 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
     }
   }
 
@@ -272,14 +274,24 @@ $swap: cubic-bezier(0.65, 0, 0.35, 1);
 @keyframes phrase-in {
   from {
     opacity: 0;
-    transform: translateY(55%);
+    clip-path: inset(100% 0 0 0);
+  }
+
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
   }
 }
 
 @keyframes phrase-out {
+  from {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+
   to {
     opacity: 0;
-    transform: translateY(-55%);
+    clip-path: inset(0 0 100% 0);
   }
 }
 
