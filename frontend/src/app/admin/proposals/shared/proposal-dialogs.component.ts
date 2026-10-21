@@ -1,5 +1,5 @@
 // TEMPORARY: the editor and delete dialogs shared by the proposals (development only).
-import { Component, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, input } from '@angular/core';
 import '@css-ch/components/notification';
 import '@css-ch/components/button';
 import '@css-ch/components/flyout';
@@ -21,7 +21,7 @@ import { ProposalStore } from '../proposal-store';
       ></css-notification>
     }
 
-    @if (store.editing(); as e) {
+    @if (editor() && store.editing(); as e) {
       <app-question-editor
         [initial]="e.draft"
         [isNew]="e.id === null"
@@ -71,4 +71,6 @@ import { ProposalStore } from '../proposal-store';
 })
 export class ProposalDialogsComponent {
   protected readonly store = inject(ProposalStore);
+  /** False where the proposal shows its own editor. */
+  readonly editor = input(true);
 }

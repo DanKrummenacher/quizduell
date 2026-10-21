@@ -1,0 +1,102 @@
+<div class="layout">
+  <!-- Phones: a top bar with the menu -->
+  <header class="mobile-bar">
+    <button
+      type="button"
+      class="menu-button"
+      aria-label="Menü"
+      [attr.aria-expanded]="nav.menuOpen()"
+      (click)="nav.menuOpen.set(!nav.menuOpen())"
+    >
+      <css-icon icon="menu-hamburger" size="sm"></css-icon>
+    </button>
+    <span class="mobile-title">{{ title() }}</span>
+    <span class="mobile-state" [class.warning]="store.ready() === false">
+      <span class="dot"></span>
+    </span>
+  </header>
+
+  @if (nav.menuOpen()) {
+    <button
+      type="button"
+      class="scrim"
+      tabindex="-1"
+      aria-label="Menü schliessen"
+      (click)="nav.menuOpen.set(false)"
+    ></button>
+  }
+
+  <aside class="sidebar" [class.open]="nav.menuOpen()">
+    <div class="brand">
+      <app-logo-mark class="logo" />
+      <span class="wordmark"><span class="light">play</span>duelio</span>
+      <span class="badge">Admin</span>
+    </div>
+
+    <nav class="nav" aria-label="Admin-Navigation">
+      @for (item of items(); track item.key) {
+        <button
+          type="button"
+          class="nav-item"
+          [class.active]="nav.view() === item.key"
+          [attr.aria-current]="nav.view() === item.key ? 'page' : null"
+          (click)="nav.go(item.key)"
+        >
+          <css-icon [icon]="item.icon" size="sm"></css-icon>
+          <span class="nav-label">{{ item.label }}</span>
+          @if (item.alert) {
+            <span class="alert" title="Ungespeicherte Änderungen"></span>
+          } @else if (item.count !== null) {
+            <span class="count">{{ item.count }}</span>
+          }
+        </button>
+      }
+    </nav>
+
+    @if (pro.issueCount() > 0) {
+      <button type="button" class="quality" (click)="nav.go('overview')">
+        <css-icon icon="priority-warning" size="sm"></css-icon>
+        <span>{{ pro.issueCount() }} Hinweise zur Qualität</span>
+      </button>
+    }
+
+    <div class="foot">
+      @if (store.stats(); as s) {
+        <div class="live" role="status">
+          <span class="dot" [class.warning]="store.ready() === false"></span>
+          <span>
+            <strong>{{
+              store.ready() === false ? 'Nicht spielbar' : 'Live'
+            }}</strong>
+            {{ s.playersOnline }} Geräte · {{ s.activeGames }} Duelle
+          </span>
+        </div>
+      }
+      <button type="button" class="foot-link" (click)="openGame.emit()">
+        <css-icon icon="home" size="sm"></css-icon>Zum Spiel
+      </button>
+      <button type="button" class="foot-link" (click)="logout.emit()">
+        <css-icon icon="logout" size="sm"></css-icon>Abmelden
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+    @switch (nav.view()) {
+      @case ('overview') {
+        <app-ws-overview />
+      }
+      @case ('questions') {
+        <app-ws-questions />
+      }
+      @case ('categories') {
+        <app-ws-categories />
+      }
+      @case ('rules') {
+        <app-ws-rules />
+      }
+    }
+  </main>
+</div>
+
+<app-proposal-dialogs />

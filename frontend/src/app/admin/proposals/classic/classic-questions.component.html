@@ -1,0 +1,196 @@
+<header class="head">
+  <h1>Fragen</h1>
+  <div class="head-actions">
+    <button type="button" class="button" (click)="importing.set(true)">
+      Importieren
+    </button>
+    <button type="button" class="button" (click)="pro.exportCsv()">
+      Exportieren
+    </button>
+    <button
+      type="button"
+      class="button primary"
+      (click)="state.go({ name: 'question', id: 'new' })"
+    >
+      Frage hinzufügen
+    </button>
+  </div>
+</header>
+
+<div class="card">
+  <div class="tabs" role="tablist">
+    @for (tab of tabs(); track tab.key) {
+      <button
+        type="button"
+        role="tab"
+        class="tab"
+        [attr.aria-selected]="state.tab() === tab.key"
+        (click)="setTab(tab.key)"
+      >
+        {{ tab.label }} <span class="tab-count">{{ tab.count }}</span>
+      </button>
+    }
+  </div>
+
+  <div class="toolbar">
+    @if (pro.selected().size > 0) {
+      <span class="selected">{{ pro.selected().size }} ausgewählt</span>
+      <label class="select">
+        <span class="visually-hidden">Aktion für die Auswahl</span>
+        <select (change)="bulk(typed($event)); $any($event.target).value = ''">
+          <option value="">Aktionen …</option>
+          <option value="activate">Aktivieren</option>
+          <option value="pause">Pausieren</option>
+          <optgroup label="Verschieben nach">
+            @for (name of store.categories(); track name) {
+              <option [value]="'move:' + name">{{ name }}</option>
+            }
+            <option [value]="'move:' + none">Ohne Kategorie</option>
+          </optgroup>
+          <option value="export">Als CSV exportieren</option>
+          <option value="delete">Löschen …</option>
+        </select>
+      </label>
+      <button type="button" class="link" (click)="pro.clear()">
+        Auswahl aufheben
+      </button>
+      @if (pro.progress(); as p) {
+        <span class="progress">{{ p.done }} / {{ p.total }} …</span>
+      }
+    } @else {
+      <label class="search">
+        <css-icon icon="search" size="sm"></css-icon>
+        <span class="visually-hidden">Suchen</span>
+        <input
+          type="search"
+          placeholder="Fragen filtern"
+          [value]="search()"
+          (input)="setSearch(typed($event))"
+        />
+      </label>
+      <label class="select">
+        <span class="visually-hidden">Kategorie</span>
+        <select
+          [value]="category()"
+          (change)="category.set(typed($event)); state.listPage.set(0)"
+        >
+          <option value="">Alle Kategorien</option>
+          @for (c of store.categoryStats(); track c.name) {
+            <option [value]="c.name || none">
+              {{ c.name || 'Ohne Kategorie' }}
+            </option>
+          }
+        </select>
+      </label>
+    }
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="c-check">
+            <input
+              type="checkbox"
+              aria-label="Alle auf dieser Seite auswählen"
+              [checked]="pageSelected()"
+              (change)="pro.toggleAll(rows().map((r) => r.id))"
+            />
+          </th>
+          <th>Frage</th>
+          <th class="c-cat">Kategorie</th>
+          <th class="c-status">Status</th>
+          <th class="c-rate">Richtig</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (q of rows(); track q.id) {
+          @let r = rate(q);
+          <tr (click)="state.go({ name: 'question', id: q.id })">
+            <td class="c-check" (click)="$event.stopPropagation()">
+              <input
+                type="checkbox"
+                [attr.aria-label]="'Auswählen: ' + q.text"
+                [checked]="pro.isSelected(q.id)"
+                (change)="pro.toggle(q.id)"
+              />
+            </td>
+            <td>
+              <button
+                type="button"
+                class="q"
+                (click)="
+                  state.go({ name: 'question', id: q.id }); $event.stopPropagation()
+                "
+              >
+                {{ q.text }}
+              </button>
+              <span class="answer">Richtig: {{ q.options[q.correctIndex] }}</span>
+            </td>
+            <td class="c-cat">{{ q.category || '–' }}</td>
+            <td class="c-status">
+              <span class="badge" [class.on]="q.active">{{
+                q.active ? 'Aktiv' : 'Pausiert'
+              }}</span>
+            </td>
+            <td class="c-rate" [class.low]="r !== null && r < 20">
+              {{ r === null ? '–' : r + ' %' }}
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="empty">Keine Fragen gefunden.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pager">
+    <span>{{ range() }}</span>
+    <div class="pager-buttons">
+      <button
+        type="button"
+        class="button"
+        aria-label="Vorherige Seite"
+        [disabled]="page() === 0"
+        (click)="state.listPage.set(page() - 1)"
+      >
+        <css-icon icon="angle-left" size="sm"></css-icon>
+      </button>
+      <button
+        type="button"
+        class="button"
+        aria-label="Nächste Seite"
+        [disabled]="page() >= pages() - 1"
+        (click)="state.listPage.set(page() + 1)"
+      >
+        <css-icon icon="angle-right" size="sm"></css-icon>
+      </button>
+    </div>
+  </div>
+</div>
+
+@if (confirmDelete()) {
+  <css-flyout
+    withoutCloseButton
+    size="small"
+    title="Fragen löschen?"
+    [main]="pro.selected().size + ' Fragen werden endgültig gelöscht.'"
+  >
+    <css-button slot="css-button" (click)="confirmDelete.set(false)"
+      >Abbrechen</css-button
+    >
+    <css-button
+      slot="css-button"
+      variant="primary"
+      [loading]="!!pro.progress()"
+      (click)="remove()"
+      >Endgültig löschen</css-button
+    >
+  </css-flyout>
+}
+
+@if (importing()) {
+  <app-import-dialog (dismiss)="importing.set(false)" />
+}

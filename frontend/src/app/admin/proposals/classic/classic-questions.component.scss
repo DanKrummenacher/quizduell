@@ -1,0 +1,249 @@
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use '../kit';
+@use 'classic';
+
+.head {
+  @include classic.head;
+}
+
+.head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: functions.rem(8);
+}
+
+.button {
+  @include classic.button;
+
+  &.primary {
+    @include classic.button(true);
+  }
+}
+
+.card {
+  @include classic.card;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  gap: functions.rem(4);
+  padding: 0 functions.rem(12);
+  border-bottom: functions.rem(1) solid #e6ebf2;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab {
+  flex: none;
+  padding: functions.rem(14) functions.rem(10) functions.rem(12);
+  border: 0;
+  border-bottom: functions.rem(2) solid transparent;
+  background: none;
+  font: inherit;
+  font-size: functions.rem(14);
+  color: kit.$muted;
+  cursor: pointer;
+
+  &[aria-selected='true'] {
+    border-bottom-color: kit.$blue;
+    font-weight: miscs.$css-ui-font-weight-bold;
+    color: kit.$blue;
+  }
+}
+
+.tab-count {
+  margin-left: functions.rem(4);
+  padding: 0 functions.rem(6);
+  border-radius: functions.rem(8);
+  background-color: #eef1f6;
+  font-size: functions.rem(12);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: functions.rem(8) functions.rem(12);
+  min-height: functions.rem(60);
+  padding: functions.rem(10) functions.rem(16);
+  border-bottom: functions.rem(1) solid #e6ebf2;
+}
+
+.search {
+  display: flex;
+  flex: 1 1 functions.rem(220);
+  align-items: center;
+  gap: functions.rem(8);
+  height: functions.rem(38);
+  padding: 0 functions.rem(12);
+  border: functions.rem(1) solid #c9d3e2;
+  border-radius: functions.rem(6);
+  color: kit.$muted;
+
+  &:focus-within {
+    border-color: kit.$blue;
+  }
+
+  input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: 0;
+    outline: none;
+    font: inherit;
+    font-size: functions.rem(14);
+    color: kit.$blue;
+  }
+}
+
+.select select {
+  height: functions.rem(38);
+  padding: 0 functions.rem(10);
+  border: functions.rem(1) solid #c9d3e2;
+  border-radius: functions.rem(6);
+  background-color: kit.$white;
+  font: inherit;
+  font-size: functions.rem(14);
+  color: kit.$blue;
+}
+
+.selected {
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$blue;
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: functions.rem(14);
+  color: kit.$blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.progress {
+  color: kit.$muted;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: functions.rem(14);
+  color: kit.$blue;
+}
+
+th {
+  padding: functions.rem(10) functions.rem(12);
+  background-color: #f7f9fb;
+  font-size: functions.rem(13);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$muted;
+  text-align: left;
+}
+
+td {
+  padding: functions.rem(12);
+  border-top: functions.rem(1) solid #eef1f6;
+  vertical-align: middle;
+}
+
+tbody tr {
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f9fbfd;
+  }
+}
+
+.c-check {
+  width: functions.rem(40);
+
+  input {
+    width: functions.rem(16);
+    height: functions.rem(16);
+    accent-color: kit.$blue;
+  }
+}
+
+.q {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$blue;
+  text-align: left;
+  cursor: pointer;
+}
+
+.answer {
+  font-size: functions.rem(13);
+  color: kit.$muted;
+}
+
+.badge {
+  display: inline-block;
+  padding: functions.rem(2) functions.rem(10);
+  border-radius: functions.rem(10);
+  background-color: #eef1f6;
+  font-size: functions.rem(12);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$muted;
+
+  &.on {
+    background-color: #dff3ea;
+    color: #00704e;
+  }
+}
+
+.c-rate {
+  width: functions.rem(80);
+  text-align: right;
+
+  &.low {
+    font-weight: miscs.$css-ui-font-weight-bold;
+    color: kit.$red;
+  }
+}
+
+@media (max-width: 700px) {
+  .c-cat,
+  .c-rate {
+    display: none;
+  }
+}
+
+.empty {
+  padding: functions.rem(32);
+  color: kit.$muted;
+  text-align: center;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: functions.rem(10) functions.rem(16);
+  border-top: functions.rem(1) solid #e6ebf2;
+  font-size: functions.rem(13);
+  color: kit.$muted;
+}
+
+.pager-buttons {
+  display: flex;
+  gap: functions.rem(6);
+
+  .button {
+    width: functions.rem(38);
+    padding: 0;
+    justify-content: center;
+  }
+}

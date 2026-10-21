@@ -4,14 +4,18 @@ import { Router } from '@angular/router';
 import { AdminAuthService } from '../admin-auth.service';
 import { BoardComponent } from './board/board.component';
 import { CheckComponent } from './check/check.component';
+import { ClassicComponent } from './classic/classic.component';
 import { CockpitComponent } from './cockpit/cockpit.component';
 import { MonitorComponent } from './monitor/monitor.component';
+import { PocketComponent } from './pocket/pocket.component';
+import { ProposalPro } from './pro';
 import { ProposalStore } from './proposal-store';
 import { ReviewComponent } from './review/review.component';
 import { SheetComponent } from './sheet/sheet.component';
 import { SpotlightComponent } from './spotlight/spotlight.component';
 import { StageComponent } from './stage/stage.component';
 import { StudioComponent } from './studio/studio.component';
+import { WorkspaceComponent } from './workspace/workspace.component';
 
 const PROPOSALS = [
   { value: 'a', label: 'A · Cockpit' },
@@ -23,6 +27,9 @@ const PROPOSALS = [
   { value: 'g', label: 'G · Monitor' },
   { value: 'h', label: 'H · Review' },
   { value: 'i', label: 'I · Tabelle' },
+  { value: 'j', label: 'J · Workspace' },
+  { value: 'k', label: 'K · Pocket' },
+  { value: 'l', label: 'L · Klassik' },
 ];
 
 @Component({
@@ -30,15 +37,18 @@ const PROPOSALS = [
   imports: [
     BoardComponent,
     CheckComponent,
+    ClassicComponent,
     CockpitComponent,
     MonitorComponent,
+    PocketComponent,
     ReviewComponent,
     SheetComponent,
     SpotlightComponent,
     StageComponent,
     StudioComponent,
+    WorkspaceComponent,
   ],
-  providers: [ProposalStore],
+  providers: [ProposalStore, ProposalPro],
   template: `
     @switch (v()) {
       @case ('b') {
@@ -64,6 +74,15 @@ const PROPOSALS = [
       }
       @case ('i') {
         <app-sheet (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('j') {
+        <app-workspace (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('k') {
+        <app-pocket (openGame)="openGame()" (logout)="logout()" />
+      }
+      @case ('l') {
+        <app-classic (openGame)="openGame()" (logout)="logout()" />
       }
       @default {
         <app-cockpit (openGame)="openGame()" (logout)="logout()" />

@@ -1,0 +1,90 @@
+// TEMPORARY: shared parts of the classic admin pages.
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
+@use '../kit';
+
+@mixin head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: functions.rem(12);
+  margin-bottom: functions.rem(20);
+
+  h1 {
+    margin: 0;
+    font-size: functions.rem(24);
+    font-weight: miscs.$css-ui-font-weight-bold;
+    line-height: 1.25;
+    color: kit.$blue;
+  }
+}
+
+@mixin back {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(4);
+  margin-bottom: functions.rem(8);
+  padding: functions.rem(4) functions.rem(6) functions.rem(4) 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: functions.rem(14);
+  color: kit.$muted;
+  cursor: pointer;
+
+  &:hover {
+    color: kit.$blue;
+  }
+}
+
+@mixin card {
+  border: functions.rem(1) solid #dfe5ee;
+  border-radius: functions.rem(8);
+  background-color: kit.$white;
+  box-shadow: 0 functions.rem(1) functions.rem(2) rgba(0, 50, 125, 0.05);
+}
+
+@mixin card-title {
+  margin: 0 0 functions.rem(16);
+  font-size: functions.rem(16);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$blue;
+}
+
+@mixin button($primary: false) {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(6);
+  height: functions.rem(38);
+  padding: 0 functions.rem(14);
+  border: functions.rem(1) solid #c9d3e2;
+  border-radius: functions.rem(6);
+  background-color: kit.$white;
+  font: inherit;
+  font-size: functions.rem(14);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$blue;
+  cursor: pointer;
+  @include interaction.chip;
+
+  @if $primary {
+    border-color: kit.$blue;
+    background-color: kit.$blue;
+    color: kit.$white;
+
+    &:hover {
+      background-color: colors-darkblue-active();
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+@function colors-darkblue-active() {
+  @return #0d358c;
+}

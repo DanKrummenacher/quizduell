@@ -379,6 +379,9 @@ export class ProposalStore {
   async deleteQuestion(question: AdminQuestion): Promise<boolean> {
     return this.run(async () => {
       await this.api.deleteQuestion(question.id);
+      if (this.editing()?.id === question.id) {
+        this.editing.set(null);
+      }
       this.questions.update((list) =>
         (list ?? []).filter((q) => q.id !== question.id),
       );

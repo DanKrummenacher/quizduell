@@ -1,0 +1,285 @@
+<header class="head">
+  <div>
+    <h1>Fragen</h1>
+    <p>
+      {{ store.counts().total }} Fragen · {{ store.counts().active }} aktiv ·
+      {{ store.counts().inactive }} pausiert
+    </p>
+  </div>
+  <div class="actions">
+    <css-button variant="plain" (click)="importing.set(true)">
+      <css-icon icon="upload" slot="prefix"></css-icon>
+      Import
+    </css-button>
+    <css-button variant="plain" (click)="pro.exportCsv()">
+      <css-icon icon="download" slot="prefix"></css-icon>
+      Export
+    </css-button>
+    <css-button variant="primary" (click)="show('new')">
+      <css-icon icon="add" slot="prefix"></css-icon>
+      Neue Frage
+    </css-button>
+  </div>
+</header>
+
+<div class="filters">
+  <label class="search">
+    <css-icon icon="search" size="sm"></css-icon>
+    <span class="visually-hidden">Suchen</span>
+    <input
+      type="search"
+      placeholder="Suchen in Frage, Antworten, Kategorie"
+      [value]="search()"
+      (input)="search.set(typed($event))"
+    />
+  </label>
+  <label class="select">
+    <span class="visually-hidden">Status</span>
+    <select [value]="status()" (change)="status.set($any(typed($event)))">
+      <option value="all">Alle Status</option>
+      <option value="active">Aktiv</option>
+      <option value="inactive">Pausiert</option>
+    </select>
+  </label>
+  <label class="select">
+    <span class="visually-hidden">Kategorie</span>
+    <select [value]="category()" (change)="category.set(typed($event))">
+      <option value="">Alle Kategorien</option>
+      @for (c of store.categoryStats(); track c.name) {
+        <option [value]="c.name || none">{{ c.name || 'Ohne Kategorie' }}</option>
+      }
+    </select>
+  </label>
+  <label class="select" [class.on]="!!nav.issue()">
+    <span class="visually-hidden">Qualität</span>
+    <select [value]="nav.issue() ?? ''" (change)="setIssue(typed($event))">
+      <option value="">Alle Qualitätsstufen</option>
+      @for (option of issueOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+  </label>
+  @if (filtered()) {
+    <button type="button" class="reset" (click)="resetFilters()">
+      Filter zurücksetzen
+    </button>
+  }
+</div>
+
+<div class="split" [class.with-detail]="open() !== null">
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th class="c-check">
+            <input
+              type="checkbox"
+              aria-label="Alle auswählen"
+              [checked]="allSelected()"
+              [indeterminate]="pro.selected().size > 0 && !allSelected()"
+              (change)="pro.toggleAll(rows().map((r) => r.id))"
+            />
+          </th>
+          <th [attr.aria-sort]="ariaSort('text')">
+            <button type="button" (click)="toggleSort('text')">Frage</button>
+          </th>
+          <th class="c-cat" [attr.aria-sort]="ariaSort('category')">
+            <button type="button" (click)="toggleSort('category')">Kategorie</button>
+          </th>
+          <th class="c-rate" [attr.aria-sort]="ariaSort('rate')">
+            <button type="button" (click)="toggleSort('rate')">Richtig</button>
+          </th>
+          <th class="c-asked" [attr.aria-sort]="ariaSort('asked')">
+            <button type="button" (click)="toggleSort('asked')">Gestellt</button>
+          </th>
+          <th class="c-state">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (q of rows(); track q.id) {
+          @let r = rate(q);
+          <tr
+            [class.open]="open() === q.id"
+            [class.selected]="pro.isSelected(q.id)"
+            (click)="show(q.id)"
+          >
+            <td class="c-check" (click)="$event.stopPropagation()">
+              <input
+                type="checkbox"
+                [attr.aria-label]="'Auswählen: ' + q.text"
+                [checked]="pro.isSelected(q.id)"
+                (change)="pro.toggle(q.id)"
+              />
+            </td>
+            <td>
+              <button
+                type="button"
+                class="q"
+                (click)="show(q.id); $event.stopPropagation()"
+              >
+                <span class="q-text">{{ q.text }}</span>
+                <span class="q-answer">✓ {{ q.options[q.correctIndex] }}</span>
+              </button>
+            </td>
+            <td class="c-cat">
+              <span class="tag">{{ q.category || '–' }}</span>
+            </td>
+            <td class="c-rate">
+              @if (r === null) {
+                <span class="muted">–</span>
+              } @else {
+                <span class="rate" [class.low]="r < 20" [class.high]="r > 90">
+                  <span class="meter" [style.--value]="r"></span>{{ r }} %
+                </span>
+              }
+            </td>
+            <td class="c-asked">{{ q.timesAsked }}</td>
+            <td class="c-state" (click)="$event.stopPropagation()">
+              <button
+                type="button"
+                class="state"
+                [class.on]="q.active"
+                [attr.aria-pressed]="q.active"
+                [attr.aria-label]="
+                  q.active ? 'Aktiv – pausieren' : 'Pausiert – aktivieren'
+                "
+                (click)="store.setActive(q, !q.active)"
+              >
+                <span class="state-dot"></span>{{ q.active ? 'Aktiv' : 'Pausiert' }}
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="empty">
+              @if (store.questions() === null) {
+                Lädt …
+              } @else if (filtered()) {
+                Keine Fragen für diese Filter.
+                <button type="button" class="reset" (click)="resetFilters()">
+                  Filter zurücksetzen
+                </button>
+              } @else {
+                Noch keine Fragen.
+                <button type="button" class="reset" (click)="store.importSamples()">
+                  Beispielfragen importieren
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <p class="table-foot">
+      {{ rows().length }} von {{ store.counts().total }} Fragen
+    </p>
+  </div>
+
+  @if (open() !== null) {
+    <app-ws-inspector
+      class="inspector"
+      [question]="openQuestion()"
+      (closed)="show(null)"
+      (saved)="onSaved($event)"
+      (dirtyChange)="editorDirty.set($event)"
+    />
+  }
+</div>
+
+<!-- Bulk actions for the selection -->
+@if (pro.selected().size > 0) {
+  <div class="bulk" role="region" aria-label="Auswahl">
+    <span class="bulk-count">{{ pro.selected().size }} ausgewählt</span>
+    @if (pro.progress(); as p) {
+      <span class="bulk-progress">{{ p.done }} / {{ p.total }} …</span>
+    } @else {
+      <button type="button" (click)="bulkActive(true)">Aktivieren</button>
+      <button type="button" (click)="bulkActive(false)">Pausieren</button>
+      @if (bulkCategory() === '__new__') {
+        <form
+          class="bulk-new"
+          (submit)="$event.preventDefault(); moveToNew(newName.value)"
+        >
+          <input
+            #newName
+            class="bulk-input"
+            placeholder="Neue Kategorie"
+            aria-label="Neue Kategorie"
+          />
+          <button type="submit">Verschieben</button>
+          <button type="button" (click)="bulkCategory.set('')">Abbrechen</button>
+        </form>
+      } @else {
+        <label class="bulk-move">
+          <span class="visually-hidden">Verschieben nach</span>
+          <select
+            [value]="bulkCategory()"
+            (change)="bulkCategory.set(typed($event)); bulkMove()"
+          >
+            <option value="">Verschieben nach …</option>
+            @for (name of store.categories(); track name) {
+              <option [value]="name">{{ name }}</option>
+            }
+            <option [value]="none">Ohne Kategorie</option>
+            <option value="__new__">Neue Kategorie …</option>
+          </select>
+        </label>
+      }
+      <button type="button" (click)="pro.exportCsv(pro.selectedQuestions())">
+        Export
+      </button>
+      <button type="button" class="danger" (click)="confirmBulkDelete.set(true)">
+        Löschen
+      </button>
+    }
+    <button
+      type="button"
+      class="bulk-close"
+      aria-label="Auswahl aufheben"
+      (click)="pro.clear()"
+    >
+      <css-icon icon="close" size="sm"></css-icon>
+    </button>
+  </div>
+}
+
+@if (pending() !== undefined) {
+  <css-flyout
+    withoutCloseButton
+    size="small"
+    title="Änderungen verwerfen?"
+    main="Die Frage hat ungespeicherte Änderungen."
+  >
+    <css-button slot="css-button" (click)="pending.set(undefined)"
+      >Weiter bearbeiten</css-button
+    >
+    <css-button slot="css-button" variant="primary" (click)="leave()"
+      >Verwerfen</css-button
+    >
+  </css-flyout>
+}
+
+@if (confirmBulkDelete()) {
+  <css-flyout
+    withoutCloseButton
+    size="small"
+    title="Fragen löschen?"
+    [main]="pro.selected().size + ' Fragen werden endgültig gelöscht.'"
+  >
+    <css-button slot="css-button" (click)="confirmBulkDelete.set(false)"
+      >Abbrechen</css-button
+    >
+    <css-button
+      slot="css-button"
+      variant="primary"
+      [loading]="!!pro.progress()"
+      (click)="bulkDelete()"
+    >
+      Endgültig löschen
+    </css-button>
+  </css-flyout>
+}
+
+@if (importing()) {
+  <app-import-dialog (dismiss)="importing.set(false)" />
+}
