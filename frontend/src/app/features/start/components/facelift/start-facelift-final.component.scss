@@ -330,3 +330,169 @@ $swap: cubic-bezier(0.65, 0, 0.35, 1);
     clip-path: inset(0 0 0 100%);
   }
 }
+
+// ---------------------------------------------------------------------------
+// Ways to reveal the new phrase (Marker D); the text never moves, so it
+// stays sharp.
+// ---------------------------------------------------------------------------
+
+// Soft crossfade.
+:host(.is-combo-reveal-fade) .line-roll .roll-word {
+  animation: reveal-fade-in 0.8s 0.2s ease both;
+
+  &.is-out {
+    animation: reveal-fade-out 0.5s ease both;
+  }
+}
+
+// Wipe from left to right, in the reading direction.
+:host(.is-combo-reveal-wipe) .line-roll .roll-word {
+  animation: reveal-wipe-in 0.75s 0.32s $expo both;
+
+  // The old phrase is wiped away in the same direction first.
+  &.is-out {
+    animation: reveal-wipe-out 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+}
+
+// Letter by letter: a quick wave; typed: one after the other.
+:host(.is-combo-reveal-letters),
+:host(.is-combo-reveal-type) {
+  .line-roll .roll-word {
+    animation: none;
+
+    &.is-out {
+      animation: reveal-fade-out 0.35s ease both;
+    }
+  }
+
+  .letter {
+    white-space: pre;
+  }
+}
+
+:host(.is-combo-reveal-letters) .roll-word:not(.is-out) .letter {
+  animation: reveal-fade-in 0.5s calc(0.25s + var(--l) * 0.035s) ease both;
+}
+
+:host(.is-combo-reveal-type) {
+  .roll-word:not(.is-out) .letter {
+    animation: reveal-type 0.01s calc(0.3s + var(--l) * 0.07s) both;
+  }
+
+  .marker {
+    animation-delay: 1.5s;
+  }
+}
+
+// Colour block: a light blue block wipes over the place and leaves the
+// new phrase behind.
+:host(.is-combo-reveal-block) .line-roll {
+  .roll-word {
+    animation: none;
+
+    &.is-out {
+      animation: reveal-hide 0.01s 0.45s both;
+    }
+  }
+
+  .roll-word:not(.is-out) .phrase {
+    animation: reveal-show 0.01s 0.45s both;
+  }
+
+  .marker {
+    animation-delay: 1s;
+  }
+}
+
+.block {
+  position: absolute;
+  inset: 0.1em -0.04em;
+  z-index: 1;
+  background-color: $opponent;
+  pointer-events: none;
+  animation: reveal-block 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@keyframes reveal-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes reveal-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes reveal-wipe-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes reveal-wipe-out {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+@keyframes reveal-type {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reveal-show {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes reveal-hide {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes reveal-block {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  50.1% {
+    transform-origin: right;
+  }
+
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}

@@ -15,6 +15,11 @@ export type StartLayout =
   | 'p-combo-marker-sub'
   | 'p-combo-marker-line'
   | 'p-combo-marker-facts'
+  | 'p-combo-reveal-fade'
+  | 'p-combo-reveal-wipe'
+  | 'p-combo-reveal-letters'
+  | 'p-combo-reveal-type'
+  | 'p-combo-reveal-block'
   | 'p-final-intro'
   | 'p-final-roll'
   | 'p-final-typer'
@@ -106,10 +111,21 @@ export const START_LAYOUTS: StartOption[] = [
   { value: 'today', label: 'Heute' },
   { value: 'p-pure', label: 'Facelift (rein)' },
   { value: 'p-combo', label: 'Basis · Intro + Schreibmaschine (ohne Wort)' },
+  {
+    value: 'p-combo-marker-line',
+    label: 'Einblenden 1 · Maske von unten (Marker D)',
+  },
+  { value: 'p-combo-reveal-fade', label: 'Einblenden 2 · weiche Überblendung' },
+  { value: 'p-combo-reveal-wipe', label: 'Einblenden 3 · Wisch von links' },
+  {
+    value: 'p-combo-reveal-letters',
+    label: 'Einblenden 4 · Buchstabe für Buchstabe',
+  },
+  { value: 'p-combo-reveal-type', label: 'Einblenden 5 · getippt' },
+  { value: 'p-combo-reveal-block', label: 'Einblenden 6 · Farbblock' },
   { value: 'p-combo-marker', label: 'Marker A · Wort im Titel' },
   { value: 'p-combo-marker-duell', label: 'Marker B · «Duell» markieren' },
   { value: 'p-combo-marker-sub', label: 'Marker C · durch die Beschreibung' },
-  { value: 'p-combo-marker-line', label: 'Marker D · ganze Titelzeile' },
   { value: 'p-combo-marker-facts', label: 'Marker E · unter den Fakten' },
   { value: 'p-combo-roll', label: 'Wort 1 · Maske (Wort im Titel)' },
   { value: 'p-combo-flip', label: 'Wort 2 · 3D-Würfel' },

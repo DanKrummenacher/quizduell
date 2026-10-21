@@ -66,7 +66,12 @@ export type StartFaceliftVariant =
   | 'combo-marker-duell'
   | 'combo-marker-sub'
   | 'combo-marker-line'
-  | 'combo-marker-facts';
+  | 'combo-marker-facts'
+  | 'combo-reveal-fade'
+  | 'combo-reveal-wipe'
+  | 'combo-reveal-letters'
+  | 'combo-reveal-type'
+  | 'combo-reveal-block';
 
 /** How a word changes on the page. */
 type WordMode =
@@ -182,8 +187,17 @@ export class StartFaceliftComponent implements OnInit {
     if (['final-roll', 'final-intro-roll', 'final-all'].includes(variant)) {
       return 'roll';
     }
+    // The reveal variants are «marker-line» with another way to fade in.
+    if (variant.startsWith('combo-reveal-')) {
+      return 'marker-line';
+    }
     return variant.startsWith('combo-') ? (variant.slice(6) as WordMode) : null;
   });
+  /** How the new phrase appears: letter by letter or as a whole. */
+  protected readonly revealsLetters = computed(() =>
+    ['combo-reveal-letters', 'combo-reveal-type'].includes(this.variant()),
+  );
+
   /** The modes that change one word of the title. */
   protected readonly rollsWord = computed(() =>
     ['roll', 'flip', 'scramble', 'marker'].includes(this.wordMode() ?? ''),

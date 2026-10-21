@@ -81,13 +81,23 @@
         >
           @for (item of rollItems(); track item.key) {
             <span class="roll-word" [class.is-out]="item.out"
-              ><span class="phrase"
-                >{{ item.word }}
+              ><span class="phrase">
+                @if (revealsLetters()) {
+                  @for (letter of item.word.split(''); track $index) {
+                    <span class="letter" [style.--l]="$index">{{ letter }}</span>
+                  }
+                } @else {
+                  {{ item.word }}
+                }
                 <!-- The old phrase keeps its marker and fades out with it. -->
                 @if (wordMode() === 'marker-line') {
                   <i class="marker"></i>
-                }</span
-            ></span>
+                }
+              </span>
+              @if (variant() === 'combo-reveal-block' && !item.out) {
+                <i class="block"></i>
+              }
+            </span>
           }
         </span>
         <span #rollMeasure class="roll-measure" aria-hidden="true">
