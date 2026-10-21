@@ -414,6 +414,77 @@ $swap: cubic-bezier(0.65, 0, 0.35, 1);
   animation: reveal-block 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
+// Cube: the phrase sits on a block that turns like the sides of a cube;
+// the old side tips away upwards, the new one comes from below.
+:host(.is-combo-reveal-cube) .line-roll {
+  overflow: visible;
+  perspective: functions.rem(600);
+
+  .roll-word {
+    transform-origin: 50% 50% -0.6em;
+    backface-visibility: hidden;
+    animation: cube-turn-in 0.7s cubic-bezier(0.65, 0, 0.35, 1) both;
+
+    &.is-out {
+      animation: cube-turn-out 0.7s cubic-bezier(0.65, 0, 0.35, 1) both;
+    }
+  }
+
+  .marker {
+    animation-delay: 0.75s;
+  }
+}
+
+// Flap: as on a split-flap board, the new phrase folds down from the top,
+// the old one tips away backwards.
+:host(.is-combo-reveal-flap) .line-roll {
+  overflow: visible;
+  perspective: functions.rem(500);
+
+  .roll-word {
+    transform-origin: 50% 0;
+    backface-visibility: hidden;
+    animation: flap-in 0.6s 0.28s cubic-bezier(0.3, 1.25, 0.6, 1) both;
+
+    &.is-out {
+      transform-origin: 50% 100%;
+      animation: flap-out 0.28s cubic-bezier(0.5, 0, 0.75, 0) both;
+    }
+  }
+
+  .marker {
+    animation-delay: 0.9s;
+  }
+}
+
+@keyframes cube-turn-in {
+  from {
+    opacity: 0.3;
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes cube-turn-out {
+  to {
+    opacity: 0.3;
+    transform: rotateX(90deg);
+  }
+}
+
+@keyframes flap-in {
+  from {
+    opacity: 0;
+    transform: rotateX(-100deg);
+  }
+}
+
+@keyframes flap-out {
+  to {
+    opacity: 0;
+    transform: rotateX(90deg);
+  }
+}
+
 @keyframes reveal-fade-in {
   from {
     opacity: 0;

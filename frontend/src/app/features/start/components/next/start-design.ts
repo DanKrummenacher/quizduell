@@ -20,6 +20,8 @@ export type StartLayout =
   | 'p-combo-reveal-letters'
   | 'p-combo-reveal-type'
   | 'p-combo-reveal-block'
+  | 'p-combo-reveal-cube'
+  | 'p-combo-reveal-flap'
   | 'p-final-intro'
   | 'p-final-roll'
   | 'p-final-typer'
@@ -123,6 +125,8 @@ export const START_LAYOUTS: StartOption[] = [
   },
   { value: 'p-combo-reveal-type', label: 'Einblenden 5 · getippt' },
   { value: 'p-combo-reveal-block', label: 'Einblenden 6 · Farbblock' },
+  { value: 'p-combo-reveal-cube', label: 'Einblenden 7 · drehender Würfel' },
+  { value: 'p-combo-reveal-flap', label: 'Einblenden 8 · Klappe' },
   { value: 'p-combo-marker', label: 'Marker A · Wort im Titel' },
   { value: 'p-combo-marker-duell', label: 'Marker B · «Duell» markieren' },
   { value: 'p-combo-marker-sub', label: 'Marker C · durch die Beschreibung' },

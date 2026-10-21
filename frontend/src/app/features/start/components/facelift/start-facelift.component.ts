@@ -71,7 +71,9 @@ export type StartFaceliftVariant =
   | 'combo-reveal-wipe'
   | 'combo-reveal-letters'
   | 'combo-reveal-type'
-  | 'combo-reveal-block';
+  | 'combo-reveal-block'
+  | 'combo-reveal-cube'
+  | 'combo-reveal-flap';
 
 /** How a word changes on the page. */
 type WordMode =
