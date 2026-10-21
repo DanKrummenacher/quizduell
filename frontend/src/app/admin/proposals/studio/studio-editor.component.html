@@ -1,0 +1,158 @@
+@let d = draft();
+@let e = errors();
+
+<div class="editor">
+  <div class="head">
+    <button type="button" class="back" (click)="back.emit()">
+      <css-icon icon="angle-left" size="sm"></css-icon>
+      Alle Fragen
+    </button>
+    <h2 class="title">{{ question() ? 'Frage bearbeiten' : 'Neue Frage' }}</h2>
+    @if (question(); as q) {
+      <p class="meta">
+        @if (rate() === null) {
+          Noch nie gestellt
+        } @else {
+          <strong>{{ rate() }} %</strong> richtig · {{ q.timesAsked }}× gestellt
+        }
+      </p>
+    }
+  </div>
+
+  <div class="form">
+    <css-input-textarea
+      label="Frage"
+      placeholder="z.B. Wie viele Kantone hat die Schweiz?"
+      rows="3"
+      [maxlength]="limits.text.max"
+      character-counter
+      [value]="d.text"
+      [errorMessage]="e.text"
+      (input)="update({ text: typed($event) })"
+    />
+
+    <fieldset class="answers">
+      <legend>
+        Antworten
+        <span class="legend-hint"
+          >Tippe auf den Buchstaben der richtigen Antwort.</span
+        >
+      </legend>
+      @for (option of d.options; track $index; let i = $index) {
+        <div class="answer" [class.correct]="d.correctIndex === i">
+          <button
+            type="button"
+            class="letter"
+            [attr.aria-pressed]="d.correctIndex === i"
+            [attr.aria-label]="'Antwort ' + letters[i] + ' ist richtig'"
+            (click)="update({ correctIndex: i })"
+          >
+            @if (d.correctIndex === i) {
+              <css-icon icon="checkmark" size="sm"></css-icon>
+            } @else {
+              {{ letters[i] }}
+            }
+          </button>
+          <css-input-text
+            class="answer-input"
+            [label]="
+              'Antwort ' + letters[i] + (d.correctIndex === i ? ' · richtig' : '')
+            "
+            [maxlength]="limits.option.max"
+            [value]="option"
+            [errorMessage]="e.optionErrors?.[i] ?? undefined"
+            (input)="setOption(i, $event)"
+          />
+        </div>
+      }
+    </fieldset>
+
+    <div class="category">
+      <css-input-text
+        label="Kategorie (optional)"
+        placeholder="z.B. Logik"
+        [maxlength]="limits.category.max"
+        [value]="d.category"
+        [errorMessage]="e.category"
+        (input)="update({ category: typed($event) })"
+      />
+      @if (suggestions().length > 0) {
+        <div class="chips" aria-label="Vorhandene Kategorien">
+          @for (category of suggestions(); track category) {
+            <button type="button" class="chip" (click)="update({ category })">
+              {{ category }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <css-switch
+      label="Aktiv – wird im Spiel verwendet"
+      [checked]="d.active"
+      (change)="setActive($event)"
+    />
+
+    @if (serverError()) {
+      <p class="server-error" role="alert">{{ serverError() }}</p>
+    }
+  </div>
+
+  <div class="actions">
+    @if (question()) {
+      <css-button variant="plain" (click)="confirmDelete.set(true)">
+        <css-icon icon="trash" slot="prefix"></css-icon>
+        Löschen
+      </css-button>
+    }
+    <span class="spacer"></span>
+    @if (dirty()) {
+      <css-button (click)="discard()">Verwerfen</css-button>
+    }
+    <css-button
+      variant="primary"
+      [disabled]="!dirty()"
+      [loading]="store.saving()"
+      (click)="save()"
+    >
+      <css-icon icon="checkmark" slot="prefix"></css-icon>
+      {{ question() ? 'Speichern' : 'Frage erstellen' }}
+    </css-button>
+  </div>
+</div>
+
+<aside class="preview" aria-label="Vorschau im Spiel">
+  <span class="preview-label">
+    <css-icon icon="iphone" size="sm"></css-icon>
+    So sehen es die Spieler
+  </span>
+  <app-question-preview
+    [text]="d.text"
+    [options]="d.options"
+    [correctIndex]="d.correctIndex"
+    [category]="d.category"
+    [total]="store.settings()?.questionsPerGame ?? 3"
+    [seconds]="store.settings()?.questionDurationSec ?? 20"
+  />
+</aside>
+
+@if (confirmDelete()) {
+  <css-flyout
+    withoutCloseButton
+    size="small"
+    title="Frage löschen?"
+    main="Die Frage wird endgültig gelöscht."
+  >
+    <css-button slot="css-button" (click)="confirmDelete.set(false)"
+      >Abbrechen</css-button
+    >
+    <css-button
+      slot="css-button"
+      variant="primary"
+      [loading]="store.busy()"
+      (click)="remove()"
+    >
+      Endgültig löschen
+    </css-button>
+  </css-flyout>
+}

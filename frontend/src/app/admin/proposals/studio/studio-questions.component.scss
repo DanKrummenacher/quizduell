@@ -1,0 +1,331 @@
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'interaction';
+@use '../kit';
+
+$split: 900px;
+// Height of the sticky header with the live strip.
+$header: calc(var(--app-safe-top) + #{functions.rem(100)});
+
+:host {
+  display: block;
+}
+
+.studio {
+  @media (min-width: $split) {
+    display: grid;
+    grid-template-columns: functions.rem(360) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+// On phones the editor replaces the list.
+@media (max-width: #{$split - 1px}) {
+  .studio.has-detail .list {
+    display: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// List
+// ---------------------------------------------------------------------------
+.list {
+  background-color: kit.$white;
+
+  @media (min-width: $split) {
+    position: sticky;
+    top: $header;
+    height: calc(100dvh - #{$header});
+    overflow-y: auto;
+    border-right: functions.rem(1) solid kit.$line;
+  }
+}
+
+.list-head {
+  display: grid;
+  gap: functions.rem(12);
+  padding: functions.rem(16);
+  border-bottom: functions.rem(1) solid kit.$line;
+}
+
+.cats {
+  display: flex;
+  gap: functions.rem(6);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cat {
+  @include kit.tag;
+  flex: none;
+  padding: functions.rem(4) functions.rem(10);
+  background-color: kit.$white;
+  font: inherit;
+  font-size: functions.rem(13);
+  cursor: pointer;
+  @include interaction.chip;
+
+  span {
+    color: kit.$muted;
+  }
+
+  &.active {
+    border-color: kit.$blue;
+    background-color: kit.$blue;
+    color: kit.$white;
+
+    span {
+      color: rgba(255, 255, 255, 0.75);
+    }
+  }
+}
+
+.new {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(12);
+  width: 100%;
+  padding: functions.rem(14) functions.rem(16);
+  border: 0;
+  border-bottom: functions.rem(1) solid kit.$line;
+  background: none;
+  font: inherit;
+  font-size: functions.rem(15);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$blue;
+  text-align: left;
+  @include interaction.chip;
+
+  &.active {
+    background-color: kit.$fill;
+  }
+}
+
+.new-icon {
+  display: grid;
+  place-items: center;
+  width: functions.rem(28);
+  height: functions.rem(28);
+  border-radius: functions.rem(4);
+  background-color: kit.$blue;
+  color: kit.$white;
+}
+
+.items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  gap: functions.rem(6);
+  width: 100%;
+  padding: functions.rem(14) functions.rem(16) functions.rem(14) functions.rem(13);
+  border: 0;
+  border-left: functions.rem(3) solid transparent;
+  border-bottom: functions.rem(1) solid kit.$line;
+  background: none;
+  font: inherit;
+  text-align: left;
+  @include interaction.chip;
+
+  &.active {
+    border-left-color: kit.$blue;
+    background-color: kit.$fill;
+  }
+
+  &.inactive .item-text {
+    color: kit.$muted;
+  }
+}
+
+.item-text {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: functions.rem(15);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1.35;
+  color: kit.$blue;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.item-meta {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(8);
+  font-size: functions.rem(13);
+  color: kit.$muted;
+}
+
+.state-dot {
+  width: functions.rem(8);
+  height: functions.rem(8);
+  border: functions.rem(1) solid kit.$border;
+  border-radius: 50%;
+
+  &.on {
+    border-color: kit.$green;
+    background-color: kit.$green;
+  }
+}
+
+.item-rate {
+  margin-left: auto;
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$blue;
+
+  &.low {
+    color: kit.$red;
+  }
+}
+
+.none {
+  padding: functions.rem(24) functions.rem(16);
+  color: kit.$muted;
+  text-align: center;
+}
+
+.loading {
+  display: grid;
+  place-items: center;
+  padding: functions.rem(32);
+}
+
+// ---------------------------------------------------------------------------
+// Detail and start panel
+// ---------------------------------------------------------------------------
+.detail {
+  min-width: 0;
+  padding: functions.rem(16);
+
+  @media (min-width: $split) {
+    padding: functions.rem(32);
+  }
+}
+
+.start {
+  max-width: functions.rem(880);
+}
+
+.start-title {
+  @include kit.page-title;
+}
+
+.start-lead {
+  max-width: functions.rem(560);
+  margin: functions.rem(8) 0 0;
+  font-size: functions.rem(16);
+  line-height: 1.45;
+  color: kit.$muted;
+}
+
+.start-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: functions.rem(8);
+  margin-top: functions.rem(24);
+}
+
+.start-section {
+  @include kit.section-title;
+  margin: functions.rem(40) 0 functions.rem(16);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(functions.rem(190), 1fr));
+  gap: functions.rem(12);
+}
+
+.card {
+  @include kit.card;
+  display: grid;
+  gap: functions.rem(8);
+  padding: functions.rem(16);
+  font: inherit;
+  text-align: left;
+  @include interaction.card;
+}
+
+.card-name {
+  font-size: functions.rem(15);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$blue;
+}
+
+.card-count {
+  font-size: functions.rem(28);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1;
+  color: kit.$blue;
+
+  small {
+    font-size: functions.rem(14);
+    font-weight: miscs.$css-ui-font-weight-regular;
+    color: kit.$muted;
+  }
+}
+
+.meter {
+  @include kit.meter(kit.$green);
+}
+
+.card-rate {
+  font-size: functions.rem(13);
+  color: kit.$muted;
+}
+
+.hard {
+  @include kit.card;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+}
+
+.hard-item {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(16);
+  width: 100%;
+  padding: functions.rem(14) functions.rem(16);
+  border: 0;
+  background: none;
+  font: inherit;
+  color: kit.$blue;
+  text-align: left;
+  @include interaction.chip;
+
+  li + li & {
+    border-top: functions.rem(1) solid kit.$line;
+  }
+}
+
+.hard-rate {
+  flex: none;
+  width: functions.rem(48);
+  padding: functions.rem(6) 0;
+  border-radius: functions.rem(4);
+  background-color: #fbe9e5;
+  font-size: functions.rem(14);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: kit.$red;
+  text-align: center;
+}
+
+.hard-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: functions.rem(15);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.delete-all {
+  display: inline-block;
+  margin-top: functions.rem(32);
+}

@@ -1,0 +1,283 @@
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use '../kit';
+
+$sidebar: functions.rem(256);
+$desktop: 1024px;
+
+:host {
+  display: block;
+  min-height: 100dvh;
+  background-color: kit.$page;
+}
+
+// ---------------------------------------------------------------------------
+// Dark navigation on the left (desktop)
+// ---------------------------------------------------------------------------
+.sidebar {
+  display: none;
+}
+
+@media (min-width: $desktop) {
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: functions.rem(24);
+    width: $sidebar;
+    padding: functions.rem(24) functions.rem(16);
+    background:
+      linear-gradient(kit.$blue, kit.$blue) padding-box,
+      linear-gradient(180deg, kit.$blue, #0078bb 55%, kit.$cyan) border-box;
+    border-right: functions.rem(4) solid transparent;
+    color: kit.$white;
+  }
+
+  .mobile-head {
+    display: none;
+  }
+
+  .content {
+    margin-left: $sidebar;
+  }
+}
+
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(10);
+  padding: 0 functions.rem(8);
+
+  .logo {
+    width: functions.rem(28);
+    height: functions.rem(28);
+  }
+}
+
+.wordmark {
+  font-size: functions.rem(20);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1;
+
+  .light {
+    font-weight: miscs.$css-ui-font-weight-regular;
+  }
+}
+
+.chip {
+  margin-left: auto;
+  padding: functions.rem(2) functions.rem(8);
+  border: functions.rem(1) solid rgba(255, 255, 255, 0.4);
+  border-radius: functions.rem(10);
+  font-size: functions.rem(12);
+}
+
+.nav {
+  display: grid;
+  gap: functions.rem(4);
+  margin-top: functions.rem(16);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(12);
+  width: 100%;
+  min-height: functions.rem(48);
+  padding: 0 functions.rem(12);
+  border: 0;
+  border-radius: functions.rem(4);
+  background: none;
+  color: rgba(255, 255, 255, 0.78);
+  font: inherit;
+  font-size: functions.rem(16);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: kit.$white;
+    }
+  }
+
+  &.active {
+    background-color: kit.$white;
+    color: kit.$blue;
+    font-weight: miscs.$css-ui-font-weight-bold;
+  }
+}
+
+.nav-label {
+  flex: 1 1 auto;
+  text-align: left;
+}
+
+.count {
+  min-width: functions.rem(24);
+  padding: functions.rem(1) functions.rem(6);
+  border-radius: functions.rem(10);
+  background-color: rgba(255, 255, 255, 0.14);
+  font-size: functions.rem(12);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  text-align: center;
+
+  .active & {
+    background-color: kit.$fill;
+  }
+}
+
+// The live state, always in view.
+.live {
+  margin-top: auto;
+  padding: functions.rem(16);
+  border: functions.rem(1) solid rgba(255, 255, 255, 0.2);
+  border-radius: functions.rem(4);
+}
+
+.live-head {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(8);
+  font-size: functions.rem(13);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+
+  .dot {
+    @include kit.live-dot;
+  }
+}
+
+.live-values {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: functions.rem(8);
+  margin: functions.rem(12) 0 0;
+
+  dt {
+    font-size: functions.rem(12);
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  dd {
+    margin: 0;
+    font-size: functions.rem(24);
+    font-weight: miscs.$css-ui-font-weight-bold;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.foot {
+  display: grid;
+  gap: functions.rem(4);
+}
+
+.foot-link {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(12);
+  min-height: functions.rem(40);
+  padding: 0 functions.rem(12);
+  border: 0;
+  border-radius: functions.rem(4);
+  background: none;
+  color: rgba(255, 255, 255, 0.78);
+  font: inherit;
+  font-size: functions.rem(15);
+  cursor: pointer;
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: kit.$white;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Content
+// ---------------------------------------------------------------------------
+.mobile-head {
+  padding: var(--app-safe-top) functions.rem(0) 0;
+}
+
+.content {
+  max-width: functions.rem(1200);
+  padding: functions.rem(24) functions.rem(16)
+    calc(var(--app-safe-bottom) + #{functions.rem(96)});
+
+  @media (min-width: 600px) {
+    padding-inline: functions.rem(24);
+  }
+
+  @media (min-width: $desktop) {
+    padding: functions.rem(40) functions.rem(48) functions.rem(64);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tab bar at the bottom (phones and tablets)
+// ---------------------------------------------------------------------------
+.tabbar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: functions.rem(6) functions.rem(8)
+    calc(var(--app-safe-bottom) + #{functions.rem(6)});
+  border-top: functions.rem(1) solid kit.$line;
+  background-color: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+
+  @media (min-width: $desktop) {
+    display: none;
+  }
+}
+
+.tab {
+  display: grid;
+  justify-items: center;
+  gap: functions.rem(2);
+  min-height: functions.rem(52);
+  padding: functions.rem(6) 0;
+  border: 0;
+  border-radius: functions.rem(4);
+  background: none;
+  color: kit.$muted;
+  font: inherit;
+  font-size: functions.rem(12);
+  cursor: pointer;
+
+  &.active {
+    color: kit.$blue;
+    font-weight: miscs.$css-ui-font-weight-bold;
+
+    css-icon {
+      padding: functions.rem(2) functions.rem(16);
+      border-radius: functions.rem(12);
+      background-color: kit.$fill;
+    }
+  }
+
+  css-icon {
+    padding: functions.rem(2) functions.rem(16);
+  }
+}
+
+.toast {
+  @include kit.toast;
+
+  @media (max-width: #{$desktop - 1px}) {
+    bottom: calc(var(--app-safe-bottom) + #{functions.rem(84)});
+  }
+
+  @media (min-width: $desktop) {
+    left: calc(50% + #{$sidebar} / 2);
+  }
+}

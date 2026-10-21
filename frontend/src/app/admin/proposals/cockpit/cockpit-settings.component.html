@@ -1,0 +1,117 @@
+<header class="head">
+  <div>
+    <h1 class="title">Spielregeln</h1>
+    <p class="lead">
+      Änderungen gelten ab dem nächsten Duell, laufende Duelle bleiben gleich.
+    </p>
+  </div>
+  <css-button
+    variant="plain"
+    [disabled]="store.isDefault() || store.saving()"
+    (click)="store.applyDefaults()"
+  >
+    <css-icon icon="reload" slot="prefix"></css-icon>
+    Empfohlene Werte
+  </css-button>
+</header>
+
+@if (store.form(); as f) {
+  <div class="layout">
+    <div class="groups">
+      @for (group of groups; track group.title) {
+        <section class="group">
+          <div class="group-head">
+            <span class="group-icon"><css-icon [icon]="group.icon"></css-icon></span>
+            <div>
+              <h2 class="group-title">{{ group.title }}</h2>
+              <p class="group-text">{{ group.text }}</p>
+            </div>
+          </div>
+          <div class="fields">
+            @for (item of group.fields; track item.key) {
+              <css-input-stepper
+                [label]="item.label"
+                [hint]="item.hint"
+                [value]="'' + f[item.key]"
+                [attr.min-number]="store.limit(item.key).min"
+                [attr.max-number]="store.limit(item.key).max"
+                [attr.error-message]="store.errors()[item.key] ?? null"
+                (change)="setNumber(item.key, $event)"
+              ></css-input-stepper>
+            }
+          </div>
+          @if (group.title === 'Duell') {
+            <div class="bonus">
+              <css-switch
+                label="Tempo-Bonus"
+                hint="Schnelle richtige Antworten geben bis zu 100 Zusatzpunkte."
+                [checked]="f.speedBonusEnabled"
+                (change)="setBonus($event)"
+              ></css-switch>
+            </div>
+          }
+        </section>
+      }
+    </div>
+
+    <!-- A live picture of one duel with these rules -->
+    <aside class="preview" aria-label="So läuft ein Duell">
+      <span class="eyebrow">Vorschau</span>
+      <h2 class="preview-title">So läuft ein Duell</h2>
+      @if (store.valid()) {
+        <app-duel-timeline
+          [segments]="store.timeline()"
+          [seconds]="store.gameSeconds()"
+          [showLabels]="f.questionsPerGame <= 6"
+        />
+      } @else {
+        <p class="invalid">Bitte prüfe die markierten Werte.</p>
+      }
+      <dl class="facts">
+        <div>
+          <dt>Dauer</dt>
+          <dd>{{ duration(store.gameSeconds()) }}</dd>
+        </div>
+        <div>
+          <dt>Max. Punkte</dt>
+          <dd>{{ store.maxPoints() }}</dd>
+        </div>
+        <div>
+          <dt>Aktive Fragen</dt>
+          <dd [class.bad]="!!store.questionWarning()">
+            {{ store.stats()?.activeQuestions ?? '–' }}
+          </dd>
+        </div>
+      </dl>
+      @if (store.questionWarning(); as warning) {
+        <p class="warning">{{ warning }}</p>
+      }
+    </aside>
+  </div>
+
+  <!-- Appears as soon as something changed -->
+  @if (store.dirty()) {
+    <div class="savebar" role="region" aria-label="Ungespeicherte Änderungen">
+      <span class="savebar-text">
+        <span class="savebar-dot"></span>
+        Ungespeicherte Änderungen
+      </span>
+      <div class="savebar-actions">
+        <css-button [disabled]="store.saving()" (click)="store.discardSettings()">
+          Verwerfen
+        </css-button>
+        <css-button
+          variant="primary"
+          [disabled]="!store.valid()"
+          [loading]="store.saving()"
+          (click)="store.saveSettings()"
+        >
+          <css-icon icon="checkmark" slot="prefix"></css-icon>
+          Speichern
+        </css-button>
+      </div>
+    </div>
+  }
+} @else {
+  <div class="loading"><css-spinner size="lg"></css-spinner></div>
+}

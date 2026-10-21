@@ -1,0 +1,113 @@
+@if (store.stats(); as s) {
+  <h1 class="section-title">Jetzt am Stand</h1>
+
+  <!-- The stage: what happens at the stand right now -->
+  <section class="stage" aria-label="Live">
+    <span class="status" [class.warning]="!store.ready()" role="status">
+      <span class="dot"></span>
+      {{ store.ready() ? 'Bereit für Besucher' : 'Noch nicht spielbar' }}
+    </span>
+
+    <div class="duel" [class.running]="s.activeGames > 0">
+      <span class="player"><css-icon icon="avatar" size="lg"></css-icon></span>
+      <span class="versus">vs</span>
+      <span class="player opponent"
+        ><css-icon icon="avatar" size="lg"></css-icon
+      ></span>
+    </div>
+
+    <p class="headline">
+      @if (s.activeGames === 0) {
+        Gerade läuft kein Duell
+      } @else if (s.activeGames === 1) {
+        <strong>1</strong> Duell läuft
+      } @else {
+        <strong>{{ s.activeGames }}</strong> Duelle laufen
+      }
+    </p>
+
+    <dl class="values">
+      <div>
+        <dt>Geräte</dt>
+        <dd>{{ s.playersOnline }}</dd>
+      </div>
+      <div>
+        <dt>Suchen Gegner</dt>
+        <dd>{{ s.playersSearching }}</dd>
+      </div>
+      <div>
+        <dt>Duelle heute</dt>
+        <dd>{{ s.gamesToday }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  @if (!store.ready()) {
+    <p class="hint" role="alert">
+      Es braucht mindestens {{ s.requiredQuestions }} aktive Fragen – es fehlen noch
+      {{ store.missingQuestions() }}.
+    </p>
+  }
+
+  <h2 class="section-title small">Verwalten</h2>
+
+  <div class="choices">
+    <button type="button" class="choice-card" (click)="navigate.emit('questions')">
+      <span class="choice-block" aria-hidden="true">
+        <css-icon icon="items-list" size="lg"></css-icon>
+      </span>
+      <span class="choice-text">
+        <span class="choice-title">Fragen</span>
+        <span class="choice-description">
+          {{ store.counts().active }} aktiv ·
+          {{ store.categories().length }} Kategorien
+        </span>
+      </span>
+      <css-icon class="chevron" icon="angle-right" size="sm"></css-icon>
+    </button>
+
+    <button type="button" class="choice-card" (click)="navigate.emit('rules')">
+      <span class="choice-block" aria-hidden="true">
+        <css-icon icon="settings" size="lg"></css-icon>
+      </span>
+      <span class="choice-text">
+        <span class="choice-title">Spielregeln</span>
+        <span class="choice-description">{{ rules() }}</span>
+      </span>
+      <css-icon class="chevron" icon="angle-right" size="sm"></css-icon>
+    </button>
+
+    <button type="button" class="choice-card" (click)="openGame.emit()">
+      <span class="choice-block" aria-hidden="true">
+        <css-icon icon="home" size="lg"></css-icon>
+      </span>
+      <span class="choice-text">
+        <span class="choice-title">Zum Spiel</span>
+        <span class="choice-description">Startseite auf diesem Gerät öffnen</span>
+      </span>
+      <css-icon class="chevron" icon="angle-right" size="sm"></css-icon>
+    </button>
+  </div>
+
+  <dl class="totals">
+    <div>
+      <dt>Duelle insgesamt</dt>
+      <dd>{{ s.gamesTotal }}</dd>
+    </div>
+    <div>
+      <dt>Richtig beantwortet</dt>
+      <dd>{{ store.overallRate() === null ? '–' : store.overallRate() + ' %' }}</dd>
+    </div>
+  </dl>
+
+  <button type="button" class="logout" (click)="logout.emit()">
+    <css-icon icon="logout" size="sm"></css-icon>
+    Abmelden
+  </button>
+} @else if (store.statsError()) {
+  <p class="hint" role="alert">
+    Die Daten konnten nicht geladen werden. Neuer Versuch in wenigen Sekunden.
+  </p>
+} @else {
+  <div class="loading"><css-spinner size="lg"></css-spinner></div>
+}
