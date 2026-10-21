@@ -7,12 +7,9 @@ import '@css-ch/components/button';
   selector: 'app-lobby-header',
   templateUrl: './lobby-header.component.html',
   styleUrl: './lobby-header.component.scss',
-  host: { '[class.is-modern]': 'modern()' },
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LobbyHeaderComponent {
   readonly playerName = input.required<string>();
-  // TEMPORARY: typography of the facelift.
-  readonly modern = input(false);
   readonly navigateBack = output<void>();
 }

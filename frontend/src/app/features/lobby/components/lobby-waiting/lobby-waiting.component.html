@@ -1,10 +1,13 @@
-<h2 class="status-title">Spiel erstellt</h2>
-<calc-text textMedium class="status-subtitle"
-  >Teile diesen Code mit deinem Gegner</calc-text
->
+<h2 class="section-title">Spiel erstellt</h2>
+<p class="body-text">Teile diesen Code mit deinem Freund</p>
 
-<div class="code-box">
-  <calc-text class="code-text">{{ roomCode() }}</calc-text>
+<!-- The boxes of «Code eingeben», filled with your code. -->
+<div class="code-boxes" role="text" [attr.aria-label]="'Code ' + roomCode()">
+  @for (char of chars(); track $index) {
+    <span class="code-box" [style.--i]="$index" aria-hidden="true"
+      ><span class="char">{{ char }}</span></span
+    >
+  }
 </div>
 
 <css-button
@@ -20,4 +23,7 @@
   {{ isCopied() ? 'Kopiert!' : 'Code kopieren' }}
 </css-button>
 
-<calc-text textSmall class="waiting-text">Warte auf den Gegner...</calc-text>
+<div class="waiting" role="status">
+  <p class="waiting-text">Warte auf deinen Freund&nbsp;…</p>
+  <span class="bar" aria-hidden="true"><i></i></span>
+</div>

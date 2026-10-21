@@ -3,7 +3,6 @@ import {
   computed,
   effect,
   inject,
-  isDevMode,
   type OnDestroy,
   signal,
   untracked,
@@ -18,13 +17,11 @@ import { GameClient } from '../../../../core/game/game-client.service';
 import { IdleResetService } from '../../../../core/platform/idle-reset.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
 import { LobbyUiComponent } from '../../components/lobby-ui/lobby-ui.component';
-import { LobbyDesignPanelComponent } from '../../components/next/design-preview-panel.component';
-import type { LobbyDesign } from '../../components/next/lobby-design';
 import type { LobbyState } from '../../lobby.types';
 
 @Component({
   selector: 'app-lobby-container',
-  imports: [LobbyUiComponent, LobbyDesignPanelComponent],
+  imports: [LobbyUiComponent],
   templateUrl: './lobby-container.component.html',
 })
 export class LobbyContainerComponent implements OnDestroy {
@@ -39,17 +36,7 @@ export class LobbyContainerComponent implements OnDestroy {
 
   private readonly game = this.gameClient.state;
 
-  // TEMPORARY: compare the lobby of today with the facelift
-  // (development builds only).
-  readonly showDesignPreview = isDevMode();
-  readonly design = signal<LobbyDesign>('facelift');
-  readonly previewScreen = signal<LobbyState | null>(null);
-
-  readonly lobbyState = computed<LobbyState>(
-    () => this.previewScreen() ?? this.realLobbyState(),
-  );
-
-  private readonly realLobbyState = computed<LobbyState>(() => {
+  readonly lobbyState = computed<LobbyState>(() => {
     const phase = this.game()?.phase;
     if (phase === 'waiting') {
       return 'WAITING';
@@ -63,13 +50,8 @@ export class LobbyContainerComponent implements OnDestroy {
     return this.menuState();
   });
 
-  readonly roomCode = computed(
-    () => this.game()?.gameCode ?? (this.previewScreen() ? 'S6Q2' : ''),
-  );
-  readonly opponentName = computed(
-    () =>
-      this.game()?.opponent?.name ?? (this.previewScreen() ? 'Max Mustermann' : ''),
-  );
+  readonly roomCode = computed(() => this.game()?.gameCode ?? '');
+  readonly opponentName = computed(() => this.game()?.opponent?.name ?? '');
   readonly countdownMs = computed(() => this.game()?.phaseDurationMs ?? 3000);
   readonly opponentLeft = computed(() => this.game()?.phase === 'aborted');
 

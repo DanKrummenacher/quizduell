@@ -1,27 +1,21 @@
-<h2 class="action-title">Spielmodus</h2>
+<h2 class="section-title">Spielmodus</h2>
 
-<button type="button" class="action-card mode-card" (click)="selectQuickGame.emit()">
-  <css-icon icon="lightning-strike" class="card-icon" size="xl"></css-icon>
-  <div class="card-text-wrapper">
-    <calc-text textMedium textLead class="card-title">Schnellspiel 1vs1</calc-text>
-    <calc-text textSmall class="card-desc"
-      >Spiele gegen einen zufälligen Gegner</calc-text
-    >
-  </div>
+<button type="button" class="choice-card" (click)="selectQuickGame.emit()">
+  <span class="choice-block" aria-hidden="true">
+    <css-icon icon="lightning-strike" size="lg"></css-icon>
+  </span>
+  <span class="choice-text">
+    <span class="choice-title">Schnellspiel 1vs1</span>
+    <span class="choice-description">Spiele gegen einen zufälligen Gegner</span>
+  </span>
 </button>
 
-<button
-  type="button"
-  class="action-card mode-card"
-  (click)="selectFriendGame.emit()"
->
-  <css-icon icon="conference" class="card-icon" size="xl"></css-icon>
-  <div class="card-text-wrapper">
-    <calc-text textMedium textLead class="card-title"
-      >Freund herausfordern</calc-text
-    >
-    <calc-text textSmall class="card-desc"
-      >Erstelle oder tritt einem Spiel bei</calc-text
-    >
-  </div>
+<button type="button" class="choice-card" (click)="selectFriendGame.emit()">
+  <span class="choice-block" aria-hidden="true">
+    <css-icon icon="conference" size="lg"></css-icon>
+  </span>
+  <span class="choice-text">
+    <span class="choice-title">Freund herausfordern</span>
+    <span class="choice-description">Erstelle oder tritt einem Spiel bei</span>
+  </span>
 </button>

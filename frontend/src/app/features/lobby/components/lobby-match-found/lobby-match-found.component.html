@@ -1,18 +1,39 @@
-<div class="success-box-wrapper">
-  <div class="success-box">
-    <css-icon icon="checkmark-circle" class="success-icon" size="xl"></css-icon>
+<div role="status">
+  <!-- Both players move together; the check confirms the match. -->
+  <div class="visual" aria-hidden="true">
+    <div class="duo">
+      <span class="glow"></span>
+      <span class="avatar is-me">{{ myInitial() }}</span>
+      <span class="avatar is-opponent">{{ opponentInitial() }}</span>
+      <span class="badge"><css-icon icon="checkmark" size="sm"></css-icon></span>
+    </div>
+  </div>
+
+  <h2 class="section-title status-title">Verbunden!</h2>
+  <p class="body-text">
+    Du spielst gegen <strong class="opponent-name">{{ opponentName() }}</strong>
+  </p>
+
+  <!-- Screen readers get the countdown as a sentence. -->
+  <p class="visually-hidden">
+    @if (countdown() > 0) {
+      Das Duell beginnt in {{ countdown() }} Sekunden
+    } @else {
+      Los geht’s!
+    }
+  </p>
+
+  <!-- The countdown, where the search had its cancel button. -->
+  <div class="countdown" aria-hidden="true">
+    <!-- Odd and even seconds are separate blocks: every new second is a
+         new element, so it rolls in again. -->
+    @let second = countdown();
+    @if (second === 0) {
+      <span class="countdown-number is-go">Los!</span>
+    } @else if (second % 2 === 1) {
+      <span class="countdown-number">{{ second }}</span>
+    } @else {
+      <span class="countdown-number">{{ second }}</span>
+    }
   </div>
 </div>
-
-<calc-text textLarge textLead class="title-text">Gegner gefunden!</calc-text>
-
-<calc-text textMedium class="opponent-label">Dein Gegner:</calc-text>
-<h2 class="opponent-name">{{ opponentName() }}</h2>
-
-@if (countdown() > 0) {
-  <calc-text class="countdown-text"
-    >Das Duell beginnt in {{ countdown() }}s...</calc-text
-  >
-} @else {
-  <calc-text textSmall class="countdown-text">Los geht's!</calc-text>
-}

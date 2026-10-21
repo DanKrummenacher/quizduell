@@ -20,19 +20,10 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: functions.rem(20);
+  // The content sits slightly above the middle, which looks calmer.
+  padding: functions.rem(20) functions.rem(20) functions.rem(100);
   box-sizing: border-box;
   width: 100%;
-}
-
-.centered-content {
-  width: 100%;
-}
-
-// TEMPORARY (facelift): the content sits slightly above the middle, which
-// looks calmer than the exact middle.
-.main-area.is-facelift {
-  padding-bottom: functions.rem(100);
 
   @media (max-height: 700px) {
     padding-bottom: functions.rem(60);
@@ -41,4 +32,8 @@
   @media (max-height: 600px) {
     padding-bottom: functions.rem(20);
   }
+}
+
+.centered-content {
+  width: 100%;
 }

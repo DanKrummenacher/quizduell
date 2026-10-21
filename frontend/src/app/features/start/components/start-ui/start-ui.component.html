@@ -1,36 +1,67 @@
 <app-brand-header />
 
-<main class="main-content">
-  <div class="centered-wrapper">
-    <h1 class="main-title">Teste dein Wissen im direkten Duell</h1>
+<main class="main">
+  <div class="content">
+    <!-- With a measured width: where the longest phrase fits, the title
+         stays on one line; otherwise every phrase stands on the second line.
+         The number of lines never changes. -->
+    <h1 #title class="title" [class.is-stacked]="stacked()">
+      <span #lead class="lead">Teste dein Wissen</span>
+      {{ ' ' }}
+      <span class="visually-hidden">im direkten Duell</span>
+      <span class="phrase-box" aria-hidden="true" [style.width.px]="phraseWidth()">
+        @for (item of phraseItems(); track item.key) {
+          <span class="phrase" [class.is-out]="item.out"
+            ><span class="phrase-text">{{ item.text }}<i class="marker"></i></span
+          ></span>
+        }
+      </span>
+      <!-- Hidden copies of the phrases, only to measure their widths. -->
+      <span #measure class="measure" aria-hidden="true">
+        @for (phrase of phrases(); track phrase) {
+          <span>{{ phrase }}</span>
+        }
+      </span>
+    </h1>
 
-    <calc-text textLarge class="subtitle">
+    <p class="subtitle">
       Fordere deinen Gegner heraus, sammle Punkte und sichere dir den Sieg.
-    </calc-text>
+    </p>
 
-    <div class="features-row">
+    <ul class="facts">
       @for (feature of features(); track feature.text) {
-        <div class="feature-item">
-          <div class="feature-circle">
-            <css-icon
-              [icon]="feature.icon"
-              class="feature-icon"
-              size="xl"
-            ></css-icon>
-          </div>
-          <calc-text textMedium textLead class="feature-text">{{
-            feature.text
-          }}</calc-text>
-        </div>
+        <li class="fact" [style.--i]="$index">
+          <span class="symbol"
+            ><css-icon [icon]="feature.icon" size="xl"></css-icon
+          ></span>
+          <span class="fact-text">{{ feature.text }}</span>
+        </li>
       }
-    </div>
+    </ul>
 
-    <div class="form-wrapper">
-      <app-start-form
-        [initialName]="initialName()"
-        [notice]="notice()"
-        (nameSubmitted)="onNameSubmitted($event)"
-      ></app-start-form>
+    <div class="form">
+      <css-input-text
+        id="playerName"
+        label="Dein Name"
+        autocomplete="nickname"
+        [placeholder]="placeholder()"
+        [attr.maxlength]="maxLength"
+        [value]="playerName()"
+        [errorMessage]="errorMessage() || undefined"
+        (input)="onNameInput($event)"
+        (keydown)="onKeydown($event)"
+      ></css-input-text>
+
+      <css-button stretch variant="primary" (click)="submit()">
+        <css-icon icon="angle-right-circle" slot="prefix"></css-icon>
+        Los geht’s
+      </css-button>
+
+      @if (notice(); as message) {
+        <p class="notice" role="status">{{ message }}</p>
+      } @else {
+        <p class="info">Direkt loslegen – kein Account nötig</p>
+      }
     </div>
   </div>
 </main>

@@ -122,7 +122,9 @@ test.describe('admin area', () => {
     await login(page);
     await page.locator('css-button', { hasText: 'Zum Spiel' }).click();
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.locator('h1.main-title')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: /Teste dein Wissen/ }),
+    ).toBeVisible();
     await page.goto('/admin/fragen');
     await expect(page).toHaveURL(/\/admin\/fragen$/);
   });

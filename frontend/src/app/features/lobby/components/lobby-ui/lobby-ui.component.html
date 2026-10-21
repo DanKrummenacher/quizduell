@@ -5,77 +5,43 @@
     <div class="header-area">
       <app-lobby-header
         [playerName]="playerName()"
-        [modern]="design() === 'facelift'"
         (navigateBack)="navigateBack.emit()"
-      >
-      </app-lobby-header>
+      />
     </div>
   }
 
-  @if (design() === 'facelift') {
-    <main class="main-area is-facelift">
-      <div class="centered-content">
-        @switch (state()) {
-          @case ('CHOOSE_MODE') {
-            <app-facelift-mode
-              (selectQuickGame)="selectQuickGame.emit()"
-              (selectFriendGame)="selectFriendGame.emit()"
-            />
-          }
-          @case ('CHOOSE_ACTION') {
-            <app-facelift-actions
-              [joinError]="joinError()"
-              (createGame)="createGame.emit()"
-              (joinGame)="joinGame.emit($event)"
-            />
-          }
-          @case ('SEARCHING') {
-            <app-facelift-searching (cancelSearch)="cancelSearch.emit()" />
-          }
-          @case ('WAITING') {
-            <app-facelift-waiting [roomCode]="roomCode()" />
-          }
-          @case ('FOUND') {
-            <app-facelift-match-found
-              [playerName]="playerName()"
-              [opponentName]="opponentName()"
-              [durationMs]="countdownMs()"
-            />
-          }
-        }
-      </div>
-    </main>
-  } @else {
-    <main class="main-area">
-      <div class="centered-content">
-        @if (state() === 'CHOOSE_MODE') {
+  <main class="main-area">
+    <div class="centered-content">
+      @switch (state()) {
+        @case ('CHOOSE_MODE') {
           <app-lobby-mode
             (selectQuickGame)="selectQuickGame.emit()"
             (selectFriendGame)="selectFriendGame.emit()"
-          >
-          </app-lobby-mode>
-        } @else if (state() === 'CHOOSE_ACTION') {
+          />
+        }
+        @case ('CHOOSE_ACTION') {
           <app-lobby-actions
             [joinError]="joinError()"
             (createGame)="createGame.emit()"
             (joinGame)="joinGame.emit($event)"
-          >
-          </app-lobby-actions>
-        } @else if (state() === 'SEARCHING') {
-          <app-lobby-searching
-            (cancelSearch)="cancelSearch.emit()"
-          ></app-lobby-searching>
-        } @else if (state() === 'WAITING') {
-          <app-lobby-waiting [roomCode]="roomCode()"></app-lobby-waiting>
-        } @else if (state() === 'FOUND') {
+          />
+        }
+        @case ('SEARCHING') {
+          <app-lobby-searching (cancelSearch)="cancelSearch.emit()" />
+        }
+        @case ('WAITING') {
+          <app-lobby-waiting [roomCode]="roomCode()" />
+        }
+        @case ('FOUND') {
           <app-lobby-match-found
+            [playerName]="playerName()"
             [opponentName]="opponentName()"
             [durationMs]="countdownMs()"
-          ></app-lobby-match-found>
+          />
         }
-      </div>
-    </main>
-  }
+      }
+    </div>
+  </main>
 </div>
 
 @if (opponentLeft()) {

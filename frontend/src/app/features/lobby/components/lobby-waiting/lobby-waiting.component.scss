@@ -1,49 +1,158 @@
+// Title → text 8, text → code 32, code → copy 16, copy → waiting 40,
+// text → bar 12. The bar is exactly as wide as the code.
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
+@use 'lobby';
+
+$track: #dfe3ea;
+$bold: miscs.$css-ui-font-weight-bold;
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 
 :host {
+  --gap-code: #{functions.rem(32)};
+  --gap-copy: #{functions.rem(16)};
+  --gap-waiting: #{functions.rem(40)};
+  --gap-bar: #{functions.rem(12)};
+  --box: #{functions.rem(60)};
+  --code-width: calc(4 * var(--box) + 3 * #{functions.rem(12)});
+
   display: block;
+  text-align: center;
 }
 
-.status-title {
-  font-size: functions.rem(24);
-  font-weight: miscs.$css-ui-font-weight-regular;
-  color: colors.$dt-color-darkblue-100;
-  text-align: center;
-  margin: 0 0 functions.rem(8);
+.section-title {
+  @include lobby.section-title;
+  margin-bottom: functions.rem(8);
 }
 
-.status-subtitle {
-  margin-top: functions.rem(8);
-  text-align: center;
+.body-text {
+  @include lobby.body-text;
+}
+
+// The boxes of «Code eingeben»; the characters roll in one by one.
+.code-boxes {
+  display: grid;
+  grid-template-columns: repeat(4, var(--box));
+  justify-content: center;
+  gap: functions.rem(12);
+  margin-top: var(--gap-code);
 }
 
 .code-box {
-  margin: functions.rem(35) functions.rem(40) 0;
-  height: functions.rem(94);
-  background-color: colors.$dt-color-white-100;
-  border: functions.rem(1) solid #8098be;
+  display: grid;
+  place-items: center;
+  height: functions.rem(68);
+  border: functions.rem(1) solid $blue;
   border-radius: functions.rem(4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: $white;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  color: $blue;
 }
 
-.code-text {
-  font-size: functions.rem(32);
-  font-weight: miscs.$css-ui-font-weight-bold;
-  color: colors.$dt-color-darkblue-100;
-  letter-spacing: functions.rem(4);
+.char {
+  display: block;
+  animation: roll-in 0.35s $spring both;
+  animation-delay: calc(var(--i) * 90ms);
 }
 
 .copy-button {
   display: block;
-  margin: functions.rem(20) auto 0;
   width: fit-content;
+  margin: var(--gap-copy) auto 0;
+}
+
+.waiting {
+  width: var(--code-width);
+  max-width: 100%;
+  margin: var(--gap-waiting) auto 0;
 }
 
 .waiting-text {
-  margin-top: functions.rem(40);
-  text-align: center;
+  margin: 0;
+  font-size: functions.rem(15);
+  color: lobby.$muted;
+}
+
+// A clear, solid piece runs from left to right along the track.
+.bar {
+  position: relative;
+  display: block;
+  height: functions.rem(4);
+  margin-top: var(--gap-bar);
+  overflow: hidden;
+  border-radius: functions.rem(999);
+  background-color: $track;
+
+  i {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 30%;
+    border-radius: inherit;
+    background-color: $blue;
+    animation: run 1.8s ease-in-out infinite;
+  }
+}
+
+@include lobby.short-screen {
+  :host {
+    --gap-code: #{functions.rem(24)};
+    --gap-waiting: #{functions.rem(24)};
+  }
+}
+
+@media (max-height: 600px) {
+  :host {
+    --gap-code: #{functions.rem(16)};
+    --gap-copy: #{functions.rem(8)};
+    --gap-waiting: #{functions.rem(16)};
+    --gap-bar: #{functions.rem(8)};
+  }
+
+  .code-box {
+    height: functions.rem(56);
+  }
+}
+
+@media (max-width: 359px) {
+  :host {
+    --box: #{functions.rem(54)};
+  }
+
+  .code-box {
+    height: functions.rem(60);
+    font-size: functions.rem(26);
+  }
+}
+
+// Without motion: the piece stays in the middle.
+@media (prefers-reduced-motion: reduce) {
+  .char,
+  .bar i {
+    animation: none;
+  }
+
+  .bar i {
+    left: 35%;
+  }
+}
+
+@keyframes roll-in {
+  from {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+}
+
+@keyframes run {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(334%);
+  }
 }

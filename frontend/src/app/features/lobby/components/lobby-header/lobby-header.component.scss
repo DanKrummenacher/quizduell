@@ -1,58 +1,45 @@
+// The type scale of the quiz and result pages.
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
+@use 'screen';
 
 :host {
   display: block;
 }
 
 .top-bar {
-  margin-bottom: functions.rem(35);
+  margin-bottom: functions.rem(40);
+
+  @media (max-height: 700px) {
+    margin-bottom: functions.rem(32);
+  }
+
+  @media (max-height: 600px) {
+    margin-bottom: functions.rem(16);
+  }
 }
 
 .back-button {
-  margin: 0;
   display: inline-block;
   width: fit-content;
+  margin: 0;
 }
 
 .greeting-title {
-  font-size: functions.rem(28);
-  font-weight: miscs.$css-ui-font-weight-regular;
-  color: colors.$dt-color-darkblue-100;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   max-width: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-size: functions.rem(28);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: colors.$dt-color-darkblue-100;
 }
 
 .greeting-subtitle {
+  display: block;
   margin-top: functions.rem(4);
-}
-
-// TEMPORARY: the facelift uses the type scale of the quiz and result pages.
-:host(.is-modern) {
-  .top-bar {
-    margin-bottom: functions.rem(40);
-
-    @media (max-height: 700px) {
-      margin-bottom: functions.rem(32);
-    }
-
-    @media (max-height: 600px) {
-      margin-bottom: functions.rem(16);
-    }
-  }
-
-  .greeting-title {
-    font-weight: miscs.$css-ui-font-weight-bold;
-    line-height: 1.2;
-  }
-
-  .greeting-subtitle {
-    display: block;
-    margin-top: functions.rem(4);
-    color: #4d70a4;
-  }
+  color: screen.$muted;
 }

@@ -1,83 +1,357 @@
+// The start page in the design system of the lobby: the large description,
+// white symbols with a frame and generous spacing on the 4/8 grid: title →
+// text 16, text → facts 48, symbol → label 16, facts → form 56, form 16.
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
+@use 'lobby';
+
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$mid: #0078bb;
+$opponent: #00a4e0;
+$spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
+$ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+$turn: cubic-bezier(0.65, 0, 0.35, 1);
 
 :host {
+  --gap-text: #{functions.rem(16)};
+  --gap-facts: #{functions.rem(48)};
+  --gap-label: #{functions.rem(16)};
+  --gap-form: #{functions.rem(56)};
+  --symbol: #{functions.rem(60)};
+  --gap-between: #{functions.rem(40)};
+
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
 }
 
-.main-content {
-  flex-grow: 1;
+// As the lobby: the content sits slightly above the middle.
+.main {
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
   justify-content: center;
-  padding: functions.rem(40) functions.rem(30);
-  box-sizing: border-box;
-  width: 100%;
+  padding: functions.rem(32) functions.rem(20) functions.rem(80);
 }
 
-.centered-wrapper {
+.content {
+  text-align: center;
+}
+
+// ---------------------------------------------------------------------------
+// Title with the changing phrase
+// ---------------------------------------------------------------------------
+.title {
+  position: relative;
+  margin: 0;
+  font-size: functions.rem(28);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1.2;
+  text-wrap: balance;
+  color: $blue;
+}
+
+// The phrase sits on a block that turns like the sides of a cube.
+.phrase-box {
+  position: relative;
+  display: inline-block;
+  // Until it is measured: wide enough for «im direkten Duell».
+  min-width: 7.8em;
+  height: 1.2em;
+  vertical-align: bottom;
+  white-space: nowrap;
+  color: $blue;
+  perspective: functions.rem(600);
+  transition: width 0.6s 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &[style*='width'] {
+    min-width: 0;
+  }
+}
+
+// Not enough room for the longest phrase: every phrase on its own line.
+.title.is-stacked .phrase-box {
+  display: block;
+  margin-inline: auto;
+}
+
+.phrase {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 50% 50% -0.6em;
+  backface-visibility: hidden;
+  animation: turn-in 0.7s $turn both;
+
+  &.is-out {
+    animation: turn-out 0.7s $turn both;
+  }
+}
+
+.phrase-text {
+  position: relative;
+  isolation: isolate;
+}
+
+// A light blue marker draws under the new phrase.
+.marker {
+  position: absolute;
+  right: -0.06em;
+  bottom: 0.1em;
+  left: -0.06em;
+  z-index: -1;
+  height: 0.34em;
+  border-radius: functions.rem(3);
+  background-color: rgba($opponent, 0.32);
+  animation: marker-draw 0.6s 0.75s $ease-out both;
+
+  .is-out & {
+    animation: none;
+  }
+}
+
+// Hidden copies of the phrases, only to measure their widths. The box has
+// no size of its own, so the copies never make the page wider.
+.measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+
+  span {
+    position: absolute;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Description, facts and form
+// ---------------------------------------------------------------------------
+.subtitle {
+  margin: var(--gap-text) 0 0;
+  font-size: functions.rem(20);
+  line-height: 1.25;
+  text-wrap: balance;
+  color: lobby.$muted;
+}
+
+// The three facts: a compact group in the middle, white symbols with a fine
+// frame.
+.facts {
+  display: flex;
+  justify-content: center;
+  gap: var(--gap-between);
+  margin: var(--gap-facts) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fact {
+  display: grid;
+  justify-items: center;
+  gap: var(--gap-label);
+}
+
+.symbol {
+  display: grid;
+  place-items: center;
+  width: var(--symbol);
+  height: var(--symbol);
+  box-sizing: border-box;
+  border: functions.rem(1) solid lobby.$border;
+  border-radius: 50%;
+  background-color: $white;
+  color: $blue;
+
+  css-icon {
+    display: block;
+  }
+}
+
+.fact-text {
+  font-size: functions.rem(16);
+  color: $blue;
+}
+
+.form {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 100%;
+  gap: functions.rem(16);
+  margin-top: var(--gap-form);
+  text-align: left;
+
+  css-button {
+    display: block;
+  }
 }
 
-.main-title {
-  text-wrap: balance;
-  font-size: functions.rem(28);
-  font-weight: miscs.$css-ui-font-weight-medium;
-  color: colors.$dt-color-darkblue-100;
-  margin: 0;
+.info,
+.notice {
+  margin: functions.rem(4) 0 0;
+  font-size: functions.rem(16);
   text-align: center;
+  color: lobby.$muted;
+}
+
+.notice {
+  color: #d53419;
+}
+
+// ---------------------------------------------------------------------------
+// Intro: everything rises in, the symbols pop; then they glow in turn
+// ---------------------------------------------------------------------------
+.title,
+.subtitle,
+.form {
+  animation: rise 0.8s $ease-out both;
 }
 
 .subtitle {
-  // Evenly balanced lines, so no single word ends up alone.
-  text-wrap: balance;
-  line-height: 1.2;
-  margin-top: functions.rem(15);
-  text-align: center;
+  animation-delay: 0.1s;
 }
 
-.features-row {
-  display: flex;
-  justify-content: center;
-  gap: functions.rem(40);
-  margin-top: functions.rem(50);
+.form {
+  animation-delay: 0.6s;
 }
 
-.feature-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.symbol {
+  animation:
+    pop 0.5s calc(0.25s + var(--i) * 0.1s) $spring both,
+    glow 4.5s calc(1.4s + var(--i) * 0.5s) ease-out infinite;
 }
 
-.feature-circle {
-  width: functions.rem(60);
-  height: functions.rem(60);
-  background-color: colors.$dt-color-white-100;
-  border-radius: 50%;
-  border: functions.rem(1) solid #8098be;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.fact-text {
+  animation: rise 0.6s calc(0.35s + var(--i) * 0.1s) $ease-out both;
 }
 
-.feature-icon {
-  width: functions.rem(32);
-  height: functions.rem(32);
-  color: colors.$dt-color-darkblue-100;
-  stroke-width: functions.rem(2);
+// ---------------------------------------------------------------------------
+// Smaller screens: the same page, a little tighter, so nothing scrolls
+// ---------------------------------------------------------------------------
+@include lobby.short-screen {
+  :host {
+    --gap-text: #{functions.rem(12)};
+    --gap-facts: #{functions.rem(32)};
+    --gap-label: #{functions.rem(12)};
+    --gap-form: #{functions.rem(40)};
+    --symbol: #{functions.rem(56)};
+  }
+
+  .main {
+    padding-block: functions.rem(20) functions.rem(48);
+  }
 }
 
-.feature-text {
-  margin-top: functions.rem(18);
+@media (max-height: 600px) {
+  :host {
+    --gap-text: #{functions.rem(8)};
+    --gap-facts: #{functions.rem(20)};
+    --gap-label: #{functions.rem(8)};
+    --gap-form: #{functions.rem(24)};
+    --symbol: #{functions.rem(48)};
+  }
+
+  .main {
+    padding-block: functions.rem(12) functions.rem(16);
+  }
+
+  .title {
+    font-size: functions.rem(24);
+  }
+
+  .subtitle {
+    font-size: functions.rem(17);
+  }
+
+  .form {
+    gap: functions.rem(12);
+  }
+
+  .info,
+  .notice {
+    margin-top: 0;
+    font-size: functions.rem(14);
+  }
 }
 
-.form-wrapper {
-  margin-top: functions.rem(55);
-  width: 100%;
+// Narrow phones: the group of facts stays on one line.
+@media (max-width: 359px) {
+  :host {
+    --gap-between: #{functions.rem(24)};
+  }
+}
+
+// Without motion the phrase simply changes.
+@media (prefers-reduced-motion: reduce) {
+  .title,
+  .subtitle,
+  .form,
+  .symbol,
+  .fact-text,
+  .phrase,
+  .marker {
+    animation: none;
+  }
+
+  .phrase-box {
+    transition: none;
+  }
+
+  .phrase.is-out {
+    display: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(functions.rem(16));
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba($opponent, 0.5);
+  }
+
+  20%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(12) rgba($opponent, 0);
+  }
+}
+
+@keyframes turn-in {
+  from {
+    opacity: 0.3;
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes turn-out {
+  to {
+    opacity: 0.3;
+    transform: rotateX(90deg);
+  }
+}
+
+@keyframes marker-draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
 }

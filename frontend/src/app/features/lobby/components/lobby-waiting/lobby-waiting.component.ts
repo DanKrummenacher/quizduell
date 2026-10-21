@@ -1,8 +1,20 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, input, signal } from '@angular/core';
-import '@css-ch/calc-ui-text';
+import {
+  Component,
+  computed,
+  CUSTOM_ELEMENTS_SCHEMA,
+  input,
+  signal,
+} from '@angular/core';
+
+import '@css-ch/components/button';
+import '@css-ch/components/icon';
 
 const COPIED_FEEDBACK_MS = 1000;
 
+/**
+ * «Spiel erstellt»: the code in the boxes of «Code eingeben», the copy
+ * button and a running bar while you wait for your friend.
+ */
 @Component({
   selector: 'app-lobby-waiting',
   templateUrl: './lobby-waiting.component.html',
@@ -12,6 +24,7 @@ const COPIED_FEEDBACK_MS = 1000;
 export class LobbyWaitingComponent {
   readonly roomCode = input.required<string>();
 
+  protected readonly chars = computed(() => Array.from(this.roomCode()));
   protected readonly isCopied = signal(false);
 
   protected async copyCode(): Promise<void> {

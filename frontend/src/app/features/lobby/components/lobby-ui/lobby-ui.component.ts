@@ -13,12 +13,6 @@ import { LobbyWaitingComponent } from '../lobby-waiting/lobby-waiting.component'
 import { LobbyMatchFoundComponent } from '../lobby-match-found/lobby-match-found.component';
 import { LobbyModeComponent } from '../lobby-mode/lobby-mode.component';
 import { LobbySearchingComponent } from '../lobby-searching/lobby-searching.component';
-import { FaceliftModeComponent } from '../next/facelift/facelift-mode.component';
-import { FaceliftActionsComponent } from '../next/facelift/facelift-actions.component';
-import { FaceliftSearchingComponent } from '../next/facelift/facelift-searching.component';
-import { FaceliftWaitingComponent } from '../next/facelift/facelift-waiting.component';
-import { FaceliftMatchFoundComponent } from '../next/facelift/facelift-match-found.component';
-import type { LobbyDesign } from '../next/lobby-design';
 import '@css-ch/components/button';
 import '@css-ch/components/flyout';
 
@@ -32,11 +26,6 @@ import '@css-ch/components/flyout';
     LobbyWaitingComponent,
     LobbySearchingComponent,
     LobbyMatchFoundComponent,
-    FaceliftModeComponent,
-    FaceliftActionsComponent,
-    FaceliftSearchingComponent,
-    FaceliftWaitingComponent,
-    FaceliftMatchFoundComponent,
   ],
   templateUrl: './lobby-ui.component.html',
   styleUrl: './lobby-ui.component.scss',
@@ -51,8 +40,6 @@ export class LobbyUiComponent {
   readonly opponentLeft = input<boolean>(false);
   readonly countdownMs = input<number>(3000);
   readonly notice = input<string | null>(null);
-  // TEMPORARY: lobby designs under review.
-  readonly design = input<LobbyDesign>('today');
 
   /** Greeting and back navigation, hidden while the duel is about to start. */
   protected readonly hasNavigation = computed(() => this.state() !== 'FOUND');
