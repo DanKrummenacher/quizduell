@@ -16,6 +16,7 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --gap-facts: #{functions.rem(32)};
   --gap-form: #{functions.rem(40)};
   --symbol: #{functions.rem(64)};
+  --gap-between: #{functions.rem(40)};
 
   display: flex;
   flex-direction: column;
@@ -52,10 +53,12 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   text-wrap: balance;
 }
 
-// The three facts: the filled symbols of the lobby and the result page.
+// The three facts as before: a compact group in the middle, 40 apart;
+// the symbols are the filled ones of the lobby and the result page.
 .facts {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  justify-content: center;
+  gap: var(--gap-between);
   margin: var(--gap-facts) 0 0;
   padding: 0;
   list-style: none;
@@ -310,6 +313,13 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     width: functions.rem(40);
     height: functions.rem(40);
     margin-bottom: functions.rem(10);
+  }
+}
+
+// Narrow phones: the group stays on one line.
+@media (max-width: 359px) {
+  :host {
+    --gap-between: #{functions.rem(24)};
   }
 }
 
