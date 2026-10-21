@@ -59,6 +59,33 @@
         }
         Duell
       </h1>
+    } @else if (hasRoll()) {
+      <!-- One word rolls through: the old one slides up and out, the new one
+           in from below, and the width follows the new word smoothly. -->
+      <h1 class="title">
+        @for (word of rollLead; track $index) {
+          <span class="word" [style.--i]="$index">{{ word }}</span>
+          {{ ' ' }}
+        }
+        <span class="visually-hidden">direkten</span>
+        <span
+          class="word roll"
+          aria-hidden="true"
+          style="--i: 4"
+          [style.width.px]="rollWidth()"
+        >
+          @for (item of rollItems(); track item.key) {
+            <span class="roll-word" [class.is-out]="item.out">{{ item.word }}</span>
+          }
+        </span>
+        {{ ' ' }}
+        <span class="word" style="--i: 5">Duell</span>
+        <span #rollMeasure class="roll-measure" aria-hidden="true">
+          @for (word of rollWords; track word) {
+            <span>{{ word }}</span>
+          }
+        </span>
+      </h1>
     } @else {
       <!-- Single words, so the variants can animate them; looks the same. -->
       <h1 class="title">

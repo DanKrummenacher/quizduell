@@ -495,6 +495,94 @@ app-brand-header,
   }
 }
 
+// ---------------------------------------------------------------------------
+// Final candidates
+// ---------------------------------------------------------------------------
+$expo: cubic-bezier(0.16, 1, 0.3, 1);
+$swap: cubic-bezier(0.65, 0, 0.35, 1);
+
+// Intro: one short, calm sequence when the page opens, then rest.
+:host(.has-intro) {
+  .title .word {
+    animation: intro-rise 0.9s calc(var(--i) * 0.06s) $expo both;
+  }
+
+  .subtitle {
+    animation: intro-rise 0.9s 0.3s $expo both;
+  }
+
+  .symbol {
+    animation: intro-pop 0.7s 0.45s $expo both;
+  }
+
+  .fact:nth-child(2) .symbol {
+    animation-delay: 0.53s;
+  }
+
+  .fact:nth-child(3) .symbol {
+    animation-delay: 0.61s;
+  }
+
+  .fact-text {
+    animation: intro-rise 0.8s 0.6s $expo both;
+  }
+
+  .form {
+    animation: intro-rise 0.9s 0.72s $expo both;
+  }
+}
+
+// The rolling word: masked, it slides; the width follows the new word.
+.roll {
+  position: relative;
+  display: inline-block;
+  min-width: 4.4em;
+  height: 1.2em;
+  overflow: hidden;
+  vertical-align: bottom;
+  color: $mid;
+  transition: width 0.55s $swap;
+
+  &[style*='width'] {
+    min-width: 0;
+  }
+}
+
+.roll-word {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  animation: roll-in 0.55s $swap both;
+
+  &.is-out {
+    animation: roll-out 0.55s $swap both;
+  }
+}
+
+// Without motion the word simply changes.
+@media (prefers-reduced-motion: reduce) {
+  .roll {
+    transition: none;
+  }
+
+  .roll-word.is-out {
+    display: none;
+  }
+}
+
+// Hidden copies of the words, only to measure their widths.
+.roll-measure {
+  position: absolute;
+  visibility: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+
+  span {
+    position: absolute;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .word,
   .subtitle,
@@ -508,6 +596,8 @@ app-brand-header,
   .symbol::after,
   .liquid i,
   .swap-word,
+  .roll-word,
+  .title .word,
   .button-frame,
   .path i {
     animation: none !important;
@@ -688,6 +778,32 @@ app-brand-header,
   100% {
     box-shadow: 0 0 0 functions.rem(12) rgba($opponent, 0);
     border-color: #8098be;
+  }
+}
+
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(functions.rem(18));
+  }
+}
+
+@keyframes intro-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+@keyframes roll-in {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+@keyframes roll-out {
+  to {
+    transform: translateY(-105%);
   }
 }
 

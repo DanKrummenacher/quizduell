@@ -4,6 +4,12 @@
 export type StartLayout =
   | 'today'
   | 'p-pure'
+  | 'p-final-intro'
+  | 'p-final-roll'
+  | 'p-final-typer'
+  | 'p-final-intro-roll'
+  | 'p-final-intro-typer'
+  | 'p-final-all'
   | 'p-intro'
   | 'p-logo'
   | 'p-live'
@@ -88,6 +94,12 @@ export interface StartOption {
 export const START_LAYOUTS: StartOption[] = [
   { value: 'today', label: 'Heute' },
   { value: 'p-pure', label: 'Facelift (rein)' },
+  { value: 'p-final-intro', label: 'Final · Intro' },
+  { value: 'p-final-roll', label: 'Final · Wechselndes Wort' },
+  { value: 'p-final-typer', label: 'Final · Schreibmaschine' },
+  { value: 'p-final-intro-roll', label: 'Final · Intro + Wort' },
+  { value: 'p-final-intro-typer', label: 'Final · Intro + Schreibmaschine' },
+  { value: 'p-final-all', label: 'Final · Intro + Wort + Schreibmaschine' },
   { value: 'p-intro', label: 'Facelift + Intro-Animation' },
   { value: 'p-logo', label: 'Facelift + Logo-Animation' },
   { value: 'p-live', label: 'Facelift + lebendige Symbole' },
