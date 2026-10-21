@@ -1,21 +1,24 @@
-// The start page in the design system of the lobby: same page column,
-// same type scale (title 28, text 16), filled symbols, spacing on the 4/8
-// grid: title → text 8, text → facts 32, facts → form 40, form 12.
+// The start page in the design system of the lobby. It keeps the sizes
+// and spacing of before (a large description, white symbols with a frame,
+// generous spacing), rounded to the 4/8 grid: title → text 16, text →
+// facts 48, symbol → label 16, facts → form 56, form 16.
 @use '@css-ch/web-design-tokens/colors';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
-@use 'screen';
 @use '../../../lobby/components/next/facelift/facelift';
 
 $blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
 $opponent: #00a4e0;
 $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
 :host {
-  --gap-facts: #{functions.rem(32)};
-  --gap-form: #{functions.rem(40)};
-  --symbol: #{functions.rem(64)};
+  --gap-text: #{functions.rem(16)};
+  --gap-facts: #{functions.rem(48)};
+  --gap-label: #{functions.rem(16)};
+  --gap-form: #{functions.rem(56)};
+  --symbol: #{functions.rem(60)};
   --gap-between: #{functions.rem(40)};
 
   display: flex;
@@ -30,7 +33,7 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   flex-grow: 1;
   flex-direction: column;
   justify-content: center;
-  padding: functions.rem(20) functions.rem(20) functions.rem(100);
+  padding: functions.rem(32) functions.rem(20) functions.rem(80);
 }
 
 .content {
@@ -47,14 +50,17 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   color: $blue;
 }
 
+// The description stays large, as before.
 .subtitle {
-  @include facelift.body-text;
-  margin-top: functions.rem(8);
+  margin: var(--gap-text) 0 0;
+  font-size: functions.rem(20);
+  line-height: 1.25;
   text-wrap: balance;
+  color: facelift.$muted;
 }
 
-// The three facts as before: a compact group in the middle, 40 apart;
-// the symbols are the filled ones of the lobby and the result page.
+// The three facts as before: a compact group in the middle, 40 apart,
+// white symbols with a fine frame.
 .facts {
   display: flex;
   justify-content: center;
@@ -67,12 +73,24 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 .fact {
   display: grid;
   justify-items: center;
-  gap: functions.rem(12);
+  gap: var(--gap-label);
 }
 
 .symbol {
-  @include screen.symbol(var(--symbol));
   position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--symbol);
+  height: var(--symbol);
+  box-sizing: border-box;
+  border: functions.rem(1) solid facelift.$border;
+  border-radius: 50%;
+  background-color: $white;
+  color: $blue;
+
+  css-icon {
+    display: block;
+  }
 }
 
 .fact-text {
@@ -83,7 +101,7 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 .form {
   display: flex;
   flex-direction: column;
-  gap: functions.rem(12);
+  gap: functions.rem(16);
   margin-top: var(--gap-form);
   text-align: left;
 
@@ -94,8 +112,8 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
 .info,
 .notice {
-  margin: 0;
-  font-size: functions.rem(14);
+  margin: functions.rem(4) 0 0;
+  font-size: functions.rem(16);
   text-align: center;
   color: facelift.$muted;
 }
@@ -104,39 +122,57 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   color: #d53419;
 }
 
+// Shorter phones: the same page, a little tighter, so nothing scrolls.
 @include facelift.short-screen {
   :host {
-    --gap-facts: #{functions.rem(24)};
-    --gap-form: #{functions.rem(32)};
+    --gap-text: #{functions.rem(12)};
+    --gap-facts: #{functions.rem(32)};
+    --gap-label: #{functions.rem(12)};
+    --gap-form: #{functions.rem(40)};
     --symbol: #{functions.rem(56)};
   }
 
   .main {
-    padding-bottom: functions.rem(60);
+    padding-block: functions.rem(20) functions.rem(48);
   }
 }
 
 @media (max-height: 600px) {
   :host {
+    --gap-text: #{functions.rem(8)};
     --gap-facts: #{functions.rem(20)};
+    --gap-label: #{functions.rem(8)};
     --gap-form: #{functions.rem(24)};
     --symbol: #{functions.rem(48)};
   }
 
   .main {
-    padding-bottom: functions.rem(20);
+    padding-block: functions.rem(12) functions.rem(16);
   }
 
   .title {
     font-size: functions.rem(24);
   }
 
-  .fact {
-    gap: functions.rem(8);
+  .subtitle {
+    font-size: functions.rem(17);
   }
 
-  .fact-text {
-    font-size: functions.rem(15);
+  .form {
+    gap: functions.rem(12);
+  }
+
+  .info,
+  .notice {
+    margin-top: 0;
+    font-size: functions.rem(14);
+  }
+}
+
+// Narrow phones: the group stays on one line.
+@media (max-width: 359px) {
+  :host {
+    --gap-between: #{functions.rem(24)};
   }
 }
 
@@ -316,13 +352,6 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 
-// Narrow phones: the group stays on one line.
-@media (max-width: 359px) {
-  :host {
-    --gap-between: #{functions.rem(24)};
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   :host(.is-intro) *,
@@ -380,19 +409,15 @@ $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
 @keyframes flash {
   0%,
+  20%,
   100% {
     box-shadow: 0 0 0 0 rgba($opponent, 0);
-    background-color: $blue;
+    color: $blue;
   }
 
   6% {
-    box-shadow: 0 0 functions.rem(24) functions.rem(4) rgba($opponent, 0.6);
-    background-color: $opponent;
-  }
-
-  20% {
-    box-shadow: 0 0 0 0 rgba($opponent, 0);
-    background-color: $blue;
+    box-shadow: 0 0 functions.rem(20) functions.rem(2) rgba($opponent, 0.5);
+    color: $opponent;
   }
 }
 
