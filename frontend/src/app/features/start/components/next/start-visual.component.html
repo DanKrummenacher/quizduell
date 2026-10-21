@@ -1,91 +1,77 @@
 @switch (kind()) {
-  @case ('logo') {
-    <!-- The eight shapes of the logo pop in, then the ring turns slowly. -->
-    <div class="logo-stage">
-      <span class="logo-glow"></span>
-      <svg class="logo-ring" viewBox="0 0 100 100">
-        @for (shape of ring; track $index) {
-          <g class="shape" [style.--i]="$index">
-            @if (shape.kind === 'circle') {
-              <circle
-                [attr.cx]="shape.cx"
-                [attr.cy]="shape.cy"
-                [attr.r]="shape.r"
-                [attr.fill]="shape.color"
-              />
-            } @else {
-              <polygon [attr.points]="shape.points" [attr.fill]="shape.color" />
+  @case ('product') {
+    <!-- The real game: a question with its timer; an answer is chosen,
+         turns green, and the score goes up. -->
+    <div class="product">
+      <div class="question-card">
+        <div class="question-head">
+          <span class="question-count">Frage 2 / {{ questions() }}</span>
+          <span class="question-time"
+            ><css-icon icon="time-limit" size="sm"></css-icon>{{ seconds() }} s</span
+          >
+        </div>
+        <span class="question-timer"><i></i></span>
+        <p class="question-text">Welcher Planet ist der grösste?</p>
+        <div class="answers">
+          <span class="answer"><b>A</b>Saturn</span>
+          <span class="answer is-picked"><b>B</b>Jupiter</span>
+          <span class="answer"><b>C</b>Erde</span>
+          <span class="answer"><b>D</b>Mars</span>
+        </div>
+      </div>
+      <div class="score-chip">
+        <span class="mini is-me">{{ initial() || 'A' }}</span>
+        <span class="score-value"
+          ><span class="score-before">1</span><span class="score-after">2</span> :
+          1</span
+        >
+        <span class="mini is-opponent">B</span>
+      </div>
+      <span class="toast"
+        ><css-icon icon="checked-circle" size="sm"></css-icon>Richtig!</span
+      >
+    </div>
+  }
+  @case ('race') {
+    <!-- A duel plays itself: both answer, the bars fill, one wins. -->
+    <div class="race">
+      <div class="race-head">
+        <span>Live-Duell</span>
+        <span class="race-live"><i></i>{{ questions() }} Fragen</span>
+      </div>
+      @for (player of ['me', 'opponent']; track player) {
+        <div class="race-row" [class.is-me]="player === 'me'">
+          <span class="race-avatar">{{
+            player === 'me' ? initial() || 'Du' : '?'
+          }}</span>
+          <span class="race-name">{{ player === 'me' ? 'Du' : 'Gegner' }}</span>
+          <span class="race-bars">
+            @for (bar of [0, 1, 2]; track bar) {
+              <i [style.--i]="bar"></i>
             }
-          </g>
-        }
-      </svg>
-    </div>
-  }
-  @case ('versus') {
-    <!-- A poster: you on the dark side, your opponent on the light one. -->
-    <div class="versus">
-      <div class="side is-me">
-        <span class="versus-avatar">{{ initial() || 'Du' }}</span>
-      </div>
-      <div class="side is-opponent">
-        <span class="versus-avatar">?</span>
-      </div>
-      <span class="versus-badge">VS</span>
-    </div>
-  }
-  @case ('timer') {
-    <!-- The ring of the search counts down the time of one question. -->
-    <div class="timer">
-      @for (angle of ticks; track angle) {
-        <span
-          class="tick"
-          [class.is-filled]="$index < filledTicks()"
-          [style.--a.deg]="angle"
-        ></span>
+          </span>
+          @if (player === 'me') {
+            <span class="race-win">Sieg</span>
+          }
+        </div>
       }
-      <span class="timer-center">
-        <span class="timer-number">{{ remaining() }}</span>
-        <span class="timer-unit">Sekunden</span>
-      </span>
     </div>
   }
-  @case ('score') {
-    <!-- A scoreboard before the first round. -->
-    <div class="score">
-      <span class="score-round">Runde 1 / {{ questions() }}</span>
-      <div class="score-row">
-        <span class="score-player">
-          <span class="score-avatar">{{ initial() || 'Du' }}</span>
-          Du
-        </span>
-        <span class="score-points">0<i>:</i>0</span>
-        <span class="score-player">
-          <span class="score-avatar is-open">?</span>
-          Gegner
-        </span>
-      </div>
-      <span class="score-rounds">
-        @for (round of rounds(); track round) {
-          <i [class.is-current]="round === 0"></i>
-        }
-      </span>
-    </div>
-  }
-  @case ('cards') {
-    <!-- A fanned stack of question cards; the right answer lights up. -->
-    <div class="stack">
-      <span class="card is-back is-left"></span>
-      <span class="card is-back is-right"></span>
-      <div class="card is-front">
-        <span class="card-label">Frage 1 / {{ questions() }}</span>
-        <span class="card-question">Welcher Planet ist der grösste?</span>
-        <span class="card-answers">
-          <span><b>A</b>Saturn</span>
-          <span class="is-right"><b>B</b>Jupiter</span>
-          <span><b>C</b>Erde</span>
-          <span><b>D</b>Mars</span>
-        </span>
-      </div>
+  @case ('wall') {
+    <!-- A wall of questions in three columns, moving slowly. -->
+    <div class="wall">
+      @for (column of wall; track $index) {
+        <div class="wall-column" [style.--i]="$index">
+          @for (copy of [0, 1]; track copy) {
+            @for (question of column; track question.text) {
+              <span class="tile">
+                <span class="tile-topic">{{ question.topic }}</span>
+                {{ question.text }}
+              </span>
+            }
+          }
+        </div>
+      }
     </div>
   }
 }

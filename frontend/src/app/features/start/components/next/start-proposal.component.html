@@ -1,5 +1,5 @@
-<!-- The name and the start button, the same in every proposal. -->
-<ng-template #form let-showInfo="showInfo">
+<!-- The name and the start button, the same in every concept. -->
+<ng-template #form>
   <div class="form">
     <css-input-text
       id="playerName"
@@ -20,159 +20,155 @@
 
     @if (notice(); as message) {
       <p class="notice" role="status">{{ message }}</p>
-    } @else if (showInfo !== false) {
+    } @else {
       <p class="info">Direkt loslegen · kein Account nötig</p>
     }
   </div>
-</ng-template>
-
-<ng-template #factLine>
-  <p class="fact-line">
-    <span>{{ questions() }} Fragen</span>
-    <span class="dot" aria-hidden="true"></span>
-    <span>{{ seconds() }}&thinsp;s pro Frage</span>
-    <span class="dot" aria-hidden="true"></span>
-    <span>1 gegen 1</span>
-  </p>
 </ng-template>
 
 <app-brand-header />
 
 <main class="main">
   @switch (layout()) {
-    @case ('n-logo') {
-      <!-- N2: the logo assembles itself and turns slowly. -->
-      <app-start-visual kind="logo" />
-      <h1 class="title">Teste dein Wissen im direkten Duell</h1>
-      <ng-container *ngTemplateOutlet="factLine" />
-      <ng-container *ngTemplateOutlet="form" />
-    }
-    @case ('n-versus') {
-      <!-- N3: a versus poster; your side takes your initial. -->
-      <app-start-visual kind="versus" [initial]="initial()" />
-      <h1 class="title">Wer weiss mehr?</h1>
-      <ng-container *ngTemplateOutlet="factLine" />
-      <ng-container *ngTemplateOutlet="form" />
-    }
-    @case ('n-marquee') {
-      <!-- N4: sample questions run by in two rows. -->
-      <div class="marquee" aria-hidden="true">
-        @for (row of marqueeRows; track $index) {
-          <div class="marquee-row" [class.is-reverse]="$index === 1">
-            @for (copy of [0, 1]; track copy) {
-              @for (question of row; track question) {
-                <span class="marquee-item">{{ question }}</span>
-              }
-            }
-          </div>
-        }
-      </div>
-      <h1 class="title">Teste dein Wissen im direkten Duell</h1>
-      <ng-container *ngTemplateOutlet="factLine" />
-      <ng-container *ngTemplateOutlet="form" />
-    }
-    @case ('n-timer') {
-      <!-- N5: the time of one question counts down. -->
-      <app-start-visual kind="timer" [seconds]="seconds()" />
-      <h1 class="title">{{ seconds() }} Sekunden pro Frage</h1>
-      <p class="lead">Wer schneller richtig liegt, gewinnt das Duell.</p>
-      <ng-container *ngTemplateOutlet="form" />
-    }
-    @case ('n-score') {
-      <!-- N6: the scoreboard before the first round. -->
-      <h1 class="title is-above">Teste dein Wissen im direkten Duell</h1>
-      <app-start-visual
-        kind="score"
-        [initial]="initial()"
-        [questions]="questions()"
-      />
-      <ng-container *ngTemplateOutlet="form" />
-    }
-    @case ('n-cards') {
-      <!-- N7: a stack of question cards. -->
-      <app-start-visual kind="cards" [questions]="questions()" />
-      <h1 class="title">Teste dein Wissen im direkten Duell</h1>
-      <ng-container *ngTemplateOutlet="factLine" />
-      <ng-container *ngTemplateOutlet="form" />
-    }
-    @case ('n-sheet') {
-      <!-- N8: a dark stage, the form on a sheet from below. -->
-      <section class="hero">
-        <app-logo-mark class="hero-logo" [inverse]="true" />
-        <h1 class="title">Teste dein Wissen im direkten Duell</h1>
-        <ul class="hero-facts">
-          <li>{{ questions() }} Fragen</li>
-          <li>{{ seconds() }}&thinsp;s pro Frage</li>
-          <li>1 gegen 1</li>
-        </ul>
-      </section>
-      <section class="sheet" aria-label="Spiel starten">
-        <ng-container *ngTemplateOutlet="form" />
-      </section>
-    }
-    @case ('n-chat') {
-      <!-- N9: playduelio greets you as in a chat; your answer appears live. -->
-      <div class="chat">
-        <div class="chat-thread">
-          <app-logo-mark class="chat-avatar" [tile]="true" />
-          <p class="bubble" style="--i: 0">Hallo! Lust auf ein Quiz-Duell?</p>
-          <p class="bubble" style="--i: 1">
-            {{ questions() }} Fragen, je {{ seconds() }} Sekunden – wer mehr weiss,
-            gewinnt.
-          </p>
-          <p class="bubble" style="--i: 2">Wie heisst du?</p>
+    @case ('c-race') {
+      <!-- K2: a duel plays itself next to the headline. -->
+      <div class="split">
+        <div class="head">
+          <p class="eyebrow">Live-Duell · 1 gegen 1</p>
+          <h1 class="display">
+            Zwei Spieler. {{ questions() }}&nbsp;Fragen. Ein&nbsp;Sieger.
+          </h1>
+          <p class="sub">Fordere jemanden heraus – in Echtzeit, ohne Account.</p>
         </div>
-        @if (cleanName()) {
-          <p class="bubble is-mine">Ich bin {{ cleanName() }}</p>
-        }
+        <app-start-visual
+          class="visual"
+          kind="race"
+          [initial]="initial()"
+          [questions]="questions()"
+        />
+        <div class="action"><ng-container *ngTemplateOutlet="form" /></div>
       </div>
-      <ng-container *ngTemplateOutlet="form" />
     }
-    @case ('n-poster') {
-      <!-- N10: three words, as a poster. -->
-      <h1 class="poster">
-        <span style="--i: 0">Wissen.</span>
-        <span style="--i: 1">Tempo.</span>
-        <span class="accent" style="--i: 2">Duell.</span>
-      </h1>
-      <p class="poster-lead">
-        {{ questions() }} Fragen, {{ seconds() }} Sekunden pro Frage, 1 gegen 1. Wer
-        mehr weiss, gewinnt.
-      </p>
-      <ng-container *ngTemplateOutlet="form" />
+    @case ('c-editorial') {
+      <!-- K3: a Swiss poster: a large number, thin rules, clear columns. -->
+      <div class="editorial">
+        <p class="index"><span>01</span>Quiz-Duell<i></i></p>
+        <p class="big-number">
+          <strong>{{ seconds() }}</strong>
+          <span>Sekunden<br />pro Frage</span>
+        </p>
+        <div class="editorial-body">
+          <h1 class="display">Teste dein Wissen im direkten Duell.</h1>
+          <dl class="table">
+            <div>
+              <dt>{{ questions() }}</dt>
+              <dd>Fragen</dd>
+            </div>
+            <div>
+              <dt>1:1</dt>
+              <dd>Modus</dd>
+            </div>
+            <div>
+              <dt>0</dt>
+              <dd>Accounts</dd>
+            </div>
+          </dl>
+          <ng-container *ngTemplateOutlet="form" />
+        </div>
+      </div>
+    }
+    @case ('c-mesh') {
+      <!-- K4: dark, with slowly moving light; the form on a frosted card. -->
+      <div class="mesh" aria-hidden="true"><i></i><i></i><i></i></div>
+      <div class="centered">
+        <p class="eyebrow">Quiz-Duell · 1 gegen 1</p>
+        <h1 class="display">Teste dein Wissen im direkten Duell.</h1>
+        <p class="sub">
+          {{ questions() }} Fragen · {{ seconds() }}&thinsp;s pro Frage · in Echtzeit
+        </p>
+        <section class="glass" aria-label="Spiel starten">
+          <ng-container *ngTemplateOutlet="form" />
+        </section>
+      </div>
+    }
+    @case ('c-arena') {
+      <!-- K5: the screen is the arena; you and your opponent face off. -->
+      <div class="arena">
+        <section class="stage">
+          <h1 class="display">Wer weiss mehr?</h1>
+          <div class="face-off" aria-hidden="true">
+            <span class="fighter is-me">
+              <span class="fighter-avatar">{{ initial() || 'Du' }}</span>
+              <span class="fighter-name">{{ cleanName() || 'Du' }}</span>
+            </span>
+            <span class="versus">VS</span>
+            <span class="fighter is-opponent">
+              <span class="fighter-avatar">?</span>
+              <span class="fighter-name">Gegner</span>
+            </span>
+          </div>
+          <p class="stage-facts">
+            {{ questions() }} Fragen · {{ seconds() }}&thinsp;s pro Frage
+          </p>
+        </section>
+        <section class="ring" aria-label="Spiel starten">
+          <ng-container *ngTemplateOutlet="form" />
+        </section>
+      </div>
+    }
+    @case ('c-wall') {
+      <!-- K6: a wall of real questions, the form on a card in front. -->
+      <div class="wall-layout">
+        <app-start-visual class="visual" kind="wall" />
+        <section class="front-card">
+          <h1 class="display">Teste dein Wissen im direkten Duell.</h1>
+          <p class="sub">
+            {{ questions() }} Fragen · {{ seconds() }}&thinsp;s pro Frage
+          </p>
+          <ng-container *ngTemplateOutlet="form" />
+        </section>
+      </div>
+    }
+    @case ('c-minimal') {
+      <!-- K7: calm and precise; one line changes. -->
+      <div class="centered is-narrow">
+        <app-logo-mark class="app-icon" [tile]="true" />
+        <h1 class="display">
+          Das Quiz-Duell.
+          <span class="roller" aria-hidden="true">
+            <span class="roller-track">
+              <span>Schnell.</span>
+              <span>Fair.</span>
+              <span>Live.</span>
+              <span>Schnell.</span>
+            </span>
+          </span>
+        </h1>
+        <p class="sub">
+          {{ questions() }} Fragen · {{ seconds() }}&thinsp;s pro Frage · 1 gegen 1
+        </p>
+        <ng-container *ngTemplateOutlet="form" />
+      </div>
     }
     @default {
-      <!-- N1: today's page, with a clear hierarchy and the facts as a strip. -->
-      <p class="live"><i></i>Quiz-Duell · 1 gegen 1</p>
-      <h1 class="title is-big">
-        Teste dein Wissen im <span class="accent">direkten Duell</span>
-      </h1>
-      <p class="lead">Fordere jemanden heraus und sichere dir den Sieg.</p>
-      <ul class="strip">
-        <li>
-          <span class="strip-icon"
-            ><css-icon icon="survey" size="sm"></css-icon
-          ></span>
-          <span
-            ><strong>{{ questions() }}</strong> Fragen</span
-          >
-        </li>
-        <li>
-          <span class="strip-icon"
-            ><css-icon icon="time-limit" size="sm"></css-icon
-          ></span>
-          <span
-            ><strong>{{ seconds() }}&thinsp;s</strong> pro Frage</span
-          >
-        </li>
-        <li>
-          <span class="strip-icon"
-            ><css-icon icon="lightning-strike" size="sm"></css-icon
-          ></span>
-          <span><strong>1:1</strong> Duell</span>
-        </li>
-      </ul>
-      <ng-container *ngTemplateOutlet="form" />
+      <!-- K1: the real game shows what you are about to play. -->
+      <div class="split">
+        <div class="head">
+          <p class="eyebrow">Das Quiz-Duell</p>
+          <h1 class="display">Wer weiss mehr – du oder dein Gegner?</h1>
+          <p class="sub">
+            {{ questions() }} Fragen. {{ seconds() }} Sekunden pro Frage. Ein Sieger.
+          </p>
+        </div>
+        <app-start-visual
+          class="visual"
+          kind="product"
+          [initial]="initial()"
+          [questions]="questions()"
+          [seconds]="seconds()"
+        />
+        <div class="action"><ng-container *ngTemplateOutlet="form" /></div>
+      </div>
     }
   }
 </main>

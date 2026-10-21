@@ -14,11 +14,21 @@ import { PlayerNameStore } from '../../../../core/player/player-name.store';
 import { StartDesignPanelComponent } from '../../components/next/start-design-panel.component';
 import type { StartLayout } from '../../components/next/start-design';
 import { StartProposalComponent } from '../../components/next/start-proposal.component';
+import { StartRoundAComponent } from '../../components/next/start-round-a.component';
+import { StartRoundBComponent } from '../../components/next/start-round-b.component';
+import { StartRoundDComponent } from '../../components/next/start-round-d.component';
 import { StartUiComponent } from '../../components/start-ui/start-ui.component';
 
 @Component({
   selector: 'app-start-container',
-  imports: [StartUiComponent, StartProposalComponent, StartDesignPanelComponent],
+  imports: [
+    StartUiComponent,
+    StartRoundAComponent,
+    StartRoundBComponent,
+    StartProposalComponent,
+    StartRoundDComponent,
+    StartDesignPanelComponent,
+  ],
   templateUrl: './start-container.component.html',
 })
 export class StartContainerComponent implements OnInit, OnDestroy {

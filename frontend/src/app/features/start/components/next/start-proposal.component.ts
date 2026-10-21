@@ -18,8 +18,8 @@ import type { StartLayout } from './start-design';
 import { StartVisualComponent } from './start-visual.component';
 
 /**
- * TEMPORARY: proposals for the start page in the design of the lobby
- * facelift. Same data and behaviour as today: a name, then off to the lobby.
+ * TEMPORARY: start page concepts. Same data and behaviour as today: a name,
+ * then off to the lobby. Unlike the game screens they use the full width.
  */
 @Component({
   selector: 'app-start-proposal',
@@ -43,21 +43,6 @@ export class StartProposalComponent implements OnInit {
   readonly startGame = output<string>();
 
   protected readonly maxLength = PLAYER_NAME_MAX_LENGTH;
-  /** N4: sample questions that run by. */
-  protected readonly marqueeRows = [
-    [
-      'Wie viele Kantone hat die Schweiz?',
-      'Welcher Planet ist der grösste?',
-      'Wer malte die Mona Lisa?',
-      'Wie hoch ist das Matterhorn?',
-    ],
-    [
-      'Was ist die Hauptstadt von Kanada?',
-      'Wie viele Beine hat eine Spinne?',
-      'Welches Element hat das Zeichen O?',
-      'In welchem Jahr fiel die Berliner Mauer?',
-    ],
-  ];
   protected readonly playerName = signal('');
   protected readonly errorMessage = signal('');
 

@@ -1,18 +1,35 @@
-import {
-  Component,
-  computed,
-  CUSTOM_ELEMENTS_SCHEMA,
-  DestroyRef,
-  inject,
-  input,
-  signal,
-} from '@angular/core';
-import { shapeRing } from '../../../../core/branding/logo-shapes';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, input } from '@angular/core';
+import '@css-ch/components/icon';
 import type { StartVisual } from './start-design';
 
-const TICKS = 60;
+interface WallQuestion {
+  topic: string;
+  text: string;
+}
 
-/** TEMPORARY: the large visuals of the start page proposals. */
+/** Sample questions for the wall, three columns. */
+const WALL: WallQuestion[][] = [
+  [
+    { topic: 'Geografie', text: 'Wie viele Kantone hat die Schweiz?' },
+    { topic: 'Kunst', text: 'Wer malte die Mona Lisa?' },
+    { topic: 'Natur', text: 'Wie viele Beine hat eine Spinne?' },
+    { topic: 'Sport', text: 'Wie lange dauert ein Fussballspiel?' },
+  ],
+  [
+    { topic: 'Wissenschaft', text: 'Welcher Planet ist der grösste?' },
+    { topic: 'Geschichte', text: 'Wann fiel die Berliner Mauer?' },
+    { topic: 'Sprache', text: 'Wie viele Landessprachen hat die Schweiz?' },
+    { topic: 'Chemie', text: 'Wofür steht das Zeichen O?' },
+  ],
+  [
+    { topic: 'Geografie', text: 'Wie hoch ist das Matterhorn?' },
+    { topic: 'Musik', text: 'Wie viele Saiten hat eine Gitarre?' },
+    { topic: 'Technik', text: 'Wofür steht «www»?' },
+    { topic: 'Natur', text: 'Welches Tier ist das schnellste?' },
+  ],
+];
+
+/** TEMPORARY: the large visuals of the start page concepts. */
 @Component({
   selector: 'app-start-visual',
   templateUrl: './start-visual.component.html',
@@ -26,23 +43,5 @@ export class StartVisualComponent {
   readonly questions = input(3);
   readonly seconds = input(20);
 
-  protected readonly ring = shapeRing();
-  protected readonly ticks = Array.from({ length: TICKS }, (_, index) => index * 6);
-
-  /** The timer counts down the time of one question, again and again. */
-  private readonly elapsed = signal(0);
-  protected readonly remaining = computed(
-    () => this.seconds() - (this.elapsed() % (this.seconds() + 1)),
-  );
-  protected readonly filledTicks = computed(() =>
-    Math.round((this.remaining() / this.seconds()) * TICKS),
-  );
-  protected readonly rounds = computed(() =>
-    Array.from({ length: this.questions() }, (_, index) => index),
-  );
-
-  constructor() {
-    const timer = setInterval(() => this.elapsed.update((value) => value + 1), 1000);
-    inject(DestroyRef).onDestroy(() => clearInterval(timer));
-  }
+  protected readonly wall = WALL;
 }

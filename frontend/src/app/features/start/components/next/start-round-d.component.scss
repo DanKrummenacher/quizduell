@@ -1,0 +1,743 @@
+// TEMPORARY (round 4): start page concepts. Phone first; from 900 px each
+// concept has its own wide layout. Spacing on the 4/8 grid.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use '../../../lobby/components/next/facelift/facelift';
+
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$opponent: #00a4e0;
+$mid: #0078bb;
+$deep: #001f52;
+$board: #0b1730;
+$line: #e3e8f0;
+$bold: miscs.$css-ui-font-weight-bold;
+$wide: 900px;
+
+:host {
+  --side: #{functions.rem(20)};
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  min-height: 100dvh;
+  margin-inline: calc(50% - 50vw);
+  overflow: hidden;
+}
+
+.main {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: calc(#{functions.rem(1120)} + 2 * var(--side));
+  margin: 0 auto;
+  padding: functions.rem(24) var(--side) functions.rem(40);
+}
+
+.eyebrow {
+  margin: 0 0 functions.rem(10);
+  font-size: functions.rem(12);
+  font-weight: $bold;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $mid;
+}
+
+.display {
+  margin: 0;
+  font-size: functions.rem(30);
+  font-weight: $bold;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  color: $blue;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: functions.rem(12);
+  text-align: left;
+
+  css-button {
+    display: block;
+  }
+}
+
+.info,
+.notice {
+  margin: 0;
+  font-size: functions.rem(14);
+  text-align: center;
+  color: facelift.$muted;
+}
+
+.notice {
+  color: #d53419;
+}
+
+// ---------------------------------------------------------------------------
+// K8: split-flap board
+// ---------------------------------------------------------------------------
+.board {
+  padding: functions.rem(16) functions.rem(14) functions.rem(14);
+  border-radius: functions.rem(16);
+  background:
+    radial-gradient(circle at 50% 0%, rgba($opponent, 0.18), transparent 70%), $board;
+  box-shadow: 0 functions.rem(16) functions.rem(40) rgba(0, 20, 50, 0.3);
+}
+
+.flaps {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: functions.rem(6);
+}
+
+.flap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: functions.rem(60);
+  border-radius: functions.rem(6);
+  background: linear-gradient(#1d2d50 50%, #17243f 50%);
+  font-size: functions.rem(32);
+  font-weight: $bold;
+  color: $white;
+  perspective: functions.rem(200);
+
+  // The split in the middle of every flap.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 50% 0 auto;
+    height: functions.rem(1);
+    background-color: rgba(0, 0, 0, 0.55);
+  }
+
+  span {
+    display: block;
+    animation: flip 0.5s cubic-bezier(0.3, 1.4, 0.6, 1) both;
+    animation-delay: calc(var(--i) * 70ms);
+  }
+}
+
+.board-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: functions.rem(12);
+  font-size: functions.rem(11);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba($white, 0.6);
+
+  b {
+    margin-left: functions.rem(4);
+    color: $opponent;
+  }
+}
+
+.flap-copy {
+  text-align: center;
+
+  .display {
+    margin-top: functions.rem(24);
+  }
+
+  .form {
+    margin-top: functions.rem(24);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// K9: bento grid
+// ---------------------------------------------------------------------------
+.bento {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: functions.rem(10);
+}
+
+.tile {
+  padding: functions.rem(16);
+  border-radius: functions.rem(16);
+
+  &.is-intro,
+  &.is-action {
+    grid-column: span 2;
+    border: functions.rem(1) solid $line;
+    background-color: $white;
+  }
+
+  &.is-intro .display {
+    font-size: functions.rem(24);
+  }
+
+  &.is-time {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(140deg, $blue, $deep);
+    color: $white;
+
+    strong {
+      font-size: functions.rem(34);
+      line-height: 1;
+    }
+
+    span {
+      margin-top: functions.rem(4);
+      font-size: functions.rem(13);
+      color: rgba($white, 0.75);
+    }
+  }
+
+  &.is-duel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #e3f4fb;
+    font-size: functions.rem(13);
+    color: $blue;
+  }
+}
+
+.time-bar {
+  display: block;
+  height: functions.rem(4);
+  margin-top: auto;
+  overflow: hidden;
+  border-radius: functions.rem(2);
+  background-color: rgba($white, 0.2);
+
+  b {
+    display: block;
+    height: 100%;
+    background-color: $opponent;
+    transform-origin: left;
+    animation: drain 6s linear infinite;
+  }
+}
+
+.duo {
+  display: flex;
+  margin-bottom: functions.rem(12);
+
+  b {
+    display: grid;
+    place-items: center;
+    width: functions.rem(40);
+    height: functions.rem(40);
+    box-sizing: border-box;
+    border: functions.rem(2) solid #e3f4fb;
+    border-radius: 50%;
+    background-color: $blue;
+    font-size: functions.rem(14);
+    color: $white;
+
+    &.is-open {
+      margin-left: functions.rem(-10);
+      border: functions.rem(2) dashed $opponent;
+      background-color: $white;
+      color: $opponent;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// K10: your name in the spotlight
+// ---------------------------------------------------------------------------
+.spotlight {
+  position: relative;
+  width: 100%;
+  max-width: functions.rem(560);
+  margin: 0 auto;
+  text-align: center;
+
+  .form {
+    position: relative;
+    max-width: functions.rem(420);
+    margin: functions.rem(28) auto 0;
+  }
+}
+
+.beam {
+  position: absolute;
+  top: functions.rem(-120);
+  left: 50%;
+  width: functions.rem(420);
+  height: functions.rem(380);
+  background: radial-gradient(
+    ellipse 50% 60% at 50% 0%,
+    rgba($opponent, 0.28),
+    transparent 75%
+  );
+  transform: translateX(-50%);
+  animation: sway 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.spot-pre {
+  position: relative;
+  margin: 0;
+  font-size: functions.rem(18);
+  color: facelift.$muted;
+}
+
+.spot-name {
+  position: relative;
+  margin: functions.rem(4) 0 0;
+  font-size: functions.rem(48);
+  font-weight: $bold;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+  background: linear-gradient(90deg, $blue, $mid 60%, $opponent);
+  background-clip: text;
+  color: transparent;
+
+  &.is-empty {
+    opacity: 0.85;
+  }
+}
+
+.caret {
+  display: inline-block;
+  width: functions.rem(4);
+  height: 0.8em;
+  margin-left: functions.rem(6);
+  vertical-align: -0.05em;
+  background-color: $opponent;
+  animation: caret 1s steps(1) infinite;
+}
+
+.spot-facts {
+  position: relative;
+  margin: functions.rem(14) 0 0;
+  font-size: functions.rem(14);
+  color: facelift.$muted;
+}
+
+// ---------------------------------------------------------------------------
+// K11: player pass
+// ---------------------------------------------------------------------------
+.pass-head {
+  text-align: center;
+}
+
+.pass-stage {
+  padding: functions.rem(20) 0 functions.rem(8);
+  perspective: functions.rem(900);
+}
+
+.pass {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: min(100%, #{functions.rem(320)});
+  aspect-ratio: 1.586;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: functions.rem(18);
+  overflow: hidden;
+  border-radius: functions.rem(18);
+  background: linear-gradient(135deg, $deep, $blue 45%, $mid 80%, $opponent);
+  box-shadow: 0 functions.rem(24) functions.rem(48) rgba(0, 31, 82, 0.35);
+  color: $white;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.2s ease-out;
+
+  // Without a mouse the pass sways by itself.
+  @media (hover: none) {
+    animation: idle 6s ease-in-out infinite;
+  }
+}
+
+.pass-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba($white, 0.22) 48%,
+    transparent 60%
+  );
+  background-size: 250% 100%;
+  animation: sheen 5s ease-in-out infinite;
+}
+
+.pass-top {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: functions.rem(8);
+}
+
+.pass-logo {
+  width: functions.rem(22);
+  height: functions.rem(22);
+}
+
+.pass-label {
+  flex: 1;
+  font-size: functions.rem(11);
+  font-weight: $bold;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba($white, 0.75);
+}
+
+.pass-avatar {
+  display: grid;
+  place-items: center;
+  width: functions.rem(36);
+  height: functions.rem(36);
+  border-radius: 50%;
+  background-color: $white;
+  font-size: functions.rem(15);
+  font-weight: $bold;
+  color: $blue;
+}
+
+.pass-name {
+  position: relative;
+  overflow: hidden;
+  font-size: functions.rem(26);
+  font-weight: $bold;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: left;
+
+  &.is-empty {
+    opacity: 0.5;
+  }
+}
+
+.pass-facts {
+  position: relative;
+  display: flex;
+  gap: functions.rem(20);
+  text-align: left;
+
+  span {
+    display: grid;
+    font-size: functions.rem(15);
+    font-weight: $bold;
+  }
+
+  small {
+    font-size: functions.rem(10);
+    font-weight: normal;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba($white, 0.6);
+  }
+}
+
+.pass-action {
+  margin-top: functions.rem(20);
+}
+
+// ---------------------------------------------------------------------------
+// Shorter phones
+// ---------------------------------------------------------------------------
+@include facelift.short-screen {
+  .main {
+    padding-block: functions.rem(16) functions.rem(24);
+  }
+
+  .display {
+    font-size: functions.rem(26);
+  }
+
+  .flap {
+    height: functions.rem(52);
+    font-size: functions.rem(28);
+  }
+
+  .flap-copy .display,
+  .flap-copy .form {
+    margin-top: functions.rem(18);
+  }
+
+  .spot-name {
+    font-size: functions.rem(42);
+  }
+
+  .pass {
+    width: min(100%, #{functions.rem(280)});
+    padding: functions.rem(16);
+  }
+
+  .pass-name {
+    font-size: functions.rem(22);
+  }
+}
+
+@media (max-height: 600px) {
+  .main {
+    padding-block: functions.rem(10) functions.rem(16);
+  }
+
+  .display,
+  .tile.is-intro .display {
+    font-size: functions.rem(22);
+  }
+
+  .eyebrow {
+    margin-bottom: functions.rem(6);
+  }
+
+  .board {
+    padding: functions.rem(10);
+  }
+
+  .flap {
+    height: functions.rem(44);
+    font-size: functions.rem(24);
+  }
+
+  .board-row {
+    margin-top: functions.rem(8);
+  }
+
+  .flap-copy .display,
+  .flap-copy .form {
+    margin-top: functions.rem(12);
+  }
+
+  .bento {
+    gap: functions.rem(8);
+  }
+
+  .tile {
+    padding: functions.rem(12);
+
+    &.is-time strong {
+      font-size: functions.rem(28);
+    }
+  }
+
+  .duo {
+    margin-bottom: functions.rem(6);
+
+    b {
+      width: functions.rem(32);
+      height: functions.rem(32);
+    }
+  }
+
+  .spot-name {
+    font-size: functions.rem(36);
+  }
+
+  .spotlight .form {
+    margin-top: functions.rem(18);
+  }
+
+  .pass-stage {
+    padding-block: functions.rem(10) 0;
+  }
+
+  .pass {
+    width: min(100%, #{functions.rem(236)});
+    padding: functions.rem(12);
+    border-radius: functions.rem(14);
+  }
+
+  .pass-avatar {
+    width: functions.rem(28);
+    height: functions.rem(28);
+  }
+
+  .pass-name {
+    font-size: functions.rem(18);
+  }
+
+  .pass-action {
+    margin-top: functions.rem(12);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Wide screens
+// ---------------------------------------------------------------------------
+@media (min-width: $wide) {
+  :host {
+    --side: #{functions.rem(48)};
+  }
+
+  .display {
+    font-size: functions.rem(52);
+  }
+
+  .flap-layout {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    column-gap: functions.rem(64);
+    align-items: center;
+  }
+
+  .board {
+    padding: functions.rem(24);
+  }
+
+  .flaps {
+    gap: functions.rem(10);
+  }
+
+  .flap {
+    height: functions.rem(110);
+    font-size: functions.rem(64);
+  }
+
+  .board-row {
+    margin-top: functions.rem(20);
+    font-size: functions.rem(13);
+  }
+
+  .flap-copy {
+    max-width: functions.rem(440);
+    text-align: left;
+
+    .display {
+      margin-top: 0;
+    }
+  }
+
+  .bento {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+    gap: functions.rem(16);
+    max-width: functions.rem(1000);
+    margin: 0 auto;
+  }
+
+  .tile {
+    padding: functions.rem(28);
+
+    &.is-intro {
+      grid-row: span 2;
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+
+      .display {
+        font-size: functions.rem(44);
+      }
+    }
+
+    &.is-time strong {
+      font-size: functions.rem(56);
+    }
+  }
+
+  .spot-name {
+    font-size: functions.rem(96);
+  }
+
+  .pass-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    grid-template-areas: 'head stage' 'action stage';
+    column-gap: functions.rem(64);
+    align-items: center;
+  }
+
+  .pass-head {
+    grid-area: head;
+    align-self: end;
+    text-align: left;
+  }
+
+  .pass-stage {
+    grid-area: stage;
+  }
+
+  .pass {
+    width: functions.rem(460);
+    padding: functions.rem(28);
+    border-radius: functions.rem(24);
+  }
+
+  .pass-name {
+    font-size: functions.rem(40);
+  }
+
+  .pass-action {
+    grid-area: action;
+    align-self: start;
+    max-width: functions.rem(420);
+    margin-top: functions.rem(28);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flap span,
+  .time-bar b,
+  .beam,
+  .caret,
+  .pass,
+  .pass-sheen {
+    animation: none !important;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Keyframes
+// ---------------------------------------------------------------------------
+@keyframes flip {
+  from {
+    opacity: 0.2;
+    transform: rotateX(-100deg);
+  }
+}
+
+@keyframes drain {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes sway {
+  to {
+    transform: translateX(-46%) rotate(4deg);
+  }
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes idle {
+  0%,
+  100% {
+    transform: rotateY(-8deg) rotateX(4deg);
+  }
+
+  50% {
+    transform: rotateY(8deg) rotateX(-2deg);
+  }
+}
+
+@keyframes sheen {
+  0% {
+    background-position: 120% 0;
+  }
+
+  60%,
+  100% {
+    background-position: -40% 0;
+  }
+}

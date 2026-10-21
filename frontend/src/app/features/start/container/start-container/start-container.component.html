@@ -5,8 +5,38 @@
     [notice]="notice()"
     (startGame)="handleStart($event)"
   />
+} @else if (layout().startsWith('f-')) {
+  <!-- TEMPORARY: start page proposals, round 1. -->
+  <app-start-round-a
+    [layout]="layout()"
+    [questions]="info().questionsPerGame"
+    [seconds]="info().questionDurationSec"
+    [initialName]="initialName"
+    [notice]="notice()"
+    (startGame)="handleStart($event)"
+  />
+} @else if (layout().startsWith('n-')) {
+  <!-- TEMPORARY: start page proposals, round 2. -->
+  <app-start-round-b
+    [layout]="layout()"
+    [questions]="info().questionsPerGame"
+    [seconds]="info().questionDurationSec"
+    [initialName]="initialName"
+    [notice]="notice()"
+    (startGame)="handleStart($event)"
+  />
+} @else if (layout().startsWith('d-')) {
+  <!-- TEMPORARY: start page proposals, round 4. -->
+  <app-start-round-d
+    [layout]="layout()"
+    [questions]="info().questionsPerGame"
+    [seconds]="info().questionDurationSec"
+    [initialName]="initialName"
+    [notice]="notice()"
+    (startGame)="handleStart($event)"
+  />
 } @else {
-  <!-- TEMPORARY: start page proposals. -->
+  <!-- TEMPORARY: start page proposals, round 3. -->
   <app-start-proposal
     [layout]="layout()"
     [questions]="info().questionsPerGame"
