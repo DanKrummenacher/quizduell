@@ -25,12 +25,15 @@
 
   <!-- The countdown, where the search had its cancel button. -->
   <div class="countdown" aria-hidden="true">
-    @for (second of [countdown()]; track second) {
-      @if (second > 0) {
-        <span class="countdown-number">{{ second }}</span>
-      } @else {
-        <span class="countdown-number is-go">Los!</span>
-      }
+    <!-- Odd and even seconds are separate blocks: every new second is a
+         new element, so it rolls in again. -->
+    @let second = countdown();
+    @if (second === 0) {
+      <span class="countdown-number is-go">Los!</span>
+    } @else if (second % 2 === 1) {
+      <span class="countdown-number">{{ second }}</span>
+    } @else {
+      <span class="countdown-number">{{ second }}</span>
     }
   </div>
 </div>

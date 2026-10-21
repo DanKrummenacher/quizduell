@@ -47,10 +47,9 @@
         [style.--i]="slot"
         aria-hidden="true"
       >
+        <!-- Created when the box fills, so the character rolls in. -->
         @if (code()[slot]; as char) {
-          @for (shown of [char]; track shown) {
-            <span class="char">{{ shown }}</span>
-          }
+          <span class="char">{{ char }}</span>
         }
       </span>
     }
