@@ -62,10 +62,24 @@ export type StartFaceliftVariant =
   | 'combo-scramble'
   | 'combo-marker'
   | 'combo-line'
-  | 'combo-sub';
+  | 'combo-sub'
+  | 'combo-marker-duell'
+  | 'combo-marker-sub'
+  | 'combo-marker-line'
+  | 'combo-marker-facts';
 
 /** How a word changes on the page. */
-type WordMode = 'roll' | 'flip' | 'scramble' | 'marker' | 'line' | 'sub';
+type WordMode =
+  | 'roll'
+  | 'flip'
+  | 'scramble'
+  | 'marker'
+  | 'line'
+  | 'sub'
+  | 'marker-duell'
+  | 'marker-sub'
+  | 'marker-line'
+  | 'marker-facts';
 
 const TITLE = 'Teste dein Wissen im direkten Duell';
 
@@ -116,6 +130,7 @@ const CARET_MS = 530;
   styleUrls: [
     './start-facelift.component.scss',
     './start-facelift-fx.component.scss',
+    './start-facelift-final.component.scss',
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: {
@@ -168,6 +183,20 @@ export class StartFaceliftComponent implements OnInit {
     }
     return variant.startsWith('combo-') ? (variant.slice(6) as WordMode) : null;
   });
+  /** The modes that change one word of the title. */
+  protected readonly rollsWord = computed(() =>
+    ['roll', 'flip', 'scramble', 'marker'].includes(this.wordMode() ?? ''),
+  );
+  /** The modes that change the whole second line of the title. */
+  protected readonly rollsLine = computed(() =>
+    ['line', 'marker-line'].includes(this.wordMode() ?? ''),
+  );
+  /** «marker-sub», «marker-facts»: which of the three is marked. */
+  protected readonly markIndex = computed(() => this.rollIndex() % 3);
+  /** The one the marker just left, so it wipes away instead of jumping. */
+  protected readonly markPrevious = computed(() =>
+    this.rollIndex() > 0 ? (this.rollIndex() - 1) % 3 : -1,
+  );
   protected readonly hasTyper = computed(
     () =>
       this.isCombo() ||
@@ -181,11 +210,10 @@ export class StartFaceliftComponent implements OnInit {
   protected readonly rollIndex = signal(0);
   private readonly rollList = computed(() => {
     const mode = this.wordMode();
-    return mode === 'line'
-      ? LINE_PHRASES
-      : mode === 'sub'
-        ? SUB_MESSAGES
-        : ROLL_WORDS;
+    if (mode === 'line' || mode === 'marker-line') {
+      return LINE_PHRASES;
+    }
+    return mode === 'sub' ? SUB_MESSAGES : ROLL_WORDS;
   });
   /** The word that rolls in and the one that rolls out. */
   protected readonly rollItems = computed(() => {
@@ -263,24 +291,28 @@ export class StartFaceliftComponent implements OnInit {
         this.rollIndex.set(0);
         return;
       }
-      // The widths are measured once the hidden words are on the page.
-      const measure = setTimeout(() => {
+      // The widths are measured with the real font (not a fallback that is
+      // still loading) and again before every change, e.g. after a turn of
+      // the phone.
+      const measure = () => {
         const element = this.rollMeasure()?.nativeElement;
         if (element) {
           this.rollWidths.set(
             Array.from(
               element.children,
-              (child) => (child as HTMLElement).offsetWidth,
+              (child) => (child as HTMLElement).getBoundingClientRect().width,
             ),
           );
         }
-      });
-      const roller = setInterval(
-        () => this.rollIndex.update((value) => value + 1),
-        ROLL_INTERVAL_MS,
-      );
+      };
+      let active = true;
+      void document.fonts.ready.then(() => active && measure());
+      const roller = setInterval(() => {
+        measure();
+        this.rollIndex.update((value) => value + 1);
+      }, ROLL_INTERVAL_MS);
       onCleanup(() => {
-        clearTimeout(measure);
+        active = false;
         clearInterval(roller);
       });
     });

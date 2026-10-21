@@ -1,0 +1,276 @@
+// TEMPORARY (variants): the final candidates on top of the start facelift:
+// a calm intro, the changing word and the text marker.
+@use '@css-ch/calc-helpers/styles' as functions;
+
+$blue: #00327d;
+$mid: #0078bb;
+$opponent: #00a4e0;
+
+$expo: cubic-bezier(0.16, 1, 0.3, 1);
+$swap: cubic-bezier(0.65, 0, 0.35, 1);
+
+// Intro: one short, calm sequence when the page opens, then rest.
+:host(.has-intro) {
+  .title .word {
+    animation: intro-rise 0.9s calc(var(--i) * 0.06s) $expo both;
+  }
+
+  .subtitle {
+    animation: intro-rise 0.9s 0.3s $expo both;
+  }
+
+  .symbol {
+    animation: intro-pop 0.7s 0.45s $expo both;
+  }
+
+  .fact:nth-child(2) .symbol {
+    animation-delay: 0.53s;
+  }
+
+  .fact:nth-child(3) .symbol {
+    animation-delay: 0.61s;
+  }
+
+  .fact-text {
+    animation: intro-rise 0.8s 0.6s $expo both;
+  }
+
+  .form {
+    animation: intro-rise 0.9s 0.72s $expo both;
+  }
+}
+
+// The rolling word: masked, it slides; the width follows the new word.
+.roll {
+  position: relative;
+  display: inline-block;
+  min-width: 4.4em;
+  height: 1.2em;
+  overflow: hidden;
+  vertical-align: bottom;
+  color: $mid;
+  transition: width 0.55s $swap;
+
+  &[style*='width'] {
+    min-width: 0;
+  }
+}
+
+.roll-word {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  animation: roll-in 0.55s $swap both;
+
+  &.is-out {
+    animation: roll-out 0.55s $swap both;
+  }
+}
+
+// 3D cube: the word tips over like the side of a cube.
+.title.is-flip .roll {
+  overflow: visible;
+  perspective: functions.rem(300);
+
+  .roll-word {
+    transform-origin: 50% 50% -0.6em;
+    backface-visibility: hidden;
+    animation-name: cube-in;
+
+    &.is-out {
+      animation-name: cube-out;
+    }
+  }
+}
+
+// Marker: the new word is underlined by a light blue marker.
+.title.is-marker .roll {
+  color: $blue;
+
+  .roll-word {
+    isolation: isolate;
+  }
+}
+
+.marker {
+  position: absolute;
+  right: -0.06em;
+  bottom: 0.1em;
+  left: -0.06em;
+  z-index: -1;
+  height: 0.34em;
+  border-radius: functions.rem(3);
+  background-color: rgba($opponent, 0.32);
+  animation: marker-draw 0.6s 0.35s $expo both;
+}
+
+// Everything that carries a marker.
+.title .word,
+.phrase,
+.mark,
+.fact-text.mark {
+  position: relative;
+  isolation: isolate;
+}
+
+.phrase {
+  display: inline-block;
+}
+
+// «Duell» is marked again and again: draw, hold, wipe away.
+.marker.is-loop {
+  animation: marker-loop 5s 1.2s $swap infinite both;
+}
+
+// Description and facts: the marker draws under the active one and wipes
+// away from the one it leaves.
+.mark .marker {
+  clip-path: inset(0 100% 0 0);
+  animation: none;
+}
+
+.mark.is-active .marker {
+  animation: marker-draw 0.6s 0.25s $expo both;
+}
+
+.mark.is-leaving .marker {
+  animation: marker-wipe 0.45s $swap both;
+}
+
+.title.is-marker .line-roll {
+  color: $blue;
+}
+
+// Facts: the marked fact's symbol lights up at the same time.
+:host(.is-combo-marker-facts) {
+  .symbol {
+    animation: pop 0.5s calc(0.25s + var(--i) * 0.1s)
+      cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+    transition:
+      border-color 0.4s ease,
+      box-shadow 0.4s ease;
+  }
+
+  .fact.is-marked .symbol {
+    border-color: $mid;
+    box-shadow: 0 0 0 functions.rem(6) rgba($opponent, 0.14);
+  }
+}
+
+// Decode: the letters whirl and settle; the width follows the new word.
+.roll.is-scramble {
+  white-space: nowrap;
+}
+
+// Whole line: the second line of the title changes as a whole.
+.line-roll {
+  position: relative;
+  display: block;
+  height: 1.2em;
+  overflow: hidden;
+  color: $mid;
+
+  .roll-word {
+    right: 0;
+    text-align: center;
+  }
+}
+
+// Description: three messages blend calmly into each other.
+.sub-stack {
+  display: grid;
+}
+
+.sub-item {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transform: translateY(functions.rem(6));
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s $expo;
+
+  // The old message leaves first, then the new one comes.
+  &.is-active {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.35s;
+  }
+}
+
+// Without motion the word simply changes.
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(functions.rem(18));
+  }
+}
+
+@keyframes intro-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+@keyframes roll-in {
+  from {
+    transform: translateY(105%);
+  }
+}
+
+@keyframes roll-out {
+  to {
+    transform: translateY(-105%);
+  }
+}
+
+@keyframes cube-in {
+  from {
+    opacity: 0;
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes cube-out {
+  to {
+    opacity: 0;
+    transform: rotateX(90deg);
+  }
+}
+
+@keyframes marker-draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes marker-wipe {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+@keyframes marker-loop {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  16%,
+  70% {
+    clip-path: inset(0 0 0 0);
+  }
+
+  86%,
+  100% {
+    clip-path: inset(0 0 0 100%);
+  }
+}

@@ -495,150 +495,6 @@ app-brand-header,
   }
 }
 
-// ---------------------------------------------------------------------------
-// Final candidates
-// ---------------------------------------------------------------------------
-$expo: cubic-bezier(0.16, 1, 0.3, 1);
-$swap: cubic-bezier(0.65, 0, 0.35, 1);
-
-// Intro: one short, calm sequence when the page opens, then rest.
-:host(.has-intro) {
-  .title .word {
-    animation: intro-rise 0.9s calc(var(--i) * 0.06s) $expo both;
-  }
-
-  .subtitle {
-    animation: intro-rise 0.9s 0.3s $expo both;
-  }
-
-  .symbol {
-    animation: intro-pop 0.7s 0.45s $expo both;
-  }
-
-  .fact:nth-child(2) .symbol {
-    animation-delay: 0.53s;
-  }
-
-  .fact:nth-child(3) .symbol {
-    animation-delay: 0.61s;
-  }
-
-  .fact-text {
-    animation: intro-rise 0.8s 0.6s $expo both;
-  }
-
-  .form {
-    animation: intro-rise 0.9s 0.72s $expo both;
-  }
-}
-
-// The rolling word: masked, it slides; the width follows the new word.
-.roll {
-  position: relative;
-  display: inline-block;
-  min-width: 4.4em;
-  height: 1.2em;
-  overflow: hidden;
-  vertical-align: bottom;
-  color: $mid;
-  transition: width 0.55s $swap;
-
-  &[style*='width'] {
-    min-width: 0;
-  }
-}
-
-.roll-word {
-  position: absolute;
-  top: 0;
-  left: 0;
-  white-space: nowrap;
-  animation: roll-in 0.55s $swap both;
-
-  &.is-out {
-    animation: roll-out 0.55s $swap both;
-  }
-}
-
-// 3D cube: the word tips over like the side of a cube.
-.title.is-flip .roll {
-  overflow: visible;
-  perspective: functions.rem(300);
-
-  .roll-word {
-    transform-origin: 50% 50% -0.6em;
-    backface-visibility: hidden;
-    animation-name: cube-in;
-
-    &.is-out {
-      animation-name: cube-out;
-    }
-  }
-}
-
-// Marker: the new word is underlined by a light blue marker.
-.title.is-marker .roll {
-  color: $blue;
-
-  .roll-word {
-    isolation: isolate;
-  }
-}
-
-.marker {
-  position: absolute;
-  right: functions.rem(-2);
-  bottom: 0.12em;
-  left: functions.rem(-2);
-  z-index: -1;
-  height: 0.32em;
-  border-radius: functions.rem(3);
-  background-color: rgba($opponent, 0.35);
-  transform-origin: left;
-  animation: marker-in 0.5s 0.4s $expo both;
-}
-
-// Decode: the letters whirl and settle; the width follows the new word.
-.roll.is-scramble {
-  white-space: nowrap;
-}
-
-// Whole line: the second line of the title changes as a whole.
-.line-roll {
-  position: relative;
-  display: block;
-  height: 1.2em;
-  overflow: hidden;
-  color: $mid;
-
-  .roll-word {
-    right: 0;
-    text-align: center;
-  }
-}
-
-// Description: three messages blend calmly into each other.
-.sub-stack {
-  display: grid;
-}
-
-.sub-item {
-  grid-area: 1 / 1;
-  opacity: 0;
-  transform: translateY(functions.rem(6));
-  transition:
-    opacity 0.6s ease,
-    transform 0.6s $expo;
-
-  // The old message leaves first, then the new one comes.
-  &.is-active {
-    opacity: 1;
-    transform: none;
-    transition-delay: 0.35s;
-  }
-}
-
-// Without motion the word simply changes.
 @media (prefers-reduced-motion: reduce) {
   .roll {
     transition: none;
@@ -648,8 +504,14 @@ $swap: cubic-bezier(0.65, 0, 0.35, 1);
     display: none;
   }
 
-  .marker {
+  .marker,
+  .mark .marker {
     animation: none;
+    clip-path: none;
+  }
+
+  .mark:not(.is-active) .marker {
+    display: none;
   }
 
   .sub-item {
@@ -864,52 +726,6 @@ $swap: cubic-bezier(0.65, 0, 0.35, 1);
   100% {
     box-shadow: 0 0 0 functions.rem(12) rgba($opponent, 0);
     border-color: #8098be;
-  }
-}
-
-@keyframes intro-rise {
-  from {
-    opacity: 0;
-    transform: translateY(functions.rem(18));
-  }
-}
-
-@keyframes intro-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.7);
-  }
-}
-
-@keyframes roll-in {
-  from {
-    transform: translateY(105%);
-  }
-}
-
-@keyframes roll-out {
-  to {
-    transform: translateY(-105%);
-  }
-}
-
-@keyframes cube-in {
-  from {
-    opacity: 0;
-    transform: rotateX(-90deg);
-  }
-}
-
-@keyframes cube-out {
-  to {
-    opacity: 0;
-    transform: rotateX(90deg);
-  }
-}
-
-@keyframes marker-in {
-  from {
-    transform: scaleX(0);
   }
 }
 

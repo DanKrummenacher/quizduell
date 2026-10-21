@@ -59,18 +59,24 @@
         }
         Duell
       </h1>
-    } @else if (wordMode() === 'line') {
+    } @else if (rollsLine()) {
       <!-- The second line of the title changes as a whole. -->
-      <h1 class="title">
+      <h1 class="title" [class.is-marker]="wordMode() === 'marker-line'">
         <span class="word" style="--i: 0">Teste dein Wissen</span>
         <span class="visually-hidden">im direkten Duell</span>
         <span class="word line-roll" aria-hidden="true" style="--i: 1">
           @for (item of rollItems(); track item.key) {
-            <span class="roll-word" [class.is-out]="item.out">{{ item.word }}</span>
+            <span class="roll-word" [class.is-out]="item.out"
+              ><span class="phrase"
+                >{{ item.word }}
+                @if (wordMode() === 'marker-line' && !item.out) {
+                  <i class="marker"></i>
+                }</span
+            ></span>
           }
         </span>
       </h1>
-    } @else if (wordMode() && wordMode() !== 'sub') {
+    } @else if (rollsWord()) {
       <!-- One word of the title changes; the width follows smoothly. -->
       <h1
         class="title"
@@ -119,9 +125,13 @@
       <!-- Single words, so the variants can animate them; looks the same. -->
       <h1 class="title">
         @for (word of titleWords; track $index) {
-          <span class="word" [class.is-last]="$last" [style.--i]="$index">{{
-            word
-          }}</span>
+          <span class="word" [class.is-last]="$last" [style.--i]="$index"
+            >{{ word }}
+            @if ($last && wordMode() === 'marker-duell') {
+              <!-- «Duell» is marked again and again. -->
+              <i class="marker is-loop"></i>
+            }
+          </span>
           {{ ' ' }}
         }
       </h1>
@@ -131,6 +141,30 @@
       <p class="subtitle is-personal">
         Bereit, <strong>{{ cleanName() }}</strong
         >? Fordere deinen Gegner heraus und sichere dir den Sieg.
+      </p>
+    } @else if (wordMode() === 'marker-sub') {
+      <!-- The marker travels through the description. -->
+      <p class="subtitle">
+        Fordere deinen
+        <span
+          class="mark"
+          [class.is-active]="markIndex() === 0"
+          [class.is-leaving]="markPrevious() === 0"
+          >Gegner heraus<i class="marker"></i></span
+        >, sammle
+        <span
+          class="mark"
+          [class.is-active]="markIndex() === 1"
+          [class.is-leaving]="markPrevious() === 1"
+          >Punkte<i class="marker"></i
+        ></span>
+        und sichere dir
+        <span
+          class="mark"
+          [class.is-active]="markIndex() === 2"
+          [class.is-leaving]="markPrevious() === 2"
+          >den Sieg<i class="marker"></i></span
+        >.
       </p>
     } @else if (wordMode() === 'sub') {
       <!-- The description changes calmly between three messages. -->
@@ -156,7 +190,11 @@
         <li class="path" aria-hidden="true"><i></i></li>
       }
       @for (feature of features(); track feature.text) {
-        <li class="fact" [style.--i]="$index">
+        <li
+          class="fact"
+          [style.--i]="$index"
+          [class.is-marked]="wordMode() === 'marker-facts' && markIndex() === $index"
+        >
           <span class="symbol" [class]="'symbol is-' + feature.icon">
             @if (variant() === 'live' && feature.icon === 'time-limit') {
               <!-- TEMPORARY (variant): the time of one question runs. -->
@@ -179,7 +217,20 @@
             }
             <css-icon [icon]="feature.icon" size="xl"></css-icon>
           </span>
-          <span class="fact-text">{{ factText(feature.text) }}</span>
+          <span
+            class="fact-text"
+            [class.mark]="wordMode() === 'marker-facts'"
+            [class.is-active]="
+              wordMode() === 'marker-facts' && markIndex() === $index
+            "
+            [class.is-leaving]="
+              wordMode() === 'marker-facts' && markPrevious() === $index
+            "
+            >{{ factText(feature.text) }}
+            @if (wordMode() === 'marker-facts') {
+              <i class="marker"></i>
+            }
+          </span>
         </li>
       }
     </ul>
