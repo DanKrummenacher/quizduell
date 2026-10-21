@@ -17,6 +17,7 @@ import { StartProposalComponent } from '../../components/next/start-proposal.com
 import { StartRoundAComponent } from '../../components/next/start-round-a.component';
 import { StartRoundBComponent } from '../../components/next/start-round-b.component';
 import { StartRoundDComponent } from '../../components/next/start-round-d.component';
+import { StartRoundEComponent } from '../../components/next/start-round-e.component';
 import { StartUiComponent } from '../../components/start-ui/start-ui.component';
 
 @Component({
@@ -27,6 +28,7 @@ import { StartUiComponent } from '../../components/start-ui/start-ui.component';
     StartRoundBComponent,
     StartProposalComponent,
     StartRoundDComponent,
+    StartRoundEComponent,
     StartDesignPanelComponent,
   ],
   templateUrl: './start-container.component.html',

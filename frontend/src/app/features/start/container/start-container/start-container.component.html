@@ -25,6 +25,16 @@
     [notice]="notice()"
     (startGame)="handleStart($event)"
   />
+} @else if (layout().startsWith('e-')) {
+  <!-- TEMPORARY: start page proposals, round 5. -->
+  <app-start-round-e
+    [layout]="layout()"
+    [questions]="info().questionsPerGame"
+    [seconds]="info().questionDurationSec"
+    [initialName]="initialName"
+    [notice]="notice()"
+    (startGame)="handleStart($event)"
+  />
 } @else if (layout().startsWith('d-')) {
   <!-- TEMPORARY: start page proposals, round 4. -->
   <app-start-round-d

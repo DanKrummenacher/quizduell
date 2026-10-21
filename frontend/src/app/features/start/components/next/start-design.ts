@@ -1,6 +1,6 @@
 // TEMPORARY: start page designs under review (development only).
 
-/** Round 1 (f-), round 2 (n-), round 3 (c-) and round 4 (d-). */
+/** Round 1 (f-), 2 (n-), 3 (c-), 4 (d-) and 5 (e-). */
 export type StartLayout =
   | 'today'
   | 'f-clean'
@@ -34,7 +34,12 @@ export type StartLayout =
   | 'd-flap'
   | 'd-bento'
   | 'd-spotlight'
-  | 'd-pass';
+  | 'd-pass'
+  | 'e-attract'
+  | 'e-question'
+  | 'e-slides'
+  | 'e-button'
+  | 'e-sentence';
 
 /** The visuals of round 3. */
 export type StartVisual = 'product' | 'race' | 'wall';
@@ -50,6 +55,11 @@ export interface StartOption {
 /** All rounds side by side; the newest first. */
 export const START_LAYOUTS: StartOption[] = [
   { value: 'today', label: 'Heute' },
+  { value: 'e-attract', label: 'R5 · E1 Attract-Modus' },
+  { value: 'e-question', label: 'R5 · E2 Frage 0: Wie heisst du?' },
+  { value: 'e-slides', label: 'R5 · E3 Onboarding-Slides' },
+  { value: 'e-button', label: 'R5 · E4 Grosser Startknopf' },
+  { value: 'e-sentence', label: 'R5 · E5 Satz-Formular' },
   { value: 'd-flap', label: 'R4 · K8 Fallblatt-Anzeige' },
   { value: 'd-bento', label: 'R4 · K9 Bento-Raster' },
   { value: 'd-spotlight', label: 'R4 · K10 Bühne frei für dich' },
