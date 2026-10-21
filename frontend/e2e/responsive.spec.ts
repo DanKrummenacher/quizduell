@@ -11,6 +11,7 @@ import {
   enterName,
   expectNoHorizontalOverflow,
   joinByCode,
+  readGameCode,
   newPlayer,
   prepareBackend,
   waitForQuestion,
@@ -110,7 +111,7 @@ test.describe('responsive layout', () => {
       await capture(player, device, '03-lobby-actions');
       await player.getByText('Spiel erstellen').first().click();
       await expect(player.getByText('Spiel erstellt')).toBeVisible();
-      const code = (await player.locator('.code-text').innerText()).trim();
+      const code = await readGameCode(player);
       await capture(player, device, '04-waiting');
 
       await joinByCode(opponent, code, 'Maximilian');

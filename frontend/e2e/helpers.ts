@@ -91,9 +91,14 @@ export async function createFriendGame(page: Page): Promise<string> {
   await page.getByText('Freund herausfordern').first().click();
   await page.getByText('Spiel erstellen').first().click();
   await expect(page.getByText('Spiel erstellt')).toBeVisible();
-  const code = page.locator('.code-text');
-  await expect(code).toHaveText(/[A-Z2-9]{4}/);
-  return (await code.innerText()).trim();
+  return readGameCode(page);
+}
+
+/** Reads the code of «Spiel erstellt» from its boxes. */
+export async function readGameCode(page: Page): Promise<string> {
+  const code = page.locator('.code-boxes');
+  await expect(code).toHaveAttribute('aria-label', /^Code [A-Z2-9]{4}$/);
+  return ((await code.getAttribute('aria-label')) ?? '').replace('Code ', '');
 }
 
 export async function joinByCode(

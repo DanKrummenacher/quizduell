@@ -1,25 +1,30 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  CUSTOM_ELEMENTS_SCHEMA,
+  input,
+  signal,
+} from '@angular/core';
 
 import '@css-ch/components/button';
 import '@css-ch/components/icon';
-import type { WaitingLayout } from '../lobby-design';
-import { WaitingWComponent } from './waiting-w.component';
 
 const COPIED_FEEDBACK_MS = 1000;
 
+/**
+ * «Spiel erstellt»: the code in the boxes of «Code eingeben», the copy
+ * button and a running bar while you wait for your friend.
+ */
 @Component({
   selector: 'app-facelift-waiting',
-  imports: [WaitingWComponent],
   templateUrl: './facelift-waiting.component.html',
   styleUrl: './facelift-waiting.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class FaceliftWaitingComponent {
-  // TEMPORARY: proposals for this screen.
-  readonly layout = input<WaitingLayout>('facelift');
-  readonly playerName = input('');
   readonly roomCode = input.required<string>();
 
+  protected readonly chars = computed(() => Array.from(this.roomCode()));
   protected readonly isCopied = signal(false);
 
   protected async copyCode(): Promise<void> {
