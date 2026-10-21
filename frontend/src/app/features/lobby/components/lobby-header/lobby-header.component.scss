@@ -9,14 +9,14 @@
 }
 
 .top-bar {
-  margin-bottom: functions.rem(40);
+  margin-bottom: functions.rem(24);
 
   @media (max-height: 700px) {
-    margin-bottom: functions.rem(32);
+    margin-bottom: functions.rem(20);
   }
 
   @media (max-height: 600px) {
-    margin-bottom: functions.rem(16);
+    margin-bottom: functions.rem(12);
   }
 }
 
@@ -40,6 +40,7 @@
 
 .greeting-subtitle {
   display: block;
-  margin-top: functions.rem(4);
+  margin-top: functions.rem(2);
+  line-height: 1.3;
   color: screen.$muted;
 }

@@ -109,9 +109,15 @@
   transform: translateY(-50%);
   width: functions.rem(30);
   height: functions.rem(30);
-  // Same colour as the opponent in the quiz header.
+  // Same colour as the opponent in the quiz header. On a white card the
+  // ring has the colour of the badge, on a coloured card it is white, so
+  // the badge always has the same size and stands out.
   background-color: #00a4e0;
-  border: functions.rem(2) solid colors.$dt-color-white-100;
+  border: functions.rem(2) solid #00a4e0;
+
+  .answer-card:is(.state-selected, .state-correct, .state-wrong) & {
+    border-color: colors.$dt-color-white-100;
+  }
   border-radius: 50%;
   display: flex;
   align-items: center;

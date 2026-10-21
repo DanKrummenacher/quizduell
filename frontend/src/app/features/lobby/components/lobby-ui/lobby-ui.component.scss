@@ -20,18 +20,10 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  // The content sits slightly above the middle, which looks calmer.
-  padding: functions.rem(20) functions.rem(20) functions.rem(100);
+  // The content sits in the middle between the greeting and the bottom.
+  padding: functions.rem(20);
   box-sizing: border-box;
   width: 100%;
-
-  @media (max-height: 700px) {
-    padding-bottom: functions.rem(60);
-  }
-
-  @media (max-height: 600px) {
-    padding-bottom: functions.rem(20);
-  }
 }
 
 .centered-content {
