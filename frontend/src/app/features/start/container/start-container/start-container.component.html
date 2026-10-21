@@ -1,6 +1,23 @@
-<app-start-ui
-  [features]="featuresData()"
-  [initialName]="initialName"
-  [notice]="notice()"
-  (startGame)="handleStart($event)"
-/>
+@if (layout() === 'today') {
+  <app-start-ui
+    [features]="featuresData()"
+    [initialName]="initialName"
+    [notice]="notice()"
+    (startGame)="handleStart($event)"
+  />
+} @else {
+  <!-- TEMPORARY: start page proposals. -->
+  <app-start-proposal
+    [layout]="layout()"
+    [questions]="info().questionsPerGame"
+    [seconds]="info().questionDurationSec"
+    [initialName]="initialName"
+    [notice]="notice()"
+    (startGame)="handleStart($event)"
+  />
+}
+
+<!-- TEMPORARY: compare start page designs (development only). -->
+@if (showDesignPreview) {
+  <app-start-design-panel [(layout)]="layout" />
+}

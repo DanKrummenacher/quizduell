@@ -2,18 +2,23 @@ import {
   Component,
   computed,
   inject,
+  isDevMode,
   type OnDestroy,
   type OnInit,
+  signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { PublicInfoService } from '../../../../core/info/public-info.service';
 import { IdleResetService } from '../../../../core/platform/idle-reset.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
+import { StartDesignPanelComponent } from '../../components/next/start-design-panel.component';
+import type { StartLayout } from '../../components/next/start-design';
+import { StartProposalComponent } from '../../components/next/start-proposal.component';
 import { StartUiComponent } from '../../components/start-ui/start-ui.component';
 
 @Component({
   selector: 'app-start-container',
-  imports: [StartUiComponent],
+  imports: [StartUiComponent, StartProposalComponent, StartDesignPanelComponent],
   templateUrl: './start-container.component.html',
 })
 export class StartContainerComponent implements OnInit, OnDestroy {
@@ -23,6 +28,10 @@ export class StartContainerComponent implements OnInit, OnDestroy {
   private readonly infoService = inject(PublicInfoService);
 
   readonly initialName = this.playerName.name();
+  readonly info = this.infoService.info;
+  // TEMPORARY: start page designs under review.
+  readonly showDesignPreview = isDevMode();
+  readonly layout = signal<StartLayout>('today');
 
   readonly featuresData = computed(() => {
     const info = this.infoService.info();
