@@ -47,7 +47,11 @@ export type StartLayout =
   | 'l-story'
   | 'l-bento'
   | 'l-aurora'
-  | 'l-ring';
+  | 'l-ring'
+  | 'l-angled'
+  | 'l-answers'
+  | 'l-cover'
+  | 'l-tv';
 
 /** The visuals of round 3. */
 export type StartVisual = 'product' | 'race' | 'wall';
@@ -71,6 +75,10 @@ export const START_LAYOUTS: StartOption[] = [
   { value: 'l-bento', label: 'Landing L6 · Bento Pro' },
   { value: 'l-aurora', label: 'Landing L7 · Aurora' },
   { value: 'l-ring', label: 'Landing L8 · Countdown-Ring' },
+  { value: 'l-angled', label: 'Landing L9 · Schräger Verlauf' },
+  { value: 'l-answers', label: 'Landing L10 · Antwort-Kacheln' },
+  { value: 'l-cover', label: 'Landing L11 · Magazin-Cover' },
+  { value: 'l-tv', label: 'Landing L12 · TV-Übertragung' },
   { value: 'e-attract', label: 'R5 · E1 Attract-Modus' },
   { value: 'e-question', label: 'R5 · E2 Frage 0: Wie heisst du?' },
   { value: 'e-slides', label: 'R5 · E3 Onboarding-Slides' },

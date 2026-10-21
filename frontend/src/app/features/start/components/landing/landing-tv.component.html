@@ -1,0 +1,52 @@
+<main class="studio">
+  <span class="spot" aria-hidden="true"></span>
+  <span class="scanlines" aria-hidden="true"></span>
+
+  <!-- Channel bug and scoreboard, as on TV. -->
+  <div class="top" aria-hidden="true">
+    <span class="bug">
+      <span class="on-air"><i></i>Live</span>
+      <app-logo-mark class="bug-logo" [inverse]="true" />
+      <span class="bug-name"><span>play</span>duelio TV</span>
+    </span>
+    <span class="board">
+      <span class="team is-me">{{ shortName() }}</span>
+      <span class="board-score">0<i>:</i>0</span>
+      <span class="team is-opponent">???</span>
+      <span class="board-round">Frage 1 / {{ questions() }}</span>
+    </span>
+  </div>
+
+  <section class="stage">
+    <p class="presenter">Heute live</p>
+    <h1 class="headline">Das grosse<br />Quiz-Duell.</h1>
+
+    <div class="lower-third" aria-hidden="true">
+      <span class="lower-label">Heute im Duell</span>
+      <span class="lower-names"
+        >{{ cleanName() || 'Du' }} <i>gegen</i> deinen Gegner</span
+      >
+    </div>
+
+    <app-landing-name-form
+      [dark]="true"
+      [initialName]="initialName()"
+      [notice]="notice()"
+      (nameChange)="name.set($event)"
+      (startGame)="startGame.emit($event)"
+    />
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <span class="ticker-label">News</span>
+    <div class="ticker-window">
+      <div class="ticker-track">
+        @for (copy of [0, 1]; track copy) {
+          @for (item of ticker(); track item) {
+            <span class="ticker-item">{{ item }}</span>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</main>

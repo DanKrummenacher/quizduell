@@ -11,6 +11,10 @@ import { Router } from '@angular/router';
 import { PublicInfoService } from '../../../../core/info/public-info.service';
 import { IdleResetService } from '../../../../core/platform/idle-reset.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
+import { LandingAngledComponent } from '../../components/landing/landing-angled.component';
+import { LandingAnswersComponent } from '../../components/landing/landing-answers.component';
+import { LandingCoverComponent } from '../../components/landing/landing-cover.component';
+import { LandingTvComponent } from '../../components/landing/landing-tv.component';
 import { LandingArenaComponent } from '../../components/landing/landing-arena.component';
 import { LandingAuroraComponent } from '../../components/landing/landing-aurora.component';
 import { LandingBentoComponent } from '../../components/landing/landing-bento.component';
@@ -40,6 +44,10 @@ import { StartUiComponent } from '../../components/start-ui/start-ui.component';
     LandingBentoComponent,
     LandingAuroraComponent,
     LandingRingComponent,
+    LandingAngledComponent,
+    LandingAnswersComponent,
+    LandingCoverComponent,
+    LandingTvComponent,
     StartRoundAComponent,
     StartRoundBComponent,
     StartProposalComponent,

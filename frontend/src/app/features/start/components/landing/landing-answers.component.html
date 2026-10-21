@@ -1,0 +1,35 @@
+<app-landing-nav />
+
+<main>
+  <section class="hero">
+    <div class="question-head">
+      <span class="count">Frage 1 / 1</span>
+      <span class="timer" aria-hidden="true"><i></i></span>
+    </div>
+    <h1 class="headline">Was brauchst du, um zu gewinnen?</h1>
+
+    <ul class="answers" aria-label="Antworten">
+      @for (answer of answers; track answer.letter) {
+        <li class="answer" [class.is-right]="$last" [style.--i]="$index">
+          <b class="letter"
+            ><span>{{ answer.letter }}</span>
+            @if ($last) {
+              <css-icon class="check" icon="checkmark" size="sm"></css-icon>
+            }
+          </b>
+          <span class="text">{{ answer.text }}</span>
+        </li>
+      }
+    </ul>
+
+    <p class="verdict">
+      <strong>Richtig.</strong> Zeig es im Duell: {{ questions() }} Fragen,
+      {{ seconds() }} Sekunden pro Frage, 1 gegen 1.
+    </p>
+    <app-landing-name-form
+      [initialName]="initialName()"
+      [notice]="notice()"
+      (startGame)="startGame.emit($event)"
+    />
+  </section>
+</main>

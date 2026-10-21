@@ -1,0 +1,67 @@
+<div class="band" aria-hidden="true"></div>
+
+<app-landing-nav [dark]="true" />
+
+<main>
+  <section class="hero">
+    <div class="copy">
+      <p class="kicker">Das Quiz-Duell</p>
+      <h1 class="headline">Für alle, die es besser wissen.</h1>
+      <p class="lead">
+        Fordere jemanden heraus und beweise es: {{ questions() }} Fragen,
+        {{ seconds() }} Sekunden pro Frage, live gegeneinander.
+      </p>
+      <app-landing-name-form
+        [initialName]="initialName()"
+        [notice]="notice()"
+        (startGame)="startGame.emit($event)"
+      />
+    </div>
+
+    <div class="cards" aria-hidden="true">
+      <div class="card is-question">
+        <span class="card-head"
+          ><span>Frage 2 / {{ questions() }}</span
+          ><span class="card-time"
+            ><css-icon icon="time-limit" size="sm"></css-icon>{{ seconds() }} s</span
+          ></span
+        >
+        <span class="card-bar"><i></i></span>
+        <span class="card-question">Wer malte die Mona Lisa?</span>
+        <span class="answer"><b>A</b>Michelangelo</span>
+        <span class="answer is-right"><b>B</b>Leonardo da Vinci</span>
+        <span class="answer"><b>C</b>Raffael</span>
+      </div>
+      <div class="card is-score">
+        <span class="score-label">Spielstand</span>
+        <span class="score-row">
+          <b class="avatar">A</b>
+          <span class="score">2<i>:</i>1</span>
+          <b class="avatar is-opponent">B</b>
+        </span>
+      </div>
+      <div class="card is-toast">
+        <css-icon icon="checked-circle" size="sm"></css-icon>
+        Richtig! +1 Punkt
+      </div>
+    </div>
+  </section>
+
+  <section class="features" aria-label="Was playduelio ausmacht">
+    <article class="feature">
+      <span class="icon"><css-icon icon="lightning-strike"></css-icon></span>
+      <h2>In Echtzeit</h2>
+      <p>Beide sehen dieselbe Frage im selben Moment.</p>
+    </article>
+    <article class="feature">
+      <span class="icon"><css-icon icon="time-limit"></css-icon></span>
+      <h2>{{ seconds() }} Sekunden</h2>
+      <p>Pro Frage. Wer schneller richtig liegt, punktet.</p>
+    </article>
+    <article class="feature">
+      <span class="icon"><css-icon icon="conference"></css-icon></span>
+      <h2>Mit Freunden</h2>
+      <p>Zufallsgegner oder ein Freund mit Code.</p>
+    </article>
+  </section>
+</main>

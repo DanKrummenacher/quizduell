@@ -1,0 +1,326 @@
+// TEMPORARY (landing concepts) · L12 TV-Übertragung.
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'landing' as *;
+
+$red: #e0321b;
+$studio: #00081c;
+
+:host {
+  @include full-bleed;
+  margin-top: calc(-1 * var(--app-safe-top));
+  background-color: $studio;
+  color: $white;
+}
+
+.studio {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+// The light of the studio and fine lines of a screen.
+.spot {
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  width: 140vmax;
+  height: 120vh;
+  background: radial-gradient(
+    ellipse 35% 60% at 50% 0%,
+    rgba($opponent, 0.4),
+    rgba($mid, 0.12) 50%,
+    transparent 75%
+  );
+  transform: translateX(-50%);
+  animation: sweep 9s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    rgba($white, 0.025) 0 1px,
+    transparent 1px 4px
+  );
+  pointer-events: none;
+}
+
+// ---------------------------------------------------------------------------
+// Channel bug and scoreboard
+// ---------------------------------------------------------------------------
+.top {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: functions.rem(12);
+  padding: calc(#{functions.rem(16)} + var(--app-safe-top)) functions.rem(20) 0;
+}
+
+.bug {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(10);
+  font-size: functions.rem(15);
+  font-weight: 700;
+
+  span span {
+    font-weight: 300;
+  }
+}
+
+.on-air {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(6);
+  padding: functions.rem(4) functions.rem(8);
+  border-radius: functions.rem(4);
+  background-color: $red;
+  font-size: functions.rem(12);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+
+  i {
+    width: functions.rem(7);
+    height: functions.rem(7);
+    border-radius: 50%;
+    background-color: $white;
+    animation: blink 1.2s steps(1) infinite;
+  }
+}
+
+.bug-logo {
+  width: functions.rem(22);
+  height: functions.rem(22);
+}
+
+.board {
+  display: inline-flex;
+  align-items: stretch;
+  overflow: hidden;
+  border-radius: functions.rem(6);
+  background-color: rgba($white, 0.08);
+  box-shadow: inset 0 0 0 functions.rem(1) rgba($white, 0.12);
+  font-size: functions.rem(14);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  animation: slide-down 0.6s 0.4s $ease-out both;
+}
+
+.team {
+  display: grid;
+  place-items: center;
+  padding: functions.rem(6) functions.rem(12);
+
+  &.is-me {
+    background-color: $white;
+    color: $blue;
+  }
+
+  &.is-opponent {
+    background-color: $opponent;
+  }
+}
+
+.board-score {
+  display: flex;
+  align-items: center;
+  padding: 0 functions.rem(12);
+  font-variant-numeric: tabular-nums;
+
+  i {
+    margin-inline: functions.rem(4);
+    font-style: normal;
+    color: $opponent;
+  }
+}
+
+.board-round {
+  display: grid;
+  place-items: center;
+  padding: 0 functions.rem(12);
+  border-left: functions.rem(1) solid rgba($white, 0.15);
+  font-weight: 300;
+  color: rgba($white, 0.8);
+}
+
+// ---------------------------------------------------------------------------
+// Stage
+// ---------------------------------------------------------------------------
+.stage {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: functions.rem(40) functions.rem(20);
+  text-align: center;
+}
+
+.presenter {
+  @include kicker;
+  @include rise(0.1s);
+  color: #7fd3f5;
+}
+
+.headline {
+  @include rise(0.18s);
+  margin: functions.rem(14) 0 0;
+  font-size: clamp(#{functions.rem(52)}, 11vw, #{functions.rem(140)});
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+}
+
+// The lower third slides in from the left.
+.lower-third {
+  display: flex;
+  align-items: stretch;
+  max-width: 100%;
+  margin: functions.rem(32) 0 functions.rem(32);
+  overflow: hidden;
+  border-radius: functions.rem(6);
+  box-shadow: 0 functions.rem(16) functions.rem(40) rgba(0, 0, 0, 0.4);
+  text-align: left;
+  animation: wipe 0.8s 0.6s $ease-out both;
+}
+
+.lower-label {
+  display: grid;
+  place-items: center;
+  padding: functions.rem(10) functions.rem(14);
+  background-color: $opponent;
+  font-size: functions.rem(12);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.lower-names {
+  overflow: hidden;
+  padding: functions.rem(10) functions.rem(18);
+  background-color: $white;
+  font-size: clamp(#{functions.rem(16)}, 2.2vw, #{functions.rem(22)});
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: $blue;
+
+  i {
+    font-style: normal;
+    font-weight: 300;
+    color: $mid;
+  }
+}
+
+app-landing-name-form {
+  @include rise(0.8s);
+  text-align: left;
+}
+
+// ---------------------------------------------------------------------------
+// Ticker
+// ---------------------------------------------------------------------------
+.ticker {
+  position: relative;
+  display: flex;
+  margin-bottom: var(--app-safe-bottom);
+  background-color: $white;
+  color: $blue;
+}
+
+.ticker-label {
+  z-index: 1;
+  padding: functions.rem(12) functions.rem(16);
+  background-color: $red;
+  font-size: functions.rem(13);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: $white;
+}
+
+.ticker-window {
+  flex: 1;
+  overflow: hidden;
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  height: 100%;
+  animation: ticker 36s linear infinite;
+}
+
+.ticker-item {
+  display: inline-flex;
+  align-items: center;
+  font-size: functions.rem(14);
+  font-weight: 700;
+  white-space: nowrap;
+
+  &::after {
+    content: '+++';
+    margin-inline: functions.rem(18);
+    color: $opponent;
+  }
+}
+
+@media (min-width: $wide) {
+  .top {
+    padding-inline: functions.rem(48);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spot,
+  .on-air i,
+  .board,
+  .lower-third,
+  .ticker-track {
+    animation: none !important;
+  }
+}
+
+@keyframes sweep {
+  from {
+    transform: translateX(-56%) rotate(-6deg);
+  }
+
+  to {
+    transform: translateX(-44%) rotate(6deg);
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}

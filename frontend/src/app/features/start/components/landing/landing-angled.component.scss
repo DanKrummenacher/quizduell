@@ -1,0 +1,313 @@
+// TEMPORARY (landing concepts) · L9 Schräger Verlauf.
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'landing' as *;
+
+:host {
+  @include full-bleed;
+  margin-top: calc(-1 * var(--app-safe-top));
+  background-color: $page;
+}
+
+// The angled band in the moving brand gradient.
+.band {
+  position: absolute;
+  inset: 0 0 auto;
+  height: clamp(36rem, 78vh, 52rem);
+  background: linear-gradient(
+    120deg,
+    $deep,
+    $blue 25%,
+    $mid 50%,
+    $opponent 75%,
+    #7fd8ff
+  );
+  background-size: 300% 300%;
+  clip-path: polygon(0 0, 100% 0, 100% 62%, 0 100%);
+  animation: flow 14s ease-in-out infinite alternate;
+}
+
+app-landing-nav,
+main {
+  position: relative;
+}
+
+// ---------------------------------------------------------------------------
+// Hero
+// ---------------------------------------------------------------------------
+.hero {
+  @include container;
+  display: grid;
+  gap: functions.rem(48);
+  padding-block: functions.rem(48) functions.rem(40);
+}
+
+.kicker {
+  @include kicker;
+  @include rise(0.05s);
+  color: rgba($white, 0.85);
+}
+
+.headline {
+  @include rise(0.12s);
+  margin: functions.rem(14) 0 0;
+  font-size: clamp(#{functions.rem(46)}, 8vw, #{functions.rem(96)});
+  font-weight: 700;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+  color: $white;
+}
+
+.lead {
+  @include rise(0.2s);
+  max-width: functions.rem(480);
+  margin: functions.rem(20) 0 functions.rem(28);
+  font-size: clamp(#{functions.rem(17)}, 2vw, #{functions.rem(20)});
+  font-weight: 300;
+  line-height: 1.5;
+  color: rgba($white, 0.85);
+}
+
+app-landing-name-form {
+  @include rise(0.28s);
+}
+
+// The cards reach over the edge of the band.
+.cards {
+  @include rise(0.35s);
+  position: relative;
+  min-height: functions.rem(400);
+}
+
+.card {
+  position: absolute;
+  box-sizing: border-box;
+  border: functions.rem(1) solid $line;
+  border-radius: functions.rem(18);
+  background-color: $white;
+  box-shadow:
+    0 functions.rem(2) functions.rem(4) rgba(0, 31, 82, 0.06),
+    0 functions.rem(30) functions.rem(60) rgba(0, 31, 82, 0.2);
+  color: $blue;
+
+  &.is-question {
+    top: 0;
+    left: 0;
+    display: grid;
+    gap: functions.rem(10);
+    width: min(88%, #{functions.rem(380)});
+    padding: functions.rem(22);
+  }
+
+  &.is-score {
+    top: 58%;
+    right: 0;
+    padding: functions.rem(16) functions.rem(20);
+    animation: float 7s ease-in-out infinite;
+  }
+
+  &.is-toast {
+    top: -1.5rem;
+    right: 6%;
+    display: inline-flex;
+    align-items: center;
+    gap: functions.rem(8);
+    padding: functions.rem(10) functions.rem(16);
+    border-color: transparent;
+    background-color: $green;
+    font-size: functions.rem(14);
+    font-weight: 700;
+    color: $white;
+    animation: float 6s -3s ease-in-out infinite;
+  }
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: functions.rem(12);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $opponent;
+}
+
+.card-time {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(4);
+  letter-spacing: 0;
+  color: $blue;
+}
+
+.card-bar {
+  height: functions.rem(4);
+  overflow: hidden;
+  border-radius: functions.rem(2);
+  background-color: $line;
+
+  i {
+    display: block;
+    width: 64%;
+    height: 100%;
+    background-color: $blue;
+  }
+}
+
+.card-question {
+  margin: functions.rem(4) 0;
+  font-size: functions.rem(19);
+  font-weight: 700;
+}
+
+.answer {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(12);
+  overflow: hidden;
+  border: functions.rem(1) solid #8098be;
+  border-radius: functions.rem(4);
+  font-size: functions.rem(15);
+
+  b {
+    display: grid;
+    place-items: center;
+    width: functions.rem(38);
+    height: functions.rem(42);
+    background-color: $blue;
+    color: $white;
+  }
+
+  &.is-right {
+    border-color: $green;
+    background-color: rgba($green, 0.08);
+
+    b {
+      background-color: $green;
+    }
+  }
+}
+
+.score-label {
+  font-size: functions.rem(12);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: $muted;
+}
+
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(14);
+  margin-top: functions.rem(8);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: functions.rem(40);
+  height: functions.rem(40);
+  border-radius: 50%;
+  background-color: $blue;
+  color: $white;
+
+  &.is-opponent {
+    background-color: $opponent;
+  }
+}
+
+.score {
+  font-size: functions.rem(36);
+  font-weight: 700;
+  line-height: 1;
+
+  i {
+    margin-inline: functions.rem(4);
+    font-style: normal;
+    color: $opponent;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Features
+// ---------------------------------------------------------------------------
+.features {
+  @include container;
+  display: grid;
+  gap: functions.rem(32);
+  padding-block: functions.rem(48)
+    calc(#{functions.rem(96)} + var(--app-safe-bottom));
+}
+
+.feature {
+  @include reveal;
+
+  h2 {
+    margin: functions.rem(16) 0 0;
+    font-size: functions.rem(22);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: $blue;
+  }
+
+  p {
+    margin: functions.rem(6) 0 0;
+    font-size: functions.rem(16);
+    font-weight: 300;
+    line-height: 1.5;
+    color: $muted;
+  }
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: functions.rem(52);
+  height: functions.rem(52);
+  border-radius: functions.rem(14);
+  background: linear-gradient(140deg, $blue, $mid);
+  box-shadow: 0 functions.rem(10) functions.rem(24) rgba(0, 50, 125, 0.25);
+  color: $white;
+}
+
+@media (min-width: $wide) {
+  .hero {
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+    min-height: calc(100dvh - #{functions.rem(80)});
+    padding-block: 0;
+  }
+
+  .cards {
+    min-height: functions.rem(480);
+  }
+
+  .card.is-question {
+    width: functions.rem(400);
+  }
+
+  .features {
+    grid-template-columns: repeat(3, 1fr);
+    gap: functions.rem(48);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .band,
+  .card {
+    animation: none !important;
+  }
+}
+
+@keyframes flow {
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes float {
+  50% {
+    transform: translateY(functions.rem(-10));
+  }
+}

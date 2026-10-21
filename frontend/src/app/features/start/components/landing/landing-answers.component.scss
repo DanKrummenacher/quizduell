@@ -1,0 +1,291 @@
+// TEMPORARY (landing concepts) · L10 Antwort-Kacheln. One 8 s loop:
+// A, B and C light up one after the other, D is chosen and turns green.
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'landing' as *;
+
+$border: #8098be;
+$hover: #eef3f9;
+$loop: 8s;
+
+:host {
+  @include full-bleed;
+  background:
+    radial-gradient(50rem 30rem at 50% 0%, rgba($opponent, 0.12), transparent 70%),
+    $page;
+}
+
+.hero {
+  @include container(functions.rem(980));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100dvh - #{functions.rem(72)});
+  padding-block: functions.rem(32)
+    calc(#{functions.rem(48)} + var(--app-safe-bottom));
+  text-align: center;
+}
+
+.question-head {
+  @include rise(0.05s);
+  display: flex;
+  align-items: center;
+  gap: functions.rem(14);
+  width: min(100%, #{functions.rem(360)});
+}
+
+.count {
+  @include kicker;
+  flex: none;
+  color: $opponent;
+}
+
+.timer {
+  flex: 1;
+  height: functions.rem(4);
+  overflow: hidden;
+  border-radius: functions.rem(2);
+  background-color: $line;
+
+  i {
+    display: block;
+    height: 100%;
+    background-color: $blue;
+    transform-origin: left;
+    animation: drain $loop linear infinite;
+  }
+}
+
+.headline {
+  @include rise(0.12s);
+  max-width: functions.rem(820);
+  margin: functions.rem(20) 0 0;
+  font-size: clamp(#{functions.rem(38)}, 7vw, #{functions.rem(80)});
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+  color: $blue;
+}
+
+// The four answers, as in the quiz.
+.answers {
+  @include rise(0.2s);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: functions.rem(10);
+  width: 100%;
+  margin: functions.rem(32) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.answer {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(14);
+  min-height: functions.rem(64);
+  overflow: hidden;
+  border: functions.rem(1) solid $border;
+  border-radius: functions.rem(4);
+  background-color: $white;
+  text-align: left;
+  animation: scan $loop ease infinite;
+  animation-delay: calc(0.6s + var(--i) * 0.9s);
+
+  &.is-right {
+    animation: win $loop ease infinite;
+    animation-delay: 0s;
+
+    .letter {
+      animation: win-block $loop ease infinite;
+    }
+  }
+}
+
+.letter {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  align-self: stretch;
+  width: functions.rem(52);
+  background-color: $blue;
+  font-size: functions.rem(18);
+  color: $white;
+
+  .is-right & span {
+    animation: swap-out $loop ease infinite;
+  }
+}
+
+.check {
+  position: absolute;
+  animation: swap-in $loop ease infinite;
+}
+
+.text {
+  font-size: clamp(#{functions.rem(16)}, 2.4vw, #{functions.rem(22)});
+  font-weight: 700;
+  color: $blue;
+}
+
+.verdict {
+  @include rise(0.3s);
+  max-width: functions.rem(520);
+  margin: functions.rem(32) 0 functions.rem(24);
+  font-size: clamp(#{functions.rem(17)}, 2vw, #{functions.rem(20)});
+  font-weight: 300;
+  line-height: 1.45;
+  text-wrap: balance;
+  color: $muted;
+
+  strong {
+    font-weight: 700;
+    color: $green;
+  }
+}
+
+app-landing-name-form {
+  @include rise(0.38s);
+  text-align: left;
+}
+
+@media (min-width: $wide) {
+  .answers {
+    gap: functions.rem(16);
+  }
+
+  .answer {
+    min-height: functions.rem(88);
+  }
+
+  .letter {
+    width: functions.rem(72);
+    font-size: functions.rem(22);
+  }
+}
+
+@media (max-height: 700px) and (max-width: 640px) {
+  .answers {
+    margin-top: functions.rem(20);
+  }
+
+  .answer {
+    min-height: functions.rem(52);
+  }
+
+  .verdict {
+    margin-block: functions.rem(20) functions.rem(16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timer i,
+  .answer,
+  .letter,
+  .letter span,
+  .check {
+    animation: none !important;
+  }
+
+  .check {
+    opacity: 0;
+  }
+}
+
+@keyframes drain {
+  0% {
+    transform: scaleX(1);
+  }
+
+  50%,
+  95% {
+    transform: scaleX(0.4);
+  }
+
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes scan {
+  0%,
+  9%,
+  100% {
+    border-color: $border;
+    background-color: $white;
+  }
+
+  3%,
+  7% {
+    border-color: $blue;
+    background-color: $hover;
+  }
+}
+
+@keyframes win {
+  0%,
+  44%,
+  95%,
+  100% {
+    border-color: $border;
+    background-color: $white;
+  }
+
+  48%,
+  54% {
+    border-color: $blue;
+    background-color: $hover;
+  }
+
+  58%,
+  92% {
+    border-color: $green;
+    background-color: rgba($green, 0.1);
+  }
+}
+
+@keyframes win-block {
+  0%,
+  54%,
+  95%,
+  100% {
+    background-color: $blue;
+  }
+
+  58%,
+  92% {
+    background-color: $green;
+  }
+}
+
+@keyframes swap-out {
+  0%,
+  54%,
+  95%,
+  100% {
+    opacity: 1;
+  }
+
+  58%,
+  92% {
+    opacity: 0;
+  }
+}
+
+@keyframes swap-in {
+  0%,
+  54%,
+  95%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  58%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+}
