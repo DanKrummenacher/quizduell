@@ -23,6 +23,10 @@ import { LandingProductComponent } from '../../components/landing/landing-produc
 import { LandingRingComponent } from '../../components/landing/landing-ring.component';
 import { LandingStoryComponent } from '../../components/landing/landing-story.component';
 import { LandingWorldComponent } from '../../components/landing/landing-world.component';
+import {
+  StartFaceliftComponent,
+  type StartFaceliftVariant,
+} from '../../components/facelift/start-facelift.component';
 import { StartDesignPanelComponent } from '../../components/next/start-design-panel.component';
 import type { StartLayout } from '../../components/next/start-design';
 import { StartProposalComponent } from '../../components/next/start-proposal.component';
@@ -36,6 +40,7 @@ import { StartUiComponent } from '../../components/start-ui/start-ui.component';
   selector: 'app-start-container',
   imports: [
     StartUiComponent,
+    StartFaceliftComponent,
     LandingProductComponent,
     LandingKineticComponent,
     LandingArenaComponent,
@@ -68,6 +73,9 @@ export class StartContainerComponent implements OnInit, OnDestroy {
   // TEMPORARY: start page designs under review.
   readonly showDesignPreview = isDevMode();
   readonly layout = signal<StartLayout>('today');
+  readonly faceliftVariant = computed(
+    () => this.layout().slice(2) as StartFaceliftVariant,
+  );
 
   readonly featuresData = computed(() => {
     const info = this.infoService.info();

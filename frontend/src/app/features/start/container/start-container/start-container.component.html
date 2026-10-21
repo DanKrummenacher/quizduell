@@ -5,6 +5,15 @@
     [notice]="notice()"
     (startGame)="handleStart($event)"
   />
+} @else if (layout().startsWith('p-')) {
+  <app-start-facelift
+    [variant]="faceliftVariant()"
+    [features]="featuresData()"
+    [seconds]="info().questionDurationSec"
+    [initialName]="initialName"
+    [notice]="notice()"
+    (startGame)="handleStart($event)"
+  />
 } @else if (layout().startsWith('l-')) {
   <!-- TEMPORARY: landing page concepts. -->
   @switch (layout()) {

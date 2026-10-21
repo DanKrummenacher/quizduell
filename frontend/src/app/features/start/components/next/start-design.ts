@@ -1,8 +1,13 @@
 // TEMPORARY: start page designs under review (development only).
 
-/** Round 1 (f-), 2 (n-), 3 (c-), 4 (d-), 5 (e-) and the landing pages (l-). */
+/** The facelift (p-), rounds 1 (f-) to 5 (e-) and the landing pages (l-). */
 export type StartLayout =
   | 'today'
+  | 'p-pure'
+  | 'p-intro'
+  | 'p-logo'
+  | 'p-live'
+  | 'p-shapes'
   | 'f-clean'
   | 'f-inline'
   | 'f-stats'
@@ -67,6 +72,11 @@ export interface StartOption {
 /** All rounds side by side; the newest first. */
 export const START_LAYOUTS: StartOption[] = [
   { value: 'today', label: 'Heute' },
+  { value: 'p-pure', label: 'Facelift (rein)' },
+  { value: 'p-intro', label: 'Facelift + Intro-Animation' },
+  { value: 'p-logo', label: 'Facelift + Logo-Animation' },
+  { value: 'p-live', label: 'Facelift + lebendige Symbole' },
+  { value: 'p-shapes', label: 'Facelift + schwebende Formen' },
   { value: 'l-product', label: 'Landing L1 · Produkt' },
   { value: 'l-kinetic', label: 'Landing L2 · Kinetic Type' },
   { value: 'l-arena', label: 'Landing L3 · Arena' },

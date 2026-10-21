@@ -1,0 +1,90 @@
+<app-brand-header />
+
+<main class="main">
+  @if (variant() === 'shapes') {
+    <!-- TEMPORARY (variant): the shapes of the logo float behind the page. -->
+    <div class="shapes" aria-hidden="true">
+      @for (shape of ring; track $index) {
+        <span
+          class="shape"
+          [style.--i]="$index"
+          [style.background]="shape.color"
+        ></span>
+      }
+    </div>
+  }
+
+  <div class="content">
+    @if (variant() === 'logo') {
+      <!-- TEMPORARY (variant): the logo assembles itself and turns slowly. -->
+      <svg class="logo" viewBox="0 0 100 100" aria-hidden="true">
+        @for (shape of ring; track $index) {
+          <g class="logo-shape" [style.--i]="$index">
+            @if (shape.kind === 'circle') {
+              <circle
+                [attr.cx]="shape.cx"
+                [attr.cy]="shape.cy"
+                [attr.r]="shape.r"
+                [attr.fill]="shape.color"
+              />
+            } @else {
+              <polygon [attr.points]="shape.points" [attr.fill]="shape.color" />
+            }
+          </g>
+        }
+      </svg>
+    }
+
+    <h1 class="title">Teste dein Wissen im direkten Duell</h1>
+    <p class="subtitle">
+      Fordere deinen Gegner heraus, sammle Punkte und sichere dir den Sieg.
+    </p>
+
+    <ul class="facts">
+      @for (feature of features(); track feature.text) {
+        <li class="fact" [style.--i]="$index">
+          <span class="symbol" [class]="'symbol is-' + feature.icon">
+            @if (variant() === 'live' && feature.icon === 'time-limit') {
+              <!-- TEMPORARY (variant): the time of one question runs. -->
+              <svg class="timer" viewBox="0 0 100 100" aria-hidden="true">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="47"
+                  [style.animation-duration.s]="seconds()"
+                />
+              </svg>
+            }
+            <css-icon [icon]="feature.icon" size="lg"></css-icon>
+          </span>
+          <span class="fact-text">{{ feature.text }}</span>
+        </li>
+      }
+    </ul>
+
+    <div class="form">
+      <css-input-text
+        id="playerName"
+        label="Dein Name"
+        placeholder="z.B. Max Mustermann"
+        autocomplete="nickname"
+        [attr.maxlength]="maxLength"
+        [value]="playerName()"
+        [errorMessage]="errorMessage() || undefined"
+        (input)="onNameInput($event)"
+        (keydown)="onKeydown($event)"
+      ></css-input-text>
+
+      <css-button stretch variant="primary" class="start-button" (click)="submit()">
+        <css-icon icon="angle-right-circle" slot="prefix"></css-icon>
+        Los geht’s
+      </css-button>
+
+      @if (notice(); as message) {
+        <p class="notice" role="status">{{ message }}</p>
+      } @else {
+        <p class="info">Direkt loslegen – kein Account nötig</p>
+      }
+    </div>
+  </div>
+</main>
