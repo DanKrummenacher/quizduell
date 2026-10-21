@@ -49,9 +49,17 @@
         {{ ' ' }}
       }
     </h1>
-    <p class="subtitle">
-      Fordere deinen Gegner heraus, sammle Punkte und sichere dir den Sieg.
-    </p>
+    @if (variant() === 'persona' && cleanName()) {
+      <!-- TEMPORARY (variant): the page speaks to you by name. -->
+      <p class="subtitle is-personal">
+        Bereit, <strong>{{ cleanName() }}</strong
+        >? Fordere deinen Gegner heraus und sichere dir den Sieg.
+      </p>
+    } @else {
+      <p class="subtitle">
+        Fordere deinen Gegner heraus, sammle Punkte und sichere dir den Sieg.
+      </p>
+    }
 
     <ul class="facts">
       @for (feature of features(); track feature.text) {
@@ -74,7 +82,7 @@
             }
             <css-icon [icon]="feature.icon" size="xl"></css-icon>
           </span>
-          <span class="fact-text">{{ feature.text }}</span>
+          <span class="fact-text">{{ factText(feature.text) }}</span>
         </li>
       }
     </ul>
@@ -83,7 +91,7 @@
       <css-input-text
         id="playerName"
         label="Dein Name"
-        placeholder="z.B. Max Mustermann"
+        [placeholder]="placeholder()"
         autocomplete="nickname"
         [attr.maxlength]="maxLength"
         [value]="playerName()"
@@ -92,17 +100,36 @@
         (keydown)="onKeydown($event)"
       ></css-input-text>
 
-      <span class="button-frame">
-        <css-button
-          stretch
-          variant="primary"
-          class="start-button"
-          (click)="submit()"
-        >
-          <css-icon icon="angle-right-circle" slot="prefix"></css-icon>
-          Los geht’s
-        </css-button>
-      </span>
+      <div class="button-area">
+        <span class="button-frame">
+          <css-button
+            stretch
+            variant="primary"
+            class="start-button"
+            (click)="submit()"
+          >
+            <css-icon icon="angle-right-circle" slot="prefix"></css-icon>
+            @if (variant() === 'persona' && cleanName()) {
+              Los geht’s, {{ cleanName() }}
+            } @else {
+              Los geht’s
+            }
+          </css-button>
+        </span>
+        @if (bursting()) {
+          <!-- TEMPORARY (variant): the shapes of the logo burst out. -->
+          <span class="burst" aria-hidden="true">
+            @for (piece of confetti; track $index) {
+              <i
+                [class.is-round]="piece.round"
+                [style.--a.deg]="piece.angle"
+                [style.--d.px]="piece.distance"
+                [style.background]="piece.color"
+              ></i>
+            }
+          </span>
+        }
+      </div>
 
       @if (notice(); as message) {
         <p class="notice" role="status">{{ message }}</p>

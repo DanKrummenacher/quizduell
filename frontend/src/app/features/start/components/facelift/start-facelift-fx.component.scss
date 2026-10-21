@@ -215,6 +215,129 @@ app-brand-header,
   }
 }
 
+// ---------------------------------------------------------------------------
+// Persona: the page speaks to you by name
+// ---------------------------------------------------------------------------
+.subtitle.is-personal {
+  animation: fade-up 0.5s $ease-out both;
+
+  strong {
+    color: $blue;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Confetti: the shapes of the logo burst out of the button
+// ---------------------------------------------------------------------------
+.button-area {
+  position: relative;
+}
+
+.burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+
+  i {
+    position: absolute;
+    width: functions.rem(12);
+    height: functions.rem(12);
+    margin: functions.rem(-6) 0 0 functions.rem(-6);
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+    animation: fly 0.7s $ease-out both;
+
+    &.is-round {
+      border-radius: 50%;
+      clip-path: none;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Parallax: title, symbols and form lie on different layers
+// ---------------------------------------------------------------------------
+:host(.is-parallax) {
+  .title,
+  .subtitle,
+  .facts,
+  .form {
+    transition: transform 0.4s $ease-out;
+  }
+
+  .title {
+    transform: translate(
+      calc(var(--px) * #{functions.rem(-14)}),
+      calc(var(--py) * #{functions.rem(-10)})
+    );
+  }
+
+  .subtitle {
+    transform: translate(
+      calc(var(--px) * #{functions.rem(-8)}),
+      calc(var(--py) * #{functions.rem(-6)})
+    );
+  }
+
+  .facts {
+    transform: translate(
+      calc(var(--px) * #{functions.rem(-22)}),
+      calc(var(--py) * #{functions.rem(-14)})
+    );
+  }
+
+  .form {
+    transform: translate(
+      calc(var(--px) * #{functions.rem(-4)}),
+      calc(var(--py) * #{functions.rem(-3)})
+    );
+  }
+
+  .symbol {
+    box-shadow: 0 functions.rem(14) functions.rem(28) rgba(0, 50, 125, 0.14);
+  }
+
+  // Without a mouse the page sways softly by itself.
+  @media (hover: none) {
+    .facts {
+      animation: sway 7s ease-in-out infinite;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Counter: the numbers count up, the symbols draw their ring
+// ---------------------------------------------------------------------------
+:host(.is-counter) {
+  .symbol {
+    animation: pop 0.6s $ease-out both;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: functions.rem(-1);
+      border-radius: 50%;
+      background: conic-gradient($blue var(--angle), transparent 0);
+      mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - #{functions.rem(2)}),
+        #000 0
+      );
+      animation:
+        draw 1.2s $ease-out both,
+        fade-out 0.6s 1.4s ease both;
+    }
+  }
+
+  .fact:nth-child(2) .symbol {
+    animation-delay: 0.1s;
+  }
+
+  .fact:nth-child(3) .symbol {
+    animation-delay: 0.2s;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .word,
   .subtitle,
@@ -223,7 +346,9 @@ app-brand-header,
   .form,
   .form::before,
   .halo,
-  .button-frame::after {
+  .button-frame::after,
+  .burst i,
+  .symbol::after {
     animation: none !important;
   }
 }
@@ -289,6 +414,48 @@ app-brand-header,
   from {
     opacity: 0;
     transform: rotateY(-180deg) scale(0.6);
+  }
+}
+
+@keyframes fly {
+  from {
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(0) scale(0.3);
+  }
+
+  to {
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(calc(-1 * var(--d))) rotate(200deg)
+      scale(1);
+  }
+}
+
+@keyframes sway {
+  50% {
+    transform: translateX(#{functions.rem(6)}) rotate(0.6deg);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+@keyframes draw {
+  from {
+    --angle: 0deg;
+  }
+
+  to {
+    --angle: 360deg;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
   }
 }
 

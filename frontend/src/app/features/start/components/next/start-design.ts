@@ -13,6 +13,11 @@ export type StartLayout =
   | 'p-spotlight'
   | 'p-kinetic'
   | 'p-holo'
+  | 'p-typewriter'
+  | 'p-persona'
+  | 'p-confetti'
+  | 'p-parallax'
+  | 'p-counter'
   | 'f-clean'
   | 'f-inline'
   | 'f-stats'
@@ -87,6 +92,11 @@ export const START_LAYOUTS: StartOption[] = [
   { value: 'p-spotlight', label: 'Facelift + Spotlight & 3D' },
   { value: 'p-kinetic', label: 'Facelift + Kinetic Intro' },
   { value: 'p-holo', label: 'Facelift + Holo-Symbole' },
+  { value: 'p-typewriter', label: 'Facelift + Schreibmaschine' },
+  { value: 'p-persona', label: 'Facelift + persönlich' },
+  { value: 'p-confetti', label: 'Facelift + Konfetti-Start' },
+  { value: 'p-parallax', label: 'Facelift + Parallax-Tiefe' },
+  { value: 'p-counter', label: 'Facelift + Zähler' },
   { value: 'l-product', label: 'Landing L1 · Produkt' },
   { value: 'l-kinetic', label: 'Landing L2 · Kinetic Type' },
   { value: 'l-arena', label: 'Landing L3 · Arena' },
