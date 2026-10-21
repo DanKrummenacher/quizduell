@@ -207,6 +207,7 @@ export class StartFaceliftComponent implements OnInit {
   protected readonly rollLead = ['Teste', 'dein', 'Wissen', 'im'];
   protected readonly rollWords = ROLL_WORDS;
   protected readonly subMessages = SUB_MESSAGES;
+  protected readonly linePhrases = LINE_PHRASES;
   protected readonly rollIndex = signal(0);
   private readonly rollList = computed(() => {
     const mode = this.wordMode();
@@ -229,7 +230,7 @@ export class StartFaceliftComponent implements OnInit {
   /** The width of the current word, so the title moves smoothly. */
   private readonly rollWidths = signal<number[]>([]);
   protected readonly rollWidth = computed(
-    () => this.rollWidths()[this.rollIndex() % ROLL_WORDS.length] ?? null,
+    () => this.rollWidths()[this.rollIndex() % this.rollList().length] ?? null,
   );
   private readonly rollMeasure = viewChild<ElementRef<HTMLElement>>('rollMeasure');
 

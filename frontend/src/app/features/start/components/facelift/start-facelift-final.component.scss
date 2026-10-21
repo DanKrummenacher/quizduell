@@ -163,17 +163,22 @@ $swap: cubic-bezier(0.65, 0, 0.35, 1);
   white-space: nowrap;
 }
 
-// Whole line: the second line of the title changes as a whole.
+// Whole phrase: the end of the title changes as a whole; on narrow screens
+// it moves to the second line as a unit.
 .line-roll {
   position: relative;
-  display: block;
+  display: inline-block;
+  // Until it is measured: wide enough for «im direkten Duell».
+  min-width: 7.8em;
   height: 1.2em;
   overflow: hidden;
+  vertical-align: bottom;
+  white-space: nowrap;
   color: $mid;
+  transition: width 0.55s $swap;
 
-  .roll-word {
-    right: 0;
-    text-align: center;
+  &[style*='width'] {
+    min-width: 0;
   }
 }
 
