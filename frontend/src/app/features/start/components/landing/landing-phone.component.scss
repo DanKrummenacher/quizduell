@@ -1,0 +1,396 @@
+// TEMPORARY (landing concepts): a phone with the real quiz screen. All
+// sizes follow the width of the phone (cqw), so it scales everywhere.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$page: colors.$dt-color-pepper-bright;
+$opponent: #00a4e0;
+$green: #00875e;
+$border: #8098be;
+$muted: #4d70a4;
+$bold: miscs.$css-ui-font-weight-bold;
+$loop: 9s;
+
+:host {
+  display: block;
+  width: var(--phone-width, 17.5rem);
+}
+
+.phone {
+  container-type: inline-size;
+  aspect-ratio: 9 / 19;
+  box-sizing: border-box;
+  padding: 3.4%;
+  border-radius: 15% / 7%;
+  background: linear-gradient(145deg, #2a3446, #0d131f 45%, #1b2333);
+  box-shadow:
+    inset 0 0 0 1px rgba($white, 0.12),
+    0 2.5rem 5rem rgba(0, 31, 82, 0.28),
+    0 1rem 2rem rgba(0, 31, 82, 0.18);
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 12% / 5.6%;
+  background-color: $page;
+}
+
+.island {
+  position: absolute;
+  top: 3cqw;
+  left: 50%;
+  z-index: 1;
+  width: 30cqw;
+  height: 8.5cqw;
+  border-radius: 999px;
+  background-color: #05080e;
+  transform: translateX(-50%);
+}
+
+.bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2cqw;
+  height: 30cqw;
+  box-sizing: border-box;
+  padding-bottom: 5cqw;
+  border-radius: 0 0 7cqw 7cqw;
+  background-color: $blue;
+  box-shadow: 0 1.2cqw 0 0 $opponent;
+}
+
+.bar-logo {
+  width: 6.5cqw;
+  height: 6.5cqw;
+}
+
+.bar-word {
+  font-size: 6cqw;
+  font-weight: $bold;
+  color: $white;
+
+  span {
+    font-weight: 300;
+  }
+}
+
+.players {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 7cqw 7cqw 0;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 2.5cqw;
+
+  b {
+    display: grid;
+    place-items: center;
+    width: 10cqw;
+    height: 10cqw;
+    border-radius: 50%;
+    background-color: $blue;
+    font-size: 4.5cqw;
+    color: $white;
+
+    &.is-opponent {
+      background-color: $opponent;
+    }
+  }
+}
+
+.points {
+  position: relative;
+  font-size: 6.5cqw;
+  font-weight: $bold;
+  color: $blue;
+}
+
+.before {
+  animation: score-out $loop ease infinite;
+}
+
+.after {
+  position: absolute;
+  left: 0;
+  color: $green;
+  animation: score-in $loop ease infinite;
+}
+
+.round {
+  font-size: 3.6cqw;
+  font-weight: $bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $muted;
+}
+
+.timer {
+  display: block;
+  height: 1.6cqw;
+  margin: 5cqw 7cqw 0;
+  overflow: hidden;
+  border-radius: 1cqw;
+  background-color: #dfe3ea;
+
+  i {
+    display: block;
+    height: 100%;
+    background-color: $blue;
+    transform-origin: left;
+    animation: drain $loop linear infinite;
+  }
+}
+
+.question {
+  margin: 7cqw 7cqw 5cqw;
+  font-size: 7cqw;
+  font-weight: $bold;
+  line-height: 1.2;
+  color: $blue;
+}
+
+.answers {
+  display: grid;
+  gap: 2.8cqw;
+  margin: 0 7cqw;
+}
+
+.answer {
+  display: flex;
+  align-items: center;
+  gap: 3.5cqw;
+  height: 13cqw;
+  overflow: hidden;
+  border: 1px solid $border;
+  border-radius: 1.5cqw;
+  background-color: $white;
+  font-size: 5cqw;
+  color: $blue;
+
+  b {
+    position: relative;
+    display: grid;
+    place-items: center;
+    align-self: stretch;
+    width: 12cqw;
+    background-color: $blue;
+    font-size: 4.8cqw;
+    color: $white;
+  }
+
+  &.is-picked {
+    animation: pick $loop ease infinite;
+
+    b {
+      animation: pick-block $loop ease infinite;
+    }
+  }
+}
+
+.letter {
+  animation: letter $loop ease infinite;
+}
+
+.check {
+  position: absolute;
+  animation: check $loop ease infinite;
+}
+
+// The opponent is still thinking.
+.opponent {
+  position: absolute;
+  right: 7cqw;
+  bottom: 9cqw;
+  left: 7cqw;
+  display: flex;
+  align-items: center;
+  gap: 3cqw;
+  padding: 3.5cqw 4cqw;
+  border-radius: 4cqw;
+  background-color: $white;
+  box-shadow: 0 1.5cqw 5cqw rgba(0, 50, 125, 0.1);
+  font-size: 4.2cqw;
+  color: $muted;
+
+  b {
+    display: grid;
+    place-items: center;
+    width: 8cqw;
+    height: 8cqw;
+    border-radius: 50%;
+    background-color: $opponent;
+    font-size: 3.8cqw;
+    color: $white;
+  }
+}
+
+.dots {
+  display: inline-flex;
+  gap: 1cqw;
+  margin-left: auto;
+
+  i {
+    width: 1.6cqw;
+    height: 1.6cqw;
+    border-radius: 50%;
+    background-color: $opponent;
+    animation: hop 1.2s ease-in-out infinite;
+
+    &:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    &:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+  }
+}
+
+@keyframes hop {
+  0%,
+  60%,
+  100% {
+    opacity: 0.4;
+    transform: none;
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-1cqw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+  }
+
+  .after,
+  .check {
+    opacity: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// One loop: time runs (0–45 %), B is chosen (40 %), right (52 %), score
+// (56 %), back to the start (95 %).
+// ---------------------------------------------------------------------------
+@keyframes drain {
+  0% {
+    transform: scaleX(1);
+  }
+
+  45%,
+  95% {
+    transform: scaleX(0.5);
+  }
+
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes pick {
+  0%,
+  36%,
+  95%,
+  100% {
+    border-color: $border;
+    background-color: $white;
+  }
+
+  40%,
+  48% {
+    border-color: $blue;
+    background-color: #eef3f9;
+  }
+
+  52%,
+  90% {
+    border-color: $green;
+    background-color: rgba($green, 0.1);
+  }
+}
+
+@keyframes pick-block {
+  0%,
+  48%,
+  95%,
+  100% {
+    background-color: $blue;
+  }
+
+  52%,
+  90% {
+    background-color: $green;
+  }
+}
+
+@keyframes letter {
+  0%,
+  48%,
+  95%,
+  100% {
+    opacity: 1;
+  }
+
+  52%,
+  90% {
+    opacity: 0;
+  }
+}
+
+@keyframes check {
+  0%,
+  48%,
+  95%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  52%,
+  90% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes score-out {
+  0%,
+  54%,
+  95%,
+  100% {
+    opacity: 1;
+  }
+
+  58%,
+  92% {
+    opacity: 0;
+  }
+}
+
+@keyframes score-in {
+  0%,
+  54%,
+  95%,
+  100% {
+    opacity: 0;
+    transform: translateY(60%);
+  }
+
+  58%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+}

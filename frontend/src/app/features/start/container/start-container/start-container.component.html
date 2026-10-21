@@ -5,6 +5,46 @@
     [notice]="notice()"
     (startGame)="handleStart($event)"
   />
+} @else if (layout().startsWith('l-')) {
+  <!-- TEMPORARY: landing page concepts. -->
+  @switch (layout()) {
+    @case ('l-kinetic') {
+      <app-landing-kinetic
+        [questions]="info().questionsPerGame"
+        [seconds]="info().questionDurationSec"
+        [initialName]="initialName"
+        [notice]="notice()"
+        (startGame)="handleStart($event)"
+      />
+    }
+    @case ('l-arena') {
+      <app-landing-arena
+        [questions]="info().questionsPerGame"
+        [seconds]="info().questionDurationSec"
+        [initialName]="initialName"
+        [notice]="notice()"
+        (startGame)="handleStart($event)"
+      />
+    }
+    @case ('l-world') {
+      <app-landing-world
+        [questions]="info().questionsPerGame"
+        [seconds]="info().questionDurationSec"
+        [initialName]="initialName"
+        [notice]="notice()"
+        (startGame)="handleStart($event)"
+      />
+    }
+    @default {
+      <app-landing-product
+        [questions]="info().questionsPerGame"
+        [seconds]="info().questionDurationSec"
+        [initialName]="initialName"
+        [notice]="notice()"
+        (startGame)="handleStart($event)"
+      />
+    }
+  }
 } @else if (layout().startsWith('f-')) {
   <!-- TEMPORARY: start page proposals, round 1. -->
   <app-start-round-a

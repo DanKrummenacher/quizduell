@@ -1,6 +1,6 @@
 // TEMPORARY: start page designs under review (development only).
 
-/** Round 1 (f-), 2 (n-), 3 (c-), 4 (d-) and 5 (e-). */
+/** Round 1 (f-), 2 (n-), 3 (c-), 4 (d-), 5 (e-) and the landing pages (l-). */
 export type StartLayout =
   | 'today'
   | 'f-clean'
@@ -39,7 +39,11 @@ export type StartLayout =
   | 'e-question'
   | 'e-slides'
   | 'e-button'
-  | 'e-sentence';
+  | 'e-sentence'
+  | 'l-product'
+  | 'l-kinetic'
+  | 'l-arena'
+  | 'l-world';
 
 /** The visuals of round 3. */
 export type StartVisual = 'product' | 'race' | 'wall';
@@ -55,6 +59,10 @@ export interface StartOption {
 /** All rounds side by side; the newest first. */
 export const START_LAYOUTS: StartOption[] = [
   { value: 'today', label: 'Heute' },
+  { value: 'l-product', label: 'Landing L1 · Produkt' },
+  { value: 'l-kinetic', label: 'Landing L2 · Kinetic Type' },
+  { value: 'l-arena', label: 'Landing L3 · Arena' },
+  { value: 'l-world', label: 'Landing L4 · Markenwelt' },
   { value: 'e-attract', label: 'R5 · E1 Attract-Modus' },
   { value: 'e-question', label: 'R5 · E2 Frage 0: Wie heisst du?' },
   { value: 'e-slides', label: 'R5 · E3 Onboarding-Slides' },

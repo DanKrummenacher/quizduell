@@ -1,0 +1,352 @@
+// TEMPORARY (landing concepts) · L3 Arena.
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'landing' as *;
+
+$neon: #3fd0ff;
+
+:host {
+  @include full-bleed;
+  margin-top: calc(-1 * var(--app-safe-top));
+  background-color: #000c22;
+  color: $white;
+}
+
+// ---------------------------------------------------------------------------
+// Hero
+// ---------------------------------------------------------------------------
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(100dvh - #{functions.rem(64)});
+  padding: functions.rem(32) functions.rem(20) functions.rem(56);
+  overflow: hidden;
+  text-align: center;
+}
+
+// A grid floor in perspective that moves towards you.
+.floor {
+  position: absolute;
+  bottom: 0;
+  left: -50%;
+  width: 200%;
+  height: 60%;
+  background-image:
+    linear-gradient(
+      rgba($neon, 0.35) functions.rem(1),
+      transparent functions.rem(1)
+    ),
+    linear-gradient(
+      90deg,
+      rgba($neon, 0.35) functions.rem(1),
+      transparent functions.rem(1)
+    );
+  background-size: functions.rem(64) functions.rem(64);
+  mask-image: linear-gradient(transparent, #000 40%);
+  transform: perspective(functions.rem(420)) rotateX(62deg);
+  transform-origin: bottom;
+  animation: floor 3s linear infinite;
+}
+
+.horizon {
+  position: absolute;
+  top: 40%;
+  left: 0;
+  width: 100%;
+  height: functions.rem(240);
+  background: radial-gradient(50% 50% at 50% 50%, rgba($mid, 0.55), transparent 70%);
+  pointer-events: none;
+}
+
+// You and your opponent.
+.face-off {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: functions.rem(8);
+}
+
+.fighter {
+  display: grid;
+  justify-items: center;
+  gap: functions.rem(10);
+  width: functions.rem(112);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: functions.rem(96);
+  height: functions.rem(96);
+  box-sizing: border-box;
+  border-radius: 50%;
+  font-size: functions.rem(34);
+  font-weight: 700;
+
+  .is-me & {
+    background-color: $white;
+    box-shadow: 0 0 functions.rem(40) rgba($white, 0.35);
+    color: $blue;
+    animation: enter-left 0.8s $ease-out both;
+  }
+
+  .is-opponent & {
+    border: functions.rem(3) dashed $neon;
+    box-shadow: 0 0 functions.rem(32) rgba($neon, 0.35);
+    color: $neon;
+    animation:
+      enter-right 0.8s $ease-out both,
+      glow 2s 0.8s ease-in-out infinite alternate;
+  }
+}
+
+.fighter-name {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: functions.rem(15);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: rgba($white, 0.8);
+}
+
+// The beam between the two, with the VS in the middle.
+.beam {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(#{functions.rem(64)}, 18vw, #{functions.rem(200)});
+  height: functions.rem(4);
+  margin-bottom: functions.rem(34);
+  border-radius: functions.rem(2);
+  background: linear-gradient(90deg, $white, $neon);
+  box-shadow: 0 0 functions.rem(16) rgba($neon, 0.8);
+  animation: charge 1.6s ease-in-out infinite alternate;
+
+  b {
+    padding: functions.rem(6) functions.rem(10);
+    border-radius: functions.rem(8);
+    background-color: #000c22;
+    font-size: functions.rem(18);
+    font-style: italic;
+    color: $neon;
+  }
+}
+
+.copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: functions.rem(40);
+}
+
+.headline {
+  margin: 0;
+  font-size: clamp(#{functions.rem(52)}, 12vw, #{functions.rem(128)});
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  animation: rise-in 0.9s 0.3s $ease-out both;
+}
+
+.live {
+  color: $neon;
+  text-shadow: 0 0 functions.rem(24) rgba($neon, 0.6);
+}
+
+.lead {
+  max-width: functions.rem(520);
+  margin: functions.rem(18) 0 functions.rem(28);
+  font-size: clamp(#{functions.rem(17)}, 2vw, #{functions.rem(20)});
+  font-weight: 300;
+  line-height: 1.45;
+  color: rgba($white, 0.75);
+  animation: rise-in 0.9s 0.4s $ease-out both;
+}
+
+app-landing-name-form {
+  text-align: left;
+  animation: rise-in 0.9s 0.5s $ease-out both;
+}
+
+// ---------------------------------------------------------------------------
+// How a duel runs
+// ---------------------------------------------------------------------------
+.rounds {
+  @include container(functions.rem(960));
+  padding-block: functions.rem(80)
+    calc(#{functions.rem(96)} + var(--app-safe-bottom));
+}
+
+.kicker {
+  @include kicker;
+  color: $neon;
+}
+
+.title {
+  @include section-title;
+  color: $white;
+}
+
+.round-list {
+  display: grid;
+  gap: functions.rem(12);
+  margin: functions.rem(32) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.round {
+  @include reveal;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: functions.rem(12) functions.rem(20);
+  padding: functions.rem(20) functions.rem(24);
+  border: functions.rem(1) solid rgba($white, 0.12);
+  border-radius: functions.rem(20);
+  background-color: rgba($white, 0.04);
+
+  &.is-last {
+    border-color: rgba($neon, 0.5);
+    box-shadow: 0 0 functions.rem(40) rgba($neon, 0.12);
+  }
+}
+
+.round-label {
+  font-size: functions.rem(14);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba($white, 0.6);
+}
+
+.round-score {
+  justify-self: end;
+  font-size: functions.rem(40);
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+
+  i {
+    margin-inline: functions.rem(6);
+    font-style: normal;
+    color: $neon;
+  }
+}
+
+.round-bar {
+  grid-column: 1 / -1;
+  height: functions.rem(6);
+  overflow: hidden;
+  border-radius: functions.rem(3);
+  background-color: rgba($white, 0.1);
+
+  b {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, $mid, $neon);
+  }
+}
+
+.round-win {
+  position: absolute;
+  top: functions.rem(-12);
+  right: functions.rem(20);
+  padding: functions.rem(4) functions.rem(12);
+  border-radius: functions.rem(999);
+  background-color: #22b07d;
+  font-size: functions.rem(12);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+// ---------------------------------------------------------------------------
+// Sizes
+// ---------------------------------------------------------------------------
+@media (max-height: 700px) {
+  .avatar {
+    width: functions.rem(76);
+    height: functions.rem(76);
+    font-size: functions.rem(28);
+  }
+
+  .copy {
+    margin-top: functions.rem(24);
+  }
+}
+
+@media (min-width: $wide) {
+  .hero {
+    justify-content: center;
+    padding-top: functions.rem(24);
+  }
+
+  .fighter {
+    width: functions.rem(180);
+  }
+
+  .avatar {
+    width: functions.rem(140);
+    height: functions.rem(140);
+    font-size: functions.rem(48);
+  }
+
+  .round-list {
+    grid-template-columns: repeat(3, 1fr);
+    gap: functions.rem(20);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floor,
+  .avatar,
+  .beam,
+  .headline,
+  .lead,
+  app-landing-name-form {
+    animation: none !important;
+  }
+}
+
+@keyframes floor {
+  to {
+    background-position: 0 functions.rem(64);
+  }
+}
+
+@keyframes enter-left {
+  from {
+    opacity: 0;
+    transform: translateX(-60%);
+  }
+}
+
+@keyframes enter-right {
+  from {
+    opacity: 0;
+    transform: translateX(60%);
+  }
+}
+
+@keyframes glow {
+  to {
+    box-shadow: 0 0 functions.rem(56) rgba($neon, 0.6);
+  }
+}
+
+@keyframes charge {
+  to {
+    box-shadow: 0 0 functions.rem(32) rgba($neon, 1);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(functions.rem(24));
+  }
+}

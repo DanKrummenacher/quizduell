@@ -1,0 +1,54 @@
+<app-landing-nav [dark]="true" />
+
+<main>
+  <section class="hero">
+    <div class="floor" aria-hidden="true"></div>
+    <span class="horizon" aria-hidden="true"></span>
+
+    <div class="face-off" aria-hidden="true">
+      <span class="fighter is-me">
+        <span class="avatar">{{ initial() || 'Du' }}</span>
+        <span class="fighter-name">{{ cleanName() || 'Du' }}</span>
+      </span>
+      <span class="beam"><b>VS</b></span>
+      <span class="fighter is-opponent">
+        <span class="avatar">?</span>
+        <span class="fighter-name">Gegner</span>
+      </span>
+    </div>
+
+    <div class="copy">
+      <h1 class="headline">1 gegen 1. <span class="live">Live.</span></h1>
+      <p class="lead">
+        {{ questions() }} Fragen, {{ seconds() }} Sekunden pro Frage. Wer schneller
+        richtig liegt, gewinnt das Duell.
+      </p>
+      <app-landing-name-form
+        [dark]="true"
+        [initialName]="initialName()"
+        [notice]="notice()"
+        (nameChange)="name.set($event)"
+        (startGame)="startGame.emit($event)"
+      />
+    </div>
+  </section>
+
+  <section class="rounds" aria-labelledby="roundsTitle">
+    <p class="kicker">So läuft ein Duell</p>
+    <h2 id="roundsTitle" class="title">Jede Frage zählt.</h2>
+    <ol class="round-list">
+      @for (round of rounds(); track $index) {
+        <li class="round" [class.is-last]="$last">
+          <span class="round-label">Runde {{ $index + 1 }}</span>
+          <span class="round-score">{{ round.me }}<i>:</i>{{ round.opponent }}</span>
+          <span class="round-bar"
+            ><b [style.width.%]="(round.me / questions()) * 100"></b
+          ></span>
+          @if ($last) {
+            <span class="round-win">Sieg</span>
+          }
+        </li>
+      }
+    </ol>
+  </section>
+</main>

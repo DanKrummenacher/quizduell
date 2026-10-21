@@ -1,0 +1,39 @@
+<div class="phone">
+  <div class="screen">
+    <span class="island"></span>
+    <div class="bar">
+      <app-logo-mark class="bar-logo" [inverse]="true" />
+      <span class="bar-word"><span>play</span>duelio</span>
+    </div>
+    <div class="players">
+      <span class="player"
+        ><b>{{ initial() || 'A' }}</b
+        ><span class="points"
+          ><span class="before">1</span><span class="after">2</span></span
+        ></span
+      >
+      <span class="round">Frage 2 / {{ questions() }}</span>
+      <span class="player is-right"
+        ><span class="points">1</span><b class="is-opponent">B</b></span
+      >
+    </div>
+    <span class="timer"><i></i></span>
+    <p class="question">Welcher Planet ist der grösste?</p>
+    <div class="answers">
+      <span class="answer"><b>A</b>Saturn</span>
+      <span class="answer is-picked"
+        ><b
+          ><span class="letter">B</span
+          ><css-icon class="check" icon="checkmark" size="sm"></css-icon></b
+        >Jupiter</span
+      >
+      <span class="answer"><b>C</b>Erde</span>
+      <span class="answer"><b>D</b>Mars</span>
+    </div>
+    <div class="opponent">
+      <b>B</b>
+      <span>Gegner antwortet</span>
+      <span class="dots"><i></i><i></i><i></i></span>
+    </div>
+  </div>
+</div>

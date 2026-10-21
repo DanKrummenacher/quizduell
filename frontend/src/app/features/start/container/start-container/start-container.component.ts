@@ -11,6 +11,10 @@ import { Router } from '@angular/router';
 import { PublicInfoService } from '../../../../core/info/public-info.service';
 import { IdleResetService } from '../../../../core/platform/idle-reset.service';
 import { PlayerNameStore } from '../../../../core/player/player-name.store';
+import { LandingArenaComponent } from '../../components/landing/landing-arena.component';
+import { LandingKineticComponent } from '../../components/landing/landing-kinetic.component';
+import { LandingProductComponent } from '../../components/landing/landing-product.component';
+import { LandingWorldComponent } from '../../components/landing/landing-world.component';
 import { StartDesignPanelComponent } from '../../components/next/start-design-panel.component';
 import type { StartLayout } from '../../components/next/start-design';
 import { StartProposalComponent } from '../../components/next/start-proposal.component';
@@ -24,6 +28,10 @@ import { StartUiComponent } from '../../components/start-ui/start-ui.component';
   selector: 'app-start-container',
   imports: [
     StartUiComponent,
+    LandingProductComponent,
+    LandingKineticComponent,
+    LandingArenaComponent,
+    LandingWorldComponent,
     StartRoundAComponent,
     StartRoundBComponent,
     StartProposalComponent,

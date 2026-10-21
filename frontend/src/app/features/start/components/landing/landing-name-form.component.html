@@ -1,0 +1,28 @@
+<form class="pill" [class.has-error]="errorMessage()" (submit)="submit($event)">
+  <label class="visually-hidden" [attr.for]="fieldId()">Dein Name</label>
+  <input
+    class="field"
+    type="text"
+    autocomplete="nickname"
+    enterkeyhint="go"
+    placeholder="Dein Name"
+    [id]="fieldId()"
+    [attr.maxlength]="maxLength"
+    [attr.aria-invalid]="errorMessage() ? true : null"
+    [attr.aria-describedby]="messageId()"
+    [value]="playerName()"
+    (input)="onNameInput($event)"
+  />
+  <button type="submit" class="go">
+    <span class="go-text">Los geht’s</span>
+    <css-icon icon="arrow-right-circle" size="sm"></css-icon>
+  </button>
+</form>
+<p
+  class="message"
+  [id]="messageId()"
+  [class.is-error]="errorMessage()"
+  role="status"
+>
+  {{ errorMessage() || notice() || 'Kein Account nötig – nur dein Name.' }}
+</p>

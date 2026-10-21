@@ -1,0 +1,82 @@
+<app-landing-nav />
+
+<main>
+  <section class="hero">
+    <p class="kicker"><span class="tag">Live</span>Das Quiz-Duell in Echtzeit</p>
+    <h1 class="headline">Wer weiss <span class="accent">mehr?</span></h1>
+    <p class="lead">
+      Fordere jemanden heraus: {{ questions() }} Fragen, {{ seconds() }} Sekunden pro
+      Frage. Wer schneller richtig liegt, gewinnt.
+    </p>
+    <app-landing-name-form
+      class="hero-form"
+      [initialName]="initialName()"
+      [notice]="notice()"
+      (nameChange)="name.set($event)"
+      (startGame)="startGame.emit($event)"
+    />
+
+    <div class="stage">
+      <span class="halo" aria-hidden="true"></span>
+      <app-landing-phone
+        class="device"
+        [initial]="initial()"
+        [questions]="questions()"
+      />
+      <span class="float is-left" aria-hidden="true">
+        <css-icon icon="checked-circle" size="sm"></css-icon>Richtig! +1
+      </span>
+      <span class="float is-right" aria-hidden="true">
+        <css-icon icon="time-limit" size="sm"></css-icon>{{ seconds() }} s pro Frage
+      </span>
+    </div>
+  </section>
+
+  <section class="steps" aria-labelledby="stepsTitle">
+    <p class="section-kicker">So einfach geht’s</p>
+    <h2 id="stepsTitle" class="section-title">In drei Schritten zum Duell.</h2>
+    <ol class="step-list">
+      <li>
+        <span class="step-number">01</span>
+        <strong>Namen eingeben</strong>
+        <span>Kein Account, kein Passwort. Nur dein Name.</span>
+      </li>
+      <li>
+        <span class="step-number">02</span>
+        <strong>Gegner finden</strong>
+        <span>Ein Zufallsgegner oder ein Freund mit Code.</span>
+      </li>
+      <li>
+        <span class="step-number">03</span>
+        <strong>Duell gewinnen</strong>
+        <span
+          >{{ questions() }} Fragen, je {{ seconds() }} Sekunden. Schnell und richtig
+          zählt.</span
+        >
+      </li>
+    </ol>
+  </section>
+
+  <section class="numbers" aria-label="Das Duell in Zahlen">
+    <div>
+      <strong>{{ questions() }}</strong
+      ><span>Fragen pro Duell</span>
+    </div>
+    <div>
+      <strong>{{ seconds() }}<small>s</small></strong
+      ><span>pro Frage</span>
+    </div>
+    <div><strong>1:1</strong><span>live gegeneinander</span></div>
+    <div><strong>0</strong><span>Accounts nötig</span></div>
+  </section>
+
+  <section class="final" aria-labelledby="finalTitle">
+    <h2 id="finalTitle" class="section-title">Bereit für dein erstes Duell?</h2>
+    <app-landing-name-form
+      fieldId="playerNameBottom"
+      [initialName]="initialName()"
+      [notice]="notice()"
+      (startGame)="startGame.emit($event)"
+    />
+  </section>
+</main>
