@@ -10,6 +10,7 @@ import {
   type OnInit,
   output,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import '@css-ch/components/button';
@@ -54,7 +55,17 @@ export type StartFaceliftVariant =
   | 'final-typer'
   | 'final-intro-roll'
   | 'final-intro-typer'
-  | 'final-all';
+  | 'final-all'
+  | 'combo'
+  | 'combo-roll'
+  | 'combo-flip'
+  | 'combo-scramble'
+  | 'combo-marker'
+  | 'combo-line'
+  | 'combo-sub';
+
+/** How a word changes on the page. */
+type WordMode = 'roll' | 'flip' | 'scramble' | 'marker' | 'line' | 'sub';
 
 const TITLE = 'Teste dein Wissen im direkten Duell';
 
@@ -68,6 +79,22 @@ const COUNT_MS = 1200;
 /** Final candidates: the words that roll through the title. */
 const ROLL_WORDS = ['direkten', 'schnellen', 'fairen', 'spannenden'];
 const ROLL_INTERVAL_MS = 2800;
+/** «line»: the second line of the title changes as a whole. */
+const LINE_PHRASES = [
+  'im direkten Duell',
+  'gegen Freunde',
+  'in 20 Sekunden',
+  'live und fair',
+];
+/** «sub»: the description changes between three messages. */
+const SUB_MESSAGES = [
+  'Fordere deinen Gegner heraus, sammle Punkte und sichere dir den Sieg.',
+  '3 Fragen, 20 Sekunden pro Frage – wer mehr weiss, gewinnt.',
+  'Spiel gegen Freunde oder gegen einen zufälligen Gegner.',
+];
+const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyzäöü';
+const SCRAMBLE_MS = 650;
+const SCRAMBLE_STEP_MS = 35;
 /** Final candidates: a natural typing rhythm for the sample names. */
 const TYPE_MIN_MS = 85;
 const TYPE_MAX_MS = 150;
@@ -95,6 +122,7 @@ const CARET_MS = 530;
     '[class]': "'is-' + variant()",
     '[class.has-focus]': 'formFocused()',
     '[class.has-intro]': 'hasIntro()',
+    '[class.is-intro]': 'isCombo()',
     '[class.is-ready]': "cleanName() !== ''",
     '[style.--px]': 'pointerX()',
     '[style.--py]': 'pointerY()',
@@ -131,21 +159,39 @@ export class StartFaceliftComponent implements OnInit {
       this.variant(),
     ),
   );
-  protected readonly hasRoll = computed(() =>
-    ['final-roll', 'final-intro-roll', 'final-all'].includes(this.variant()),
-  );
-  protected readonly hasTyper = computed(() =>
-    ['final-typer', 'final-intro-typer', 'final-all'].includes(this.variant()),
+  /** Combinations: the intro of before, the typewriter, a word change. */
+  protected readonly isCombo = computed(() => this.variant().startsWith('combo'));
+  protected readonly wordMode = computed<WordMode | null>(() => {
+    const variant = this.variant();
+    if (['final-roll', 'final-intro-roll', 'final-all'].includes(variant)) {
+      return 'roll';
+    }
+    return variant.startsWith('combo-') ? (variant.slice(6) as WordMode) : null;
+  });
+  protected readonly hasTyper = computed(
+    () =>
+      this.isCombo() ||
+      ['final-typer', 'final-intro-typer', 'final-all'].includes(this.variant()),
   );
 
   /** The title up to the rolling word. */
   protected readonly rollLead = ['Teste', 'dein', 'Wissen', 'im'];
   protected readonly rollWords = ROLL_WORDS;
-  private readonly rollIndex = signal(0);
+  protected readonly subMessages = SUB_MESSAGES;
+  protected readonly rollIndex = signal(0);
+  private readonly rollList = computed(() => {
+    const mode = this.wordMode();
+    return mode === 'line'
+      ? LINE_PHRASES
+      : mode === 'sub'
+        ? SUB_MESSAGES
+        : ROLL_WORDS;
+  });
   /** The word that rolls in and the one that rolls out. */
   protected readonly rollItems = computed(() => {
     const index = this.rollIndex();
-    const word = (i: number) => ROLL_WORDS[i % ROLL_WORDS.length]!;
+    const list = this.rollList();
+    const word = (i: number) => list[i % list.length]!;
     const items = [{ key: index, word: word(index), out: false }];
     if (index > 0) {
       items.unshift({ key: index - 1, word: word(index - 1), out: true });
@@ -158,6 +204,9 @@ export class StartFaceliftComponent implements OnInit {
     () => this.rollWidths()[this.rollIndex() % ROLL_WORDS.length] ?? null,
   );
   private readonly rollMeasure = viewChild<ElementRef<HTMLElement>>('rollMeasure');
+
+  /** «scramble»: the letters whirl and settle into the new word. */
+  protected readonly scrambleText = signal(ROLL_WORDS[0]!);
 
   /** The sample name being typed and the blinking caret. */
   private readonly typedName = signal('');
@@ -210,7 +259,7 @@ export class StartFaceliftComponent implements OnInit {
 
     // Final candidates: the word rolls through the title.
     effect((onCleanup) => {
-      if (!this.hasRoll()) {
+      if (!this.wordMode()) {
         this.rollIndex.set(0);
         return;
       }
@@ -234,6 +283,35 @@ export class StartFaceliftComponent implements OnInit {
         clearTimeout(measure);
         clearInterval(roller);
       });
+    });
+
+    // «scramble»: on every change the letters whirl into the new word.
+    effect((onCleanup) => {
+      const index = this.rollIndex();
+      if (this.wordMode() !== 'scramble') {
+        return;
+      }
+      const target = ROLL_WORDS[index % ROLL_WORDS.length]!;
+      const from = untracked(() => this.scrambleText());
+      const steps = Math.round(SCRAMBLE_MS / SCRAMBLE_STEP_MS);
+      let step = 0;
+      const timer = setInterval(() => {
+        step++;
+        const progress = step / steps;
+        const length = Math.round(
+          from.length + (target.length - from.length) * progress,
+        );
+        const text = Array.from({ length }, (_, i) =>
+          i < target.length * progress
+            ? (target[i] ?? '')
+            : SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)],
+        ).join('');
+        this.scrambleText.set(step >= steps ? target : text);
+        if (step >= steps) {
+          clearInterval(timer);
+        }
+      }, SCRAMBLE_STEP_MS);
+      onCleanup(() => clearInterval(timer));
     });
 
     // Final candidates: the placeholder types sample names.
@@ -263,7 +341,10 @@ export class StartFaceliftComponent implements OnInit {
           timer = window.setTimeout(() => type(1), NEXT_NAME_MS);
         }
       };
-      timer = window.setTimeout(() => type(1), this.hasIntro() ? 1200 : 400);
+      timer = window.setTimeout(
+        () => type(1),
+        this.hasIntro() || this.isCombo() ? 1200 : 400,
+      );
       const caret = setInterval(() => this.caretOn.update((on) => !on), CARET_MS);
       onCleanup(() => {
         clearTimeout(timer);

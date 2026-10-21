@@ -4,6 +4,13 @@
 export type StartLayout =
   | 'today'
   | 'p-pure'
+  | 'p-combo'
+  | 'p-combo-roll'
+  | 'p-combo-flip'
+  | 'p-combo-scramble'
+  | 'p-combo-marker'
+  | 'p-combo-line'
+  | 'p-combo-sub'
   | 'p-final-intro'
   | 'p-final-roll'
   | 'p-final-typer'
@@ -94,6 +101,13 @@ export interface StartOption {
 export const START_LAYOUTS: StartOption[] = [
   { value: 'today', label: 'Heute' },
   { value: 'p-pure', label: 'Facelift (rein)' },
+  { value: 'p-combo', label: 'Basis · Intro + Schreibmaschine (ohne Wort)' },
+  { value: 'p-combo-roll', label: 'Wort 1 · Maske (Wort im Titel)' },
+  { value: 'p-combo-flip', label: 'Wort 2 · 3D-Würfel' },
+  { value: 'p-combo-scramble', label: 'Wort 3 · Decode' },
+  { value: 'p-combo-marker', label: 'Wort 4 · Textmarker' },
+  { value: 'p-combo-line', label: 'Wort 5 · Ganze Titelzeile' },
+  { value: 'p-combo-sub', label: 'Wort 6 · Beschreibung wechselt' },
   { value: 'p-final-intro', label: 'Final · Intro' },
   { value: 'p-final-roll', label: 'Final · Wechselndes Wort' },
   { value: 'p-final-typer', label: 'Final · Schreibmaschine' },

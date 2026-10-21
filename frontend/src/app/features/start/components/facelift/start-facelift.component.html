@@ -59,25 +59,54 @@
         }
         Duell
       </h1>
-    } @else if (hasRoll()) {
-      <!-- One word rolls through: the old one slides up and out, the new one
-           in from below, and the width follows the new word smoothly. -->
+    } @else if (wordMode() === 'line') {
+      <!-- The second line of the title changes as a whole. -->
       <h1 class="title">
+        <span class="word" style="--i: 0">Teste dein Wissen</span>
+        <span class="visually-hidden">im direkten Duell</span>
+        <span class="word line-roll" aria-hidden="true" style="--i: 1">
+          @for (item of rollItems(); track item.key) {
+            <span class="roll-word" [class.is-out]="item.out">{{ item.word }}</span>
+          }
+        </span>
+      </h1>
+    } @else if (wordMode() && wordMode() !== 'sub') {
+      <!-- One word of the title changes; the width follows smoothly. -->
+      <h1
+        class="title"
+        [class.is-flip]="wordMode() === 'flip'"
+        [class.is-marker]="wordMode() === 'marker'"
+      >
         @for (word of rollLead; track $index) {
           <span class="word" [style.--i]="$index">{{ word }}</span>
           {{ ' ' }}
         }
         <span class="visually-hidden">direkten</span>
-        <span
-          class="word roll"
-          aria-hidden="true"
-          style="--i: 4"
-          [style.width.px]="rollWidth()"
-        >
-          @for (item of rollItems(); track item.key) {
-            <span class="roll-word" [class.is-out]="item.out">{{ item.word }}</span>
-          }
-        </span>
+        @if (wordMode() === 'scramble') {
+          <span
+            class="word roll is-scramble"
+            aria-hidden="true"
+            style="--i: 4"
+            [style.width.px]="rollWidth()"
+            >{{ scrambleText() }}</span
+          >
+        } @else {
+          <span
+            class="word roll"
+            aria-hidden="true"
+            style="--i: 4"
+            [style.width.px]="rollWidth()"
+          >
+            @for (item of rollItems(); track item.key) {
+              <span class="roll-word" [class.is-out]="item.out"
+                >{{ item.word }}
+                @if (wordMode() === 'marker' && !item.out) {
+                  <i class="marker"></i>
+                }
+              </span>
+            }
+          </span>
+        }
         {{ ' ' }}
         <span class="word" style="--i: 5">Duell</span>
         <span #rollMeasure class="roll-measure" aria-hidden="true">
@@ -102,6 +131,18 @@
       <p class="subtitle is-personal">
         Bereit, <strong>{{ cleanName() }}</strong
         >? Fordere deinen Gegner heraus und sichere dir den Sieg.
+      </p>
+    } @else if (wordMode() === 'sub') {
+      <!-- The description changes calmly between three messages. -->
+      <p class="subtitle sub-stack">
+        @for (message of subMessages; track $index) {
+          <span
+            class="sub-item"
+            [class.is-active]="rollIndex() % subMessages.length === $index"
+            [attr.aria-hidden]="rollIndex() % subMessages.length !== $index"
+            >{{ message }}</span
+          >
+        }
       </p>
     } @else {
       <p class="subtitle">
