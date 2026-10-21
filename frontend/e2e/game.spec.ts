@@ -111,11 +111,11 @@ test.describe('playing duels', () => {
     const ben = await newPlayer(browser, phone);
 
     await enterName(anna, 'Anna');
-    await anna.getByText('Schnellspiel 1vs1').click();
+    await anna.getByText('Schnellspiel 1 vs 1').click();
     await expect(anna.getByText(/Suche Gegner/)).toBeVisible();
 
     await enterName(ben, 'Ben');
-    await ben.getByText('Schnellspiel 1vs1').click();
+    await ben.getByText('Schnellspiel 1 vs 1').click();
 
     await expect(anna.getByText('Verbunden!')).toBeVisible();
     await waitForQuestion(anna, 1);
@@ -133,7 +133,7 @@ test.describe('playing duels', () => {
       timeout: 40_000,
     });
     await anna.locator('css-button', { hasText: 'Zum Spielmodus' }).click();
-    await expect(anna.getByText('Schnellspiel 1vs1')).toBeVisible();
+    await expect(anna.getByText('Schnellspiel 1 vs 1')).toBeVisible();
   });
 
   for (const [label, target] of [
@@ -212,9 +212,9 @@ test.describe('playing duels', () => {
     const anna = await newPlayer(browser, phone);
     const ben = await newPlayer(browser, phone);
     await enterName(anna, 'Anna');
-    await anna.getByText('Schnellspiel 1vs1').click();
+    await anna.getByText('Schnellspiel 1 vs 1').click();
     await enterName(ben, 'Ben');
-    await ben.getByText('Schnellspiel 1vs1').click();
+    await ben.getByText('Schnellspiel 1 vs 1').click();
     await playToResult(anna, ben);
 
     await ben.locator('css-button', { hasText: 'Revanche fordern' }).click();
@@ -275,9 +275,9 @@ test.describe('playing duels', () => {
   test('cancelling the search returns to the game modes', async ({ browser }) => {
     const anna = await newPlayer(browser, phone);
     await enterName(anna, 'Anna');
-    await anna.getByText('Schnellspiel 1vs1').click();
+    await anna.getByText('Schnellspiel 1 vs 1').click();
     await anna.locator('css-button', { hasText: 'Abbrechen' }).click();
-    await expect(anna.getByText('Schnellspiel 1vs1')).toBeVisible();
+    await expect(anna.getByText('Schnellspiel 1 vs 1')).toBeVisible();
   });
 
   test('a reload during the duel resumes the game', async ({ browser, request }) => {
@@ -317,10 +317,10 @@ test.describe('playing duels', () => {
   test('offensive names are rejected', async ({ browser }) => {
     const anna = await newPlayer(browser, phone);
     await enterName(anna, 'Arschloch');
-    await anna.getByText('Schnellspiel 1vs1').click();
+    await anna.getByText('Schnellspiel 1 vs 1').click();
     await expect(anna.getByText('Dieser Name ist nicht erlaubt.')).toBeVisible();
     await anna.locator('css-button', { hasText: 'OK' }).click();
-    await expect(anna.getByText('Schnellspiel 1vs1')).toBeVisible();
+    await expect(anna.getByText('Schnellspiel 1 vs 1')).toBeVisible();
   });
 });
 
@@ -336,7 +336,7 @@ test.describe('without questions', () => {
     await expect(anna.getByText('Das Quiz wird gerade vorbereitet.')).toBeVisible();
 
     await enterName(anna, 'Anna');
-    await anna.getByText('Schnellspiel 1vs1').click();
+    await anna.getByText('Schnellspiel 1 vs 1').click();
     await expect(anna.getByText('nicht genügend Fragen')).toBeVisible();
   });
 });

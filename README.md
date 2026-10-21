@@ -11,7 +11,7 @@ Zentralschweizer Bildungsmesse (ZEBI).
 
 **Für Spielerinnen und Spieler**
 
-- **Schnellspiel 1vs1:** automatische Gegnersuche
+- **Schnellspiel 1 vs 1:** automatische Gegnersuche
 - **Freund herausfordern:** Spiel erstellen und Code teilen oder mit Code beitreten
 - Echtzeit-Duell mit Timer, Tempo-Bonus, Auflösung und Revanche gegen denselben Gegner
 - Läuft weiter nach Verbindungsabbrüchen oder einem Neuladen der Seite; wer das Spiel
