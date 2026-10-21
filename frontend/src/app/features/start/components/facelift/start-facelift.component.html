@@ -61,11 +61,16 @@
       </h1>
     } @else if (rollsLine()) {
       <!-- The second line of the title changes as a whole. -->
-      <h1 class="title" [class.is-marker]="wordMode() === 'marker-line'">
-        <!-- Inline with a measured width: on wide screens the title stays on
-             one line; on narrow ones the phrase moves to the second line as
-             a whole. -->
-        <span class="word" style="--i: 0">Teste dein Wissen</span>
+      <h1
+        #lineTitle
+        class="title"
+        [class.is-marker]="wordMode() === 'marker-line'"
+        [class.is-stacked]="lineStacked()"
+      >
+        <!-- With a measured width: where the longest phrase fits, the title
+             stays on one line; otherwise every phrase stands on the second
+             line. The number of lines never changes. -->
+        <span #lineLead class="word" style="--i: 0">Teste dein Wissen</span>
         {{ ' ' }}
         <span class="visually-hidden">im direkten Duell</span>
         <span
@@ -78,7 +83,8 @@
             <span class="roll-word" [class.is-out]="item.out"
               ><span class="phrase"
                 >{{ item.word }}
-                @if (wordMode() === 'marker-line' && !item.out) {
+                <!-- The old phrase keeps its marker and fades out with it. -->
+                @if (wordMode() === 'marker-line') {
                   <i class="marker"></i>
                 }</span
             ></span>

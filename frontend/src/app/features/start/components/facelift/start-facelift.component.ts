@@ -92,7 +92,8 @@ const COUNT_MS = 1200;
 
 /** Final candidates: the words that roll through the title. */
 const ROLL_WORDS = ['direkten', 'schnellen', 'fairen', 'spannenden'];
-const ROLL_INTERVAL_MS = 2800;
+/** Calm: every phrase stays long enough to be read. */
+const ROLL_INTERVAL_MS = 4500;
 /** «line»: the second line of the title changes as a whole. */
 const LINE_PHRASES = [
   'im direkten Duell',
@@ -233,6 +234,14 @@ export class StartFaceliftComponent implements OnInit {
     () => this.rollWidths()[this.rollIndex() % this.rollList().length] ?? null,
   );
   private readonly rollMeasure = viewChild<ElementRef<HTMLElement>>('rollMeasure');
+  private readonly lineTitle = viewChild<ElementRef<HTMLElement>>('lineTitle');
+  private readonly lineLead = viewChild<ElementRef<HTMLElement>>('lineLead');
+  /**
+   * The phrase stands on its own line when the longest one would not fit
+   * next to «Teste dein Wissen»; decided once per width, so the number of
+   * lines never changes while the phrases change.
+   */
+  protected readonly lineStacked = signal(false);
 
   /** «scramble»: the letters whirl and settle into the new word. */
   protected readonly scrambleText = signal(ROLL_WORDS[0]!);
@@ -297,23 +306,33 @@ export class StartFaceliftComponent implements OnInit {
       // the phone.
       const measure = () => {
         const element = this.rollMeasure()?.nativeElement;
-        if (element) {
-          this.rollWidths.set(
-            Array.from(
-              element.children,
-              (child) => (child as HTMLElement).getBoundingClientRect().width,
-            ),
-          );
+        if (!element) {
+          return;
+        }
+        const widths = Array.from(
+          element.children,
+          (child) => (child as HTMLElement).getBoundingClientRect().width,
+        );
+        this.rollWidths.set(widths);
+        const title = this.lineTitle()?.nativeElement;
+        const lead = this.lineLead()?.nativeElement;
+        if (title && lead) {
+          const space = parseFloat(getComputedStyle(title).fontSize) * 0.3;
+          const needed =
+            lead.getBoundingClientRect().width + space + Math.max(...widths);
+          this.lineStacked.set(needed > title.clientWidth);
         }
       };
       let active = true;
       void document.fonts.ready.then(() => active && measure());
+      window.addEventListener('resize', measure);
       const roller = setInterval(() => {
         measure();
         this.rollIndex.update((value) => value + 1);
       }, ROLL_INTERVAL_MS);
       onCleanup(() => {
         active = false;
+        window.removeEventListener('resize', measure);
         clearInterval(roller);
       });
     });
