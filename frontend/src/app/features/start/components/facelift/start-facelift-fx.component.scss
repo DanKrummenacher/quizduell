@@ -338,6 +338,163 @@ app-brand-header,
   }
 }
 
+// ---------------------------------------------------------------------------
+// Liquid: a level with a wave rises and falls inside the symbols
+// ---------------------------------------------------------------------------
+.liquid {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 50%;
+
+  i {
+    position: absolute;
+    top: 100%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    border-radius: 42%;
+    background-color: rgba($opponent, 0.28);
+    animation:
+      level 7s ease-in-out infinite,
+      spin 6s linear infinite;
+    animation-delay: calc(var(--i, 0) * -2.3s), 0s;
+  }
+}
+
+:host(.is-liquid) .symbol css-icon {
+  position: relative;
+}
+
+// ---------------------------------------------------------------------------
+// Wordswap: one word of the title rolls in, in its own width
+// ---------------------------------------------------------------------------
+.swap-word {
+  display: inline-block;
+  color: $mid;
+  animation: swap-in 0.6s $ease-out both;
+}
+
+// ---------------------------------------------------------------------------
+// Focus: while you type, the rest steps back; a name makes the button ready
+// ---------------------------------------------------------------------------
+:host(.is-focus) {
+  .title,
+  .subtitle,
+  .facts {
+    transition:
+      opacity 0.35s ease,
+      filter 0.35s ease;
+  }
+
+  .form {
+    padding: functions.rem(16);
+    border-radius: functions.rem(18);
+    transition:
+      transform 0.35s $ease-out,
+      background-color 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+}
+
+:host(.is-focus.has-focus) {
+  .title,
+  .subtitle,
+  .facts {
+    opacity: 0.3;
+    filter: blur(functions.rem(2));
+  }
+
+  .form {
+    background-color: $white;
+    box-shadow: 0 functions.rem(24) functions.rem(56) rgba(0, 50, 125, 0.16);
+    transform: translateY(functions.rem(-8));
+  }
+}
+
+:host(.is-focus.is-ready) .button-frame {
+  animation: ready 1.8s ease-out infinite;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      rgba($white, 0.45) 50%,
+      transparent 65%
+    );
+    animation: sheen 2.4s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Path: a line links the facts, a light travels from one to the next
+// ---------------------------------------------------------------------------
+:host(.is-path) {
+  .facts {
+    position: relative;
+    width: fit-content;
+    gap: functions.rem(20);
+    margin-inline: auto;
+
+    @media (max-width: 359px) {
+      gap: functions.rem(8);
+    }
+  }
+
+  .fact {
+    position: relative;
+    z-index: 1;
+    width: functions.rem(96);
+
+    // Narrow phones: three columns still fit.
+    @media (max-width: 359px) {
+      width: functions.rem(84);
+    }
+  }
+
+  .fact .symbol {
+    animation: arrive 3.6s ease-out infinite;
+  }
+
+  .fact:nth-of-type(2) .symbol {
+    animation-delay: 1.44s;
+  }
+
+  .fact:nth-of-type(3) .symbol {
+    animation-delay: 2.88s;
+  }
+}
+
+.path {
+  position: absolute;
+  top: calc(var(--symbol) / 2 - #{functions.rem(1)});
+  right: functions.rem(48);
+  left: functions.rem(48);
+  height: functions.rem(2);
+  background: repeating-linear-gradient(
+    90deg,
+    #8098be 0 functions.rem(4),
+    transparent functions.rem(4) functions.rem(9)
+  );
+
+  i {
+    position: absolute;
+    top: functions.rem(-4);
+    left: 0;
+    width: functions.rem(10);
+    height: functions.rem(10);
+    margin-left: functions.rem(-5);
+    border-radius: 50%;
+    background-color: $opponent;
+    box-shadow: 0 0 functions.rem(12) $opponent;
+    animation: travel 3.6s ease-in-out infinite;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .word,
   .subtitle,
@@ -348,7 +505,11 @@ app-brand-header,
   .halo,
   .button-frame::after,
   .burst i,
-  .symbol::after {
+  .symbol::after,
+  .liquid i,
+  .swap-word,
+  .button-frame,
+  .path i {
     animation: none !important;
   }
 }
@@ -456,6 +617,77 @@ app-brand-header,
 @keyframes fade-out {
   to {
     opacity: 0;
+  }
+}
+
+@keyframes level {
+  0%,
+  100% {
+    top: 100%;
+  }
+
+  50% {
+    top: 42%;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes swap-in {
+  from {
+    opacity: 0;
+    filter: blur(functions.rem(4));
+    transform: translateY(50%);
+  }
+}
+
+@keyframes ready {
+  0% {
+    box-shadow: 0 0 0 0 rgba($opponent, 0.45);
+  }
+
+  70%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(10) rgba($opponent, 0);
+  }
+}
+
+@keyframes travel {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 1;
+  }
+
+  80% {
+    left: 100%;
+    opacity: 1;
+  }
+
+  90%,
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes arrive {
+  0% {
+    box-shadow: 0 0 0 0 rgba($opponent, 0.5);
+    border-color: $opponent;
+  }
+
+  25%,
+  100% {
+    box-shadow: 0 0 0 functions.rem(12) rgba($opponent, 0);
+    border-color: #8098be;
   }
 }
 

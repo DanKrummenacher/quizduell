@@ -20,6 +20,7 @@ import {
   StartBackdropComponent,
   type StartBackdropKind,
 } from './start-backdrop.component';
+import { StartNetworkComponent } from './start-network.component';
 
 /**
  * TEMPORARY: «pure» is the facelift of today's start page; the others add
@@ -40,7 +41,12 @@ export type StartFaceliftVariant =
   | 'persona'
   | 'confetti'
   | 'parallax'
-  | 'counter';
+  | 'counter'
+  | 'liquid'
+  | 'wordswap'
+  | 'focus'
+  | 'path'
+  | 'network';
 
 const TITLE = 'Teste dein Wissen im direkten Duell';
 
@@ -58,7 +64,7 @@ const COUNT_MS = 1200;
  */
 @Component({
   selector: 'app-start-facelift',
-  imports: [BrandHeaderComponent, StartBackdropComponent],
+  imports: [BrandHeaderComponent, StartBackdropComponent, StartNetworkComponent],
   templateUrl: './start-facelift.component.html',
   // TEMPORARY: the second file holds the variants on top of the facelift.
   styleUrls: [
@@ -68,6 +74,8 @@ const COUNT_MS = 1200;
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: {
     '[class]': "'is-' + variant()",
+    '[class.has-focus]': 'formFocused()',
+    '[class.is-ready]': "cleanName() !== ''",
     '[style.--px]': 'pointerX()',
     '[style.--py]': 'pointerY()',
     '(window:pointermove)': 'onPointerMove($event)',
@@ -97,6 +105,12 @@ export class StartFaceliftComponent implements OnInit {
     this.playerName().replace(/\s+/g, ' ').trim(),
   );
 
+  /** TEMPORARY (wordswap): the words that roll through the title. */
+  protected readonly swapWords = ['direkten', 'schnellen', 'fairen', 'spannenden'];
+  protected readonly swapIndex = signal(0);
+  /** TEMPORARY (focus): the name field has the focus. */
+  protected readonly formFocused = signal(false);
+
   /** TEMPORARY (typewriter): the placeholder types sample names. */
   protected readonly typed = signal('');
   protected readonly placeholder = computed(() =>
@@ -122,7 +136,14 @@ export class StartFaceliftComponent implements OnInit {
 
   constructor() {
     const typer = setInterval(() => this.typeStep(), TYPE_STEP_MS);
-    inject(DestroyRef).onDestroy(() => clearInterval(typer));
+    const swapper = setInterval(
+      () => this.swapIndex.update((value) => value + 1),
+      2500,
+    );
+    inject(DestroyRef).onDestroy(() => {
+      clearInterval(typer);
+      clearInterval(swapper);
+    });
 
     effect((onCleanup) => {
       if (this.variant() !== 'counter') {

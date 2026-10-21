@@ -18,6 +18,11 @@ export type StartLayout =
   | 'p-confetti'
   | 'p-parallax'
   | 'p-counter'
+  | 'p-liquid'
+  | 'p-wordswap'
+  | 'p-focus'
+  | 'p-path'
+  | 'p-network'
   | 'f-clean'
   | 'f-inline'
   | 'f-stats'
@@ -97,6 +102,11 @@ export const START_LAYOUTS: StartOption[] = [
   { value: 'p-confetti', label: 'Facelift + Konfetti-Start' },
   { value: 'p-parallax', label: 'Facelift + Parallax-Tiefe' },
   { value: 'p-counter', label: 'Facelift + Zähler' },
+  { value: 'p-liquid', label: 'Facelift + flüssige Symbole' },
+  { value: 'p-wordswap', label: 'Facelift + wechselndes Wort' },
+  { value: 'p-focus', label: 'Facelift + Fokus-Modus' },
+  { value: 'p-path', label: 'Facelift + Verbindungslinie' },
+  { value: 'p-network', label: 'Facelift + Partikel-Netz' },
   { value: 'l-product', label: 'Landing L1 · Produkt' },
   { value: 'l-kinetic', label: 'Landing L2 · Kinetic Type' },
   { value: 'l-arena', label: 'Landing L3 · Arena' },

@@ -3,6 +3,11 @@
   <app-start-backdrop [kind]="kind" />
 }
 
+@if (variant() === 'network') {
+  <!-- TEMPORARY (variant): a network of dots behind the page. -->
+  <app-start-network />
+}
+
 <app-brand-header />
 
 <main class="main">
@@ -40,15 +45,31 @@
       </svg>
     }
 
-    <!-- Single words, so the variants can animate them; looks the same. -->
-    <h1 class="title">
-      @for (word of titleWords; track $index) {
-        <span class="word" [class.is-last]="$last" [style.--i]="$index">{{
-          word
-        }}</span>
-        {{ ' ' }}
-      }
-    </h1>
+    @if (variant() === 'wordswap') {
+      <!-- TEMPORARY (variant): one word of the title rolls through. -->
+      <h1 class="title">
+        Teste dein Wissen im
+        <!-- Even and odd words are separate blocks: each new word is a new
+             element and rolls in. -->
+        @let word = swapWords[swapIndex() % swapWords.length];
+        @if (swapIndex() % 2 === 0) {
+          <span class="swap-word">{{ word }}</span>
+        } @else {
+          <span class="swap-word">{{ word }}</span>
+        }
+        Duell
+      </h1>
+    } @else {
+      <!-- Single words, so the variants can animate them; looks the same. -->
+      <h1 class="title">
+        @for (word of titleWords; track $index) {
+          <span class="word" [class.is-last]="$last" [style.--i]="$index">{{
+            word
+          }}</span>
+          {{ ' ' }}
+        }
+      </h1>
+    }
     @if (variant() === 'persona' && cleanName()) {
       <!-- TEMPORARY (variant): the page speaks to you by name. -->
       <p class="subtitle is-personal">
@@ -62,6 +83,10 @@
     }
 
     <ul class="facts">
+      @if (variant() === 'path') {
+        <!-- TEMPORARY (variant): a light travels from fact to fact. -->
+        <li class="path" aria-hidden="true"><i></i></li>
+      }
       @for (feature of features(); track feature.text) {
         <li class="fact" [style.--i]="$index">
           <span class="symbol" [class]="'symbol is-' + feature.icon">
@@ -80,6 +105,10 @@
               <!-- TEMPORARY (variant): a ring in the brand gradient. -->
               <span class="halo" aria-hidden="true"></span>
             }
+            @if (variant() === 'liquid') {
+              <!-- TEMPORARY (variant): a liquid level rises and falls. -->
+              <span class="liquid" aria-hidden="true"><i></i></span>
+            }
             <css-icon [icon]="feature.icon" size="xl"></css-icon>
           </span>
           <span class="fact-text">{{ factText(feature.text) }}</span>
@@ -87,7 +116,11 @@
       }
     </ul>
 
-    <div class="form">
+    <div
+      class="form"
+      (focusin)="formFocused.set(true)"
+      (focusout)="formFocused.set(false)"
+    >
       <css-input-text
         id="playerName"
         label="Dein Name"
