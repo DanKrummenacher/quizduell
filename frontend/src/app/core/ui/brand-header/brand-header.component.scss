@@ -40,24 +40,16 @@ $light: #00a4e0;
   }
 }
 
-// Logo in the middle (or at the start); an optional label sits on the right.
+// Logo and wordmark in the middle of the content column.
 .inner {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: functions.rem(12);
-  max-width: var(--brand-inner-width, var(--app-column-width));
-  min-height: functions.rem(62);
-  margin: 0 auto;
-  padding: 0 var(--brand-inner-padding, #{functions.rem(16)});
-}
-
-.lockup {
-  grid-column: 2;
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: functions.rem(10);
-  min-width: 0;
+  max-width: var(--app-column-width);
+  min-height: functions.rem(62);
+  margin: 0 auto;
+  padding: 0 functions.rem(16);
 
   .logo {
     width: functions.rem(30);
@@ -75,30 +67,5 @@ $light: #00a4e0;
 
   .light {
     font-weight: miscs.$css-ui-font-weight-regular;
-  }
-}
-
-.chip {
-  grid-column: 3;
-  justify-self: end;
-  padding: functions.rem(5) functions.rem(12);
-  border: functions.rem(1) solid rgba(255, 255, 255, 0.35);
-  border-radius: 999px;
-  background-color: rgba(255, 255, 255, 0.12);
-  font-size: functions.rem(13);
-  font-weight: miscs.$css-ui-font-weight-medium;
-  color: colors.$dt-color-white-100;
-  white-space: nowrap;
-}
-
-.align-start {
-  grid-template-columns: auto 1fr;
-
-  .lockup {
-    grid-column: 1;
-  }
-
-  .chip {
-    grid-column: 2;
   }
 }

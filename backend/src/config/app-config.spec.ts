@@ -7,7 +7,8 @@ describe('loadAppConfig', () => {
     expect(config.port).toBe(3000);
     expect(config.databaseUrl).toBe('');
     expect(config.corsOrigins).toContain('http://localhost:4200');
-    expect(config.jwtSecret.length).toBeGreaterThan(0);
+    expect(config.seedSampleQuestions).toBe(true);
+    expect(config.testControl).toBe(false);
   });
 
   it('parses production settings', () => {
@@ -16,10 +17,9 @@ describe('loadAppConfig', () => {
       PORT: '10000',
       DATABASE_URL: 'postgres://u:p@db.example.com/x',
       CORS_ORIGINS: 'https://playduelio.onrender.com/, https://example.ch',
-      ADMIN_PASSWORD: 'a-very-long-password',
-      JWT_SECRET: 'x'.repeat(40),
     });
     expect(config.port).toBe(10000);
+    expect(config.seedSampleQuestions).toBe(false);
     expect(config.corsOrigins).toEqual([
       'https://playduelio.onrender.com',
       'https://example.ch',
@@ -28,9 +28,7 @@ describe('loadAppConfig', () => {
 
   it('refuses incomplete production settings', () => {
     expect(() =>
-      loadAppConfig({ NODE_ENV: 'production', ADMIN_PASSWORD: 'short' }),
-    ).toThrow(
-      /DATABASE_URL[\s\S]*CORS_ORIGINS[\s\S]*ADMIN_PASSWORD[\s\S]*JWT_SECRET/,
-    );
+      loadAppConfig({ NODE_ENV: 'production', TEST_CONTROL: 'true' }),
+    ).toThrow(/DATABASE_URL[\s\S]*CORS_ORIGINS[\s\S]*TEST_CONTROL/);
   });
 });

@@ -138,7 +138,6 @@ test.describe('playing duels', () => {
 
   for (const [label, target] of [
     ['the start page', '/'],
-    ['the admin area', '/admin/login'],
     ['an unknown game path', '/quiz/sdfsdfd'],
   ] as const) {
     test(`typing the address of ${label} during a duel ends it for both`, async ({
@@ -187,9 +186,9 @@ test.describe('playing duels', () => {
     // prerendered page in the same tab does.
     const [preloaded] = await Promise.all([
       ben.waitForEvent('popup'),
-      ben.evaluate(() => window.open('/admin/login')),
+      ben.evaluate(() => window.open('/')),
     ]);
-    await expect(preloaded.getByText('Admin-Bereich')).toBeVisible();
+    await expect(preloaded.locator('app-start-ui app-brand-header')).toBeVisible();
     await anna.waitForTimeout(3_000);
     await expect(anna.getByText(aborted)).toHaveCount(0);
     await expect(anna.locator('.question-text')).toBeVisible();

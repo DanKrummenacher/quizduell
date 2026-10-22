@@ -1,11 +1,6 @@
 <header class="header">
-  <div class="inner" [class.align-start]="align() === 'start'">
-    <span class="lockup">
-      <app-logo-mark class="logo" [inverse]="true" />
-      <span class="wordmark"><span class="light">play</span>duelio</span>
-    </span>
-    @if (label(); as text) {
-      <span class="chip">{{ text }}</span>
-    }
+  <div class="inner">
+    <app-logo-mark class="logo" [inverse]="true" />
+    <span class="wordmark"><span class="light">play</span>duelio</span>
   </div>
 </header>

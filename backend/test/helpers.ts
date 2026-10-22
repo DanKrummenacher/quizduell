@@ -10,22 +10,23 @@ import {
   ServerEvents,
 } from '../src/contracts/game.contract.js';
 
-export const ADMIN_PASSWORD = 'test-admin-password';
-
 export interface TestApp {
   app: INestApplication;
   url: string;
   close: () => Promise<void>;
 }
 
-export async function startTestApp(): Promise<TestApp> {
+export async function startTestApp(
+  overrides: Partial<AppConfig> = {},
+): Promise<TestApp> {
   const config: AppConfig = {
     port: 0,
     production: false,
     databaseUrl: '',
     corsOrigins: ['http://localhost:4200'],
-    adminPassword: ADMIN_PASSWORD,
-    jwtSecret: 'test-jwt-secret',
+    seedSampleQuestions: false,
+    testControl: true,
+    ...overrides,
   };
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(APP_CONFIG)

@@ -1,10 +1,13 @@
-import type { QuestionInput } from '../contracts/admin.contract.js';
-
-type SampleQuestion = Omit<QuestionInput, 'active'>;
+export interface SampleQuestion {
+  text: string;
+  options: string[];
+  correctIndex: number;
+  category: string | null;
+}
 
 /**
- * Optional starter set. The live database starts empty; admins can import
- * these with one click to try the game and delete them again afterwards.
+ * Starter set for an empty in-memory database (local development) and for
+ * the end-to-end tests.
  */
 export const SAMPLE_QUESTIONS: SampleQuestion[] = [
   // Logik

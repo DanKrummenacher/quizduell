@@ -6,7 +6,6 @@ import {
   test,
 } from '@playwright/test';
 import {
-  ADMIN_PASSWORD,
   answer,
   enterName,
   expectNoHorizontalOverflow,
@@ -136,44 +135,6 @@ test.describe('responsive layout', () => {
 
       await player.context().close();
       await opponent.context().close();
-    });
-  }
-
-  for (const device of [DEVICES[1]!, DEVICES[6]!, DEVICES[11]!]) {
-    test(`admin screens on ${device.name}`, async ({ browser, browserName }) => {
-      test.skip(
-        browserName === 'webkit' && !device.apple,
-        'Non-Apple devices only in Chromium',
-      );
-
-      const admin = await newPlayer(browser, device.options);
-      await admin.goto('/admin/login');
-      await capture(admin, device, '10-admin-login');
-      await admin.locator('css-input-text input').fill(ADMIN_PASSWORD);
-      await admin.locator('css-button', { hasText: 'Anmelden' }).click();
-      await expect(admin.getByText('Alles bereit')).toBeVisible();
-      await capture(admin, device, '11-admin-dashboard');
-
-      await admin.getByRole('link', { name: 'Fragen' }).click();
-      await expect(admin.locator('.item').first()).toBeVisible();
-      await capture(admin, device, '12-admin-questions', false);
-
-      await admin.locator('css-button', { hasText: 'Neue Frage' }).click();
-      await expect(
-        admin.getByText('Neue Frage', { exact: true }).last(),
-      ).toBeVisible();
-      await admin.screenshot({
-        path: `e2e-results/screens/${slug(device.name)}/13-admin-editor.png`,
-        animations: 'disabled',
-      });
-      await admin
-        .locator('app-question-editor css-button', { hasText: 'Abbrechen' })
-        .click();
-
-      await admin.getByRole('link', { name: 'Einstellungen' }).click();
-      await expect(admin.getByText('Fragen pro Duell')).toBeVisible();
-      await capture(admin, device, '14-admin-settings');
-      await admin.context().close();
     });
   }
 });

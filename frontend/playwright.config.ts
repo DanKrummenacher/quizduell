@@ -33,9 +33,7 @@ export default defineConfig({
       env: {
         PORT: String(API_PORT),
         CORS_ORIGINS: `http://localhost:${WEB_PORT}`,
-        ADMIN_PASSWORD: 'e2e-admin-password',
-        JWT_SECRET: 'e2e-jwt-secret-that-is-long-enough',
-        ADMIN_LOGIN_ATTEMPTS_PER_MINUTE: '1000',
+        TEST_CONTROL: 'true',
         DATABASE_URL: '',
       },
     },

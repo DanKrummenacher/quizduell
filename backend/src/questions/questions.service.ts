@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { asc, count, eq, sql } from 'drizzle-orm';
-import type { AdminQuestion, QuestionInput } from '../contracts/admin.contract.js';
+import { Inject, Injectable, type OnModuleInit } from '@nestjs/common';
+import { count, eq, sql } from 'drizzle-orm';
+import { APP_CONFIG, type AppConfig } from '../config/app-config.js';
 import { DatabaseService } from '../database/database.service.js';
-import { questions, type QuestionRow } from '../database/schema.js';
+import { questions } from '../database/schema.js';
 import { SAMPLE_QUESTIONS } from './sample-questions.js';
 
 export interface GameQuestion {
@@ -19,55 +19,20 @@ export interface QuestionResult {
 }
 
 @Injectable()
-export class QuestionsService {
-  constructor(private readonly database: DatabaseService) {}
+export class QuestionsService implements OnModuleInit {
+  constructor(
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
+    private readonly database: DatabaseService,
+  ) {}
+
+  async onModuleInit(): Promise<void> {
+    if (this.config.seedSampleQuestions && (await this.countAll()) === 0) {
+      await this.importSamples();
+    }
+  }
 
   private get db() {
     return this.database.db;
-  }
-
-  async list(): Promise<AdminQuestion[]> {
-    const rows = await this.db.select().from(questions).orderBy(asc(questions.id));
-    return rows.map(toAdminQuestion);
-  }
-
-  async create(input: QuestionInput): Promise<AdminQuestion> {
-    const [row] = await this.db.insert(questions).values(toRow(input)).returning();
-    return toAdminQuestion(row!);
-  }
-
-  async update(id: number, input: QuestionInput): Promise<AdminQuestion> {
-    const [row] = await this.db
-      .update(questions)
-      .set({ ...toRow(input), updatedAt: new Date() })
-      .where(eq(questions.id, id))
-      .returning();
-    if (!row) {
-      throw new NotFoundException();
-    }
-    return toAdminQuestion(row);
-  }
-
-  async setActive(id: number, active: boolean): Promise<AdminQuestion> {
-    const [row] = await this.db
-      .update(questions)
-      .set({ active, updatedAt: new Date() })
-      .where(eq(questions.id, id))
-      .returning();
-    if (!row) {
-      throw new NotFoundException();
-    }
-    return toAdminQuestion(row);
-  }
-
-  async remove(id: number): Promise<void> {
-    const deleted = await this.db
-      .delete(questions)
-      .where(eq(questions.id, id))
-      .returning({ id: questions.id });
-    if (deleted.length === 0) {
-      throw new NotFoundException();
-    }
   }
 
   async removeAll(): Promise<number> {
@@ -78,7 +43,7 @@ export class QuestionsService {
   async importSamples(): Promise<number> {
     const inserted = await this.db
       .insert(questions)
-      .values(SAMPLE_QUESTIONS.map((sample) => toRow({ ...sample, active: true })))
+      .values(SAMPLE_QUESTIONS.map((sample) => ({ ...sample, active: true })))
       .returning({ id: questions.id });
     return inserted.length;
   }
@@ -137,30 +102,5 @@ function shuffleOptions(question: GameQuestion): GameQuestion {
     text: question.text,
     options: order.map((index) => question.options[index]!),
     correctIndex: order.indexOf(question.correctIndex),
-  };
-}
-
-function toRow(input: QuestionInput) {
-  return {
-    text: input.text,
-    options: input.options,
-    correctIndex: input.correctIndex,
-    category: input.category,
-    active: input.active,
-  };
-}
-
-function toAdminQuestion(row: QuestionRow): AdminQuestion {
-  return {
-    id: row.id,
-    text: row.text,
-    options: row.options,
-    correctIndex: row.correctIndex,
-    category: row.category,
-    active: row.active,
-    timesAsked: row.timesAsked,
-    timesCorrect: row.timesCorrect,
-    createdAt: row.createdAt.toISOString(),
-    updatedAt: row.updatedAt.toISOString(),
   };
 }

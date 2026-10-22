@@ -28,7 +28,6 @@ describe('GameLifecycleService', () => {
           { path: '', children: [] },
           { path: 'quiz', data: GAME_SCREEN_DATA, children: [] },
           { path: 'result', data: GAME_SCREEN_DATA, children: [] },
-          { path: 'admin', children: [] },
         ]),
         { provide: GameClient, useValue: client },
       ],
@@ -48,7 +47,7 @@ describe('GameLifecycleService', () => {
   it('leaves a stored game when the page opens anywhere else', async () => {
     client.storedGame = true;
     start();
-    await router.navigateByUrl('/admin');
+    await router.navigateByUrl('/');
     expect(client.calls).toEqual(['leaveStoredGame']);
   });
 
@@ -66,7 +65,7 @@ describe('GameLifecycleService', () => {
     await router.navigateByUrl('/result');
     expect(client.calls).toEqual([]);
 
-    await router.navigateByUrl('/admin');
+    await router.navigateByUrl('/');
     expect(client.calls).toEqual(['leave']);
   });
 
@@ -74,7 +73,7 @@ describe('GameLifecycleService', () => {
     client.storedGame = true;
     setPrerendering(true);
     start();
-    await router.navigateByUrl('/admin');
+    await router.navigateByUrl('/');
     expect(client.calls).toEqual([]);
 
     setPrerendering(false);

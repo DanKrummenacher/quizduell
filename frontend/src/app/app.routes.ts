@@ -40,10 +40,5 @@ export const routes: Routes = [
     data: GAME_SCREEN_DATA,
     title: TITLE,
   },
-  {
-    path: 'admin',
-    loadChildren: () => import('./admin/admin.routes').then((m) => m.ADMIN_ROUTES),
-    title: 'Admin – playduelio',
-  },
   { path: '**', redirectTo: '' },
 ];

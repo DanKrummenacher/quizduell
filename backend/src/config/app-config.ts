@@ -7,12 +7,12 @@ export interface AppConfig {
   databaseUrl: string;
   /** Origins allowed to call the API and open sockets. */
   corsOrigins: string[];
-  /** Password for the admin area. Empty disables the admin login. */
-  adminPassword: string;
-  jwtSecret: string;
+  /** Fills an empty in-memory database with the sample questions. */
+  seedSampleQuestions: boolean;
+  /** Enables `/api/test/*` so end-to-end tests can reset questions and settings. */
+  testControl: boolean;
 }
 
-const DEV_JWT_SECRET = 'playduelio-dev-secret-change-me';
 const DEV_ORIGINS = ['http://localhost:4200', 'http://127.0.0.1:4200'];
 
 export function loadAppConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
@@ -37,14 +37,9 @@ export function loadAppConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     errors.push('CORS_ORIGINS is required in production');
   }
 
-  const adminPassword = env['ADMIN_PASSWORD'] ?? '';
-  if (production && adminPassword.length < 12) {
-    errors.push('ADMIN_PASSWORD must be at least 12 characters in production');
-  }
-
-  const jwtSecret = env['JWT_SECRET'] ?? (production ? '' : DEV_JWT_SECRET);
-  if (production && jwtSecret.length < 32) {
-    errors.push('JWT_SECRET must be at least 32 characters in production');
+  const testControl = env['TEST_CONTROL'] === 'true';
+  if (production && testControl) {
+    errors.push('TEST_CONTROL must not be enabled in production');
   }
 
   if (errors.length > 0) {
@@ -56,7 +51,7 @@ export function loadAppConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     production,
     databaseUrl,
     corsOrigins: corsOrigins.length > 0 ? corsOrigins : DEV_ORIGINS,
-    adminPassword,
-    jwtSecret,
+    seedSampleQuestions: !databaseUrl,
+    testControl,
   };
 }

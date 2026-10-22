@@ -2,14 +2,13 @@ import { Logger } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
-  type OnGatewayConnection,
   type OnGatewayDisconnect,
   type OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import type { Namespace, Server, Socket } from 'socket.io';
+import type { Server, Socket } from 'socket.io';
 import {
   type Ack,
   ClientEvents,
@@ -27,9 +26,7 @@ const ok = <T>(data: T): Ack<T> => ({ ok: true, data });
 const fail = (error: ErrorCode): Ack<never> => ({ ok: false, error });
 
 @WebSocketGateway()
-export class GameGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -46,10 +43,6 @@ export class GameGateway
     });
   }
 
-  handleConnection(): void {
-    // Connections are tracked by socket.io itself (see `onlineCount`).
-  }
-
   handleDisconnect(client: Socket, reason?: string): void {
     this.limiter.forget(client.id);
     // The client closes the connection itself when its page is unloaded.
@@ -57,16 +50,6 @@ export class GameGateway
       client.id,
       reason === 'client namespace disconnect',
     );
-  }
-
-  /** Number of connected sockets (devices with the app open). */
-  get onlineCount(): number {
-    // Depending on the setup Nest injects the server or its default namespace.
-    const target = this.server as Server | Namespace | undefined;
-    if (!target) {
-      return 0;
-    }
-    return 'engine' in target ? target.engine.clientsCount : target.sockets.size;
   }
 
   @SubscribeMessage(ClientEvents.CREATE_GAME)

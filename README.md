@@ -19,12 +19,12 @@ Zentralschweizer Bildungsmesse (ZEBI).
 - Stand-Modus: Geräte am Messestand springen nach Inaktivität zur Startseite zurück
 - Optimiert für Handy (hoch/quer), Tablet und Desktop bis Ultrawide
 
-**Für Administratorinnen und Administratoren** (`/admin`)
+**Fragen und Einstellungen**
 
-- Live-Übersicht: verbundene Geräte, laufende Duelle, Statistik
-- Fragen erstellen, bearbeiten, (de)aktivieren, löschen – inkl. Trefferquote je Frage
-- Einstellungen: Fragen pro Duell, Zeit pro Frage, Tempo-Bonus, Stand-Modus u. a.
-- Optionales Startpaket mit Beispielfragen
+Fragen und Spielregeln (Fragen pro Duell, Zeit pro Frage, Tempo-Bonus, Stand-Modus u. a.)
+liegen in der Datenbank und werden dort gepflegt, z. B. mit Drizzle Studio
+(`npm --prefix backend run db:studio`, siehe [Deployment](docs/DEPLOYMENT.md#5-fragen-und-spielregeln-pflegen)).
+Ein neues Admin-UI entsteht auf dem Branch `admin`.
 
 ## Technik
 
@@ -54,8 +54,8 @@ npm run dev:backend     # http://localhost:3000
 npm run dev:frontend    # http://localhost:4200
 ```
 
-Ohne `DATABASE_URL` startet das Backend mit einer temporären In-Memory-Datenbank.
-Admin-Bereich: <http://localhost:4200/admin> (Passwort aus `backend/.env`).
+Ohne `DATABASE_URL` startet das Backend mit einer temporären In-Memory-Datenbank, die
+bereits die Beispielfragen enthält.
 
 ## Qualität
 

@@ -45,7 +45,7 @@ const STATIC_PLACEHOLDER = 'z.B. Max Mustermann';
 })
 export class StartUiComponent implements OnInit {
   readonly features = input.required<{ icon: string; text: string }[]>();
-  /** The time per question, as configured by the admin. */
+  /** The time per question from the game settings. */
   readonly seconds = input(20);
   readonly initialName = input('');
   readonly notice = input<string | null>(null);

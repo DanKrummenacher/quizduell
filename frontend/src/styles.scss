@@ -141,7 +141,7 @@ app-result-container {
 /*
  * Large screens: the free sides next to the content column show the brand
  * colours and a fine dot grid. Each page draws its column on top of it
- * (`layout.page-column`), on game and admin pages alike.
+ * (`layout.page-column`).
  */
 @media (min-width: layout.$large-screen) {
   html {

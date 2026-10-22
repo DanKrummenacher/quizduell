@@ -45,8 +45,6 @@ Render → **New → Web Service** → Repository `quizduell` verbinden.
 | `NODE_ENV`       | `production`                                                         |
 | `DATABASE_URL`   | Internal Database URL aus Schritt 1                                  |
 | `CORS_ORIGINS`   | `https://playduelio.onrender.com` (exakte Frontend-URL, ohne `/`)    |
-| `ADMIN_PASSWORD` | Selbst gewähltes Passwort, **mindestens 12 Zeichen**                 |
-| `JWT_SECRET`     | Mit dem Button **Generate** erzeugen lassen                          |
 
 Das Backend startet nur, wenn alle Werte gültig sind – sonst steht im Log genau,
 was fehlt. Test: `https://playduelio-api.onrender.com/health` liefert `{"status":"ok"}`.
@@ -84,20 +82,27 @@ Unter **Settings → Headers** für den Pfad `/*` diese Security-Header ergänze
   *Settings → Secrets and variables → Actions* das Secret **`CSS_PACKAGES_TOKEN`**
   anlegen (GitHub-Token mit `read:packages`).
 
-## 5. Erste Inbetriebnahme
+## 5. Fragen und Spielregeln pflegen
 
-1. `https://playduelio.onrender.com/admin` öffnen und mit `ADMIN_PASSWORD` anmelden
-2. Unter **Fragen** eigene Fragen erfassen (oder testweise *Beispielfragen importieren*)
-3. Unter **Einstellungen** Fragen pro Duell, Zeit usw. festlegen
-4. Mit zwei Geräten ein Duell spielen
+Fragen und Spielregeln liegen in der Datenbank. Am einfachsten pflegt man sie mit
+Drizzle Studio: In Render bei der Datenbank die **External Database URL** kopieren und
+lokal starten:
+
+```bash
+DATABASE_URL='<External Database URL>' npm --prefix backend run db:studio
+```
+
+- Tabelle `questions`: Fragen erfassen, ändern oder mit `active` aus dem Spiel nehmen.
+  Änderungen gelten sofort für neue Duelle. `options` sind genau vier Antworten,
+  `correct_index` ist die Position der richtigen (0–3).
+- Tabelle `settings` (eine Zeile): Fragen pro Duell, Zeit pro Frage usw. Das Backend liest
+  sie beim Start; nach einer Änderung den Dienst in Render neu starten.
 
 Solange zu wenige aktive Fragen vorhanden sind, zeigt die Startseite einen freundlichen
-Hinweis und der Admin-Bereich meldet, wie viele Fragen noch fehlen.
+Hinweis. Danach mit zwei Geräten ein Duell spielen.
 
-## Passwort oder Secret ändern
-
-Wert in Render unter *Environment* ändern → der Dienst startet automatisch neu.
-Ein neues `JWT_SECRET` meldet alle Admin-Sitzungen ab.
+Nicht mehr benötigte Variablen `ADMIN_PASSWORD` und `JWT_SECRET` können in Render
+gelöscht werden.
 
 ## Kosten sparen nach der Messe
 

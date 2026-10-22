@@ -8,7 +8,6 @@ import {
 } from '@playwright/test';
 
 const API_URL = 'http://localhost:3100';
-export const ADMIN_PASSWORD = 'e2e-admin-password';
 
 export const FAST_SETTINGS = {
   questionsPerGame: 3,
@@ -19,46 +18,23 @@ export const FAST_SETTINGS = {
   idleResetSec: 0,
 };
 
-let cachedToken: string | null = null;
-
-/** Logs in once per test worker; the login endpoint is rate limited. */
-async function adminToken(request: APIRequestContext): Promise<string> {
-  if (cachedToken) {
-    return cachedToken;
-  }
-  const response = await request.post(`${API_URL}/api/admin/auth/login`, {
-    data: { password: ADMIN_PASSWORD },
-  });
-  expect(response.ok()).toBeTruthy();
-  cachedToken = ((await response.json()) as { token: string }).token;
-  return cachedToken;
-}
-
 /** Fresh question set and fast settings so games finish quickly. */
 export async function prepareBackend(
   request: APIRequestContext,
   settings: Partial<typeof FAST_SETTINGS> = {},
 ): Promise<void> {
-  const token = await adminToken(request);
-  const headers = { Authorization: `Bearer ${token}` };
-  await request.delete(`${API_URL}/api/admin/questions`, { headers });
-  const imported = await request.post(
-    `${API_URL}/api/admin/questions/import-samples`,
-    { headers },
-  );
+  await removeAllQuestions(request);
+  const imported = await request.post(`${API_URL}/api/test/questions/samples`);
   expect(imported.ok()).toBeTruthy();
-  const saved = await request.put(`${API_URL}/api/admin/settings`, {
-    headers,
+  const saved = await request.put(`${API_URL}/api/test/settings`, {
     data: { ...FAST_SETTINGS, ...settings },
   });
   expect(saved.ok()).toBeTruthy();
 }
 
 export async function removeAllQuestions(request: APIRequestContext): Promise<void> {
-  const token = await adminToken(request);
-  await request.delete(`${API_URL}/api/admin/questions`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const removed = await request.delete(`${API_URL}/api/test/questions`);
+  expect(removed.ok()).toBeTruthy();
 }
 
 const openContexts = new Set<BrowserContext>();
