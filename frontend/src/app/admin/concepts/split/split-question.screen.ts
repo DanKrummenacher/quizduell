@@ -152,10 +152,6 @@ import { SplitSidebarComponent } from './split-sidebar.component';
       @include s.group;
       margin-bottom: 22px;
     }
-    .foot + .group,
-    .group + .group {
-      margin-top: 0;
-    }
     .cell {
       @include s.cell;
     }
