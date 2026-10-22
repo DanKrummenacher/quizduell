@@ -351,6 +351,7 @@ export class ProposalStore {
   async saveQuestion(
     draft: QuestionDraft,
     id: number | null,
+    { quiet = false } = {},
   ): Promise<AdminQuestion> {
     const input = toInput(draft);
     const saved =
@@ -358,10 +359,12 @@ export class ProposalStore {
         ? await this.api.createQuestion(input)
         : await this.api.updateQuestion(id, input);
     this.upsert(saved);
-    this.flash(
-      'success',
-      id === null ? 'Frage erstellt.' : 'Änderungen gespeichert.',
-    );
+    if (!quiet) {
+      this.flash(
+        'success',
+        id === null ? 'Frage erstellt.' : 'Änderungen gespeichert.',
+      );
+    }
     void this.loadStats();
     return saved;
   }

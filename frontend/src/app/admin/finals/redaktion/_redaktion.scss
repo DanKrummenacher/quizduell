@@ -1,0 +1,93 @@
+// Redaktion: an editor for content. White paper, a narrow column for the
+// text, quiet controls that appear where the cursor is.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+
+$paper: colors.$dt-color-white-100;
+$side: #f7f7f5;
+$hover: #f2f4f7;
+$line: #ebedf0;
+$ink: colors.$dt-color-darkblue-100;
+$ink-2: #5a7299;
+$ink-3: #9aa8bd;
+$accent: colors.$dt-color-darkblue-100;
+$green: colors.$dt-color-basil-dark;
+$green-soft: #e6f4ee;
+$red: colors.$dt-color-red;
+$amber: #b07400;
+$focus: colors.$dt-color-cyan-100;
+$ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+@mixin focus {
+  &:focus-visible {
+    outline: functions.rem(2) solid $focus;
+    outline-offset: functions.rem(2);
+  }
+}
+
+/// Text field without a frame; the paper is the field.
+@mixin bare {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  resize: none;
+
+  &::placeholder {
+    color: $ink-3;
+  }
+}
+
+@mixin quiet-button {
+  display: inline-flex;
+  align-items: center;
+  gap: functions.rem(6);
+  height: functions.rem(30);
+  padding: 0 functions.rem(10);
+  border: 0;
+  border-radius: functions.rem(6);
+  background: none;
+  font: inherit;
+  font-size: functions.rem(13);
+  color: $ink-2;
+  white-space: nowrap;
+  cursor: pointer;
+  @include focus;
+
+  &:hover:not(:disabled) {
+    background-color: $hover;
+    color: $ink;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+@mixin solid-button {
+  @include quiet-button;
+  height: functions.rem(34);
+  padding: 0 functions.rem(14);
+  background-color: $accent;
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: colors.$dt-color-white-100;
+
+  &:hover:not(:disabled) {
+    background-color: colors.$dt-color-darkblue-active;
+    color: colors.$dt-color-white-100;
+  }
+}
+
+@mixin doc-title {
+  margin: 0;
+  font-size: functions.rem(36);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: $ink;
+}

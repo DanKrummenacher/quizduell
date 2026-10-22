@@ -1,0 +1,224 @@
+<header class="head">
+  <div>
+    <h1>Fragen</h1>
+    <p>
+      {{ rows().length }} von {{ store.counts().total }} ·
+      {{ store.counts().active }} aktiv
+    </p>
+  </div>
+  <div class="head-actions">
+    <button type="button" class="ghost" (click)="importing.set(true)">
+      <css-icon icon="upload" size="sm"></css-icon>Importieren
+    </button>
+    <button type="button" class="ghost" (click)="pro.exportCsv()">
+      <css-icon icon="download" size="sm"></css-icon>Exportieren
+    </button>
+    <button type="button" class="primary" (click)="state.open.set('new')">
+      <css-icon icon="add" size="sm"></css-icon>Neue Frage <kbd>N</kbd>
+    </button>
+  </div>
+</header>
+
+<div class="toolbar">
+  <label class="search">
+    <css-icon icon="search" size="sm"></css-icon>
+    <span class="visually-hidden">Fragen filtern</span>
+    <input
+      id="atelier-search"
+      type="search"
+      placeholder="Filtern nach Frage, Antwort, Kategorie"
+      [value]="state.search()"
+      (input)="state.search.set(value($event))"
+    />
+    <kbd>/</kbd>
+  </label>
+
+  <label class="pill" [class.on]="state.status() !== 'all'">
+    <span class="pill-key">Status</span>
+    <select [value]="state.status()" (change)="setStatus(value($event))">
+      <option value="all">Alle</option>
+      <option value="active">Aktiv</option>
+      <option value="paused">Pausiert</option>
+    </select>
+  </label>
+
+  <label class="pill" [class.on]="state.category() !== null">
+    <span class="pill-key">Kategorie</span>
+    <select [value]="categoryValue()" (change)="setCategory(value($event))">
+      <option [value]="all">Alle</option>
+      @for (c of store.categoryStats(); track c.name) {
+        <option [value]="c.name || none">{{ c.name || 'Ohne Kategorie' }}</option>
+      }
+    </select>
+  </label>
+
+  <label class="pill" [class.on]="state.issue() !== null">
+    <span class="pill-key">Prüfen</span>
+    <select [value]="state.issue() ?? ''" (change)="setIssue(value($event))">
+      <option value="">Alle</option>
+      @for (issue of pro.issues(); track issue.kind) {
+        <option [value]="issue.kind">
+          {{ issueLabels[issue.kind] }} ({{ issue.ids.length }})
+        </option>
+      }
+    </select>
+  </label>
+
+  @if (filtered()) {
+    <button type="button" class="reset" (click)="reset()">Zurücksetzen</button>
+  }
+</div>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th class="c-check">
+          <input
+            type="checkbox"
+            aria-label="Alle sichtbaren auswählen"
+            [checked]="allSelected()"
+            [indeterminate]="pro.selected().size > 0 && !allSelected()"
+            (change)="pro.toggleAll(rows().map((r) => r.id))"
+          />
+        </th>
+        <th [attr.aria-sort]="ariaSort('text')">
+          <button type="button" (click)="toggleSort('text')">Frage</button>
+        </th>
+        <th class="c-cat" [attr.aria-sort]="ariaSort('category')">
+          <button type="button" (click)="toggleSort('category')">Kategorie</button>
+        </th>
+        <th class="c-rate" [attr.aria-sort]="ariaSort('rate')">
+          <button type="button" (click)="toggleSort('rate')">Richtig</button>
+        </th>
+        <th class="c-num" [attr.aria-sort]="ariaSort('asked')">
+          <button type="button" (click)="toggleSort('asked')">Gestellt</button>
+        </th>
+        <th class="c-state">Im Spiel</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (state.open() === 'new') {
+        <tr class="editor-row">
+          <td colspan="6"><app-atelier-editor (closed)="state.open.set(null)" /></td>
+        </tr>
+      }
+      @for (q of rows(); track q.id) {
+        @let r = rate(q);
+        @let isOpen = state.open() === q.id;
+        <tr
+          class="row"
+          [class.open]="isOpen"
+          [class.selected]="pro.isSelected(q.id)"
+          [class.paused]="!q.active"
+        >
+          <td class="c-check">
+            <input
+              type="checkbox"
+              [attr.aria-label]="'Auswählen: ' + q.text"
+              [checked]="pro.isSelected(q.id)"
+              (change)="pro.toggle(q.id)"
+            />
+          </td>
+          <td class="c-q">
+            <button
+              type="button"
+              class="q"
+              [attr.aria-expanded]="isOpen"
+              (click)="toggleRow(q.id)"
+            >
+              <span class="q-text">{{ q.text }}</span>
+              <span class="q-answer">{{ q.options[q.correctIndex] }}</span>
+            </button>
+          </td>
+          <td class="c-cat">
+            @if (q.category) {
+              <span class="tag">{{ q.category }}</span>
+            } @else {
+              <span class="faint">–</span>
+            }
+          </td>
+          <td class="c-rate">
+            @if (r === null) {
+              <span class="faint">neu</span>
+            } @else {
+              <span class="rate" [class.low]="r < 20" [class.high]="r > 90">
+                <span class="meter"><span [style.width.%]="r"></span></span>{{ r }}%
+              </span>
+            }
+          </td>
+          <td class="c-num">{{ q.timesAsked }}</td>
+          <td class="c-state">
+            <button
+              type="button"
+              role="switch"
+              class="toggle"
+              [attr.aria-checked]="q.active"
+              [attr.aria-label]="'Im Spiel: ' + q.text"
+              (click)="setActive(q, !q.active)"
+            >
+              <span class="knob"></span>
+            </button>
+          </td>
+        </tr>
+        @if (isOpen) {
+          <tr class="editor-row">
+            <td colspan="6">
+              <app-atelier-editor [question]="q" (closed)="state.open.set(null)" />
+            </td>
+          </tr>
+        }
+      } @empty {
+        <tr>
+          <td colspan="6" class="empty">
+            @if (store.questions() === null) {
+              <span class="faint">Lädt …</span>
+            } @else if (filtered()) {
+              <strong>Nichts gefunden</strong>
+              <span>Kein Treffer für diese Filter.</span>
+              <button type="button" class="ghost" (click)="reset()">
+                Filter zurücksetzen
+              </button>
+            } @else {
+              <strong>Noch keine Fragen</strong>
+              <span
+                >Erstelle die erste Frage oder starte mit dem Beispielpaket.</span
+              >
+              <span class="empty-actions">
+                <button
+                  type="button"
+                  class="primary"
+                  (click)="state.open.set('new')"
+                >
+                  Erste Frage
+                </button>
+                <button type="button" class="ghost" (click)="store.importSamples()">
+                  Beispielfragen laden
+                </button>
+              </span>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (store.counts().total > 0) {
+  <p class="foot">
+    Tipp: <kbd>N</kbd> neue Frage · <kbd>/</kbd> filtern · <kbd>⌘K</kbd> alles suchen
+    <button
+      type="button"
+      class="link danger"
+      (click)="store.confirm.set({ kind: 'delete-all' })"
+    >
+      Alle Fragen löschen …
+    </button>
+  </p>
+}
+
+<app-atelier-bulk />
+
+@if (importing()) {
+  <app-import-dialog (dismiss)="importing.set(false)" />
+}

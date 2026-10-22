@@ -10,7 +10,7 @@ import { ProposalStore } from '../proposal-store';
   selector: 'app-proposal-dialogs',
   imports: [QuestionEditorComponent],
   template: `
-    @if (store.message(); as m) {
+    @if (toast() && store.message(); as m) {
       <css-notification
         class="toast"
         size="sm"
@@ -73,4 +73,6 @@ export class ProposalDialogsComponent {
   protected readonly store = inject(ProposalStore);
   /** False where the proposal shows its own editor. */
   readonly editor = input(true);
+  /** False where the proposal shows the messages itself. */
+  readonly toast = input(true);
 }

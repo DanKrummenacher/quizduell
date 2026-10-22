@@ -1,0 +1,113 @@
+@let d = draft();
+
+<span class="number" aria-hidden="true">{{ number() }}</span>
+
+<div class="content">
+  <textarea
+    class="question"
+    rows="1"
+    [attr.aria-label]="'Frage ' + number()"
+    placeholder="Frage schreiben …"
+    [maxLength]="limits.text.max"
+    [value]="d.text"
+    (input)="update({ text: value($event) }); grow($event)"
+    (focus)="grow($event)"
+  ></textarea>
+
+  <ol class="answers">
+    @for (option of d.options; track $index; let i = $index) {
+      <li class="answer" [class.right]="d.correctIndex === i">
+        <button
+          type="button"
+          class="mark"
+          [attr.aria-pressed]="d.correctIndex === i"
+          [attr.aria-label]="'Antwort ' + letters[i] + ' ist richtig'"
+          (click)="update({ correctIndex: i })"
+        >
+          @if (d.correctIndex === i) {
+            <css-icon icon="checkmark" size="sm"></css-icon>
+          }
+        </button>
+        <span class="letter" aria-hidden="true">{{ letters[i] }}</span>
+        <input
+          class="option"
+          [attr.aria-label]="'Antwort ' + letters[i]"
+          [placeholder]="'Antwort ' + letters[i]"
+          [maxLength]="limits.option.max"
+          [value]="option"
+          (input)="setOption(i, value($event))"
+        />
+      </li>
+    }
+  </ol>
+
+  <div class="meta">
+    <span class="status" [class]="status()" role="status">
+      @switch (status()) {
+        @case ('saved') {
+          <css-icon icon="checkmark" size="sm"></css-icon>Gespeichert
+        }
+        @case ('editing') {
+          Bearbeitet …
+        }
+        @case ('saving') {
+          Speichert …
+        }
+        @case ('incomplete') {
+          {{
+            id() === null && !d.text
+              ? 'Neue Frage – wird gespeichert, sobald sie vollständig ist'
+              : message()
+          }}
+        }
+        @case ('error') {
+          {{ message() }}
+        }
+      }
+    </span>
+    @if (
+      changedSinceVisit() && (status() === 'saved' || status() === 'incomplete')
+    ) {
+      <button type="button" class="undo" (click)="undo()">Rückgängig</button>
+    }
+    @if (live(); as q) {
+      <span class="stat">{{
+        rate() === null
+          ? 'noch nie gestellt'
+          : rate() + ' % richtig · ' + q.timesAsked + '× gestellt'
+      }}</span>
+    }
+  </div>
+</div>
+
+<div class="tools">
+  <button
+    type="button"
+    class="pill"
+    [class.on]="d.active"
+    [attr.aria-pressed]="d.active"
+    [title]="
+      d.active
+        ? 'Im Spiel – klicken zum Pausieren'
+        : 'Pausiert – klicken zum Aktivieren'
+    "
+    (click)="update({ active: !d.active })"
+  >
+    <span class="dot"></span>{{ d.active ? 'Im Spiel' : 'Pausiert' }}
+  </button>
+  @if (confirmDelete()) {
+    <button type="button" class="tool danger" (click)="remove()">
+      Wirklich löschen
+    </button>
+  } @else {
+    <button
+      type="button"
+      class="tool"
+      aria-label="Frage löschen"
+      title="Frage löschen"
+      (click)="confirmDelete.set(true)"
+    >
+      <css-icon icon="trash" size="sm"></css-icon>
+    </button>
+  }
+</div>

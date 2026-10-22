@@ -1,0 +1,344 @@
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'buehne' as b;
+
+:host {
+  display: grid;
+  gap: functions.rem(16);
+}
+
+.head {
+  h1 {
+    @include b.title-xl;
+  }
+
+  p {
+    margin: functions.rem(6) 0 0;
+    color: b.$on-dark;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Presets
+// ---------------------------------------------------------------------------
+.presets {
+  display: grid;
+  gap: functions.rem(12);
+
+  @media (min-width: 760px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.preset {
+  @include b.glass;
+  display: grid;
+  align-content: start;
+  gap: functions.rem(6);
+  padding: functions.rem(18) functions.rem(20);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+  @include b.focus;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  strong {
+    margin-top: functions.rem(6);
+    font-size: functions.rem(20);
+  }
+
+  &.on {
+    border-color: b.$white;
+    background-color: b.$white;
+    color: b.$ink;
+
+    .p-text,
+    .p-meta {
+      color: b.$ink-2;
+    }
+
+    .p-icon {
+      background-color: b.$blue;
+      color: b.$white;
+    }
+  }
+}
+
+.p-head {
+  display: flex;
+  justify-content: space-between;
+}
+
+.p-icon {
+  display: grid;
+  place-items: center;
+  width: functions.rem(44);
+  height: functions.rem(44);
+  border-radius: functions.rem(12);
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.p-check {
+  display: grid;
+  place-items: center;
+  width: functions.rem(28);
+  height: functions.rem(28);
+  border-radius: 50%;
+  background-color: b.$green;
+  color: b.$white;
+}
+
+.p-text {
+  font-size: functions.rem(14);
+  color: b.$on-dark;
+}
+
+.p-line {
+  display: flex;
+  gap: functions.rem(2);
+  height: functions.rem(10);
+  margin-top: functions.rem(8);
+
+  i {
+    min-width: functions.rem(2);
+    border-radius: functions.rem(2);
+  }
+
+  .start {
+    background-color: #8fa6c8;
+  }
+
+  .q {
+    background-color: b.$cyan;
+  }
+
+  .r {
+    background-color: b.$mint;
+  }
+
+  .on & .q {
+    background-color: b.$blue;
+  }
+
+  .on & .r {
+    background-color: b.$green;
+  }
+}
+
+.p-meta {
+  font-size: functions.rem(13);
+  color: b.$on-dark;
+}
+
+.custom {
+  margin: 0;
+  padding: functions.rem(12) functions.rem(16);
+  border: functions.rem(1) dashed b.$on-dark-faint;
+  border-radius: b.$radius-sm;
+  font-size: functions.rem(14);
+  color: b.$on-dark;
+}
+
+// ---------------------------------------------------------------------------
+// Sliders
+// ---------------------------------------------------------------------------
+.panel {
+  @include b.card;
+  display: grid;
+  gap: functions.rem(8);
+  padding: functions.rem(22);
+
+  @media (min-width: 760px) {
+    padding: functions.rem(28) functions.rem(32);
+  }
+
+  h2 {
+    margin: 0 0 functions.rem(4);
+    font-size: functions.rem(20);
+    font-weight: miscs.$css-ui-font-weight-bold;
+  }
+}
+
+.slider {
+  display: grid;
+  gap: functions.rem(6);
+  padding: functions.rem(14) 0;
+  border-bottom: functions.rem(1) solid b.$line;
+
+  &.changed output {
+    color: #c27f00;
+  }
+}
+
+.s-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: functions.rem(12);
+
+  label {
+    font-size: functions.rem(16);
+    font-weight: miscs.$css-ui-font-weight-bold;
+  }
+
+  output {
+    font-size: functions.rem(28);
+    font-weight: miscs.$css-ui-font-weight-bold;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+
+    small {
+      margin-left: functions.rem(2);
+      font-size: functions.rem(15);
+      color: b.$ink-2;
+    }
+  }
+}
+
+.s-hint {
+  font-size: functions.rem(13);
+  color: b.$ink-2;
+}
+
+input[type='range'] {
+  width: 100%;
+  height: functions.rem(36);
+  margin: 0;
+  background: none;
+  appearance: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+
+    &::-webkit-slider-thumb {
+      box-shadow: 0 0 0 functions.rem(4) rgba(0, 164, 224, 0.5);
+    }
+  }
+
+  &::-webkit-slider-runnable-track {
+    height: functions.rem(10);
+    border-radius: functions.rem(5);
+    background: linear-gradient(90deg, b.$blue var(--fill), b.$soft var(--fill));
+  }
+
+  &::-webkit-slider-thumb {
+    width: functions.rem(30);
+    height: functions.rem(30);
+    margin-top: functions.rem(-10);
+    border: functions.rem(3) solid b.$blue;
+    border-radius: 50%;
+    background-color: b.$white;
+    box-shadow: 0 functions.rem(2) functions.rem(6) rgba(0, 0, 0, 0.2);
+    appearance: none;
+  }
+
+  &::-moz-range-track {
+    height: functions.rem(10);
+    border-radius: functions.rem(5);
+    background-color: b.$soft;
+  }
+
+  &::-moz-range-progress {
+    height: functions.rem(10);
+    border-radius: functions.rem(5);
+    background-color: b.$blue;
+  }
+
+  &::-moz-range-thumb {
+    width: functions.rem(24);
+    height: functions.rem(24);
+    border: functions.rem(3) solid b.$blue;
+    border-radius: 50%;
+    background-color: b.$white;
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: functions.rem(16);
+  padding-top: functions.rem(14);
+
+  strong {
+    display: block;
+    font-size: functions.rem(16);
+  }
+
+  small {
+    font-size: functions.rem(13);
+    color: b.$ink-2;
+  }
+}
+
+.switch {
+  @include b.switch;
+}
+
+.warning {
+  margin: 0;
+  padding: functions.rem(12) functions.rem(16);
+  border-radius: b.$radius-sm;
+  background-color: rgba(213, 52, 25, 0.2);
+  color: b.$white;
+}
+
+// ---------------------------------------------------------------------------
+// Save bar, above the tab bar
+// ---------------------------------------------------------------------------
+.savebar {
+  position: sticky;
+  bottom: calc(var(--app-safe-bottom) + #{functions.rem(92)});
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: functions.rem(8);
+  padding: functions.rem(8) functions.rem(8) functions.rem(8) functions.rem(20);
+  border-radius: functions.rem(32);
+  background-color: b.$white;
+  color: b.$ink;
+  box-shadow: 0 functions.rem(16) functions.rem(40) rgba(0, 0, 0, 0.35);
+  animation: rise 0.3s b.$ease both;
+
+  @media (min-width: 900px) {
+    bottom: functions.rem(24);
+  }
+}
+
+.sb-text {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+
+  small {
+    font-size: functions.rem(13);
+    color: b.$ink-2;
+  }
+}
+
+.sb-discard {
+  @include b.button(transparent, b.$ink);
+  padding: 0 functions.rem(14);
+
+  @media (max-width: 420px) {
+    display: none;
+  }
+}
+
+.sb-save {
+  @include b.button(b.$blue, b.$white);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(functions.rem(16));
+  }
+}

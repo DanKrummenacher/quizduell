@@ -1,0 +1,318 @@
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use '@css-ch/calc-helpers/styles' as functions;
+@use 'redaktion' as r;
+
+$side: functions.rem(248);
+$desktop: 1024px;
+$wide: 1360px;
+
+:host {
+  display: block;
+  min-height: 100dvh;
+  background-color: r.$paper;
+  color: r.$ink;
+}
+
+// ---------------------------------------------------------------------------
+// Sidebar with the pages
+// ---------------------------------------------------------------------------
+.side {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  width: $side;
+  padding: calc(var(--app-safe-top) + #{functions.rem(16)}) functions.rem(10)
+    calc(var(--app-safe-bottom) + #{functions.rem(12)});
+  overflow-y: auto;
+  background-color: r.$side;
+  transform: translateX(-100%);
+  transition: transform 0.25s r.$ease;
+
+  &.open {
+    transform: none;
+    box-shadow: functions.rem(16) 0 functions.rem(40) rgba(0, 25, 62, 0.18);
+  }
+
+  @media (min-width: $desktop) {
+    transform: none;
+    box-shadow: none !important;
+  }
+}
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 29;
+  padding: 0;
+  border: 0;
+  background-color: rgba(0, 25, 62, 0.25);
+
+  @media (min-width: $desktop) {
+    display: none;
+  }
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(8);
+  padding: 0 functions.rem(10) functions.rem(18);
+
+  .logo {
+    width: functions.rem(24);
+    height: functions.rem(24);
+  }
+}
+
+.wordmark {
+  font-size: functions.rem(16);
+  font-weight: miscs.$css-ui-font-weight-bold;
+
+  .light {
+    font-weight: miscs.$css-ui-font-weight-regular;
+  }
+}
+
+nav {
+  display: grid;
+  gap: functions.rem(1);
+}
+
+.group {
+  margin: functions.rem(18) functions.rem(10) functions.rem(4);
+  font-size: functions.rem(12);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: r.$ink-3;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(10);
+  width: 100%;
+  min-height: functions.rem(32);
+  padding: 0 functions.rem(10);
+  border: 0;
+  border-radius: functions.rem(6);
+  background: none;
+  font: inherit;
+  font-size: functions.rem(14);
+  color: r.$ink-2;
+  text-align: left;
+  cursor: pointer;
+  @include r.focus;
+
+  span {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    font-size: functions.rem(12);
+    color: r.$ink-3;
+  }
+
+  css-icon {
+    color: r.$ink-3;
+  }
+
+  &:hover {
+    background-color: #ececea;
+    color: r.$ink;
+  }
+
+  &.active {
+    background-color: #e8e8e5;
+    font-weight: miscs.$css-ui-font-weight-bold;
+    color: r.$ink;
+  }
+}
+
+.dirty {
+  width: functions.rem(7);
+  height: functions.rem(7);
+  border-radius: 50%;
+  background-color: #e0a100;
+}
+
+.foot {
+  display: grid;
+  gap: functions.rem(1);
+  margin-top: auto;
+  padding-top: functions.rem(18);
+}
+
+.live {
+  display: flex;
+  align-items: center;
+  gap: functions.rem(8);
+  margin: functions.rem(10) functions.rem(10) 0;
+  font-size: functions.rem(12);
+  color: r.$ink-3;
+
+  .dot {
+    width: functions.rem(7);
+    height: functions.rem(7);
+    border-radius: 50%;
+    background-color: r.$green;
+  }
+
+  &.bad .dot {
+    background-color: r.$red;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// The document and the preview next to it
+// ---------------------------------------------------------------------------
+.mobilebar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: functions.rem(8);
+  height: calc(var(--app-safe-top) + #{functions.rem(52)});
+  padding: var(--app-safe-top) functions.rem(8) 0;
+  border-bottom: functions.rem(1) solid r.$line;
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+
+  @media (min-width: $desktop) {
+    display: none;
+  }
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: functions.rem(40);
+  height: functions.rem(40);
+  border: 0;
+  border-radius: functions.rem(6);
+  background: none;
+  color: r.$ink;
+  cursor: pointer;
+}
+
+.mobile-title {
+  font-weight: miscs.$css-ui-font-weight-bold;
+}
+
+.desk {
+  @media (min-width: $desktop) {
+    margin-left: $side;
+  }
+
+  @media (min-width: $wide) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) functions.rem(340);
+  }
+}
+
+.doc {
+  width: 100%;
+  max-width: functions.rem(760);
+  margin: 0 auto;
+  padding: functions.rem(32) functions.rem(20) functions.rem(120);
+
+  @media (min-width: $desktop) {
+    padding: functions.rem(64) functions.rem(48) functions.rem(120);
+  }
+}
+
+.preview {
+  display: none;
+
+  @media (min-width: $wide) {
+    position: sticky;
+    top: 0;
+    display: block;
+    align-self: start;
+    height: 100dvh;
+    padding: functions.rem(64) functions.rem(28) functions.rem(32) 0;
+  }
+}
+
+.preview-label {
+  display: block;
+  margin-bottom: functions.rem(10);
+  font-size: functions.rem(12);
+  font-weight: miscs.$css-ui-font-weight-bold;
+  color: r.$ink-3;
+}
+
+.preview-hint {
+  margin: 0 0 functions.rem(10);
+  font-size: functions.rem(14);
+  line-height: 1.5;
+  color: r.$ink-2;
+}
+
+.screen {
+  display: grid;
+  gap: functions.rem(8);
+  padding: functions.rem(20) functions.rem(16);
+  border: functions.rem(6) solid r.$accent;
+  border-radius: functions.rem(26);
+  background-color: colors.$dt-color-pepper-bright;
+}
+
+.s-q {
+  margin: 0 0 functions.rem(10);
+  font-size: functions.rem(17);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.s-a {
+  display: flex;
+  align-items: center;
+  min-height: functions.rem(42);
+  overflow: hidden;
+  border: functions.rem(1) solid #8098be;
+  border-radius: functions.rem(4);
+  background-color: colors.$dt-color-white-100;
+  font-size: functions.rem(14);
+  font-weight: miscs.$css-ui-font-weight-bold;
+
+  b {
+    display: grid;
+    place-items: center;
+    align-self: stretch;
+    width: functions.rem(36);
+    background-color: r.$accent;
+    color: colors.$dt-color-white-100;
+  }
+
+  span {
+    padding: functions.rem(6) functions.rem(10);
+    overflow-wrap: anywhere;
+  }
+
+  &.right {
+    background-color: r.$green;
+    color: colors.$dt-color-white-100;
+
+    b {
+      background-color: rgba(255, 255, 255, 0.16);
+    }
+  }
+}
+
+.empty {
+  opacity: 0.45;
+}
+
+.preview-note {
+  margin: functions.rem(10) 0 0;
+  font-size: functions.rem(13);
+  color: r.$ink-2;
+  text-align: center;
+}

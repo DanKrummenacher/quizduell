@@ -1,0 +1,181 @@
+<div class="shell">
+  <!-- Phones and tablets: a slim bar with the menu -->
+  <header class="mobilebar">
+    <button
+      type="button"
+      class="icon-button"
+      aria-label="Menü"
+      [attr.aria-expanded]="state.menuOpen()"
+      (click)="state.menuOpen.set(!state.menuOpen())"
+    >
+      <css-icon icon="menu-hamburger" size="sm"></css-icon>
+    </button>
+    <span class="mobile-brand">
+      <app-logo-mark class="mobile-logo" />
+      Admin
+    </span>
+    <button
+      type="button"
+      class="icon-button"
+      aria-label="Suchen"
+      (click)="state.paletteOpen.set(true)"
+    >
+      <css-icon icon="search" size="sm"></css-icon>
+    </button>
+  </header>
+
+  @if (state.menuOpen()) {
+    <button
+      type="button"
+      class="scrim"
+      tabindex="-1"
+      aria-label="Menü schliessen"
+      (click)="state.menuOpen.set(false)"
+    ></button>
+  }
+
+  <aside class="sidebar" [class.open]="state.menuOpen()">
+    <div class="brand">
+      <app-logo-mark class="logo" />
+      <span class="brand-text">
+        <span class="wordmark"><span class="light">play</span>duelio</span>
+        <span class="brand-sub">Admin</span>
+      </span>
+    </div>
+
+    <button
+      type="button"
+      class="search-trigger"
+      (click)="state.paletteOpen.set(true)"
+    >
+      <css-icon icon="search" size="sm"></css-icon>
+      <span>Suchen und Befehle</span>
+      <kbd>⌘K</kbd>
+    </button>
+
+    <nav class="nav" aria-label="Admin-Navigation">
+      @for (item of nav(); track item.key) {
+        <button
+          type="button"
+          class="nav-item"
+          [class.active]="state.view() === item.key"
+          [attr.aria-current]="state.view() === item.key ? 'page' : null"
+          (click)="state.go(item.key)"
+        >
+          <css-icon [icon]="item.icon" size="sm"></css-icon>
+          <span class="nav-label">{{ item.label }}</span>
+          @if (item.meta) {
+            <span class="nav-meta" [class.alert]="item.meta === '•'">{{
+              item.meta
+            }}</span>
+          }
+        </button>
+      }
+    </nav>
+
+    @if (store.categoryStats().length) {
+      <div class="section">
+        <span class="section-label">Kategorien</span>
+        @for (c of store.categoryStats(); track c.name) {
+          <button
+            type="button"
+            class="nav-item small"
+            [class.active]="
+              state.view() === 'questions' && state.category() === c.name
+            "
+            (click)="openCategory(c.name)"
+          >
+            <span class="cat-dot" [class.off]="c.active === 0"></span>
+            <span class="nav-label">{{ c.name || 'Ohne Kategorie' }}</span>
+            <span class="nav-meta">{{ c.active }}/{{ c.total }}</span>
+          </button>
+        }
+      </div>
+    }
+
+    <div class="foot">
+      @if (store.stats(); as s) {
+        <div class="status" [class.bad]="store.ready() === false" role="status">
+          <span class="pulse"></span>
+          <span class="status-text">
+            <strong>{{
+              store.ready() === false ? 'Nicht spielbar' : 'Spiel läuft'
+            }}</strong>
+            <span
+              >{{ s.playersOnline }}
+              {{ s.playersOnline === 1 ? 'Gerät' : 'Geräte' }} · {{ s.activeGames }}
+              {{ s.activeGames === 1 ? 'Duell' : 'Duelle' }}</span
+            >
+          </span>
+        </div>
+      }
+      <button type="button" class="nav-item small" (click)="openGame.emit()">
+        <css-icon icon="home" size="sm"></css-icon
+        ><span class="nav-label">Zum Spiel</span>
+      </button>
+      <button type="button" class="nav-item small" (click)="logout.emit()">
+        <css-icon icon="logout" size="sm"></css-icon
+        ><span class="nav-label">Abmelden</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    @switch (state.view()) {
+      @case ('overview') {
+        <app-atelier-overview [greeting]="greeting()" />
+      }
+      @case ('questions') {
+        <app-atelier-questions />
+      }
+      @case ('rules') {
+        <app-atelier-rules />
+      }
+    }
+  </main>
+</div>
+
+@if (state.paletteOpen()) {
+  <app-atelier-palette (openGame)="openGame.emit()" (logout)="logout.emit()" />
+}
+
+<app-proposal-dialogs [editor]="false" [toast]="false" />
+
+<!-- Toasts, each with «Rückgängig» where possible -->
+<div class="toasts" aria-live="polite">
+  @for (toast of state.toasts(); track toast.id) {
+    <div class="toast">
+      <span>{{ toast.text }}</span>
+      @if (toast.undo) {
+        <button
+          type="button"
+          class="toast-undo"
+          (click)="toast.undo(); state.dismiss(toast.id)"
+        >
+          Rückgängig
+        </button>
+      }
+      <button
+        type="button"
+        class="toast-close"
+        aria-label="Schliessen"
+        (click)="state.dismiss(toast.id)"
+      >
+        <css-icon icon="close" size="sm"></css-icon>
+      </button>
+    </div>
+  }
+  @if (store.message(); as m) {
+    <div class="toast" [class.error]="m.variant === 'error'" role="status">
+      <span>{{ m.text }}</span>
+      <button
+        type="button"
+        class="toast-close"
+        aria-label="Schliessen"
+        (click)="store.message.set(null)"
+      >
+        <css-icon icon="close" size="sm"></css-icon>
+      </button>
+    </div>
+  }
+</div>

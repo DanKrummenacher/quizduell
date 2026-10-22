@@ -1,0 +1,226 @@
+@let d = draft();
+@let e = errors();
+
+<div
+  class="sheet"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="isNew() ? 'Neue Frage' : 'Frage bearbeiten'"
+>
+  <header class="bar">
+    <button type="button" class="round" aria-label="Schliessen" (click)="close()">
+      <css-icon icon="close" size="sm"></css-icon>
+    </button>
+    <ol class="steps">
+      @for (label of steps; track label; let i = $index) {
+        <li>
+          <button
+            type="button"
+            class="step"
+            [class.active]="step() === i"
+            [class.done]="step() > i"
+            [attr.aria-current]="step() === i ? 'step' : null"
+            (click)="goTo($any(i))"
+          >
+            <span class="step-no">
+              @if (step() > i) {
+                <css-icon icon="checkmark" size="sm"></css-icon>
+              } @else {
+                {{ i + 1 }}
+              }
+            </span>
+            <span class="step-label">{{ label }}</span>
+          </button>
+        </li>
+      }
+    </ol>
+    <span class="round-spacer"></span>
+  </header>
+
+  <div class="body">
+    @switch (step()) {
+      @case (0) {
+        <section class="panel" aria-labelledby="b-step-1">
+          <h2 id="b-step-1">{{ isNew() ? 'Wie lautet die Frage?' : 'Frage' }}</h2>
+          <textarea
+            class="big-input"
+            rows="3"
+            aria-label="Frage"
+            placeholder="z.B. Wie viele Kantone hat die Schweiz?"
+            [maxLength]="limits.text.max"
+            [class.bad]="!!e.text"
+            [value]="d.text"
+            (input)="update({ text: value($event) })"
+          ></textarea>
+          <div class="meta-row">
+            @if (e.text) {
+              <span class="error">{{ e.text }}</span>
+            }
+            <span class="count">{{ d.text.length }}/{{ limits.text.max }}</span>
+          </div>
+
+          <h3>Kategorie</h3>
+          <div class="cats">
+            @for (name of store.categories(); track name) {
+              <button
+                type="button"
+                class="cat"
+                [class.on]="d.category === name"
+                (click)="update({ category: d.category === name ? '' : name })"
+              >
+                {{ name }}
+              </button>
+            }
+            <input
+              class="cat-input"
+              placeholder="Neue Kategorie"
+              aria-label="Neue Kategorie"
+              [maxLength]="limits.category.max"
+              [value]="store.categories().includes(d.category) ? '' : d.category"
+              (input)="update({ category: value($event) })"
+            />
+          </div>
+          @if (e.category) {
+            <span class="error">{{ e.category }}</span>
+          }
+
+          <div class="toggle-row">
+            <span>
+              <strong>Im Spiel</strong>
+              <small>{{
+                d.active
+                  ? 'Die Frage kann in Duellen vorkommen.'
+                  : 'Pausiert – kommt in keinem Duell vor.'
+              }}</small>
+            </span>
+            <button
+              type="button"
+              role="switch"
+              class="switch"
+              aria-label="Im Spiel"
+              [attr.aria-checked]="d.active"
+              (click)="update({ active: !d.active })"
+            ></button>
+          </div>
+        </section>
+      }
+      @case (1) {
+        <section class="panel" aria-labelledby="b-step-2">
+          <h2 id="b-step-2">Vier Antworten</h2>
+          <p class="lead">Tippe auf den Buchstaben der richtigen Antwort.</p>
+          <div class="answers">
+            @for (option of d.options; track $index; let i = $index) {
+              <div
+                class="answer"
+                [class.right]="d.correctIndex === i"
+                [class.bad]="!!e.options?.[i]"
+              >
+                <button
+                  type="button"
+                  class="letter"
+                  [attr.aria-pressed]="d.correctIndex === i"
+                  [attr.aria-label]="'Antwort ' + letters[i] + ' ist richtig'"
+                  (click)="update({ correctIndex: i })"
+                >
+                  @if (d.correctIndex === i) {
+                    <css-icon icon="checkmark"></css-icon>
+                  } @else {
+                    {{ letters[i] }}
+                  }
+                </button>
+                <input
+                  [attr.aria-label]="'Antwort ' + letters[i]"
+                  [placeholder]="'Antwort ' + letters[i]"
+                  [maxLength]="limits.option.max"
+                  [value]="option"
+                  (input)="setOption(i, value($event))"
+                />
+              </div>
+              @if (e.options?.[i]; as msg) {
+                <span class="error">{{ msg }}</span>
+              }
+            }
+          </div>
+        </section>
+      }
+      @case (2) {
+        <section class="panel check" aria-labelledby="b-step-3">
+          <h2 id="b-step-3">So sehen es die Spieler</h2>
+          <app-buehne-preview
+            [text]="d.text"
+            [options]="d.options"
+            [correctIndex]="d.correctIndex"
+            [total]="store.settings()?.questionsPerGame ?? 3"
+            [seconds]="store.settings()?.questionDurationSec ?? 20"
+          />
+          <dl class="summary">
+            <div>
+              <dt>Kategorie</dt>
+              <dd>{{ d.category || 'Ohne Kategorie' }}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>{{ d.active ? 'Im Spiel' : 'Pausiert' }}</dd>
+            </div>
+            @if (question(); as q) {
+              <div>
+                <dt>Bisher</dt>
+                <dd>
+                  {{
+                    rate() === null
+                      ? 'noch nie gestellt'
+                      : rate() + ' % richtig · ' + q.timesAsked + '×'
+                  }}
+                </dd>
+              </div>
+            }
+          </dl>
+          @if (error()) {
+            <p class="error">{{ error() }}</p>
+          }
+          @if (question()) {
+            @if (confirmDelete()) {
+              <div class="delete-confirm">
+                <span>Frage endgültig löschen?</span>
+                <button
+                  type="button"
+                  class="ghost-dark"
+                  (click)="confirmDelete.set(false)"
+                >
+                  Nein
+                </button>
+                <button type="button" class="danger" (click)="remove()">
+                  Löschen
+                </button>
+              </div>
+            } @else {
+              <button type="button" class="delete" (click)="confirmDelete.set(true)">
+                Frage löschen
+              </button>
+            }
+          }
+        </section>
+      }
+    }
+  </div>
+
+  <footer class="foot">
+    @if (step() > 0) {
+      <button type="button" class="ghost" (click)="goTo($any(step() - 1))">
+        Zurück
+      </button>
+    } @else {
+      <span></span>
+    }
+    @if (step() < 2) {
+      <button type="button" class="next" (click)="goTo($any(step() + 1))">
+        Weiter<css-icon icon="arrow-right" size="sm"></css-icon>
+      </button>
+    } @else {
+      <button type="button" class="next save" [disabled]="saving()" (click)="save()">
+        <css-icon icon="checkmark" size="sm"></css-icon>
+        {{ saving() ? 'Speichert …' : isNew() ? 'Frage erstellen' : 'Speichern' }}
+      </button>
+    }
+  </footer>
+</div>

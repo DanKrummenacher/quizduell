@@ -1,0 +1,167 @@
+@let d = draft();
+@let e = errors();
+
+<div class="editor">
+  <div class="form">
+    <label class="field-label" for="atelier-q">Frage</label>
+    <textarea
+      #first
+      id="atelier-q"
+      class="field area"
+      rows="2"
+      placeholder="z.B. Wie viele Kantone hat die Schweiz?"
+      [maxLength]="limits.text.max"
+      [class.bad]="!!e.text"
+      [value]="d.text"
+      (input)="update({ text: value($event) })"
+    ></textarea>
+    <div class="field-foot">
+      @if (e.text) {
+        <span class="error">{{ e.text }}</span>
+      }
+      <span class="counter">{{ d.text.length }}/{{ limits.text.max }}</span>
+    </div>
+
+    <span class="field-label"
+      >Antworten <small>Buchstabe = richtige Antwort</small></span
+    >
+    <div class="answers">
+      @for (option of d.options; track $index; let i = $index) {
+        <div
+          class="answer"
+          [class.correct]="d.correctIndex === i"
+          [class.bad]="!!e.optionErrors?.[i]"
+        >
+          <button
+            type="button"
+            class="letter"
+            [attr.aria-pressed]="d.correctIndex === i"
+            [attr.aria-label]="'Antwort ' + letters[i] + ' als richtig markieren'"
+            (click)="update({ correctIndex: i })"
+          >
+            @if (d.correctIndex === i) {
+              <css-icon icon="checkmark" size="sm"></css-icon>
+            } @else {
+              {{ letters[i] }}
+            }
+          </button>
+          <input
+            class="answer-input"
+            [attr.aria-label]="'Antwort ' + letters[i]"
+            [placeholder]="'Antwort ' + letters[i]"
+            [maxLength]="limits.option.max"
+            [value]="option"
+            (input)="setOption(i, value($event))"
+          />
+        </div>
+      }
+    </div>
+    @if (e.options) {
+      <span class="error">{{ e.options }}</span>
+    }
+
+    <div class="row">
+      <div class="grow">
+        <label class="field-label" for="atelier-cat">Kategorie</label>
+        <input
+          id="atelier-cat"
+          class="field"
+          placeholder="Ohne Kategorie"
+          [maxLength]="limits.category.max"
+          [value]="d.category"
+          (input)="update({ category: value($event) })"
+        />
+        @if (suggestions().length) {
+          <div class="chips">
+            @for (name of suggestions(); track name) {
+              <button
+                type="button"
+                class="chip"
+                (click)="update({ category: name })"
+              >
+                {{ name }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+      <div>
+        <span class="field-label">Im Spiel</span>
+        <button
+          type="button"
+          role="switch"
+          class="switch"
+          [attr.aria-checked]="d.active"
+          (click)="update({ active: !d.active })"
+        >
+          <span class="knob"></span>{{ d.active ? 'Aktiv' : 'Pausiert' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- How the players will see it -->
+  <aside class="preview" aria-label="Vorschau im Spiel">
+    <span class="preview-label">Vorschau im Spiel</span>
+    <div class="screen">
+      <p class="p-text" [class.empty]="!d.text.trim()">
+        {{ d.text.trim() || 'Die Frage erscheint hier' }}
+      </p>
+      @for (option of d.options; track $index; let i = $index) {
+        <div class="p-answer" [class.right]="i === d.correctIndex">
+          <span class="p-letter">{{ letters[i] }}</span>
+          <span class="p-option" [class.empty]="!option.trim()">{{
+            option.trim() || '…'
+          }}</span>
+        </div>
+      }
+    </div>
+  </aside>
+</div>
+
+<footer class="bar">
+  <span class="meta">
+    @if (question(); as q) {
+      <span
+        ><strong>{{ rate() === null ? '–' : rate() + ' %' }}</strong> richtig</span
+      >
+      <span>{{ q.timesAsked }}× gestellt</span>
+    } @else {
+      <span>Neue Frage</span>
+    }
+    @if (error()) {
+      <span class="error">{{ error() }}</span>
+    }
+  </span>
+  <span class="actions">
+    @if (question()) {
+      @if (confirmDelete()) {
+        <span class="confirm">Endgültig löschen?</span>
+        <button type="button" class="ghost" (click)="confirmDelete.set(false)">
+          Nein
+        </button>
+        <button type="button" class="danger" (click)="remove()">Löschen</button>
+      } @else {
+        <button
+          type="button"
+          class="ghost danger-text"
+          (click)="confirmDelete.set(true)"
+        >
+          <css-icon icon="trash" size="sm"></css-icon>Löschen
+        </button>
+      }
+    }
+    <button type="button" class="button" (click)="cancel()">
+      Abbrechen <kbd>Esc</kbd>
+    </button>
+    <button
+      type="button"
+      class="primary"
+      [disabled]="(!dirty() && !!question()) || saving()"
+      (click)="save()"
+    >
+      {{ saving() ? 'Speichert …' : question() ? 'Speichern' : 'Erstellen' }}
+      <kbd>⌘↵</kbd>
+    </button>
+  </span>
+</footer>

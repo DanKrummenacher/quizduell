@@ -1,0 +1,143 @@
+<header class="mobilebar">
+  <button
+    type="button"
+    class="icon"
+    aria-label="Seiten"
+    [attr.aria-expanded]="state.menuOpen()"
+    (click)="state.menuOpen.set(!state.menuOpen())"
+  >
+    <css-icon icon="menu-hamburger" size="sm"></css-icon>
+  </button>
+  <span class="mobile-title">{{
+    current() !== null
+      ? current() || 'Ohne Kategorie'
+      : state.page().kind === 'rules'
+        ? 'Spielregeln'
+        : 'Übersicht'
+  }}</span>
+</header>
+
+@if (state.menuOpen()) {
+  <button
+    type="button"
+    class="scrim"
+    tabindex="-1"
+    aria-label="Schliessen"
+    (click)="state.menuOpen.set(false)"
+  ></button>
+}
+
+<aside class="side" [class.open]="state.menuOpen()">
+  <div class="brand">
+    <app-logo-mark class="logo" />
+    <span class="wordmark"><span class="light">play</span>duelio</span>
+  </div>
+
+  <nav aria-label="Seiten">
+    <button
+      type="button"
+      class="item"
+      [class.active]="state.page().kind === 'start'"
+      (click)="state.open({ kind: 'start' })"
+    >
+      <css-icon icon="statistic" size="sm"></css-icon><span>Übersicht</span>
+    </button>
+    <button
+      type="button"
+      class="item"
+      [class.active]="state.page().kind === 'rules'"
+      (click)="state.open({ kind: 'rules' })"
+    >
+      <css-icon icon="settings" size="sm"></css-icon><span>Spielregeln</span>
+      @if (store.dirty()) {
+        <i class="dirty" title="Nicht übernommen"></i>
+      }
+    </button>
+
+    <span class="group">Kategorien</span>
+    @for (page of pages(); track page.name) {
+      <button
+        type="button"
+        class="item"
+        [class.active]="current() === page.name"
+        (click)="state.open({ kind: 'category', name: page.name })"
+      >
+        <css-icon icon="document" size="sm"></css-icon>
+        <span>{{ page.name || 'Ohne Kategorie' }}</span>
+        <small>{{ page.total }}</small>
+      </button>
+    }
+  </nav>
+
+  <div class="foot">
+    <button type="button" class="item" (click)="state.importing.set(true)">
+      <css-icon icon="upload" size="sm"></css-icon><span>Importieren</span>
+    </button>
+    <button type="button" class="item" (click)="pro.exportCsv()">
+      <css-icon icon="download" size="sm"></css-icon><span>Exportieren</span>
+    </button>
+    <button type="button" class="item" (click)="openGame.emit()">
+      <css-icon icon="home" size="sm"></css-icon><span>Zum Spiel</span>
+    </button>
+    <button type="button" class="item" (click)="logout.emit()">
+      <css-icon icon="logout" size="sm"></css-icon><span>Abmelden</span>
+    </button>
+    @if (store.stats(); as s) {
+      <p class="live" [class.bad]="store.ready() === false">
+        <span class="dot"></span>
+        {{ store.ready() === false ? 'Nicht spielbar' : 'Spiel bereit' }} ·
+        {{ s.activeGames }} {{ s.activeGames === 1 ? 'Duell' : 'Duelle' }}
+      </p>
+    }
+  </div>
+</aside>
+
+<div class="desk">
+  <main class="doc">
+    @switch (state.page().kind) {
+      @case ('start') {
+        <app-redaktion-start />
+      }
+      @case ('rules') {
+        <app-redaktion-rules />
+      }
+      @case ('category') {
+        <app-redaktion-category [name]="current() ?? ''" />
+      }
+    }
+  </main>
+
+  <!-- The question with the cursor, as the players see it -->
+  <aside class="preview" aria-label="Vorschau">
+    @if (state.focused(); as d) {
+      <span class="preview-label">So sehen es die Spieler</span>
+      <div class="screen">
+        <p class="s-q" [class.empty]="!d.text.trim()">
+          {{ d.text.trim() || 'Die Frage erscheint hier' }}
+        </p>
+        @for (option of d.options; track $index; let i = $index) {
+          <div class="s-a" [class.right]="i === d.correctIndex">
+            <b>{{ letters[i] }}</b
+            ><span [class.empty]="!option.trim()">{{ option.trim() || '…' }}</span>
+          </div>
+        }
+      </div>
+      <p class="preview-note">
+        {{ d.active ? 'Im Spiel' : 'Pausiert – kommt in keinem Duell vor' }}
+      </p>
+    } @else {
+      <span class="preview-label">Vorschau</span>
+      <p class="preview-hint">
+        Klicke in eine Frage, um sie hier so zu sehen, wie sie im Spiel erscheint.
+      </p>
+      <p class="preview-hint">
+        Änderungen speichern sich selbst, sobald eine Frage vollständig ist.
+      </p>
+    }
+  </aside>
+</div>
+
+@if (state.importing()) {
+  <app-import-dialog (dismiss)="state.importing.set(false)" />
+}
+<app-proposal-dialogs [editor]="false" />
