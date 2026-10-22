@@ -1,0 +1,50 @@
+// TEMPORARY: concept «Galerie» – questions as playing cards in decks.
+$bg: #eef1f6;
+$ink: #00327d;
+$ink-2: #4d70a4;
+$ink-3: #8098be;
+$line: #dde3ec;
+$green: #00875e;
+$red: #d53419;
+
+// A question shown as a small game card: blue face, four answer slots.
+@mixin card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgba(0, 50, 125, 0.08),
+    0 8px 24px rgba(0, 50, 125, 0.08);
+}
+
+@mixin face {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 16px;
+  background: $ink;
+  color: #fff;
+}
+
+@mixin slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 10px;
+}
+
+@mixin slot {
+  overflow: hidden;
+  padding: 7px 9px;
+  border: 1px solid #c9d4e4;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: $ink;
+}

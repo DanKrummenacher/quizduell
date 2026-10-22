@@ -14,6 +14,14 @@ export const ADMIN_ROUTES: Routes = [
       import('./login/admin-login.page').then((m) => m.AdminLoginPage),
     title: 'Admin-Login – playduelio',
   },
+  // TEMPORARY: design concepts for the admin (development only).
+  {
+    path: 'konzepte',
+    canActivate: [requireAdmin],
+    loadComponent: () =>
+      import('./concepts/concepts.page').then((m) => m.ConceptsPage),
+    title: 'Konzepte – Admin',
+  },
   // TEMPORARY: the final admin designs to choose from (development only).
   {
     path: 'final',

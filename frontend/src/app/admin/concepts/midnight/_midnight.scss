@@ -1,0 +1,25 @@
+// TEMPORARY: concept «Midnight» – a dark, dense tool for the keyboard.
+$bg: #0b1220;
+$panel: #111a2c;
+$raised: #16213a;
+$line: #1f2b45;
+$ink: #e8eef9;
+$ink-2: #9aa9c4;
+$ink-3: #62718f;
+$accent: #3fb6ff;
+$green: #34d399;
+$amber: #fbbf24;
+$red: #f87171;
+
+@mixin kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid $line;
+  border-radius: 4px;
+  background: $raised;
+  font-size: 11px;
+  color: $ink-2;
+}

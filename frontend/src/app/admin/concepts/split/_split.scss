@@ -1,0 +1,79 @@
+// TEMPORARY: concept «Split-View» – grouped lists like the iPad settings.
+$bg: #f2f4f8;
+$group: #fff;
+$ink: #00327d;
+$ink-2: #4d70a4;
+$ink-3: #8098be;
+$line: #e3e8f0;
+$blue: #0078bb;
+$green: #00875e;
+$red: #d53419;
+
+@mixin group {
+  overflow: hidden;
+  border-radius: 12px;
+  background: $group;
+}
+
+@mixin cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  padding: 0 16px;
+  border-bottom: 1px solid $line;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+@mixin caption {
+  margin: 0 16px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $ink-3;
+}
+
+@mixin footnote {
+  margin: 6px 16px 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: $ink-3;
+}
+
+@mixin badge($color) {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: $color;
+  color: #fff;
+  font-size: 14px;
+}
+
+// A switch in the on state.
+@mixin toggle {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  margin-left: auto;
+  border-radius: 13px;
+  background: $green;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 20px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  }
+}
