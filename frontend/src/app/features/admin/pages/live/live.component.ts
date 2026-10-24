@@ -16,6 +16,7 @@ import type { EndReason, GamePhase } from '../../../../core/contracts/game.contr
 import { ANSWER_LETTERS } from '../../../../core/game/answer-letters';
 import { AdminApi } from '../../core/admin-api.service';
 import { AdminData } from '../../core/admin-data.service';
+import { PlayControl } from '../../core/play-control.service';
 import { formatClock, formatSeconds, formatTime } from '../../core/format';
 import { every } from '../../core/remote';
 import { AutofocusDirective } from '../../ui/autofocus.directive';
@@ -65,7 +66,8 @@ const EVENT_GROUPS: Record<EventFilter, LiveEvent['kind'][] | null> = {
 })
 export class LiveComponent {
   private readonly api = inject(AdminApi);
-  private readonly data = inject(AdminData);
+  protected readonly data = inject(AdminData);
+  protected readonly play = inject(PlayControl);
 
   protected readonly snapshot = signal<LiveSnapshot | null>(this.data.live());
   protected readonly error = signal<string | null>(null);

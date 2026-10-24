@@ -6,10 +6,14 @@ import { DEFAULT_SETTINGS, type GameSettings } from './game-settings.js';
 
 const SETTINGS_ID = 1;
 
-/** Keeps the game settings in memory so games never wait for the database. */
+/**
+ * Keeps the game settings, and whether new duels may start, in memory so
+ * games never wait for the database.
+ */
 @Injectable()
 export class SettingsService implements OnModuleInit {
   private current: GameSettings = { ...DEFAULT_SETTINGS };
+  private paused = false;
 
   constructor(private readonly database: DatabaseService) {}
 
@@ -21,6 +25,7 @@ export class SettingsService implements OnModuleInit {
 
     if (row) {
       this.current = toSettings(row);
+      this.paused = row.paused;
     } else {
       await this.database.db
         .insert(settings)
@@ -44,6 +49,19 @@ export class SettingsService implements OnModuleInit {
       });
     this.current = values;
     return this.get();
+  }
+
+  /** True while the game is paused: no new duels may start. */
+  isPaused(): boolean {
+    return this.paused;
+  }
+
+  async setPaused(paused: boolean): Promise<void> {
+    await this.database.db
+      .insert(settings)
+      .values({ id: SETTINGS_ID, ...this.current, paused })
+      .onConflictDoUpdate({ target: settings.id, set: { paused } });
+    this.paused = paused;
   }
 }
 

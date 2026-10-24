@@ -19,6 +19,7 @@ export class PublicController {
       questionDurationSec: settings.questionDurationSec,
       idleResetSec: settings.idleResetSec,
       playable: activeQuestions >= settings.questionsPerGame,
+      paused: this.settingsService.isPaused(),
     };
   }
 }

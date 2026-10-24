@@ -41,6 +41,9 @@ export class StartContainerComponent implements OnInit, OnDestroy {
     if (!this.infoService.reachable()) {
       return 'Der Server ist gerade nicht erreichbar. Bitte versuche es gleich nochmals.';
     }
+    if (this.infoService.info().paused) {
+      return 'Das Quiz ist gerade pausiert. Gleich geht es weiter!';
+    }
     if (!this.infoService.info().playable) {
       return 'Das Quiz wird gerade vorbereitet. Schau gleich nochmals vorbei!';
     }

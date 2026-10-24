@@ -16,6 +16,7 @@ import { ADMIN_AREAS } from '../../core/admin-areas';
 import { AdminData } from '../../core/admin-data.service';
 import { AdminSessionService } from '../../core/admin-session.service';
 import { ConfirmService } from '../../core/confirm.service';
+import { PlayControl } from '../../core/play-control.service';
 import { every } from '../../core/remote';
 import { AdminHeaderComponent, type NavItem } from '../../ui/admin-header.component';
 import { AdCommandPaletteComponent } from '../../ui/command-palette.component';
@@ -27,10 +28,27 @@ const SEEN_CHANGE = 'playduelio.admin.seen.change';
 @Component({
   selector: 'app-admin-shell',
   imports: [RouterOutlet, AdminHeaderComponent, AdCommandPaletteComponent],
-  providers: [AdminData],
+  providers: [AdminData, PlayControl],
   template: `
     <div class="ad-frame">
       <app-admin-header [items]="items()" (signOut)="signOut()" />
+      @if (data.paused()) {
+        <div class="ad-paused" role="status">
+          <span class="ad-paused-dot" aria-hidden="true"></span>
+          <p>
+            <strong>Spiel pausiert.</strong> Es starten keine neuen Duelle, laufende
+            spielen zu Ende.
+          </p>
+          <button
+            type="button"
+            class="btn-primary btn-sm"
+            [disabled]="play.busy()"
+            (click)="play.resume()"
+          >
+            Wieder freigeben
+          </button>
+        </div>
+      }
       <router-outlet />
     </div>
     <app-ad-command-palette [areas]="items()" />
@@ -40,6 +58,7 @@ const SEEN_CHANGE = 'playduelio.admin.seen.change';
 })
 export class AdminShellComponent {
   protected readonly data = inject(AdminData);
+  protected readonly play = inject(PlayControl);
   private readonly session = inject(AdminSessionService);
   private readonly confirm = inject(ConfirmService);
   private readonly api = inject(AdminApi);

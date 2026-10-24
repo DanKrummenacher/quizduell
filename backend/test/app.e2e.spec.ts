@@ -42,6 +42,7 @@ describe('playduelio backend (e2e)', () => {
         questionDurationSec: 20,
         idleResetSec: 120,
         playable: false,
+        paused: false,
       });
     });
 

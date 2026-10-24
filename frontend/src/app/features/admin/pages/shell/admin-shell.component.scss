@@ -259,3 +259,43 @@ app-admin-shell {
     @include l.chip;
   }
 }
+
+// The game is paused: a calm strip under the bar, on every page.
+app-admin-shell .ad-paused {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px max(32px, calc((100vw - 1360px) / 2 + 32px));
+  border-bottom: 1px solid #f1d58a;
+  background: t.$warning-bg;
+  color: t.$warning-text;
+  font-size: 14px;
+
+  p {
+    flex: 1;
+    min-width: 0;
+  }
+
+  strong {
+    font-weight: t.$bold;
+  }
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+
+    // The sentence takes the row beside the dot, the button goes below.
+    p {
+      flex-basis: calc(100% - 20px);
+    }
+  }
+}
+
+app-admin-shell .ad-paused-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: t.$warning;
+  box-shadow: 0 0 0 4px rgba(224, 161, 0, 0.2);
+}

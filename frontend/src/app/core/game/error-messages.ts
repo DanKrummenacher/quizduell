@@ -11,6 +11,7 @@ const MESSAGES: Record<ClientErrorCode, string> = {
   NOT_IN_GAME: 'Du bist in keinem Spiel.',
   NOT_ENOUGH_QUESTIONS:
     'Im Moment sind nicht genügend Fragen verfügbar. Bitte versuche es später.',
+  PAUSED: 'Das Quiz ist gerade pausiert. Gleich geht es weiter!',
   ANSWER_REJECTED: 'Deine Antwort kam leider zu spät.',
   REMATCH_UNAVAILABLE: 'Eine Revanche ist nicht mehr möglich.',
   SESSION_NOT_FOUND: 'Das Spiel ist leider nicht mehr verfügbar.',

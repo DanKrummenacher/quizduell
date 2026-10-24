@@ -257,6 +257,12 @@ export interface LiveSnapshot {
   history: LiveSample[];
   /** Most duels at the same time since the server started. */
   peak: { games: number; at: number } | null;
+  /** No new duels start while true; running duels play to the end. */
+  paused: boolean;
+}
+
+export interface PauseRequest {
+  paused: boolean;
 }
 
 // -----------------------------------------------------------------------------
@@ -300,6 +306,8 @@ export interface Hint {
 
 export type AuditAction =
   | 'login'
+  | 'game.pause'
+  | 'game.resume'
   | 'settings.update'
   | 'settings.restore'
   | 'question.create'

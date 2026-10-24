@@ -56,6 +56,8 @@ export const settings = pgTable('settings', {
   speedBonusEnabled: boolean('speed_bonus_enabled').notNull(),
   rematchTimeoutSec: smallint('rematch_timeout_sec').notNull(),
   idleResetSec: smallint('idle_reset_sec').notNull(),
+  /** No new duels start while true; running duels play to the end. */
+  paused: boolean('paused').notNull().default(false),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 

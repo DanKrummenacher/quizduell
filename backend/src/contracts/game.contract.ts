@@ -69,6 +69,8 @@ export type ErrorCode =
   | 'OWN_GAME'
   | 'NOT_IN_GAME'
   | 'NOT_ENOUGH_QUESTIONS'
+  /** The admin paused the game: no new duels start for now. */
+  | 'PAUSED'
   | 'ANSWER_REJECTED'
   | 'REMATCH_UNAVAILABLE'
   | 'SESSION_NOT_FOUND'
@@ -163,4 +165,6 @@ export interface PublicInfo {
   idleResetSec: number;
   /** Enough active questions exist to start a duel. */
   playable: boolean;
+  /** The admin paused the game: no new duels start for now. */
+  paused: boolean;
 }

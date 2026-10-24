@@ -70,6 +70,17 @@ export class AdminData {
     await Promise.all([this.questions.reload(), this.hints.reload()]);
   }
 
+  /** The admin paused the game: no new duels start. */
+  readonly paused = computed(() => this.live()?.paused === true);
+
+  async setPaused(paused: boolean): Promise<void> {
+    const result = await this.api.setPause(paused);
+    const live = this.live();
+    if (live) {
+      this.live.set({ ...live, paused: result.paused });
+    }
+  }
+
   async refreshLive(): Promise<void> {
     try {
       this.live.set(await this.api.live());
@@ -83,6 +94,9 @@ export class AdminData {
   readonly status = computed<QuizStatus>(() => {
     if (!this.reachable()) {
       return { tone: 'down', label: 'Server nicht erreichbar' };
+    }
+    if (this.paused()) {
+      return { tone: 'warn', label: 'Spiel pausiert', detail: 'keine neuen Duelle' };
     }
     if (this.playable() === false) {
       return { tone: 'warn', label: 'Zu wenige Fragen' };

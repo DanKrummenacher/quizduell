@@ -19,10 +19,16 @@ import {
   type BulkAction,
   type BulkRequest,
   type ImportRequest,
+  type PauseRequest,
   type QuestionInput,
   type QuestionUpdate,
 } from '../contracts/admin.contract.js';
 import { ANSWER_OPTION_COUNT } from '../contracts/game.contract.js';
+
+export class PauseDto implements PauseRequest {
+  @IsBoolean()
+  paused!: boolean;
+}
 
 export class LoginDto {
   @IsString()

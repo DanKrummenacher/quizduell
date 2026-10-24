@@ -15,6 +15,25 @@
       }
     </p>
     <div class="ad-actions">
+      @if (data.paused()) {
+        <button
+          type="button"
+          class="btn-primary"
+          [disabled]="play.busy()"
+          (click)="play.resume()"
+        >
+          <css-icon icon="unlock" size="xs"></css-icon>Spiel freigeben
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="btn-secondary"
+          [disabled]="play.busy()"
+          (click)="play.pause()"
+        >
+          <css-icon icon="lock" size="xs"></css-icon>Spiel pausieren
+        </button>
+      }
       <button
         type="button"
         class="btn-secondary"
@@ -25,7 +44,7 @@
           [attr.icon]="paused() ? 'play-circle' : 'pause-circle'"
           size="xs"
         ></css-icon
-        >{{ paused() ? 'Fortsetzen' : 'Anhalten' }}
+        >{{ paused() ? 'Ansicht fortsetzen' : 'Ansicht anhalten' }}
       </button>
     </div>
   </app-ad-page-head>

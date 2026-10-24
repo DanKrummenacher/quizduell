@@ -215,6 +215,22 @@ describe('admin API (e2e)', () => {
       }).expect(200);
     });
 
+    it('pauses and resumes the game', async () => {
+      await put('/pause', { paused: 'yes' }).expect(400);
+      expect((await put('/pause', { paused: true }).expect(200)).body).toEqual({
+        paused: true,
+      });
+      expect((await get('/live').expect(200)).body.paused).toBe(true);
+      expect((await request(http).get('/api/info')).body.paused).toBe(true);
+
+      await put('/pause', { paused: false }).expect(200);
+      const audit = (await get('/audit').expect(200)).body as AuditPage;
+      expect(audit.entries.slice(0, 2).map((e) => e.action)).toEqual([
+        'game.resume',
+        'game.pause',
+      ]);
+    });
+
     it('pages through the audit log', async () => {
       const first = (await get('/audit?limit=2').expect(200)).body as AuditPage;
       expect(first.entries).toHaveLength(2);

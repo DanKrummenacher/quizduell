@@ -21,6 +21,7 @@ import type {
   Hint,
   ImportResult,
   LiveSnapshot,
+  PauseRequest,
   QuestionDay,
 } from '../contracts/admin.contract.js';
 import { GameService } from '../game/game.service.js';
@@ -33,6 +34,7 @@ import {
   BulkDto,
   HistoryQueryDto,
   ImportDto,
+  PauseDto,
   QuestionInputDto,
   QuestionUpdateDto,
   RangeQueryDto,
@@ -64,6 +66,21 @@ export class AdminController {
   @Get('live')
   live(): LiveSnapshot {
     return this.game.getLiveSnapshot();
+  }
+
+  /** Stops or allows new duels; running duels play to the end. */
+  @Put('pause')
+  async setPause(@Body() body: PauseDto): Promise<PauseRequest> {
+    if (body.paused !== this.settings.isPaused()) {
+      await this.settings.setPaused(body.paused);
+      await this.audit.record(
+        body.paused ? 'game.pause' : 'game.resume',
+        body.paused
+          ? 'Spiel pausiert: keine neuen Duelle'
+          : 'Spiel wieder freigegeben',
+      );
+    }
+    return { paused: this.settings.isPaused() };
   }
 
   @Get('analytics')

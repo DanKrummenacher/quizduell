@@ -16,6 +16,7 @@ import type {
   ImportResult,
   LiveSnapshot,
   QuestionDay,
+  PauseRequest,
   QuestionInput,
   QuestionUpdate,
 } from '../../../core/contracts/admin.contract';
@@ -108,6 +109,13 @@ export class AdminApi {
   updateSettings(settings: AdminSettings): Promise<AdminSettingsView> {
     return this.call(
       this.http.put<AdminSettingsView>(`${BASE}/settings`, settings, this.options()),
+    );
+  }
+
+  /** Stops or allows new duels; running duels play to the end. */
+  setPause(paused: boolean): Promise<PauseRequest> {
+    return this.call(
+      this.http.put<PauseRequest>(`${BASE}/pause`, { paused }, this.options()),
     );
   }
 

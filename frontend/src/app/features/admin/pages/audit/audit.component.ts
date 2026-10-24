@@ -28,7 +28,7 @@ const GROUPS: { id: Group; label: string; actions: AuditAction[] | null }[] = [
   {
     id: 'settings',
     label: 'Spielregeln',
-    actions: ['settings.update', 'settings.restore'],
+    actions: ['settings.update', 'settings.restore', 'game.pause', 'game.resume'],
   },
   {
     id: 'questions',
@@ -49,6 +49,8 @@ const ICONS: Record<AuditAction, string> = {
   login: 'unlock',
   'settings.update': 'settings',
   'settings.restore': 'undo',
+  'game.pause': 'lock',
+  'game.resume': 'play-circle',
   'question.create': 'add',
   'question.update': 'edit',
   'question.delete': 'trash',

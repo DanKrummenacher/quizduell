@@ -104,6 +104,7 @@ export class GameService implements OnModuleInit, OnApplicationShutdown {
 
   async createFriendGame(socketId: string, name: string): Promise<void> {
     this.leaveEverything(socketId);
+    this.assertOpen();
     await this.assertEnoughQuestions();
     this.leaveEverything(socketId);
 
@@ -130,6 +131,7 @@ export class GameService implements OnModuleInit, OnApplicationShutdown {
     if (session.phase !== 'waiting' || session.players.length >= 2) {
       throw new GameError('GAME_FULL');
     }
+    this.assertOpen();
 
     this.leaveEverything(socketId);
     this.addPlayer(session, socketId, name);
@@ -144,6 +146,7 @@ export class GameService implements OnModuleInit, OnApplicationShutdown {
     name: string,
   ): Promise<'matched' | 'queued'> {
     this.leaveEverything(socketId);
+    this.assertOpen();
     await this.assertEnoughQuestions();
     this.leaveEverything(socketId);
 
@@ -196,6 +199,7 @@ export class GameService implements OnModuleInit, OnApplicationShutdown {
     if (!this.isRematchAvailable(session)) {
       throw new GameError('REMATCH_UNAVAILABLE');
     }
+    this.assertOpen();
 
     const firstRequest = !session.players.some((p) => p.rematchRequested);
     player.rematchRequested = true;
@@ -321,6 +325,7 @@ export class GameService implements OnModuleInit, OnApplicationShutdown {
       events: [...this.events].reverse(),
       history: this.historyWindow(now),
       peak: this.peak,
+      paused: this.settingsService.isPaused(),
     };
   }
 
@@ -775,6 +780,13 @@ export class GameService implements OnModuleInit, OnApplicationShutdown {
       throw new GameError('NOT_IN_GAME');
     }
     return entry;
+  }
+
+  /** While the admin paused the game, no new duel starts. */
+  private assertOpen(): void {
+    if (this.settingsService.isPaused()) {
+      throw new GameError('PAUSED');
+    }
   }
 
   private async assertEnoughQuestions(): Promise<void> {

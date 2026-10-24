@@ -9,6 +9,7 @@ const FALLBACK: PublicInfo = {
   questionDurationSec: 20,
   idleResetSec: 120,
   playable: true,
+  paused: false,
 };
 
 /** Public game configuration (number of questions, time per question, …). */

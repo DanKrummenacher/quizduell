@@ -47,7 +47,11 @@ const SETTINGS: GameSettings = {
 };
 
 function setup(
-  overrides: { activeQuestions?: number; settings?: Partial<GameSettings> } = {},
+  overrides: {
+    activeQuestions?: number;
+    settings?: Partial<GameSettings>;
+    paused?: boolean;
+  } = {},
 ) {
   const settings = { ...SETTINGS, ...overrides.settings };
   const questionsService = {
@@ -57,7 +61,10 @@ function setup(
     pickRandom: vi.fn().mockResolvedValue(QUESTIONS.map((q) => ({ ...q }))),
     recordResults: vi.fn().mockResolvedValue(undefined),
   };
-  const settingsService = { get: () => ({ ...settings }) };
+  const settingsService = {
+    get: () => ({ ...settings }),
+    isPaused: () => overrides.paused ?? false,
+  };
   const statsService = { recordGame: vi.fn().mockResolvedValue(undefined) };
   const service = new GameService(
     questionsService as unknown as QuestionsService,
@@ -119,6 +126,16 @@ describe('GameService', () => {
       const ctx = setup({ activeQuestions: 2 });
       await expect(ctx.service.createFriendGame('host', 'Anna')).rejects.toEqual(
         new GameError('NOT_ENOUGH_QUESTIONS'),
+      );
+    });
+
+    it('refuses new duels while the game is paused', async () => {
+      const ctx = setup({ paused: true });
+      await expect(ctx.service.createFriendGame('host', 'Anna')).rejects.toEqual(
+        new GameError('PAUSED'),
+      );
+      await expect(ctx.service.startMatchmaking('solo', 'Ben')).rejects.toEqual(
+        new GameError('PAUSED'),
       );
     });
 
