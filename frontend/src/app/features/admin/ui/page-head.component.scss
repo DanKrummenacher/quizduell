@@ -1,6 +1,6 @@
-// Head of every admin page: the path, the title with its line and actions, a
-// rule that fades out to the right. Behind it the light of the bar falls into
-// the page, and the icon of the area sits large and faint at the right.
+// Head of every admin page: the path, the title with its line and actions.
+// Behind it the navy of the bar fades out slowly into the page, and the icon
+// of the area sits large and faint at the right.
 // page-head-menu.scss: the menu of the path.
 @use '../styles/tokens' as t;
 
@@ -18,45 +18,37 @@ app-ad-page-head {
   z-index: 3;
   isolation: isolate;
   margin-bottom: 28px;
-  padding-bottom: 22px;
+  padding-bottom: 30px;
+
+  // While the menu of the path is open, the head lies above everything below.
+  &:has(.ph-menu) {
+    z-index: 10;
+  }
 
   css-icon {
     display: inline-flex;
   }
 
-  // The light of the bar.
+  // The navy of the bar fades out over the head into the page. As wide as the
+  // window; the frame clips it.
   &::before {
     content: '';
     position: absolute;
-    inset: -32px -100vmax -40px;
+    inset: -32px calc(50% - 50vw) -140px;
     z-index: -1;
-    background:
-      radial-gradient(40% 120px at 50% 0, rgba(0, 164, 224, 0.22), transparent 100%),
-      linear-gradient(180deg, rgba(0, 50, 125, 0.07), transparent 70%);
-    pointer-events: none;
-  }
-
-  // The rule under the head.
-  &::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: 1px;
     background: linear-gradient(
-      90deg,
-      t.$line-strong,
-      rgba(128, 152, 190, 0.35) 45%,
+      180deg,
+      rgba(0, 50, 125, 0.34),
+      rgba(0, 50, 125, 0.14) 30%,
+      rgba(0, 50, 125, 0.05) 60%,
       transparent
     );
-    transform-origin: left;
-    animation: ph-rule 0.9s 0.1s $ease both;
+    pointer-events: none;
   }
 
   @media (max-width: $tablet) {
     &::before {
-      inset: -24px -100vmax -40px;
+      top: -24px;
     }
   }
 }
@@ -88,8 +80,9 @@ app-ad-page-head {
   display: flex;
   align-items: center;
   gap: 8px;
-  // As high as the chips of «Zuletzt», so the head does not move once they come.
-  min-height: 26px;
+  // As high as the chips of «Zuletzt»: one centre line, and the head does not
+  // move once they come.
+  min-height: 28px;
   margin-bottom: 16px;
   color: t.$text-3;
   font-size: t.$text-base;
@@ -103,8 +96,9 @@ app-ad-page-head {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin: -4px -8px;
-  padding: 4px 8px;
+  height: 28px;
+  margin: 0 -8px;
+  padding: 0 8px;
   border: 0;
   border-radius: 8px;
   background: transparent;
@@ -112,7 +106,7 @@ app-ad-page-head {
   font: inherit;
   font-weight: t.$bold;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: color 0.15s ease;
 
   svg {
     width: 14px;
@@ -122,23 +116,23 @@ app-ad-page-head {
     stroke-width: 1.5;
     stroke-linecap: round;
     stroke-linejoin: round;
-    transition: stroke 0.15s ease;
+    transition:
+      stroke 0.15s ease,
+      transform 0.2s ease;
   }
 
-  &:hover {
-    background: rgba(0, 50, 125, 0.06);
-
-    svg {
-      stroke: t.$text-2;
-    }
-  }
-
+  // Under the pointer and while open the step turns cyan; open, the arrow turns.
+  &:hover,
   &[aria-expanded='true'] {
-    background: rgba(0, 50, 125, 0.09);
+    color: #0078bb;
 
     svg {
-      stroke: t.$brand;
+      stroke: #0078bb;
     }
+  }
+
+  &[aria-expanded='true'] svg {
+    transform: rotate(180deg);
   }
 
   &:focus-visible {
@@ -164,7 +158,7 @@ app-ad-page-head {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    height: 26px;
+    height: 28px;
     padding: 0 10px;
     border-radius: t.$radius-pill;
     background: rgba(0, 50, 125, 0.05);
@@ -210,17 +204,17 @@ app-ad-page-head {
 
   h1 {
     margin: 0;
-    font-size: 34px;
+    font-size: 40px;
     font-weight: t.$bold;
     line-height: 1.15;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 }
 
 .ph-desc {
-  margin-top: 6px;
+  margin-top: 8px;
   color: t.$text-2;
-  font-size: t.$text-md;
+  font-size: 15px;
   line-height: 1.5;
 
   p {
@@ -266,12 +260,6 @@ app-ad-page-head {
   }
 }
 
-@keyframes ph-rule {
-  from {
-    transform: scaleX(0);
-  }
-}
-
 @media (max-width: $phone) {
   .ph-row {
     align-items: flex-start;
@@ -283,13 +271,12 @@ app-ad-page-head {
     width: 100%;
 
     h1 {
-      font-size: 28px;
+      font-size: 30px;
     }
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ph::after,
   .ph-crumbs,
   .ph-text h1,
   .ph-desc,
