@@ -1,0 +1,367 @@
+// Page structure shared by every admin page: the content width, the page
+// head with title and actions, tabs, cards with a head, key figures and the
+// side drawer. One structure, so every area reads the same.
+@use 'tokens' as t;
+@use 'controls' as c;
+
+$page-width: 1360px;
+
+/// The content column under the brand bar.
+@mixin page {
+  max-width: $page-width;
+  margin: 0 auto;
+  padding: 32px 32px 104px;
+}
+
+/// Title, description and actions of a page.
+@mixin page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: t.$text-3xl;
+    font-weight: t.$bold;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin: 6px 0 0;
+    color: t.$text-2;
+    font-size: t.$text-md;
+    line-height: 1.5;
+  }
+}
+
+/// Group of actions at the right of a page head.
+@mixin actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/// Tabs under a page head: navy text, navy underline.
+@mixin tabs {
+  display: flex;
+  gap: 4px;
+  margin: -4px 0 24px;
+  border-bottom: 1px solid t.$line;
+
+  button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 14px;
+    border: 0;
+    background: transparent;
+    color: t.$text-2;
+    font-size: t.$text-md;
+    font-weight: t.$medium;
+    cursor: pointer;
+
+    &:hover {
+      color: t.$text;
+    }
+
+    &.is-active {
+      color: t.$text;
+      font-weight: t.$bold;
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        bottom: -1px;
+        height: 3px;
+        border-radius: 2px 2px 0 0;
+        background: t.$brand;
+      }
+    }
+
+    .tab-count {
+      @include c.badge(neutral);
+      height: 20px;
+      padding: 0 7px;
+      font-size: t.$text-xs;
+    }
+
+    &.is-active .tab-count {
+      @include c.badge-tone(brand);
+    }
+  }
+}
+
+/// White card with an optional head.
+@mixin card {
+  @include c.card;
+  padding: 20px 22px;
+}
+
+/// Head of a card: title and description left, actions right.
+@mixin card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+
+  h2 {
+    margin: 0;
+    font-size: t.$text-lg;
+    font-weight: t.$bold;
+    line-height: 1.3;
+  }
+
+  p {
+    margin: 3px 0 0;
+    color: t.$text-2;
+    font-size: t.$text-base;
+  }
+}
+
+/// Key figure: label, value, change, optional line.
+@mixin stat {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+
+  .stat-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: t.$text-2;
+    font-size: t.$text-base;
+    font-weight: t.$medium;
+  }
+
+  .stat-value {
+    font-size: t.$text-3xl;
+    font-weight: t.$bold;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    @include t.numeric;
+
+    small {
+      margin-left: 4px;
+      color: t.$text-2;
+      font-size: t.$text-md;
+      font-weight: t.$regular;
+      letter-spacing: 0;
+    }
+  }
+
+  .stat-change {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: t.$text-3;
+    font-size: t.$text-sm;
+  }
+}
+
+/// Change of a figure: green up, red down (or reversed with `.inverse`).
+@mixin delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: t.$radius-pill;
+  background: t.$success-bg;
+  color: t.$success-text;
+  font-size: t.$text-xs;
+  font-weight: t.$bold;
+  @include t.numeric;
+
+  &.down {
+    background: t.$danger-bg;
+    color: t.$danger-text;
+  }
+
+  &.flat {
+    background: t.$bg-muted;
+    color: t.$text-2;
+  }
+}
+
+/// Text button with an arrow at the end of a card.
+@mixin more-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: t.$brand;
+  font-size: t.$text-sm;
+  font-weight: t.$medium;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+/// Drawer at the right edge over the page.
+@mixin drawer($width: 520px) {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  width: $width;
+  max-width: 100vw;
+  border-left: 1px solid t.$line;
+  background: t.$bg;
+  box-shadow: -24px 0 48px -16px rgba(0, 50, 125, 0.22);
+  animation: ad-drawer 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes ad-drawer {
+    from {
+      transform: translateX(32px);
+      opacity: 0;
+    }
+  }
+}
+
+/// Dimmed page behind a drawer or dialog.
+@mixin scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 49;
+  border: 0;
+  background: rgba(0, 50, 125, 0.16);
+  cursor: default;
+}
+
+/// Small notice that confirms an action.
+@mixin toast {
+  position: fixed;
+  top: 84px;
+  left: 50%;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: t.$radius-pill;
+  background: t.$brand;
+  color: #fff;
+  font-size: t.$text-md;
+  box-shadow: t.$shadow-pop;
+  transform: translateX(-50%);
+
+  css-icon {
+    color: #00e09d;
+  }
+}
+
+/// Dropdown button (opens a menu).
+@mixin dropdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid t.$line-strong;
+  border-radius: t.$radius;
+  background: t.$bg;
+  color: t.$text;
+  font-size: t.$text-md;
+  cursor: pointer;
+
+  &:hover {
+    background: t.$bg-hover;
+  }
+
+  .dd-label {
+    color: t.$text-2;
+  }
+
+  css-icon:last-child {
+    color: t.$text-3;
+  }
+}
+
+/// Menu of a dropdown.
+@mixin menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  min-width: 220px;
+  padding: 6px;
+  border-radius: t.$radius-lg;
+  background: t.$bg;
+  box-shadow: t.$shadow-pop;
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: 34px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: t.$radius;
+    background: transparent;
+    font-size: t.$text-md;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: t.$bg-hover;
+    }
+
+    css-icon {
+      color: t.$brand;
+    }
+  }
+}
+
+/// Filter chip: «Kategorie: Logik».
+@mixin chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid t.$line-strong;
+  border-radius: t.$radius-pill;
+  background: t.$bg;
+  color: t.$text;
+  font-size: t.$text-base;
+  cursor: pointer;
+
+  &:hover {
+    background: t.$bg-hover;
+  }
+
+  &.is-active {
+    border-color: t.$brand;
+    background: t.$brand;
+    color: #fff;
+  }
+
+  .chip-key {
+    color: t.$text-2;
+  }
+
+  &.is-active .chip-key {
+    color: rgba(255, 255, 255, 0.75);
+  }
+}

@@ -12,10 +12,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { APP_CONFIG, type AppConfig } from '../config/app-config.js';
+import { DatabaseService } from '../database/database.service.js';
 import { QuestionsService } from '../questions/questions.service.js';
 import type { GameSettings } from '../settings/game-settings.js';
 import { UpdateSettingsDto } from '../settings/settings.dto.js';
 import { SettingsService } from '../settings/settings.service.js';
+import { generateDemoData } from './demo-data.js';
 
 /** Hides the test endpoints unless `TEST_CONTROL=true` (never in production). */
 @Injectable()
@@ -37,6 +39,7 @@ export class TestControlController {
   constructor(
     private readonly questionsService: QuestionsService,
     private readonly settingsService: SettingsService,
+    private readonly database: DatabaseService,
   ) {}
 
   @Delete('questions')
@@ -48,6 +51,12 @@ export class TestControlController {
   @Post('questions/samples')
   async importSamples(): Promise<{ imported: number }> {
     return { imported: await this.questionsService.importSamples() };
+  }
+
+  /** 60 days of plausible duels and answers for the existing questions. */
+  @Post('demo-data')
+  async demoData(): Promise<{ games: number }> {
+    return { games: await generateDemoData(this.database) };
   }
 
   @Put('settings')

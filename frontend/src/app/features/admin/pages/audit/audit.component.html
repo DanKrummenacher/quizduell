@@ -1,0 +1,104 @@
+<main class="ad-page">
+  <header class="ad-page-head">
+    <div>
+      <h1>Verlauf</h1>
+      <p>
+        Jede Änderung im Admin, neueste zuerst. Frühere Spielregeln lassen sich
+        wiederherstellen.
+      </p>
+    </div>
+  </header>
+
+  <div class="filters" role="group" aria-label="Art der Änderung">
+    @for (option of groups; track option.id) {
+      <button
+        type="button"
+        class="ad-chip"
+        [class.is-active]="group() === option.id"
+        [attr.aria-pressed]="group() === option.id"
+        (click)="group.set(option.id)"
+      >
+        {{ option.label }}
+      </button>
+    }
+  </div>
+
+  @if (!loaded()) {
+    @if (error()) {
+      <app-ad-state kind="error" [text]="error()" (retry)="load(true)" />
+    } @else {
+      <div class="ad-card"><app-ad-state kind="loading" [lines]="8" /></div>
+    }
+  } @else {
+    @for (day of days(); track day.key) {
+      <section class="day" [attr.aria-label]="day.label">
+        <h2 class="day-title">{{ day.label }}</h2>
+        <ol class="ad-card flush entries">
+          @for (item of day.entries; track item.entry.id) {
+            <li class="entry">
+              <span class="icon" [attr.data-action]="item.entry.action">
+                <css-icon
+                  [attr.icon]="icons[item.entry.action]"
+                  size="xs"
+                ></css-icon>
+              </span>
+              <div class="body">
+                <p class="title">{{ item.title }}</p>
+                @if (item.changes.length) {
+                  <ul class="changes">
+                    @for (change of item.changes; track change.label) {
+                      <li>
+                        {{ change.label }}
+                        <span class="before">{{ change.before }}</span>
+                        <css-icon icon="arrow-right" size="xs"></css-icon>
+                        <b>{{ change.after }}</b>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+              <time [attr.datetime]="item.entry.at">{{
+                timeOf(item.entry.at)
+              }}</time>
+              @if (item.entry.before) {
+                <button
+                  type="button"
+                  class="btn-ghost btn-sm restore"
+                  [disabled]="restoring() !== null"
+                  (click)="restore(item.entry)"
+                >
+                  <css-icon icon="undo" size="xs"></css-icon>Davor wiederherstellen
+                </button>
+              }
+            </li>
+          }
+        </ol>
+      </section>
+    } @empty {
+      <div class="ad-card">
+        <app-ad-state
+          kind="empty"
+          icon="time"
+          title="Noch keine Einträge"
+          text="Sobald im Admin etwas geändert wird, steht es hier."
+        />
+      </div>
+    }
+
+    @if (cursor()) {
+      <div class="more">
+        <button
+          type="button"
+          class="btn-secondary"
+          [disabled]="loading()"
+          (click)="load()"
+        >
+          {{ loading() ? 'Lädt…' : 'Ältere laden' }}
+        </button>
+      </div>
+    }
+    @if (error() && loaded()) {
+      <p class="ad-error load-error" role="alert">{{ error() }}</p>
+    }
+  }
+</main>

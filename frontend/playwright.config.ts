@@ -35,6 +35,7 @@ export default defineConfig({
         CORS_ORIGINS: `http://localhost:${WEB_PORT}`,
         TEST_CONTROL: 'true',
         DATABASE_URL: '',
+        ADMIN_PASSWORD: 'e2e-admin-password',
       },
     },
     {

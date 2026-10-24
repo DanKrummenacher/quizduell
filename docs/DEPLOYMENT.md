@@ -45,6 +45,7 @@ Render → **New → Web Service** → Repository `quizduell` verbinden.
 | `NODE_ENV`       | `production`                                                         |
 | `DATABASE_URL`   | Internal Database URL aus Schritt 1                                  |
 | `CORS_ORIGINS`   | `https://playduelio.onrender.com` (exakte Frontend-URL, ohne `/`)    |
+| `ADMIN_PASSWORD` | Passwort für das Admin, mindestens 12 Zeichen (Passwort-Manager)     |
 
 Das Backend startet nur, wenn alle Werte gültig sind – sonst steht im Log genau,
 was fehlt. Test: `https://playduelio-api.onrender.com/health` liefert `{"status":"ok"}`.
@@ -84,9 +85,17 @@ Unter **Settings → Headers** für den Pfad `/*` diese Security-Header ergänze
 
 ## 5. Fragen und Spielregeln pflegen
 
-Fragen und Spielregeln liegen in der Datenbank. Am einfachsten pflegt man sie mit
-Drizzle Studio: In Render bei der Datenbank die **External Database URL** kopieren und
-lokal starten:
+Fragen, Spielregeln und Zahlen pflegt man im **Admin**: `https://playduelio.onrender.com/admin`,
+Anmeldung mit dem `ADMIN_PASSWORD`. Eine Anmeldung gilt 12 Stunden. Wird das Passwort in
+Render geändert, sind danach alle bestehenden Anmeldungen ungültig.
+
+- **Fragen:** erfassen, bearbeiten, pausieren, löschen, als CSV importieren oder
+  exportieren. Änderungen gelten sofort für neue Duelle.
+- **Spielregeln:** gelten ab dem nächsten Duell, ohne Neustart.
+- **Verlauf:** jede Änderung im Admin; frühere Spielregeln lassen sich wiederherstellen.
+
+Für Notfälle bleibt der direkte Weg in die Datenbank mit Drizzle Studio: In Render bei
+der Datenbank die **External Database URL** kopieren und lokal starten:
 
 ```bash
 DATABASE_URL='<External Database URL>' npm --prefix backend run db:studio
@@ -95,14 +104,14 @@ DATABASE_URL='<External Database URL>' npm --prefix backend run db:studio
 - Tabelle `questions`: Fragen erfassen, ändern oder mit `active` aus dem Spiel nehmen.
   Änderungen gelten sofort für neue Duelle. `options` sind genau vier Antworten,
   `correct_index` ist die Position der richtigen (0–3).
-- Tabelle `settings` (eine Zeile): Fragen pro Duell, Zeit pro Frage usw. Das Backend liest
-  sie beim Start; nach einer Änderung den Dienst in Render neu starten.
+- Tabelle `settings` (eine Zeile): Fragen pro Duell, Zeit pro Frage usw. Direkt in der
+  Datenbank geänderte Spielregeln liest das Backend erst beim nächsten Start.
 
 Solange zu wenige aktive Fragen vorhanden sind, zeigt die Startseite einen freundlichen
 Hinweis. Danach mit zwei Geräten ein Duell spielen.
 
-Nicht mehr benötigte Variablen `ADMIN_PASSWORD` und `JWT_SECRET` können in Render
-gelöscht werden.
+Die frühere Variable `JWT_SECRET` wird nicht mehr gebraucht und kann in Render gelöscht
+werden.
 
 ## Kosten sparen nach der Messe
 

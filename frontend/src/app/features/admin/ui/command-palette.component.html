@@ -1,0 +1,55 @@
+<dialog
+  #dialog
+  class="palette"
+  aria-label="Schnellsuche"
+  tabindex="-1"
+  (cancel)="$event.preventDefault(); palette.open.set(false)"
+  (keydown.escape)="palette.open.set(false)"
+  (click)="onBackdrop($event)"
+>
+  <div class="search">
+    <css-icon icon="search" size="sm"></css-icon>
+    <input
+      #input
+      type="text"
+      role="combobox"
+      aria-expanded="true"
+      aria-controls="palette-results"
+      aria-autocomplete="list"
+      placeholder="Bereich, Aktion oder Frage suchen"
+      [value]="query()"
+      (input)="onInput($event)"
+      (keydown)="onKey($event)"
+    />
+    <span class="kbd">Esc</span>
+  </div>
+  <div id="palette-results" class="results" role="listbox" aria-label="Treffer">
+    @for (group of groups(); track group.name) {
+      <p class="group">{{ group.name }}</p>
+      @for (entry of group.entries; track entry.id) {
+        <button
+          type="button"
+          role="option"
+          class="entry"
+          [attr.aria-selected]="entry.index === active()"
+          (mouseenter)="active.set(entry.index)"
+          (click)="choose(entry)"
+        >
+          <css-icon [attr.icon]="entry.icon" size="sm"></css-icon>
+          <span class="label">{{ entry.label }}</span>
+          @if (entry.hint) {
+            <span class="hint">{{ entry.hint }}</span>
+          }
+          <css-icon class="enter" icon="arrow-right" size="xs"></css-icon>
+        </button>
+      }
+    } @empty {
+      <p class="empty">Nichts gefunden für «{{ query() }}».</p>
+    }
+  </div>
+  <p class="foot">
+    <span><span class="kbd">↑</span><span class="kbd">↓</span> auswählen</span>
+    <span><span class="kbd">↵</span> öffnen</span>
+    <span><span class="kbd">⌘K</span> schliessen</span>
+  </p>
+</dialog>

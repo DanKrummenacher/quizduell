@@ -75,7 +75,8 @@ Umsetzung:
 | `game/`      | Spiel-Engine (`GameService`), Socket-Gateway, Namensfilter, Rate-Limit |
 | `questions/` | Fragen in der Datenbank, Zufallsauswahl, Trefferstatistik, Beispielfragen |
 | `settings/`  | Spieleinstellungen (im Speicher gecacht, gelten ab dem nächsten Duell) |
-| `stats/`     | Anzahl gespielter Duelle                                               |
+| `stats/`     | Gespielte und abgebrochene Duelle mit Dauer, Punkten und Revanche      |
+| `admin/`     | Admin-API: Anmeldung, Live-Stand, Auswertung, Fragen, Regeln, Hinweise, Verlauf |
 | `testing/`   | Teststeuerung `/api/test/*` für die E2E-Tests (nur mit `TEST_CONTROL=true`) |
 | `database/`  | Drizzle-Schema, Verbindung, Migrationen beim Start                     |
 | `config/`    | Validierte Konfiguration aus Umgebungsvariablen                        |
@@ -96,6 +97,7 @@ gesperrt: Die Konfiguration verweigert dort `TEST_CONTROL=true`.
 | `features/lobby`   | Spielmodus, Freund herausfordern, Suche, Warten, Gegner gefunden    |
 | `features/quiz`    | Frage, Timer, Scoreboard, Auflösung                                 |
 | `features/result`  | Endstand, Revanche, neues Spiel                                     |
+| `features/admin`   | Admin: Anmeldung, Rahmen, Seiten, Diagramme und Admin-Styles        |
 
 - **Angular ohne Zone.js**, durchgehend Signals und Standalone-Komponenten.
 - **Smart/Dumb-Pattern** in den Spiel-Features: Ein Container verbindet den `GameClient`
@@ -123,6 +125,25 @@ gesperrt: Die Konfiguration verweigert dort `TEST_CONTROL=true`.
   End-to-End-Tests (Playwright, Chromium und WebKit, 14 Geräte)
 - Jeder Push läuft durch die CI: Vertrag, Format, Lint, Typen, Tests, Build, E2E
 
+## Admin
+
+Das Admin ist Teil des Frontends (`/admin`, eigener Lazy-Load-Bereich) und sieht aus wie
+das Quiz: dieselbe Markenleiste, dieselben Farben, Karten und Buttons. Alles kommt über die
+Admin-API (`/api/admin/*`, Vertrag in `contracts/admin.contract.ts`).
+
+- **Erfassung:** Die Spiel-Engine zählt pro Frage, welche Antwort gewählt wurde (in der
+  gespeicherten Reihenfolge, nicht der gemischten), wie oft die Zeit ablief und wie lange
+  das Antworten dauerte – gesamt und pro Tag (`question_daily`). Jedes gestartete Duell
+  wird beim Ende mit Status, Grund, Dauer, Punkten und Revanche gespeichert.
+- **Live:** Der Live-Stand kommt direkt aus dem Arbeitsspeicher der Engine (Duelle,
+  Warteschlange, Ereignisse, Höchststand pro Minute der letzten Stunde) und wird alle
+  zwei Sekunden abgefragt.
+- **Hinweise** berechnet das Backend aus den Zahlen (ab 20 Antworten pro Frage);
+  ignorierte Hinweise stehen in `dismissed_hints`.
+- **Verlauf:** Jede Änderung landet in `audit_log`; Änderungen der Spielregeln speichern
+  die Werte davor und danach, damit sie sich wiederherstellen lassen.
+- Tage und Stunden der Auswertung gelten in der Zeitzone Europe/Zurich.
+
 ## Skalierung
 
 Laufende Duelle liegen im Arbeitsspeicher einer Backend-Instanz; das hält jede Antwort im
@@ -141,6 +162,10 @@ für diesen Einsatz ist das bewusst nicht nötig.
 - Eingaben werden im Backend validiert (DTOs bzw. eigene Parser für Socket-Events)
 - Rate-Limits: HTTP global, Socket-Events 30/10 s
 - Helmet-Security-Header, CORS nur für die konfigurierte Frontend-Domain
-- Keine Schreibzugriffe über die API: Fragen und Einstellungen ändern sich nur direkt in der
-  Datenbank (die Teststeuerung ist in der Produktion gesperrt)
+- Schreibzugriffe nur über die Admin-API mit gültiger Anmeldung (die Teststeuerung ist in
+  der Produktion gesperrt)
+- Admin-Anmeldung: ein gemeinsames Passwort (`ADMIN_PASSWORD`, in der Produktion Pflicht,
+  mindestens 12 Zeichen), Vergleich in konstanter Zeit, höchstens 10 Versuche pro Minute
+  und IP. Die Sitzung ist ein mit HMAC-SHA256 signiertes Token (12 Stunden), dessen
+  Schlüssel aus dem Passwort abgeleitet ist: Ein neues Passwort beendet alle Sitzungen.
 - Keine Personendaten in der Datenbank

@@ -1,0 +1,434 @@
+// Controls for the admin in the shape language of the quiz: round uppercase
+// buttons like the library's `css-button`, 4px fields with the blue-grey
+// border, the navy block, the hover fill and shadow of the game's cards.
+// Page-level actions use the library's `css-button` itself; these are the
+// compact versions for toolbars and tables.
+@use 'tokens' as t;
+
+/// Shape of the round uppercase button, without colours.
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: t.$radius-pill;
+  font-family: t.$font;
+  font-size: t.$text-sm;
+  font-weight: t.$medium;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease;
+
+  css-icon {
+    display: flex;
+    flex: none;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+}
+
+/// Colours of a button variant: primary, secondary, ghost, danger.
+@mixin button-variant($variant) {
+  @if $variant == primary {
+    background: t.$brand;
+    color: #fff;
+
+    &:hover:not(:disabled) {
+      background: t.$brand-hover;
+      box-shadow: t.$shadow-hover;
+    }
+  } @else if $variant == secondary {
+    border-color: t.$brand;
+    background: t.$bg;
+    color: t.$brand;
+
+    &:hover:not(:disabled) {
+      background: t.$bg-hover;
+    }
+  } @else if $variant == ghost {
+    padding-inline: 8px;
+    background: transparent;
+    color: t.$brand;
+
+    &:hover:not(:disabled) {
+      background: t.$bg-hover;
+    }
+  } @else if $variant == danger {
+    border-color: t.$danger;
+    background: t.$bg;
+    color: t.$danger-text;
+
+    &:hover:not(:disabled) {
+      background: t.$danger-bg;
+    }
+  }
+}
+
+/// Round uppercase button. Variants: primary, secondary, ghost, danger.
+@mixin button($variant: secondary) {
+  @include button-base;
+  @include button-variant($variant);
+}
+
+/// Round icon button.
+@mixin icon-button($size: 32px) {
+  display: inline-grid;
+  place-items: center;
+  width: $size;
+  height: $size;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: t.$text-2;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: t.$bg-hover;
+    color: t.$text;
+  }
+
+  css-icon {
+    display: flex;
+  }
+}
+
+/// Text field in the look of the library's inputs.
+@mixin field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid t.$line-strong;
+  border-radius: t.$radius;
+  background: t.$bg;
+  color: t.$text;
+  font-family: t.$font;
+  font-size: t.$text-md;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:focus-within {
+    border-color: t.$brand;
+    box-shadow: 0 0 0 3px rgba(0, 50, 125, 0.14);
+  }
+
+  input,
+  textarea,
+  select {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+
+    &::placeholder {
+      color: t.$text-4;
+    }
+  }
+}
+
+/// Keyboard key.
+@mixin kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border: 1px solid t.$line;
+  border-radius: t.$radius-sm;
+  background: t.$bg;
+  color: t.$text-3;
+  font-family: t.$font;
+  font-size: t.$text-xs;
+  font-weight: t.$medium;
+  line-height: 1;
+}
+
+/// Shape of the small round status label, without colours.
+@mixin badge-base {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 9px;
+  border-radius: t.$radius-pill;
+  font-size: t.$text-sm;
+  font-weight: t.$medium;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/// Colours of a status label: neutral, brand, success, danger, warning, info.
+@mixin badge-tone($tone) {
+  @if $tone == neutral {
+    background: t.$bg-muted;
+    color: t.$text-2;
+  } @else if $tone == brand {
+    background: t.$brand;
+    color: #fff;
+  } @else if $tone == success {
+    background: t.$success-bg;
+    color: t.$success-text;
+  } @else if $tone == danger {
+    background: t.$danger-bg;
+    color: t.$danger-text;
+  } @else if $tone == warning {
+    background: t.$warning-bg;
+    color: t.$warning-text;
+  } @else if $tone == info {
+    background: t.$info-bg;
+    color: t.$info-text;
+  }
+}
+
+/// Small round status label. Tones: neutral, brand, success, danger, warning, info.
+@mixin badge($tone: neutral) {
+  @include badge-base;
+  @include badge-tone($tone);
+}
+
+/// Segmented control like the library's toggle group: navy when chosen.
+@mixin segmented {
+  display: inline-flex;
+  border: 1px solid t.$line-strong;
+  border-radius: t.$radius;
+  background: t.$bg;
+  overflow: hidden;
+
+  button {
+    height: 32px;
+    padding: 0 14px;
+    border: 0;
+    background: transparent;
+    color: t.$text;
+    font-size: t.$text-base;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    & + button {
+      border-left: 1px solid t.$line-strong;
+    }
+
+    &:hover {
+      background: t.$bg-hover;
+    }
+
+    &.is-active {
+      background: t.$brand;
+      color: #fff;
+      font-weight: t.$medium;
+    }
+  }
+}
+
+/// White card as in the game.
+@mixin card {
+  border: 1px solid t.$line;
+  border-radius: t.$radius;
+  background: t.$bg;
+}
+
+/// Card people act on: the game's blue-grey border, hover fill and shadow.
+@mixin action-card {
+  border: 1px solid t.$line-strong;
+  border-radius: t.$radius;
+  background: t.$bg;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+
+  @media (hover: hover) {
+    &:hover {
+      background: t.$bg-hover;
+      box-shadow: t.$shadow-hover;
+    }
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+/// The navy block on the left of game cards (answer letters, mode icons).
+@mixin block($width: 56px) {
+  display: grid;
+  place-items: center;
+  flex: none;
+  align-self: stretch;
+  width: $width;
+  background: t.$brand;
+  color: #fff;
+  font-weight: t.$bold;
+
+  css-icon {
+    display: flex;
+  }
+}
+
+/// Navy circle with a white icon (result and lobby screens).
+@mixin symbol($size: 44px) {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  background: t.$brand;
+  color: #fff;
+
+  css-icon {
+    display: flex;
+  }
+}
+
+/// White circle with a fine border and a navy icon (start page facts).
+@mixin symbol-light($size: 44px) {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: $size;
+  height: $size;
+  border: 1px solid t.$line-strong;
+  border-radius: 50%;
+  background: t.$bg;
+  color: t.$brand;
+
+  css-icon {
+    display: flex;
+  }
+}
+
+/// Small uppercase label.
+@mixin overline {
+  font-size: t.$text-xs;
+  font-weight: t.$medium;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: t.$text-3;
+}
+
+/// The game's light blue marker under a word.
+@mixin marker {
+  background: linear-gradient(
+    transparent 62%,
+    rgba(0, 164, 224, 0.32) 62%,
+    rgba(0, 164, 224, 0.32) 92%,
+    transparent 92%
+  );
+}
+
+/// Data table.
+@mixin table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: t.$text-base;
+
+  th {
+    height: 38px;
+    padding: 0 12px;
+    border-bottom: 1px solid t.$line;
+    background: t.$bg-subtle;
+    color: t.$text-2;
+    font-size: t.$text-xs;
+    font-weight: t.$medium;
+    letter-spacing: 0.06em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  td {
+    height: 46px;
+    padding: 0 12px;
+    border-bottom: 1px solid t.$line-soft;
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background-color 0.1s ease;
+
+    &:hover {
+      background: t.$bg-hover;
+    }
+
+    &:last-child td {
+      border-bottom: 0;
+    }
+  }
+}
+
+/// Thin horizontal meter.
+@mixin meter($height: 4px) {
+  display: block;
+  height: $height;
+  border-radius: 99px;
+  background: t.$bg-muted;
+  overflow: hidden;
+
+  > span {
+    display: block;
+    height: 100%;
+    border-radius: 99px;
+    background: t.$brand;
+  }
+}
+
+/// Avatar circle with initials, as the players in the game.
+@mixin avatar($size: 24px) {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: t.$bold;
+  color: #fff;
+}
+
+/// Back link as in the lobby («Zurück»).
+@mixin back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: t.$brand;
+  font-size: t.$text-sm;
+  font-weight: t.$medium;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}

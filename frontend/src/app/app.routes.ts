@@ -40,5 +40,10 @@ export const routes: Routes = [
     data: GAME_SCREEN_DATA,
     title: TITLE,
   },
+  {
+    path: 'admin',
+    loadChildren: () =>
+      import('./features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
+  },
   { path: '**', redirectTo: '' },
 ];

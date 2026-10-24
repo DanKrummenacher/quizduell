@@ -1,0 +1,236 @@
+@use '../../styles/tokens' as t;
+
+.import {
+  width: 680px;
+}
+
+.drop {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 36px 20px;
+  border: 2px dashed t.$line-strong;
+  border-radius: t.$radius-lg;
+  background: t.$bg-subtle;
+  font-size: t.$text-md;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover,
+  &.is-dragging {
+    border-color: t.$brand;
+    background: t.$brand-50;
+  }
+
+  &:focus-within {
+    outline: 2px solid t.$brand;
+    outline-offset: 2px;
+  }
+
+  input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .ad-muted {
+    font-size: t.$text-base;
+  }
+}
+
+.drop-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: t.$brand;
+  color: #fff;
+}
+
+.format {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-top: 28px;
+
+  h3 {
+    font-size: t.$text-lg;
+    font-weight: t.$bold;
+  }
+
+  p {
+    font-size: t.$text-base;
+    line-height: 1.55;
+  }
+}
+
+.sample {
+  display: grid;
+  grid-template-columns: 2fr 1.4fr auto 1fr;
+  width: 100%;
+  border: 1px solid t.$line;
+  border-radius: t.$radius;
+  font-size: t.$text-sm;
+
+  span {
+    padding: 8px 10px;
+    border-bottom: 1px solid t.$line-soft;
+  }
+
+  span:nth-child(-n + 4) {
+    background: t.$bg-subtle;
+    color: t.$text-2;
+    font-weight: t.$medium;
+  }
+
+  span:nth-child(n + 5) {
+    border-bottom: 0;
+  }
+}
+
+.file {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding: 12px 14px;
+  border-radius: t.$radius;
+  background: t.$bg-subtle;
+  font-size: t.$text-md;
+
+  b {
+    overflow-wrap: anywhere;
+  }
+
+  .btn-ghost {
+    margin-left: auto;
+  }
+}
+
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: t.$radius;
+  font-size: t.$text-md;
+
+  b {
+    font-size: t.$text-xl;
+    @include t.numeric;
+  }
+
+  &.ok {
+    background: t.$success-bg;
+    color: t.$success-text;
+  }
+
+  &.bad {
+    background: t.$danger-bg;
+    color: t.$danger-text;
+  }
+
+  &.dup {
+    background: t.$warning-bg;
+    color: t.$warning-text;
+  }
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: t.$text-md;
+  cursor: pointer;
+
+  input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: t.$brand;
+  }
+}
+
+.note {
+  margin-top: 10px;
+  font-size: t.$text-base;
+}
+
+.rows {
+  margin-top: 16px;
+  border: 1px solid t.$line;
+  border-radius: t.$radius;
+
+  td {
+    height: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    vertical-align: top;
+  }
+
+  tr[data-status='error'] {
+    background: #fffafa;
+  }
+
+  tr[data-status='skip'] .row-text {
+    color: t.$text-3;
+  }
+}
+
+.row-text {
+  display: block;
+  font-size: t.$text-base;
+  line-height: 1.45;
+}
+
+.row-meta {
+  display: block;
+  margin-top: 2px;
+  color: t.$text-3;
+  font-size: t.$text-sm;
+}
+
+.status {
+  width: 220px;
+}
+
+.problem {
+  display: block;
+  margin-top: 4px;
+  color: t.$danger-text;
+  font-size: t.$text-sm;
+  line-height: 1.4;
+}
+
+.error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 16px 0;
+  padding: 10px 14px;
+  border-radius: t.$radius;
+  background: t.$danger-bg;
+  color: t.$danger-text;
+  font-size: t.$text-md;
+  line-height: 1.5;
+
+  css-icon {
+    flex: none;
+    margin-top: 1px;
+  }
+}

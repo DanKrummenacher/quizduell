@@ -1,0 +1,174 @@
+// The sign-in in the design of the quiz's start page: brand bar, a white
+// symbol with a fine frame, the large title with the light blue marker, the
+// muted description and the library's field and button. Spacing on the 4/8
+// grid as on the start page: symbol → title 24, title → text 16, → form 40.
+@use '@css-ch/web-design-tokens/colors';
+@use '@css-ch/calc-design-tokens/miscs';
+@use 'screen';
+
+$blue: colors.$dt-color-darkblue-100;
+$white: colors.$dt-color-white-100;
+$light: #00a4e0;
+$ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  color: $blue;
+}
+
+// As on the start page: the content sits slightly above the middle.
+.main {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  justify-content: center;
+  padding: 32px 20px 80px;
+}
+
+.column {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: miscs.$css-ui-font-weight-bold;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+// The quiz's light blue marker under a word.
+.marked {
+  position: relative;
+  isolation: isolate;
+  white-space: nowrap;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: -0.06em;
+    bottom: 0.1em;
+    left: -0.06em;
+    z-index: -1;
+    height: 0.34em;
+    border-radius: 3px;
+    background-color: rgba($light, 0.32);
+    animation: marker 0.6s 0.4s $ease-out both;
+  }
+}
+
+.subtitle {
+  margin: 16px 0 0;
+  font-size: 20px;
+  line-height: 1.3;
+  text-wrap: balance;
+  color: screen.$muted;
+}
+
+.symbol {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 24px;
+  box-sizing: border-box;
+  border: 1px solid screen.$border;
+  border-radius: 50%;
+  background-color: $white;
+  color: $blue;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 40px;
+  text-align: left;
+
+  css-button {
+    display: block;
+  }
+}
+
+.notice {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 4px;
+  background: #e8f3fa;
+  color: #005a8f;
+  font-size: 15px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.info {
+  margin: 20px 0 0;
+  font-size: 16px;
+  color: screen.$muted;
+  text-align: center;
+}
+
+.back {
+  color: $blue;
+  text-decoration: underline;
+  text-decoration-color: rgba($blue, 0.3);
+  text-underline-offset: 3px;
+
+  &:hover {
+    text-decoration-color: $blue;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Intro as on the start page: everything rises in
+// ---------------------------------------------------------------------------
+.symbol,
+.title,
+.subtitle,
+.form,
+.info {
+  animation: rise 0.7s $ease-out both;
+}
+
+.subtitle {
+  animation-delay: 0.08s;
+}
+
+.title {
+  animation-delay: 0.05s;
+}
+
+.form,
+.info {
+  animation-delay: 0.18s;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes marker {
+  from {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .symbol,
+  .title,
+  .subtitle,
+  .form,
+  .info,
+  .marked::after {
+    animation: none;
+  }
+}

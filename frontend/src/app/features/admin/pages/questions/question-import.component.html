@@ -1,0 +1,204 @@
+<button
+  type="button"
+  class="ad-scrim"
+  aria-label="Schliessen"
+  (click)="closed.emit()"
+></button>
+<aside
+  class="ad-drawer import"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="import-title"
+>
+  <header class="ad-drawer-head">
+    <div>
+      <p class="ad-overline">CSV-Datei</p>
+      <h2 id="import-title">Fragen importieren</h2>
+    </div>
+    <button
+      type="button"
+      class="icon-btn"
+      aria-label="Schliessen"
+      appAutofocus
+      (click)="closed.emit()"
+    >
+      <css-icon icon="close" size="sm"></css-icon>
+    </button>
+  </header>
+
+  <div class="ad-drawer-body">
+    @if (!preview()) {
+      <label
+        class="drop"
+        [class.is-dragging]="dragging()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="dragging.set(false)"
+        (drop)="onDrop($event)"
+      >
+        <input type="file" accept=".csv,.txt,text/csv" (change)="onFile($event)" />
+        <span class="drop-icon"
+          ><css-icon icon="upload-document" size="md"></css-icon
+        ></span>
+        <b>CSV-Datei wählen oder hierher ziehen</b>
+        <span class="ad-muted">Aus Excel: «Speichern unter» → «CSV UTF-8»</span>
+      </label>
+
+      @if (error(); as text) {
+        <p class="error" role="alert">
+          <css-icon icon="priority-warning" size="sm"></css-icon>{{ text }}
+        </p>
+      }
+
+      <section class="format">
+        <h3>So sieht die Datei aus</h3>
+        <p class="ad-muted">
+          Eine Zeile pro Frage, die Spalten mit Überschrift. «Richtig» ist A, B, C
+          oder D. «Kategorie» und «Aktiv» (ja/nein) sind freiwillig. Jede Zeile wird
+          vor dem Import geprüft – es wird nichts gespeichert, bevor du bestätigst.
+        </p>
+        <div class="sample" aria-hidden="true">
+          <span>Frage</span><span>Antwort A–D</span><span>Richtig</span
+          ><span>Kategorie</span> <span>Wie viele Kantone hat die Schweiz?</span
+          ><span>26 · 23 · 20 · 24</span><span>A</span><span>Schweiz</span>
+        </div>
+        <button type="button" class="btn-secondary" (click)="downloadTemplate()">
+          <css-icon icon="download" size="xs"></css-icon>Vorlage herunterladen
+        </button>
+      </section>
+    } @else if (preview()?.error; as text) {
+      <div class="file">
+        <css-icon icon="file" size="sm"></css-icon><b>{{ fileName() }}</b>
+        <button type="button" class="btn-ghost btn-sm" (click)="reset()">
+          Andere Datei
+        </button>
+      </div>
+      <p class="error" role="alert">
+        <css-icon icon="priority-warning" size="sm"></css-icon>{{ text }}
+      </p>
+      <button type="button" class="btn-secondary" (click)="downloadTemplate()">
+        <css-icon icon="download" size="xs"></css-icon>Vorlage herunterladen
+      </button>
+    } @else {
+      <div class="file">
+        <css-icon icon="file" size="sm"></css-icon><b>{{ fileName() }}</b>
+        <span class="ad-muted">{{ formatInt(summary().total) }} Zeilen</span>
+        <button type="button" class="btn-ghost btn-sm" (click)="reset()">
+          Andere Datei
+        </button>
+      </div>
+
+      <div class="counts">
+        <span class="count ok"
+          ><b>{{ formatInt(summary().ready) }}</b> bereit</span
+        >
+        @if (summary().invalid) {
+          <span class="count bad"
+            ><b>{{ formatInt(summary().invalid) }}</b> mit Fehler</span
+          >
+        }
+        @if (summary().duplicates) {
+          <span class="count dup"
+            ><b>{{ formatInt(summary().duplicates) }}</b> schon vorhanden</span
+          >
+        }
+      </div>
+
+      @if (summary().duplicates) {
+        <label class="check">
+          <input
+            type="checkbox"
+            [checked]="skipDuplicates()"
+            (change)="onSkip($event)"
+          />
+          Fragen, die es schon gibt, überspringen
+        </label>
+      }
+      @if (summary().invalid) {
+        <p class="ad-muted note">Zeilen mit Fehler werden nicht importiert.</p>
+      }
+
+      <div class="ad-table-wrap rows">
+        <table class="ad-table">
+          <thead>
+            <tr>
+              <th scope="col" class="num">Zeile</th>
+              <th scope="col">Frage</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.line) {
+              <tr [attr.data-status]="row.status">
+                <td class="num ad-muted">{{ row.line }}</td>
+                <td>
+                  <span class="row-text">{{ row.question.text || '–' }}</span>
+                  @if (!row.problem) {
+                    <span class="row-meta"
+                      >Richtig: {{ row.question.options[row.question.correctIndex] }}
+                      @if (row.question.category) {
+                        · {{ row.question.category }}
+                      }
+                      @if (!row.question.active) {
+                        · pausiert
+                      }
+                    </span>
+                  }
+                </td>
+                <td class="status">
+                  @switch (row.status) {
+                    @case ('error') {
+                      <span class="badge danger">Fehler</span>
+                      <span class="problem">{{ row.problem }}</span>
+                    }
+                    @case ('skip') {
+                      <span class="badge">Übersprungen</span>
+                    }
+                    @case ('duplicate') {
+                      <span class="badge warning">Doppelt</span>
+                    }
+                    @default {
+                      <span class="badge success">Bereit</span>
+                    }
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (hiddenRows()) {
+        <p class="ad-muted note">
+          … und {{ formatInt(hiddenRows()) }} weitere Zeilen.
+        </p>
+      }
+
+      @if (error(); as text) {
+        <p class="error" role="alert">
+          <css-icon icon="priority-warning" size="sm"></css-icon>{{ text }}
+        </p>
+      }
+    }
+  </div>
+
+  <footer class="ad-drawer-foot">
+    <button type="button" class="btn-secondary" (click)="closed.emit()">
+      Abbrechen
+    </button>
+    @if (preview() && !preview()?.error) {
+      <button
+        type="button"
+        class="btn-primary"
+        [disabled]="!summary().ready || busy()"
+        (click)="import()"
+      >
+        @if (busy()) {
+          Importiert…
+        } @else {
+          {{ formatInt(summary().ready) }}
+          {{ summary().ready === 1 ? 'Frage' : 'Fragen' }}
+          importieren
+        }
+      </button>
+    }
+  </footer>
+</aside>

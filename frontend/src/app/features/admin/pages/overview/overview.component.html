@@ -1,0 +1,353 @@
+<main class="ad-page">
+  <header class="ad-page-head">
+    <div>
+      <h1>Übersicht</h1>
+      <p>
+        @if (range() === 7) {
+          Die letzten 7 Tage im Vergleich zur Woche davor.
+        } @else {
+          Die letzten 30 Tage im Vergleich zu den 30 Tagen davor.
+        }
+      </p>
+    </div>
+    <div class="ad-segmented" role="group" aria-label="Zeitraum">
+      <button
+        type="button"
+        [class.is-active]="range() === 7"
+        [attr.aria-pressed]="range() === 7"
+        (click)="setRange(7)"
+      >
+        7 Tage
+      </button>
+      <button
+        type="button"
+        [class.is-active]="range() === 30"
+        [attr.aria-pressed]="range() === 30"
+        (click)="setRange(30)"
+      >
+        30 Tage
+      </button>
+    </div>
+  </header>
+
+  @if (critical(); as hint) {
+    <div class="alert" role="alert">
+      <css-icon icon="priority-warning" size="md"></css-icon>
+      <div>
+        <p class="alert-title">Duelle können gerade nicht starten</p>
+        <p>
+          Nur {{ formatInt(hint.value) }} aktive Fragen, ein Duell braucht
+          {{ formatInt(hint.sample) }}. Die Startseite zeigt einen Hinweis statt der
+          Spielmodi.
+        </p>
+      </div>
+      <a class="btn-primary" routerLink="/admin/fragen">Fragen öffnen</a>
+    </div>
+  }
+
+  @if (analytics.error() && !analytics.value()) {
+    <app-ad-state
+      kind="error"
+      [text]="analytics.error()"
+      (retry)="analytics.reload()"
+    />
+  } @else {
+    <section class="kpis" aria-label="Kennzahlen">
+      @if (kpis(); as k) {
+        <app-ad-kpi
+          label="Gespielte Duelle"
+          [value]="k.games.value"
+          [delta]="k.games.delta"
+          [trend]="k.games.trend"
+          [note]="k.games.note"
+        />
+        <app-ad-kpi
+          label="Zu Ende gespielt"
+          [value]="k.completion.value"
+          [delta]="k.completion.delta"
+          [points]="true"
+          [trend]="k.completion.trend"
+          [range]="[0, 1]"
+          [note]="k.completion.note"
+        />
+        <app-ad-kpi
+          label="Richtige Antworten"
+          [value]="k.accuracy.value"
+          [delta]="k.accuracy.delta"
+          [points]="true"
+          [good]="null"
+          [trend]="k.accuracy.trend"
+          [range]="[0, 1]"
+          [note]="k.accuracy.note"
+        />
+        <app-ad-kpi
+          label="Ø Dauer eines Duells"
+          [value]="k.duration.value"
+          [delta]="k.duration.delta"
+          [good]="null"
+          [note]="k.duration.note"
+        />
+      } @else {
+        @for (n of [1, 2, 3, 4]; track n) {
+          <div class="ad-card"><app-ad-state kind="loading" [lines]="3" /></div>
+        }
+      }
+    </section>
+
+    <div class="ad-grid">
+      <section class="ad-card span-8">
+        <header class="ad-card-head">
+          <div>
+            <h2>Duelle pro Tag</h2>
+            <p>Zu Ende gespielte Duelle, grau die Vorperiode</p>
+          </div>
+          <a class="ad-more" routerLink="/admin/auswertung"
+            >Auswertung<css-icon icon="arrow-right" size="xs"></css-icon
+          ></a>
+        </header>
+        @if (chart(); as c) {
+          @if (c.empty) {
+            <app-ad-state
+              kind="empty"
+              icon="statistic"
+              title="Noch keine Duelle in diesem Zeitraum"
+              text="Sobald gespielt wird, erscheint hier der Verlauf pro Tag."
+            />
+          } @else {
+            <app-ad-line-chart
+              [values]="c.values"
+              [compare]="c.compare"
+              [labels]="c.labels"
+              [labelEvery]="c.every"
+              [height]="232"
+              unit="Duelle"
+              ariaLabel="Zu Ende gespielte Duelle pro Tag"
+            />
+          }
+        } @else {
+          <app-ad-state kind="loading" [lines]="6" />
+        }
+      </section>
+
+      <section class="ad-card span-4 live">
+        <header class="ad-card-head">
+          <div>
+            <h2>Jetzt</h2>
+            <p>
+              @if (live(); as l) {
+                Stand {{ l.updated }}
+              } @else {
+                Wird geladen
+              }
+            </p>
+          </div>
+          <a class="ad-more" routerLink="/admin/live"
+            >Live<css-icon icon="arrow-right" size="xs"></css-icon
+          ></a>
+        </header>
+        @if (live(); as l) {
+          <p class="live-now">
+            <span
+              class="pulse"
+              [class.idle]="l.duels === 0"
+              aria-hidden="true"
+            ></span>
+            <b>{{ l.duels }}</b>
+            {{ l.duels === 1 ? 'Duell läuft' : 'Duelle laufen' }}
+          </p>
+          <app-ad-sparkline class="live-spark" [values]="l.history" [height]="44" />
+          <p class="live-caption">
+            Letzte 60 Minuten
+            @if (l.peak) {
+              · Höchststand {{ l.peak.games }} ({{ formatRelative(l.peak.at) }})
+            }
+          </p>
+          <dl class="facts">
+            <div>
+              <dt>Im Duell</dt>
+              <dd>{{ l.players }}</dd>
+            </div>
+            <div>
+              <dt>Suchen Gegner</dt>
+              <dd>{{ l.searching }}</dd>
+            </div>
+            <div>
+              <dt>Warten mit Code</dt>
+              <dd>{{ l.waiting }}</dd>
+            </div>
+          </dl>
+        } @else {
+          <app-ad-state kind="loading" [lines]="5" />
+        }
+      </section>
+
+      <section class="ad-card span-4">
+        <header class="ad-card-head">
+          <div>
+            <h2>Hinweise</h2>
+            <p>Was Aufmerksamkeit braucht</p>
+          </div>
+          <a class="ad-more" routerLink="/admin/hinweise"
+            >Alle<css-icon icon="arrow-right" size="xs"></css-icon
+          ></a>
+        </header>
+        @if (data.hints.value()) {
+          <ul class="hints">
+            @for (item of hints(); track item.hint.key) {
+              <li>
+                <a
+                  class="hint"
+                  routerLink="/admin/hinweise"
+                  [queryParams]="{ hinweis: item.hint.key }"
+                >
+                  <span class="sev" [attr.data-severity]="item.hint.severity">{{
+                    severityLabels[item.hint.severity]
+                  }}</span>
+                  <span class="hint-title">{{ item.text.title }}</span>
+                  @if (item.hint.questionId) {
+                    <span class="hint-meta">F-{{ item.hint.questionId }}</span>
+                  }
+                </a>
+              </li>
+            } @empty {
+              <li>
+                <app-ad-state
+                  kind="empty"
+                  icon="checkmark-circle"
+                  title="Alles in Ordnung"
+                  text="Keine Frage fällt gerade auf."
+                />
+              </li>
+            }
+          </ul>
+        } @else if (data.hints.error()) {
+          <app-ad-state
+            kind="error"
+            [text]="data.hints.error()"
+            (retry)="data.hints.reload()"
+          />
+        } @else {
+          <app-ad-state kind="loading" [lines]="4" />
+        }
+      </section>
+
+      <section class="ad-card span-4">
+        <header class="ad-card-head">
+          <div>
+            <h2>Fragen</h2>
+            <p>
+              @if (catalog(); as c) {
+                {{ formatInt(c.active) }} aktiv · {{ formatInt(c.paused) }} pausiert
+              } @else {
+                Wird geladen
+              }
+            </p>
+          </div>
+          <a class="ad-more" routerLink="/admin/fragen"
+            >Verwalten<css-icon icon="arrow-right" size="xs"></css-icon
+          ></a>
+        </header>
+        @if (catalog(); as c) {
+          @if (c.total === 0) {
+            <app-ad-state
+              kind="empty"
+              icon="items-list"
+              title="Noch keine Fragen"
+              text="Fragen erfassen oder aus einer CSV-Datei importieren."
+            />
+          } @else {
+            <p class="ad-overline">Aktive Fragen nach Kategorie</p>
+            <ul class="bars">
+              @for (category of c.categories; track category.name) {
+                <li>
+                  <span class="bar-label">{{ category.name }}</span>
+                  <span class="bar-value">{{ category.count }}</span>
+                  <span class="bar"
+                    ><span [style.width.%]="category.width"></span
+                  ></span>
+                </li>
+              }
+            </ul>
+          }
+        } @else if (data.questions.error()) {
+          <app-ad-state
+            kind="error"
+            [text]="data.questions.error()"
+            (retry)="data.questions.reload()"
+          />
+        } @else {
+          <app-ad-state kind="loading" [lines]="5" />
+        }
+      </section>
+
+      <section class="ad-card span-4">
+        <header class="ad-card-head">
+          <div>
+            <h2>Spielregeln</h2>
+            <p>
+              @if (rules(); as r) {
+                @if (r.updatedAt) {
+                  Geändert {{ formatRelative(r.updatedAt) }}
+                } @else {
+                  Noch nie geändert
+                }
+              } @else {
+                Wird geladen
+              }
+            </p>
+          </div>
+          <a class="ad-more" routerLink="/admin/regeln"
+            >Ändern<css-icon icon="arrow-right" size="xs"></css-icon
+          ></a>
+        </header>
+        @if (rules(); as r) {
+          <dl class="rules">
+            @for (item of r.items; track item.label) {
+              <div>
+                <dt>{{ item.label }}</dt>
+                <dd>{{ item.value }}</dd>
+              </div>
+            }
+          </dl>
+          <p class="ad-card-foot">
+            <span
+              >Ein Duell dauert typisch {{ r.typical }}, höchstens {{ r.max }}</span
+            >
+          </p>
+        } @else {
+          <app-ad-state kind="loading" [lines]="6" />
+        }
+      </section>
+
+      <section class="ad-card flush span-12">
+        <header class="ad-card-head">
+          <div>
+            <h2>Letzte Änderungen</h2>
+            <p>Was im Admin geändert wurde</p>
+          </div>
+          <a class="ad-more" routerLink="/admin/verlauf"
+            >Verlauf<css-icon icon="arrow-right" size="xs"></css-icon
+          ></a>
+        </header>
+        @if (audit.value(); as page) {
+          <ul class="audit">
+            @for (entry of page.entries; track entry.id) {
+              <li>
+                <span class="audit-text">{{ entry.summary }}</span>
+                <time [attr.datetime]="entry.at">{{
+                  formatRelative(entry.at)
+                }}</time>
+              </li>
+            } @empty {
+              <li class="audit-empty">Noch keine Änderungen.</li>
+            }
+          </ul>
+        } @else {
+          <div class="audit-loading">
+            <app-ad-state kind="loading" [lines]="3" />
+          </div>
+        }
+      </section>
+    </div>
+  }
+</main>

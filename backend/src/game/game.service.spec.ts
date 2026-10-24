@@ -15,9 +15,27 @@ import {
 } from './game.types.js';
 
 const QUESTIONS: GameQuestion[] = [
-  { id: 1, text: 'Q1', options: ['a', 'b', 'c', 'd'], correctIndex: 0 },
-  { id: 2, text: 'Q2', options: ['a', 'b', 'c', 'd'], correctIndex: 1 },
-  { id: 3, text: 'Q3', options: ['a', 'b', 'c', 'd'], correctIndex: 2 },
+  {
+    id: 1,
+    text: 'Q1',
+    options: ['a', 'b', 'c', 'd'],
+    correctIndex: 0,
+    order: [0, 1, 2, 3],
+  },
+  {
+    id: 2,
+    text: 'Q2',
+    options: ['a', 'b', 'c', 'd'],
+    correctIndex: 1,
+    order: [0, 1, 2, 3],
+  },
+  {
+    id: 3,
+    text: 'Q3',
+    options: ['a', 'b', 'c', 'd'],
+    correctIndex: 2,
+    order: [0, 1, 2, 3],
+  },
 ];
 
 const SETTINGS: GameSettings = {
@@ -297,7 +315,13 @@ describe('GameService', () => {
       expect(state.you.score).toBe(600);
       expect(state.opponent?.score).toBe(0);
       expect(state.rematch).toBe('open');
-      expect(ctx.statsService.recordGame).toHaveBeenCalledWith('friend', 3);
+      expect(ctx.statsService.recordGame).toHaveBeenCalledWith(
+        expect.objectContaining({
+          mode: 'friend',
+          status: 'finished',
+          questionsPlayed: 3,
+        }),
+      );
       expect(ctx.questionsService.recordResults).toHaveBeenCalledTimes(3);
     });
   });

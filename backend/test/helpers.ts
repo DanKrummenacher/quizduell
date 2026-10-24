@@ -26,6 +26,7 @@ export async function startTestApp(
     corsOrigins: ['http://localhost:4200'],
     seedSampleQuestions: false,
     testControl: true,
+    adminPassword: 'test-admin-password',
     ...overrides,
   };
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })

@@ -1,5 +1,16 @@
-import { Injectable, Logger, type OnApplicationShutdown } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  type OnApplicationShutdown,
+  type OnModuleInit,
+} from '@nestjs/common';
 import { randomBytes, randomUUID } from 'node:crypto';
+import type {
+  LiveDuel,
+  LiveEvent,
+  LiveSample,
+  LiveSnapshot,
+} from '../contracts/admin.contract.js';
 import type {
   EndReason,
   GameMode,
@@ -8,6 +19,7 @@ import type {
   RematchStatus,
 } from '../contracts/game.contract.js';
 import {
+  type GameQuestion,
   QuestionsService,
   type QuestionResult,
 } from '../questions/questions.service.js';
@@ -19,6 +31,9 @@ import {
   COUNTDOWN_MS,
   DISCONNECT_GRACE_MS,
   LEAVE_GRACE_MS,
+  LIVE_EVENT_LIMIT,
+  LIVE_HISTORY_MINUTES,
+  LIVE_SAMPLE_MS,
   GameError,
   MAX_SPEED_BONUS,
   SESSION_RETENTION_MS,
@@ -26,12 +41,14 @@ import {
   type GameNotifier,
   type LiveStats,
   type Player,
+  type RoundRecord,
   type Session,
 } from './game.types.js';
 
 interface QueueEntry {
   socketId: string;
   name: string;
+  since: number;
 }
 
 const RUNNING_PHASES = new Set(['countdown', 'question', 'reveal']);
@@ -41,7 +58,7 @@ const RUNNING_PHASES = new Set(['countdown', 'question', 'reveal']);
  * the gateway only translates socket messages into calls on this service.
  */
 @Injectable()
-export class GameService implements OnApplicationShutdown {
+export class GameService implements OnModuleInit, OnApplicationShutdown {
   private readonly logger = new Logger(GameService.name);
   private readonly sessions = new Map<string, Session>();
   private readonly socketToPlayer = new Map<string, string>();
@@ -49,6 +66,12 @@ export class GameService implements OnApplicationShutdown {
   private readonly tokens = new Map<string, string>();
   private queue: QueueEntry[] = [];
   private notifier: GameNotifier | null = null;
+  private readonly startedAt = Date.now();
+  private events: LiveEvent[] = [];
+  private eventId = 0;
+  private history: LiveSample[] = [];
+  private peak: { games: number; at: number } | null = null;
+  private sampler: NodeJS.Timeout | null = null;
 
   constructor(
     private readonly questionsService: QuestionsService,
@@ -60,7 +83,15 @@ export class GameService implements OnApplicationShutdown {
     this.notifier = notifier;
   }
 
+  onModuleInit(): void {
+    this.sampler = setInterval(() => this.sample(), LIVE_SAMPLE_MS);
+    this.sampler.unref();
+  }
+
   onApplicationShutdown(): void {
+    if (this.sampler) {
+      clearInterval(this.sampler);
+    }
     for (const session of this.sessions.values()) {
       this.clearTimers(session);
     }
@@ -79,8 +110,12 @@ export class GameService implements OnApplicationShutdown {
     const session = this.createSession('friend');
     this.addPlayer(session, socketId, name);
     session.phase = 'waiting';
-    this.setTimer(session, WAITING_TIMEOUT_MS, () => this.removeSession(session));
+    this.setTimer(session, WAITING_TIMEOUT_MS, () => {
+      this.event(session, 'expired');
+      this.removeSession(session);
+    });
     this.logger.log(`Friend game ${session.code} created`);
+    this.event(session, 'created');
     this.broadcast(session);
   }
 
@@ -99,6 +134,7 @@ export class GameService implements OnApplicationShutdown {
     this.leaveEverything(socketId);
     this.addPlayer(session, socketId, name);
     this.logger.log(`Player joined friend game ${session.code}`);
+    this.event(session, 'joined');
     this.startCountdown(session);
   }
 
@@ -113,7 +149,7 @@ export class GameService implements OnApplicationShutdown {
 
     const opponent = this.queue.shift();
     if (!opponent) {
-      this.queue.push({ socketId, name });
+      this.queue.push({ socketId, name, since: Date.now() });
       return 'queued';
     }
 
@@ -121,6 +157,7 @@ export class GameService implements OnApplicationShutdown {
     this.addPlayer(session, opponent.socketId, opponent.name);
     this.addPlayer(session, socketId, name);
     this.logger.log(`Quick game ${session.code} matched`);
+    this.event(session, 'matched');
     this.startCountdown(session);
     return 'matched';
   }
@@ -252,6 +289,129 @@ export class GameService implements OnApplicationShutdown {
     return { activeGames, playersInGames, playersSearching: this.queue.length };
   }
 
+  /** Everything the admin shows on its live page. */
+  getLiveSnapshot(): LiveSnapshot {
+    const now = Date.now();
+    const duels: LiveDuel[] = [];
+    const waiting: LiveSnapshot['waiting'] = [];
+    for (const session of this.sessions.values()) {
+      if (session.phase === 'waiting') {
+        waiting.push({
+          code: session.code,
+          name: session.players[0]?.name ?? '',
+          since: session.phaseStartedAt,
+        });
+      } else if (
+        RUNNING_PHASES.has(session.phase) ||
+        (session.phase === 'finished' && session.phaseEndsAt !== null)
+      ) {
+        duels.push(this.toLiveDuel(session));
+      }
+    }
+    duels.sort((a, b) => a.startedAt - b.startedAt);
+    return {
+      serverNow: now,
+      since: this.startedAt,
+      duels,
+      searching: this.queue.map((entry) => ({
+        name: entry.name,
+        since: entry.since,
+      })),
+      waiting: waiting.sort((a, b) => a.since - b.since),
+      events: [...this.events].reverse(),
+      history: this.historyWindow(now),
+      peak: this.peak,
+    };
+  }
+
+  private toLiveDuel(session: Session): LiveDuel {
+    const people = [...session.players, ...session.departed];
+    const question =
+      session.phase === 'question' || session.phase === 'reveal'
+        ? session.questions[session.questionIndex]
+        : undefined;
+    return {
+      code: session.code,
+      mode: session.mode,
+      phase: session.phase,
+      players: people.map((player) => ({
+        name: player.name,
+        score: player.score,
+        connected: player.socketId !== null,
+        answered: player.answerIndex !== null,
+      })),
+      questionNumber: Math.min(
+        session.questionIndex + 1,
+        Math.max(session.questions.length, 1),
+      ),
+      totalQuestions: session.questions.length || session.settings.questionsPerGame,
+      currentQuestion: question?.text ?? null,
+      phaseEndsAt: session.phaseEndsAt,
+      startedAt: session.startedAt,
+      rematch: session.rematch,
+      rounds: session.rounds.map((round) => ({
+        questionId: round.questionId,
+        text: round.text,
+        options: round.options,
+        correctIndex: round.correctIndex,
+        answers: people.map(
+          (player) =>
+            round.answers.get(player.id) ?? { index: null, ms: null, points: 0 },
+        ),
+      })),
+    };
+  }
+
+  /** The last hour, one sample per minute, gaps filled with zero. */
+  private historyWindow(now: number): LiveSample[] {
+    const minute = Math.floor(now / 60_000) * 60_000;
+    const byMinute = new Map(this.history.map((sample) => [sample.at, sample]));
+    const samples: LiveSample[] = [];
+    for (let i = LIVE_HISTORY_MINUTES - 1; i >= 0; i--) {
+      const at = minute - i * 60_000;
+      samples.push(byMinute.get(at) ?? { at, games: 0, players: 0 });
+    }
+    return samples;
+  }
+
+  /** Keeps the highest load of each minute. */
+  private sample(): void {
+    const now = Date.now();
+    const at = Math.floor(now / 60_000) * 60_000;
+    const { activeGames, playersInGames } = this.getLiveStats();
+    const last = this.history.at(-1);
+    if (last?.at === at) {
+      last.games = Math.max(last.games, activeGames);
+      last.players = Math.max(last.players, playersInGames);
+    } else {
+      this.history.push({ at, games: activeGames, players: playersInGames });
+      const oldest = at - LIVE_HISTORY_MINUTES * 60_000;
+      this.history = this.history.filter((sample) => sample.at > oldest);
+    }
+    if (activeGames > 0 && activeGames > (this.peak?.games ?? 0)) {
+      this.peak = { games: activeGames, at: now };
+    }
+  }
+
+  private event(
+    session: Session,
+    kind: LiveEvent['kind'],
+    extra: Pick<LiveEvent, 'scores' | 'reason'> = {},
+  ): void {
+    this.events.push({
+      id: ++this.eventId,
+      at: Date.now(),
+      kind,
+      code: session.code,
+      mode: session.mode,
+      names: [...session.players, ...session.departed].map((player) => player.name),
+      ...extra,
+    });
+    if (this.events.length > LIVE_EVENT_LIMIT) {
+      this.events = this.events.slice(-LIVE_EVENT_LIMIT);
+    }
+  }
+
   /** Builds the personalised snapshot for one player. */
   buildView(session: Session, player: Player): GameStateView {
     const opponent =
@@ -348,6 +508,8 @@ export class GameService implements OnApplicationShutdown {
     session.departed = [];
     session.lastReveal = null;
     session.endReason = null;
+    session.startedAt = Date.now();
+    session.rounds = [];
     this.enterPhase(session, 'countdown', COUNTDOWN_MS, () =>
       this.startQuestion(session),
     );
@@ -388,6 +550,13 @@ export class GameService implements OnApplicationShutdown {
     const durationMs = session.settings.questionDurationSec * 1000;
     const answers = new Map<string, number | null>();
     const points = new Map<string, number>();
+    const round: RoundRecord = {
+      questionId: question.id,
+      text: question.text,
+      options: question.options,
+      correctIndex: question.correctIndex,
+      answers: new Map(),
+    };
 
     for (const player of session.players) {
       const correct = player.answerIndex === question.correctIndex;
@@ -398,10 +567,16 @@ export class GameService implements OnApplicationShutdown {
       player.lastPoints = earned;
       answers.set(player.id, player.answerIndex);
       points.set(player.id, earned);
+      round.answers.set(player.id, {
+        index: player.answerIndex,
+        ms: player.answerIndex === null ? null : player.answerTimeMs,
+        points: earned,
+      });
     }
 
     session.lastReveal = { correctIndex: question.correctIndex, answers, points };
-    this.recordQuestionResult(session, question.id, answers, question.correctIndex);
+    session.rounds.push(round);
+    this.recordQuestionResult(session, question);
 
     const isLast = session.questionIndex >= session.questions.length - 1;
     this.enterPhase(
@@ -420,7 +595,10 @@ export class GameService implements OnApplicationShutdown {
   }
 
   private finish(session: Session): void {
-    void this.statsService.recordGame(session.mode, session.questions.length);
+    this.recordGame(session, 'finished');
+    this.event(session, 'finished', {
+      scores: session.players.map((player) => player.score),
+    });
     // Both modes offer a rematch against the same opponent for a while.
     this.openRematchWindow(session);
   }
@@ -441,11 +619,15 @@ export class GameService implements OnApplicationShutdown {
 
   private restart(session: Session): void {
     this.logger.log(`Rematch in game ${session.code}`);
+    session.rematch = true;
+    this.event(session, 'rematch');
     this.startCountdown(session);
   }
 
   private abort(session: Session, reason: EndReason): void {
     session.endReason = reason;
+    this.recordGame(session, 'aborted');
+    this.event(session, 'aborted', { reason });
     this.enterPhase(session, 'aborted', null, null);
     this.setTimer(session, SESSION_RETENTION_MS, () => this.removeSession(session));
   }
@@ -493,6 +675,9 @@ export class GameService implements OnApplicationShutdown {
       timer: null,
       lastReveal: null,
       generation: 0,
+      startedAt: Date.now(),
+      rematch: false,
+      rounds: [],
     };
     this.sessions.set(session.code, session);
     return session;
@@ -672,20 +857,40 @@ export class GameService implements OnApplicationShutdown {
     };
   }
 
-  private recordQuestionResult(
-    session: Session,
-    questionId: number,
-    answers: Map<string, number | null>,
-    correctIndex: number,
-  ): void {
-    const values = [...answers.values()].filter((answer) => answer !== null);
+  private recordGame(session: Session, status: 'finished' | 'aborted'): void {
+    const people = [...session.players, ...session.departed];
+    void this.statsService.recordGame({
+      mode: session.mode,
+      status,
+      endReason: status === 'aborted' ? session.endReason : null,
+      questionCount: session.questions.length || session.settings.questionsPerGame,
+      questionsPlayed: session.rounds.length,
+      rematch: session.rematch,
+      durationMs: Date.now() - session.startedAt,
+      scores: people.map((player) => player.score),
+    });
+  }
+
+  /** Counts picks in the stored order of the question, not the shuffled one. */
+  private recordQuestionResult(session: Session, question: GameQuestion): void {
     const result: QuestionResult = {
-      questionId,
-      answers: values.length,
-      correctAnswers: values.filter((answer) => answer === correctIndex).length,
+      questionId: question.id,
+      picks: question.options.map(() => 0),
+      correct: 0,
+      timeouts: 0,
+      answerMsTotal: 0,
     };
-    if (result.answers === 0) {
-      return;
+    for (const player of session.players) {
+      if (player.answerIndex === null) {
+        result.timeouts++;
+        continue;
+      }
+      const stored = question.order[player.answerIndex] ?? player.answerIndex;
+      result.picks[stored] = (result.picks[stored] ?? 0) + 1;
+      result.answerMsTotal += player.answerTimeMs ?? 0;
+      if (player.answerIndex === question.correctIndex) {
+        result.correct++;
+      }
     }
     this.questionsService.recordResults([result]).catch((error: unknown) => {
       this.logger.error(

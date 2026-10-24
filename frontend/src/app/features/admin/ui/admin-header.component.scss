@@ -1,0 +1,457 @@
+// The quiz's bar as the admin's top bar. Every control is 36px high with an
+// 8px radius – the hover, the active pill, the search and the icons – and the
+// areas keep 4px between each other. data-fit narrows the bar step by step
+// (see AdminHeaderComponent.fit()).
+@use '../styles/tokens' as t;
+
+$h: 36px;
+$edge: linear-gradient(90deg, t.$brand, #0078bb 45%, #00a4e0);
+$spring: cubic-bezier(0.3, 1.2, 0.4, 1);
+
+// No box of its own, so the bar sticks to the whole page.
+:host {
+  display: contents;
+}
+
+css-icon {
+  display: inline-flex;
+  flex: none;
+}
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 4px solid transparent;
+  background:
+    linear-gradient(t.$brand, t.$brand) padding-box,
+    $edge border-box;
+  box-shadow: 0 4px 14px rgba(0, 50, 125, 0.16);
+  color: #fff;
+  font-family: t.$font;
+
+  // The admin's navy focus ring would vanish on navy.
+  :focus-visible {
+    outline-color: #fff;
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  max-width: 1360px;
+  height: 64px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+// -----------------------------------------------------------------------------
+// Logo: the mark with the lock of the sign-in, and the word mark
+// -----------------------------------------------------------------------------
+
+.brand {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  margin-right: 32px;
+  border-radius: 6px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.logo {
+  position: relative;
+  display: inline-flex;
+}
+
+.mark {
+  width: 26px;
+  height: 26px;
+}
+
+.lock {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 2px t.$brand;
+  color: t.$brand;
+
+  css-icon {
+    transform: scale(0.62);
+  }
+}
+
+.word {
+  font-size: 18px;
+  font-weight: t.$bold;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.light {
+  font-weight: t.$regular;
+}
+
+// -----------------------------------------------------------------------------
+// Areas
+// -----------------------------------------------------------------------------
+
+.nav {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-self: stretch;
+  // Keeps air to the search, also when the row is just wide enough.
+  margin-right: 16px;
+}
+
+.group {
+  display: flex;
+  gap: 4px;
+
+  & + & {
+    position: relative;
+    margin-left: 8px;
+    padding-left: 8px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: calc(50% - 8px);
+      left: 0;
+      width: 1px;
+      height: 16px;
+      background: rgba(255, 255, 255, 0.18);
+    }
+  }
+}
+
+.item {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: t.$text-md;
+  font-weight: t.$medium;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+
+  // Hover: the same pill as the active area, fainter.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: calc(50% - #{$h} / 2) 0;
+    z-index: -1;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover {
+    color: #fff;
+  }
+
+  &:hover:not(.is-active)::after {
+    opacity: 1;
+  }
+
+  &.is-active {
+    color: #fff;
+  }
+
+  &:focus-visible {
+    outline-offset: -2px;
+  }
+}
+
+// The pill under the active area slides to the next one.
+.pill {
+  position: absolute;
+  top: calc(50% - #{$h} / 2);
+  left: 0;
+  width: var(--w);
+  height: $h;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  transform: translateX(var(--l));
+  transition:
+    transform 0.45s $spring,
+    width 0.45s $spring;
+}
+
+// A mark: a coloured dot and a word or number on glass.
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  padding: 0 7px 0 6px;
+  border-radius: t.$radius-pill;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 10px;
+  font-weight: t.$bold;
+  line-height: 1;
+
+  i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--c);
+  }
+
+  &[data-tone='alert'] {
+    --c: #ff7a61;
+  }
+
+  &[data-tone='warn'] {
+    --c: #ffc233;
+  }
+
+  &[data-tone='new'] {
+    --c: #7fd8ff;
+  }
+
+  &[data-tone='live'] {
+    --c: #2ee6a6;
+
+    i {
+      animation: pulse 2s ease-in-out infinite;
+    }
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Search and actions
+// -----------------------------------------------------------------------------
+
+.search {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 10px;
+  width: 220px;
+  height: $h;
+  margin-left: auto;
+  padding: 0 8px 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.62);
+  font-size: t.$text-base;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.11);
+    color: rgba(255, 255, 255, 0.88);
+  }
+
+  span {
+    flex: 1;
+    text-align: left;
+  }
+
+  kbd {
+    padding: 2px 5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: t.$medium;
+    line-height: 1;
+  }
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+.icon-btn,
+.menu-btn {
+  display: grid;
+  place-items: center;
+  width: $h;
+  height: $h;
+  flex: none;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+}
+
+.menu-btn {
+  display: none;
+  margin-left: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.lines {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+
+  i {
+    display: block;
+    width: 16px;
+    height: 1.5px;
+    border-radius: 1px;
+    background: currentColor;
+
+    &:last-child {
+      width: 10px;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Steps
+// -----------------------------------------------------------------------------
+
+// 1 and narrower: the search is a button of the same size as the icons.
+.bar:not([data-fit='0']) .search {
+  width: $h;
+  padding: 0;
+  justify-content: center;
+
+  span,
+  kbd {
+    display: none;
+  }
+}
+
+// 2–3: names without icons.
+.bar:is([data-fit='2'], [data-fit='3']) .item-icon {
+  display: none;
+}
+
+// 3–4: a little less air.
+.bar:is([data-fit='3'], [data-fit='4']) {
+  .brand {
+    margin-right: 20px;
+  }
+
+  .item {
+    padding: 0 10px;
+  }
+
+  .group + .group {
+    margin-left: 4px;
+    padding-left: 4px;
+  }
+}
+
+// 4: icons only; a mark shrinks to a dot on the icon.
+.bar[data-fit='4'] {
+  .item {
+    width: $h + 4px;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .label {
+    display: none;
+  }
+
+  .chip {
+    position: absolute;
+    top: calc(50% - 11px);
+    left: calc(50% + 3px);
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    overflow: hidden;
+    background: var(--c);
+    box-shadow: 0 0 0 2px t.$brand;
+    font-size: 0;
+
+    i {
+      display: none;
+    }
+  }
+}
+
+// 5: phone – logo, search and the button that opens the sheet.
+.bar[data-fit='5'] {
+  .row {
+    padding: 0 16px;
+  }
+
+  .brand {
+    margin-right: 12px;
+  }
+
+  .nav,
+  .actions {
+    display: none;
+  }
+
+  .menu-btn {
+    display: grid;
+  }
+
+  // Right-aligned beside the menu; below 140px it falls back to the button.
+  &[data-search='full'] .search {
+    flex: 0 1 180px;
+    width: auto;
+    min-width: 140px;
+    margin-left: auto;
+    padding: 0 12px;
+    justify-content: flex-start;
+
+    span {
+      display: inline;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill {
+    transition: none;
+  }
+
+  .chip[data-tone='live'] i {
+    animation: none;
+  }
+}

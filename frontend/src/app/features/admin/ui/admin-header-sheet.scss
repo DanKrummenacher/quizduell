@@ -1,0 +1,211 @@
+// Phones: every area, the game and the sign-out in a sheet from below.
+@use '../styles/tokens' as t;
+
+$ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(0, 20, 50, 0.45);
+  animation: fade 0.25s ease both;
+}
+
+.sheet {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 71;
+  max-width: 560px;
+  max-height: 86dvh;
+  margin: 0 auto;
+  padding: 6px 16px calc(16px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  border-radius: 22px 22px 0 0;
+  background: t.$bg;
+  box-shadow: 0 -20px 50px -20px rgba(0, 20, 50, 0.5);
+  color: t.$text;
+  font-family: t.$font;
+  animation: up 0.38s $ease both;
+  overscroll-behavior: contain;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.grab {
+  display: block;
+  width: 38px;
+  height: 4px;
+  margin: 4px auto 10px;
+  border-radius: t.$radius-pill;
+  background: t.$line;
+}
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 4px;
+
+  strong {
+    font-size: t.$text-lg;
+    font-weight: t.$bold;
+  }
+}
+
+.sheet-close {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: t.$bg-muted;
+  color: t.$text;
+  cursor: pointer;
+}
+
+.sheet-label {
+  display: block;
+  padding: 14px 6px 6px;
+  color: t.$text-4;
+  font-size: t.$text-xs;
+  font-weight: t.$bold;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.sheet-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 12px;
+  color: t.$text;
+  text-decoration: none;
+
+  &:hover {
+    background: t.$bg-hover;
+  }
+
+  &.is-active {
+    background: t.$brand-50;
+
+    .area-icon {
+      background: t.$brand;
+      color: #fff;
+    }
+  }
+}
+
+.area-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: 11px;
+  background: t.$bg-muted;
+  color: t.$brand;
+}
+
+.area-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.35;
+
+  strong {
+    font-size: t.$text-md;
+    font-weight: t.$bold;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: t.$text-sm;
+    @include t.truncate;
+  }
+}
+
+// The mark of the bar, on white.
+.chip.light {
+  background: t.$bg-muted;
+  color: t.$text-2;
+
+  &[data-tone='alert'] {
+    --c: #{t.$danger};
+  }
+
+  &[data-tone='warn'] {
+    --c: #{t.$warning};
+  }
+
+  &[data-tone='live'] {
+    --c: #{t.$success};
+  }
+
+  &[data-tone='new'] {
+    --c: #{t.$cat-1};
+  }
+}
+
+.sheet-foot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 18px;
+
+  a,
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 46px;
+    border: 1px solid t.$line;
+    border-radius: 12px;
+    background: t.$bg;
+    color: t.$text;
+    font-size: t.$text-md;
+    font-weight: t.$medium;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+
+    &:hover {
+      border-color: t.$line-strong;
+      background: t.$bg-hover;
+    }
+  }
+}
+
+@keyframes up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .scrim {
+    animation: none;
+  }
+}

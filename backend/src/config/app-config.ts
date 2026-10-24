@@ -11,7 +11,13 @@ export interface AppConfig {
   seedSampleQuestions: boolean;
   /** Enables `/api/test/*` so end-to-end tests can reset questions and settings. */
   testControl: boolean;
+  /** The one password that opens the admin. */
+  adminPassword: string;
 }
+
+/** Used outside production when no ADMIN_PASSWORD is set. */
+export const DEV_ADMIN_PASSWORD = 'admin';
+export const ADMIN_PASSWORD_MIN_LENGTH = 12;
 
 const DEV_ORIGINS = ['http://localhost:4200', 'http://127.0.0.1:4200'];
 
@@ -42,6 +48,13 @@ export function loadAppConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     errors.push('TEST_CONTROL must not be enabled in production');
   }
 
+  const adminPassword = env['ADMIN_PASSWORD'] ?? '';
+  if (production && adminPassword.length < ADMIN_PASSWORD_MIN_LENGTH) {
+    errors.push(
+      `ADMIN_PASSWORD is required in production (at least ${ADMIN_PASSWORD_MIN_LENGTH} characters)`,
+    );
+  }
+
   if (errors.length > 0) {
     throw new Error(`Invalid configuration:\n- ${errors.join('\n- ')}`);
   }
@@ -53,5 +66,6 @@ export function loadAppConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     corsOrigins: corsOrigins.length > 0 ? corsOrigins : DEV_ORIGINS,
     seedSampleQuestions: !databaseUrl,
     testControl,
+    adminPassword: adminPassword || DEV_ADMIN_PASSWORD,
   };
 }

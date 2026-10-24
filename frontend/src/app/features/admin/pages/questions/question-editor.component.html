@@ -1,0 +1,293 @@
+<button
+  type="button"
+  class="ad-scrim"
+  aria-label="Schliessen"
+  (click)="close()"
+></button>
+<aside
+  class="ad-drawer editor"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="editor-title"
+>
+  <header class="ad-drawer-head">
+    <div>
+      <p class="ad-overline">
+        @if (creating()) {
+          Neue Frage
+        } @else if (question(); as q) {
+          F-{{ q.id }} · erfasst {{ formatDateTime(q.createdAt) }}
+        }
+      </p>
+      <h2 id="editor-title">
+        {{ creating() ? 'Frage erfassen' : 'Frage bearbeiten' }}
+      </h2>
+    </div>
+    <button
+      type="button"
+      class="icon-btn"
+      aria-label="Schliessen"
+      appAutofocus
+      (click)="close()"
+    >
+      <css-icon icon="close" size="sm"></css-icon>
+    </button>
+  </header>
+
+  <div class="ad-drawer-body">
+    @if (missing()) {
+      <app-ad-state
+        kind="empty"
+        icon="search"
+        title="Diese Frage gibt es nicht mehr"
+        text="Vielleicht wurde sie inzwischen gelöscht."
+      />
+    } @else if (!creating() && !question()) {
+      <app-ad-state kind="loading" [lines]="8" />
+    } @else {
+      <form class="form" novalidate (submit)="$event.preventDefault(); save(false)">
+        <div class="ad-field">
+          <label for="question-text">Frage</label>
+          <div
+            class="ad-input multiline"
+            [class.is-invalid]="show('text') && problems().text"
+          >
+            <textarea
+              #textArea
+              id="question-text"
+              rows="3"
+              [attr.maxlength]="limits.questionText + 20"
+              [value]="draft().text"
+              [attr.aria-invalid]="show('text') && !!problems().text"
+              aria-describedby="question-text-hint"
+              (input)="setText($event)"
+              (blur)="touch('text')"
+            ></textarea>
+          </div>
+          <p
+            id="question-text-hint"
+            class="field-foot"
+            [class.ad-error]="show('text') && problems().text"
+          >
+            <span>{{
+              show('text') && problems().text
+                ? problems().text
+                : 'Kurz und eindeutig – im Spiel bleibt wenig Zeit zum Lesen.'
+            }}</span>
+            <span
+              class="counter"
+              [class.over]="draft().text.length > limits.questionText"
+              >{{ draft().text.length }}/{{ limits.questionText }}</span
+            >
+          </p>
+        </div>
+
+        <fieldset class="ad-field options">
+          <legend class="ad-label">Antworten</legend>
+          <p class="ad-hint">
+            Die richtige Antwort markieren. Im Spiel wird die Reihenfolge gemischt.
+          </p>
+          @for (option of draft().options; track $index; let i = $index) {
+            <div class="option" [class.is-correct]="draft().correctIndex === i">
+              <label
+                class="ad-input"
+                [class.is-invalid]="show('option' + i) && problems().options[i]"
+              >
+                <span class="letter" aria-hidden="true">{{ letters[i] }}</span>
+                <span class="ad-sr">Antwort {{ letters[i] }}</span>
+                <input
+                  type="text"
+                  [attr.aria-label]="'Antwort ' + letters[i]"
+                  [attr.maxlength]="limits.optionText + 10"
+                  [value]="option"
+                  [attr.aria-invalid]="show('option' + i) && !!problems().options[i]"
+                  (input)="setOption(i, $event)"
+                  (blur)="touch('option' + i)"
+                />
+              </label>
+              <label class="correct">
+                <input
+                  type="radio"
+                  name="correct"
+                  [attr.aria-label]="'Antwort ' + letters[i] + ' ist richtig'"
+                  [checked]="draft().correctIndex === i"
+                  (change)="setCorrect(i)"
+                />
+                <span>Richtig</span>
+              </label>
+              @if (show('option' + i) && problems().options[i]; as problem) {
+                <p class="ad-error option-error">{{ problem }}</p>
+              }
+            </div>
+          }
+        </fieldset>
+
+        <div class="row">
+          <div class="ad-field category">
+            <label for="question-category">Kategorie</label>
+            <div class="ad-input">
+              <input
+                id="question-category"
+                type="text"
+                list="question-categories"
+                placeholder="Ohne Kategorie"
+                [attr.maxlength]="limits.category"
+                [value]="draft().category"
+                (input)="setCategory($event)"
+              />
+            </div>
+            <datalist id="question-categories">
+              @for (name of data.categories(); track name) {
+                <option [value]="name"></option>
+              }
+            </datalist>
+          </div>
+          <div class="ad-field active">
+            <span class="ad-label" id="question-active-label">Im Spiel</span>
+            <span class="active-row">
+              <app-ad-toggle
+                [checked]="draft().active"
+                label="Im Spiel"
+                (toggled)="setActive($event)"
+              />
+              <span class="ad-muted">{{
+                draft().active ? 'Aktiv' : 'Pausiert'
+              }}</span>
+            </span>
+          </div>
+        </div>
+
+        @if (!creating() && hasStats() && (contentChanged() || dirty())) {
+          <label class="reset">
+            <input
+              type="checkbox"
+              [checked]="resetStats()"
+              (change)="setReset($event)"
+            />
+            <span>
+              <b>Statistik zurücksetzen</b>
+              <span class="ad-muted">
+                @if (contentChanged()) {
+                  Empfohlen: Die Antworten haben sich geändert, die bisherigen Zahlen
+                  passen nicht mehr.
+                } @else {
+                  Antworten und Trefferquote beginnen wieder bei null.
+                }
+              </span>
+            </span>
+          </label>
+        }
+
+        @if (serverError(); as error) {
+          <p class="server-error" role="alert">
+            <css-icon icon="priority-warning" size="sm"></css-icon>{{ error }}
+          </p>
+        }
+      </form>
+
+      @if (question(); as q) {
+        <section class="stats" aria-labelledby="stats-title">
+          <h3 id="stats-title">So wird sie beantwortet</h3>
+
+          @for (item of hints(); track item.hint.key) {
+            <a
+              class="hint"
+              routerLink="/admin/hinweise"
+              [queryParams]="{ hinweis: item.hint.key }"
+            >
+              <span class="sev" [attr.data-severity]="item.hint.severity">{{
+                severityLabels[item.hint.severity]
+              }}</span>
+              <span>
+                <b>{{ item.text.title }}</b>
+                <span class="ad-muted">{{ item.text.finding }}</span>
+              </span>
+            </a>
+          }
+
+          @if (stats(); as s) {
+            <dl class="facts">
+              <div>
+                <dt>Trefferquote</dt>
+                <dd>{{ s.rate }}</dd>
+              </div>
+              <div>
+                <dt>Antworten</dt>
+                <dd>{{ s.answers }}</dd>
+              </div>
+              <div>
+                <dt>Ohne Antwort</dt>
+                <dd>{{ s.timeouts }}</dd>
+              </div>
+              <div>
+                <dt>Ø Zeit</dt>
+                <dd>{{ s.time }}</dd>
+              </div>
+            </dl>
+          }
+
+          <app-ad-answer-distribution [question]="q" [footer]="false" />
+
+          <h4 class="ad-overline chart-title">
+            Trefferquote pro Tag, letzte 30 Tage
+          </h4>
+          @if (chart(); as c) {
+            @if (c.empty) {
+              <p class="ad-muted chart-empty">
+                In den letzten 30 Tagen nicht gespielt.
+              </p>
+            } @else {
+              <app-ad-line-chart
+                [values]="c.values"
+                [labels]="c.labels"
+                [labelEvery]="7"
+                [percent]="true"
+                [height]="160"
+                ariaLabel="Trefferquote pro Tag"
+              />
+            }
+          } @else {
+            <app-ad-state kind="loading" [lines]="4" />
+          }
+        </section>
+      }
+    }
+  </div>
+
+  @if (!missing()) {
+    <footer class="ad-drawer-foot">
+      @if (!creating() && question()) {
+        <button
+          type="button"
+          class="btn-ghost delete"
+          [disabled]="saving()"
+          (click)="remove()"
+        >
+          <css-icon icon="trash" size="xs"></css-icon>Löschen
+        </button>
+      }
+      <span class="spacer"></span>
+      <button type="button" class="btn-secondary" (click)="close()">
+        Abbrechen
+      </button>
+      @if (creating()) {
+        <button
+          type="button"
+          class="btn-secondary"
+          [disabled]="saving()"
+          (click)="save(true)"
+        >
+          Speichern &amp; nächste
+        </button>
+      }
+      <button
+        type="button"
+        class="btn-primary"
+        [disabled]="saving()"
+        (click)="save(false)"
+      >
+        {{ saving() ? 'Speichert…' : 'Speichern' }}
+      </button>
+    </footer>
+  }
+</aside>

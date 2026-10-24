@@ -19,12 +19,21 @@ Zentralschweizer Bildungsmesse (ZEBI).
 - Stand-Modus: Geräte am Messestand springen nach Inaktivität zur Startseite zurück
 - Optimiert für Handy (hoch/quer), Tablet und Desktop bis Ultrawide
 
-**Fragen und Einstellungen**
+**Admin** (unter `/admin`, Anmeldung mit einem gemeinsamen Admin-Passwort)
 
-Fragen und Spielregeln (Fragen pro Duell, Zeit pro Frage, Tempo-Bonus, Stand-Modus u. a.)
-liegen in der Datenbank und werden dort gepflegt, z. B. mit Drizzle Studio
-(`npm --prefix backend run db:studio`, siehe [Deployment](docs/DEPLOYMENT.md#5-fragen-und-spielregeln-pflegen)).
-Ein neues Admin-UI entsteht auf dem Branch `admin`.
+- **Übersicht:** Kennzahlen im Vergleich zur Vorperiode, Duelle pro Tag, Live-Stand,
+  Hinweise, Fragenbestand, Spielregeln und die letzten Änderungen
+- **Live:** laufende Duelle in Echtzeit, jedes Duell Frage für Frage, Gegnersuche,
+  offene Spiele mit Code und ein Ereignisprotokoll
+- **Fragen:** Suche, Filter, Sortierung, Erfassen und Bearbeiten mit Prüfung,
+  Massenaktionen, CSV-Import mit Prüfung jeder Zeile und CSV-Export; pro Frage die
+  Verteilung auf die Antworten, Trefferquote, Antwortzeit und Verlauf
+- **Hinweise:** Das Admin findet selbst Fragen, die locken, zu schwer oder zu leicht sind
+  oder bei denen oft die Zeit abläuft, und warnt bei zu wenigen Fragen
+- **Auswertung:** 7, 30 oder 90 Tage – Duelle, Abbrüche, Revanchen, Spielzeiten
+  (Wochentag × Stunde), Trefferquote, Kategorien, schwerste und leichteste Fragen
+- **Spielregeln:** mit Auswirkung (Dauer eines Duells, Wiederholungen) vor dem Speichern
+- **Verlauf:** jede Änderung im Admin; frühere Spielregeln lassen sich wiederherstellen
 
 ## Technik
 
@@ -55,7 +64,16 @@ npm run dev:frontend    # http://localhost:4200
 ```
 
 Ohne `DATABASE_URL` startet das Backend mit einer temporären In-Memory-Datenbank, die
-bereits die Beispielfragen enthält.
+bereits die Beispielfragen enthält. Das Admin liegt unter http://localhost:4200/admin;
+ohne `ADMIN_PASSWORD` gilt lokal das Passwort `admin`.
+
+Für ein Admin mit realistischen Zahlen (60 Tage Duelle und Antworten) das Backend mit
+Teststeuerung starten und die Demodaten laden:
+
+```bash
+TEST_CONTROL=true DATABASE_URL= npm run dev:backend
+curl -X POST http://localhost:3000/api/test/demo-data
+```
 
 ## Qualität
 

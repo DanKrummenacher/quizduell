@@ -1,0 +1,149 @@
+// Design foundation of the admin, taken from the quiz itself so the admin and
+// the game are one product:
+// - the page colour and the fine dot grid of the game's large screens
+// - navy text, muted blue secondary text, the blue-grey card border
+// - cards with a 4px radius, navy blocks, round uppercase buttons
+// - the game's hover fill, hover shadow and focus ring
+// Sizes are in px: the admin is used on desktops and keeps a fixed 16px root.
+@use '@css-ch/web-design-tokens/colors';
+
+// Typeface (Museo Sans has 300, 500 and 700).
+$font: 'Museo Sans', helvetica, arial, sans-serif;
+$regular: 300;
+$medium: 500;
+$bold: 700;
+
+// Type scale
+$text-xs: 11px;
+$text-sm: 12px;
+$text-base: 13px;
+$text-md: 14px;
+$text-lg: 16px;
+$text-xl: 20px;
+$text-2xl: 24px;
+$text-3xl: 28px;
+
+// Text: the game's navy and its muted blue
+$text: colors.$dt-color-darkblue-100;
+$text-2: #4d70a4;
+$text-3: #6c86ae;
+$text-4: #8098be;
+
+// Lines: the game's card border for cards people act on, lighter lines
+// for structure inside them
+$line: #dbe2ec;
+$line-soft: #e9edf3;
+$line-strong: #8098be;
+
+// Surfaces
+$bg: colors.$dt-color-white-100;
+$bg-subtle: #fafbfc;
+$bg-muted: #eff2f6;
+$bg-hover: #eef3f9;
+$bg-pressed: #dfe8f3;
+$canvas: colors.$dt-color-pepper-bright;
+
+// Brand (design system)
+$brand: colors.$dt-color-darkblue-100;
+$brand-hover: colors.$dt-color-darkblue-active;
+$brand-50: #eef3f9;
+$brand-100: #dfe8f3;
+$brand-200: #c3d3ec;
+$accent: colors.$dt-color-cyan-dark;
+$cyan: colors.$dt-color-cyan-100;
+
+// Status, as in the game (correct answer #00875e, wrong #d53419)
+$success: #00875e;
+$success-bg: #e6f4ef;
+$success-text: #006b4b;
+$danger: colors.$dt-color-red;
+$danger-bg: #fcefec;
+$danger-text: #a8290f;
+$warning: colors.$dt-color-yellow;
+$warning-bg: #fff6dc;
+$warning-text: #7f5600;
+$info-bg: #e8f3fa;
+$info-text: #005a8f;
+
+// Categories (validated chart order)
+$cat-1: #0078bb;
+$cat-2: #ff548c;
+$cat-3: #9b50c8;
+$cat-4: #00a4e0;
+
+// Radii and shadows (the game's cards have 4px)
+$radius-sm: 2px;
+$radius: 4px;
+$radius-md: 4px;
+$radius-lg: 6px;
+$radius-pill: 999px;
+$shadow-xs: 0 1px 2px rgba(0, 50, 125, 0.05);
+$shadow-sm: 0 2px 6px rgba(0, 50, 125, 0.08);
+$shadow-hover: 0 4px 12px rgba(0, 50, 125, 0.12);
+$shadow-pop:
+  0 0 0 1px rgba(0, 50, 125, 0.08),
+  0 14px 36px -8px rgba(0, 50, 125, 0.28);
+
+/// The page colour with the game's fine dot grid. Fixed to the viewport, so
+/// a surface that repeats it (a tab that opens into the page) lines up.
+@mixin canvas {
+  background:
+    radial-gradient(rgba(0, 50, 125, 0.08) 1.1px, transparent 1.3px) 0 0 / 22px 22px,
+    radial-gradient(50% 60% at 0% 20%, rgba(0, 164, 224, 0.1), transparent 70%),
+    radial-gradient(50% 60% at 100% 90%, rgba(0, 120, 187, 0.1), transparent 70%),
+    $canvas;
+  background-attachment: fixed;
+}
+
+/// Base of every admin page.
+@mixin page($dots: true) {
+  display: block;
+  min-height: 100dvh;
+  font-family: $font;
+  font-size: $text-md;
+  font-weight: $regular;
+  line-height: 1.45;
+  color: $text;
+  -webkit-font-smoothing: antialiased;
+
+  @if $dots {
+    @include canvas;
+  } @else {
+    background: $canvas;
+  }
+
+  --ad-chart-ink: #{$text};
+  --ad-chart-muted: #{$text-3};
+  --ad-chart-grid: #{$line-soft};
+  --ad-chart-surface: #{$bg};
+  --ad-chart-accent: #{$brand};
+  --ad-chart-tip-bg: #{$brand};
+  --ad-good: #{$success};
+  --ad-bad: #{$danger};
+  --ad-toggle-on: #{$success};
+  --ad-toggle-off: #{$line-strong};
+  --ad-toggle-width: 32px;
+  --ad-toggle-height: 18px;
+
+  // The game's focus ring.
+  :focus-visible {
+    outline: 2px solid $brand;
+    outline-offset: 2px;
+  }
+
+  // No specificity, so every button class wins.
+  :where(button, input, textarea, select) {
+    font: inherit;
+    color: inherit;
+  }
+}
+
+@mixin numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

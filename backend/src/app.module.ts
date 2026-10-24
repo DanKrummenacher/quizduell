@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { AdminModule } from './admin/admin.module.js';
 import { HttpThrottlerGuard } from './common/http-throttler.guard.js';
 import { ConfigModule } from './config/config.module.js';
 import { DatabaseModule } from './database/database.module.js';
@@ -20,6 +21,7 @@ import { TestControlController } from './testing/test-control.controller.js';
     QuestionsModule,
     SettingsModule,
     GameModule,
+    AdminModule,
   ],
   controllers: [HealthController, PublicController, TestControlController],
   providers: [{ provide: APP_GUARD, useClass: HttpThrottlerGuard }],

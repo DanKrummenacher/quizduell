@@ -1,0 +1,35 @@
+<app-brand-header />
+<main class="main">
+  <div class="column">
+    <span class="symbol"><css-icon icon="lock" size="xl"></css-icon></span>
+    <h1 class="title"><span class="marked">Admin</span></h1>
+    <p class="subtitle">
+      Verwalte Fragen, Spielregeln und alles rund ums Spiel – an einem Ort.
+    </p>
+
+    <div class="form">
+      @if (notice(); as text) {
+        <p class="notice" role="status">{{ text }}</p>
+      }
+      <css-input-text
+        #field
+        id="admin-password"
+        label="Admin-Passwort"
+        type="password"
+        autocomplete="current-password"
+        [value]="password()"
+        [errorMessage]="error() || undefined"
+        (input)="onInput($event)"
+        (keydown)="onKeydown($event)"
+      ></css-input-text>
+      <!-- The library shows the error; screen readers hear it from here. -->
+      <p class="ad-sr" role="alert">{{ error() }}</p>
+      <css-button stretch variant="primary" [loading]="busy()" (click)="submit()">
+        <css-icon icon="angle-right-circle" slot="prefix"></css-icon>
+        Anmelden
+      </css-button>
+    </div>
+
+    <p class="info"><a class="back" href="/">Zurück zum Spiel</a></p>
+  </div>
+</main>

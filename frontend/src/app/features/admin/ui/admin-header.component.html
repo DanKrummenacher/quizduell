@@ -1,0 +1,159 @@
+<!-- data-fit is set by fit(): the bar narrows only when it has to. -->
+<header class="bar" data-fit="0" data-search="full" #bar>
+  <div class="row">
+    <a class="brand" routerLink="/admin" aria-label="playduelio Admin, Übersicht">
+      <span class="logo">
+        <app-logo-mark class="mark" [inverse]="true" />
+        <span class="lock"><css-icon icon="lock" size="xs"></css-icon></span>
+      </span>
+      <span class="word"><span class="light">play</span>duelio</span>
+    </a>
+
+    <nav class="nav" aria-label="Bereiche" #track>
+      @if (marker(); as m) {
+        <span
+          class="pill"
+          aria-hidden="true"
+          [style.--l.px]="m.left"
+          [style.--w.px]="m.width"
+        ></span>
+      }
+      @for (group of groups(); track group.name) {
+        <div class="group" role="group" [attr.aria-label]="group.name">
+          @for (item of group.items; track item.path) {
+            <a
+              class="item"
+              [routerLink]="item.path"
+              routerLinkActive="is-active"
+              ariaCurrentWhenActive="page"
+              [routerLinkActiveOptions]="{ exact: item.path === '/admin' }"
+              [attr.title]="item.label"
+              (isActiveChange)="measureSoon()"
+            >
+              <css-icon
+                class="item-icon"
+                [attr.icon]="item.icon"
+                size="xs"
+              ></css-icon>
+              <span class="label">{{ item.label }}</span>
+              @if (markOf(item); as mark) {
+                <span class="chip" [attr.data-tone]="mark.tone"
+                  ><i aria-hidden="true"></i
+                  ><span aria-hidden="true">{{ mark.text }}</span
+                  ><span class="ad-sr">, {{ mark.label }}</span></span
+                >
+              }
+            </a>
+          }
+        </div>
+      }
+    </nav>
+
+    <button
+      type="button"
+      class="search"
+      aria-label="Suchen"
+      (click)="palette.open.set(true)"
+    >
+      <css-icon icon="search" size="xs"></css-icon>
+      <span>Suchen</span>
+      <kbd>{{ isMac ? '⌘' : 'Ctrl' }} K</kbd>
+    </button>
+
+    <div class="actions">
+      <a
+        class="icon-btn"
+        href="/"
+        target="_blank"
+        rel="noopener"
+        aria-label="Zum Spiel"
+        title="Zum Spiel"
+      >
+        <css-icon icon="play-circle" size="sm"></css-icon>
+      </a>
+      <button
+        type="button"
+        class="icon-btn"
+        aria-label="Abmelden"
+        title="Abmelden"
+        (click)="signOut.emit()"
+      >
+        <css-icon icon="logout" size="sm"></css-icon>
+      </button>
+    </div>
+
+    <button
+      type="button"
+      class="menu-btn"
+      aria-label="Alle Bereiche"
+      aria-haspopup="dialog"
+      [attr.aria-expanded]="sheetOpen()"
+      (click)="sheetOpen.set(true)"
+    >
+      <span class="lines" aria-hidden="true"><i></i><i></i></span>
+    </button>
+  </div>
+</header>
+
+<!-- Phones: every area, the game and the sign-out in a sheet from below. -->
+@if (sheetOpen()) {
+  <div class="scrim" aria-hidden="true" (click)="sheetOpen.set(false)"></div>
+  <div
+    class="sheet"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Alle Bereiche"
+    tabindex="-1"
+    appAutofocus
+  >
+    <span class="grab" aria-hidden="true"></span>
+    <div class="sheet-head">
+      <strong>Alle Bereiche</strong>
+      <button
+        type="button"
+        class="sheet-close"
+        aria-label="Schliessen"
+        (click)="sheetOpen.set(false)"
+      >
+        <css-icon icon="close" size="xs"></css-icon>
+      </button>
+    </div>
+    @for (group of groups(); track group.name) {
+      <span class="sheet-label">{{ group.name }}</span>
+      <div class="sheet-group">
+        @for (item of group.items; track item.path) {
+          <a
+            class="area"
+            [routerLink]="item.path"
+            routerLinkActive="is-active"
+            ariaCurrentWhenActive="page"
+            [routerLinkActiveOptions]="{ exact: item.path === '/admin' }"
+          >
+            <span class="area-icon"
+              ><css-icon [attr.icon]="item.icon" size="xs"></css-icon
+            ></span>
+            <span class="area-text">
+              <strong>{{ item.label }}</strong>
+              <span>{{ item.description }}</span>
+            </span>
+            @if (markOf(item); as mark) {
+              <span class="chip light" [attr.data-tone]="mark.tone"
+                ><i aria-hidden="true"></i
+                ><span aria-hidden="true">{{ mark.text }}</span
+                ><span class="ad-sr">, {{ mark.label }}</span></span
+              >
+            }
+          </a>
+        }
+      </div>
+    }
+    <div class="sheet-foot">
+      <a href="/" target="_blank" rel="noopener"
+        ><css-icon icon="play-circle" size="xs"></css-icon>Zum Spiel</a
+      >
+      <button type="button" (click)="sheetOpen.set(false); signOut.emit()">
+        <css-icon icon="logout" size="xs"></css-icon>Abmelden
+      </button>
+    </div>
+  </div>
+}

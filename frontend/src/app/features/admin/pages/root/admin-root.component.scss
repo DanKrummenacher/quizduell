@@ -1,0 +1,189 @@
+// Base and controls of every admin page, the sign-in included, scoped to the
+// admin root. The layout of signed-in pages lives in the admin shell; pages
+// add their own encapsulated styles for what only they have.
+@use '../../styles/tokens' as t;
+@use '../../styles/controls' as c;
+
+app-admin-root {
+  @include t.page(true);
+
+  // The icon's SVG sits on the text baseline otherwise and drops by ~2px.
+  css-icon {
+    display: inline-flex;
+    flex: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  p {
+    margin: 0;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Controls
+  // ---------------------------------------------------------------------------
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    @include c.button-base;
+  }
+  .btn-primary {
+    @include c.button-variant(primary);
+  }
+  .btn-secondary {
+    @include c.button-variant(secondary);
+  }
+  .btn-ghost {
+    @include c.button-variant(ghost);
+  }
+  .btn-danger {
+    @include c.button-variant(danger);
+  }
+  .btn-sm {
+    height: 28px;
+    padding: 0 12px;
+    font-size: t.$text-xs;
+  }
+  .btn-ghost.btn-sm {
+    padding: 0 8px;
+  }
+  .icon-btn {
+    @include c.icon-button(34px);
+  }
+
+  .ad-field {
+    display: grid;
+    gap: 6px;
+
+    > label,
+    > .ad-label {
+      color: t.$text;
+      font-size: t.$text-base;
+      font-weight: t.$medium;
+    }
+
+    .ad-hint {
+      color: t.$text-3;
+      font-size: t.$text-sm;
+      line-height: 1.45;
+    }
+
+    .ad-error {
+      color: t.$danger-text;
+      font-size: t.$text-sm;
+      font-weight: t.$medium;
+    }
+  }
+
+  .ad-input {
+    @include c.field;
+
+    &.is-invalid {
+      border-color: t.$danger;
+
+      &:focus-within {
+        box-shadow: 0 0 0 3px rgba(213, 52, 25, 0.14);
+      }
+    }
+
+    &.multiline {
+      align-items: flex-start;
+      height: auto;
+      padding: 10px 12px;
+
+      textarea {
+        min-height: 64px;
+        resize: vertical;
+        line-height: 1.5;
+      }
+    }
+
+    > css-icon {
+      flex: none;
+      color: t.$text-3;
+    }
+
+    .counter {
+      flex: none;
+      color: t.$text-4;
+      font-size: t.$text-xs;
+      @include t.numeric;
+    }
+  }
+
+  .ad-select {
+    @include c.field;
+    position: relative;
+    padding-right: 32px;
+
+    select {
+      appearance: none;
+      cursor: pointer;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      width: 7px;
+      height: 7px;
+      border-right: 1.5px solid t.$text-2;
+      border-bottom: 1.5px solid t.$text-2;
+      transform: translateY(-70%) rotate(45deg);
+      pointer-events: none;
+    }
+  }
+
+  .ad-segmented {
+    @include c.segmented;
+  }
+
+  .ad-kbd {
+    @include c.kbd;
+  }
+
+  .badge {
+    @include c.badge(neutral);
+  }
+  .badge.success {
+    @include c.badge-tone(success);
+  }
+  .badge.danger {
+    @include c.badge-tone(danger);
+  }
+  .badge.warning {
+    @include c.badge-tone(warning);
+  }
+  .badge.info {
+    @include c.badge-tone(info);
+  }
+  .badge.brand {
+    @include c.badge-tone(brand);
+  }
+
+  .ad-overline {
+    @include c.overline;
+  }
+
+  .ad-muted {
+    color: t.$text-2;
+  }
+
+  .ad-num {
+    @include t.numeric;
+  }
+
+  // Visually hidden, read by screen readers.
+  .ad-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

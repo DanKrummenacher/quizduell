@@ -43,6 +43,15 @@ export interface LastReveal {
   points: Map<string, number>;
 }
 
+/** One revealed question of a duel, kept for the live view of the admin. */
+export interface RoundRecord {
+  questionId: number;
+  text: string;
+  options: string[];
+  correctIndex: number;
+  answers: Map<string, { index: number | null; ms: number | null; points: number }>;
+}
+
 export interface Session {
   code: string;
   mode: GameMode;
@@ -60,6 +69,11 @@ export interface Session {
   lastReveal: LastReveal | null;
   /** Bumped whenever a new round of the game starts (rematch), guards async work. */
   generation: number;
+  /** When the current duel (countdown) started, epoch ms. */
+  startedAt: number;
+  /** The current duel is a rematch. */
+  rematch: boolean;
+  rounds: RoundRecord[];
 }
 
 export interface GameNotifier {
@@ -71,6 +85,12 @@ export class GameError extends Error {
     super(code);
   }
 }
+
+/** How many live events the admin can look back on. */
+export const LIVE_EVENT_LIMIT = 200;
+/** Minutes of live history kept for the admin. */
+export const LIVE_HISTORY_MINUTES = 60;
+export const LIVE_SAMPLE_MS = 5_000;
 
 export interface LiveStats {
   activeGames: number;

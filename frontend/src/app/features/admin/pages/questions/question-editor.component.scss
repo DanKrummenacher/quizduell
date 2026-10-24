@@ -1,0 +1,268 @@
+@use '../../styles/tokens' as t;
+@use '../../styles/controls' as c;
+
+.editor {
+  width: 620px;
+}
+
+.form {
+  display: grid;
+  gap: 22px;
+}
+
+.field-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: t.$text-3;
+  font-size: t.$text-sm;
+  line-height: 1.45;
+}
+
+.counter {
+  flex: none;
+  @include t.numeric;
+
+  &.over {
+    color: t.$danger-text;
+    font-weight: t.$bold;
+  }
+}
+
+.options {
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    margin-bottom: 2px;
+    padding: 0;
+  }
+
+  .ad-hint {
+    margin-bottom: 4px;
+  }
+}
+
+.option {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 10px;
+
+  .ad-input {
+    height: 42px;
+    padding-left: 0;
+    overflow: hidden;
+  }
+
+  &.is-correct .ad-input {
+    border-color: t.$success;
+    background: #f5fbf8;
+  }
+
+  &.is-correct .ad-input.is-invalid {
+    border-color: t.$danger;
+    background: t.$bg;
+  }
+}
+
+.letter {
+  display: grid;
+  flex: none;
+  place-items: center;
+  align-self: stretch;
+  width: 40px;
+  margin-right: 2px;
+  background: t.$brand;
+  color: #fff;
+  font-weight: t.$bold;
+
+  .is-correct & {
+    background: t.$success;
+  }
+}
+
+.correct {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 12px 0 10px;
+  border-radius: t.$radius-pill;
+  color: t.$text-2;
+  font-size: t.$text-sm;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover {
+    background: t.$bg-hover;
+  }
+
+  input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: t.$success;
+    cursor: pointer;
+  }
+
+  .is-correct & {
+    color: t.$success-text;
+  }
+}
+
+.option-error {
+  grid-column: 1 / -1;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.active-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  font-size: t.$text-md;
+}
+
+.reset {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid t.$line;
+  border-radius: t.$radius;
+  background: t.$bg-subtle;
+  font-size: t.$text-base;
+  line-height: 1.5;
+  cursor: pointer;
+
+  input {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    margin: 2px 0 0;
+    accent-color: t.$brand;
+  }
+
+  b {
+    display: block;
+    font-weight: t.$bold;
+  }
+}
+
+.server-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: t.$radius;
+  background: t.$danger-bg;
+  color: t.$danger-text;
+  font-size: t.$text-md;
+
+  css-icon {
+    flex: none;
+  }
+}
+
+.stats {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid t.$line-soft;
+
+  h3 {
+    font-size: t.$text-lg;
+    font-weight: t.$bold;
+  }
+}
+
+.hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #f0d9a8;
+  border-radius: t.$radius;
+  background: t.$warning-bg;
+  color: t.$text;
+  font-size: t.$text-base;
+  line-height: 1.5;
+  text-decoration: none;
+
+  &:hover {
+    border-color: t.$warning;
+  }
+
+  b {
+    display: block;
+  }
+}
+
+.sev {
+  @include c.badge(warning);
+  flex: none;
+  height: 20px;
+  padding: 0 8px;
+  background: #fff;
+  font-size: t.$text-xs;
+
+  &[data-severity='high'],
+  &[data-severity='critical'] {
+    color: t.$danger-text;
+  }
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: t.$radius;
+  background: t.$bg-subtle;
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  dt {
+    color: t.$text-3;
+    font-size: t.$text-sm;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: t.$text-lg;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+}
+
+.chart-title {
+  margin: 6px 0 -6px;
+}
+
+.chart-empty {
+  font-size: t.$text-base;
+}
+
+.delete {
+  color: t.$danger-text;
+
+  &:hover:not(:disabled) {
+    background: t.$danger-bg;
+  }
+}
