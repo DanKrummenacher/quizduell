@@ -20,6 +20,17 @@
       >
         <css-icon icon="download" size="xs"></css-icon>Exportieren
       </button>
+      <button
+        type="button"
+        class="btn-secondary"
+        [attr.aria-label]="'Papierkorb, ' + trashCount() + ' Fragen'"
+        (click)="trashOpen.set(true)"
+      >
+        <css-icon icon="trash" size="xs"></css-icon>Papierkorb
+        @if (trashCount()) {
+          <span class="trash-count">{{ formatInt(trashCount()) }}</span>
+        }
+      </button>
       <button type="button" class="btn-primary" (click)="open('new')">
         <css-icon icon="add" size="xs"></css-icon>Neue Frage
       </button>
@@ -436,4 +447,8 @@
 
 @if (importing()) {
   <app-question-import (closed)="importing.set(false)" />
+}
+
+@if (trashOpen()) {
+  <app-question-trash (closed)="trashOpen.set(false)" />
 }

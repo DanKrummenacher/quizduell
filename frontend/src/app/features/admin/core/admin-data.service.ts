@@ -24,6 +24,8 @@ export class AdminData {
   readonly questions = remote(() => this.api.questions());
   readonly hints = remote(() => this.api.hints());
   readonly settings = remote(() => this.api.settings());
+  /** Deleted questions that can still be restored. */
+  readonly trash = remote(() => this.api.trash());
   /** The latest live snapshot, from the live page or the shell's slower poll. */
   readonly live = signal<LiveSnapshot | null>(null);
   /** False when the last live request failed: the game server is not reachable. */
@@ -63,6 +65,22 @@ export class AdminData {
     const gone = new Set(ids);
     this.questions.update((all) => all.filter((q) => !gone.has(q.id)));
     void this.hints.reload();
+    void this.trash.reload();
+  }
+
+  /** Takes questions out of the trash; returns how many came back. */
+  async restoreQuestions(ids: readonly number[]): Promise<number> {
+    let restored = 0;
+    for (const id of ids) {
+      try {
+        this.replaceQuestion(await this.api.restoreQuestion(id));
+        restored++;
+      } catch {
+        // Gone for good in the meantime; the trash reload shows it.
+      }
+    }
+    await this.trash.reload();
+    return restored;
   }
 
   /** After bulk changes and imports: everything from the server. */

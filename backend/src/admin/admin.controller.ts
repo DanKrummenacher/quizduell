@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -23,6 +24,7 @@ import type {
   LiveSnapshot,
   PauseRequest,
   QuestionDay,
+  TrashedQuestion,
 } from '../contracts/admin.contract.js';
 import { GameService } from '../game/game.service.js';
 import { QuestionsService } from '../questions/questions.service.js';
@@ -155,8 +157,51 @@ export class AdminController {
     await this.hints.forgetQuestion(id);
     await this.audit.record(
       'question.delete',
-      `Frage F-${id} gelöscht: «${shorten(row.text)}»`,
+      `Frage F-${id} in den Papierkorb gelegt: «${shorten(row.text)}»`,
     );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Trash
+  // ---------------------------------------------------------------------------
+
+  @Get('trash')
+  trash(): Promise<TrashedQuestion[]> {
+    return this.questions.trash();
+  }
+
+  @Post('trash/:id/restore')
+  @HttpCode(200)
+  async restoreQuestion(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<AdminQuestion> {
+    const row = await this.questions.restore(id);
+    await this.audit.record(
+      'question.restore',
+      `Frage F-${id} wiederhergestellt: «${shorten(row.text)}»`,
+    );
+    return this.questions.getForAdmin(id);
+  }
+
+  @Delete('trash/:id')
+  @HttpCode(204)
+  async purgeQuestion(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    if ((await this.questions.purge([id])) === 0) {
+      throw new NotFoundException();
+    }
+    await this.audit.record('trash.purge', `Frage F-${id} endgültig gelöscht`);
+  }
+
+  @Delete('trash')
+  @HttpCode(204)
+  async emptyTrash(): Promise<void> {
+    const removed = await this.questions.purge();
+    if (removed > 0) {
+      await this.audit.record(
+        'trash.purge',
+        `Papierkorb geleert: ${removed === 1 ? '1 Frage' : `${removed} Fragen`} endgültig gelöscht`,
+      );
+    }
   }
 
   @Post('questions/bulk')
@@ -194,7 +239,7 @@ export class AdminController {
         for (const id of ids) {
           await this.hints.forgetQuestion(id);
         }
-        summary = `${questions(ids, affected)} gelöscht`;
+        summary = `${questions(ids, affected)} in den Papierkorb gelegt`;
         break;
     }
     if (affected > 0) {

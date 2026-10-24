@@ -1,0 +1,119 @@
+<button
+  type="button"
+  class="ad-scrim"
+  aria-label="Schliessen"
+  (click)="closed.emit()"
+></button>
+<aside
+  class="ad-drawer trash"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="trash-title"
+>
+  <header class="ad-drawer-head">
+    <div>
+      <p class="ad-overline">Gelöschte Fragen</p>
+      <h2 id="trash-title">Papierkorb</h2>
+    </div>
+    <button
+      type="button"
+      class="icon-btn"
+      aria-label="Schliessen"
+      appAutofocus
+      (click)="closed.emit()"
+    >
+      <css-icon icon="close" size="sm"></css-icon>
+    </button>
+  </header>
+
+  <div class="ad-drawer-body">
+    <p class="note">
+      Gelöschte Fragen bleiben {{ days }} Tage hier und lassen sich mit ihrer
+      Statistik und ihrem Verlauf wiederherstellen. Danach werden sie endgültig
+      gelöscht.
+    </p>
+
+    @if (data.trash.error() && !data.trash.value()) {
+      <app-ad-state
+        kind="error"
+        [text]="data.trash.error()"
+        (retry)="data.trash.reload()"
+      />
+    } @else if (!data.trash.value()) {
+      <app-ad-state kind="loading" [lines]="4" />
+    } @else if (!items().length) {
+      <app-ad-state
+        kind="empty"
+        icon="trash"
+        title="Der Papierkorb ist leer"
+        text="Gelöschte Fragen erscheinen hier und lassen sich wiederherstellen."
+      />
+    } @else {
+      <ul class="list" aria-label="Gelöschte Fragen">
+        @for (item of items(); track item.id) {
+          <li class="row">
+            <div class="row-text">
+              <p class="row-meta">
+                <span class="ad-num">{{ code(item.id) }}</span>
+                @if (item.category) {
+                  <span>· {{ item.category }}</span>
+                }
+                <span>· gelöscht {{ formatRelative(item.deletedAt) }}</span>
+              </p>
+              <p class="row-title">{{ item.text }}</p>
+              <p class="row-answer">
+                <css-icon icon="checkmark" size="xs"></css-icon>
+                {{ item.options[item.correctIndex] }}
+                @if (item.answers) {
+                  <span class="ad-muted"
+                    >· {{ formatInt(item.answers) }} Antworten</span
+                  >
+                }
+              </p>
+            </div>
+            <div class="row-side">
+              <span class="left">{{ left(item) }}</span>
+              <div class="row-actions">
+                <button
+                  type="button"
+                  class="btn-secondary btn-sm"
+                  [disabled]="isBusy(item.id)"
+                  (click)="restore(item)"
+                >
+                  <css-icon icon="undo" size="xs"></css-icon>Wiederherstellen
+                </button>
+                <button
+                  type="button"
+                  class="icon-btn"
+                  [attr.aria-label]="code(item.id) + ' endgültig löschen'"
+                  title="Endgültig löschen"
+                  [disabled]="isBusy(item.id)"
+                  (click)="purge(item)"
+                >
+                  <css-icon icon="trash" size="xs"></css-icon>
+                </button>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  @if (items().length) {
+    <footer class="ad-drawer-foot">
+      <span class="count ad-muted"
+        >{{ formatInt(items().length) }} im Papierkorb</span
+      >
+      <span class="spacer"></span>
+      <button
+        type="button"
+        class="btn-danger"
+        [disabled]="emptying()"
+        (click)="empty()"
+      >
+        Papierkorb leeren
+      </button>
+    </footer>
+  }
+</aside>

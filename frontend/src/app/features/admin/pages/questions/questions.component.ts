@@ -14,10 +14,11 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import '@css-ch/components/icon';
-import type {
-  AdminQuestion,
-  BulkAction,
-  Hint,
+import {
+  type AdminQuestion,
+  type BulkAction,
+  type Hint,
+  TRASH_DAYS,
 } from '../../../../core/contracts/admin.contract';
 import { AdminApi, AdminApiError } from '../../core/admin-api.service';
 import { AdminData } from '../../core/admin-data.service';
@@ -41,6 +42,7 @@ import { AdStateComponent } from '../../ui/state.component';
 import { AdToggleComponent } from '../../ui/toggle.component';
 import { QuestionEditorComponent } from './question-editor.component';
 import { QuestionImportComponent } from './question-import.component';
+import { QuestionTrashComponent } from './question-trash.component';
 import { AdPageHeadComponent } from '../../ui/page-head.component';
 
 type StatusFilter = 'all' | 'active' | 'paused';
@@ -68,6 +70,7 @@ const SORTS: { id: Sort; label: string }[] = [
     AdToggleComponent,
     QuestionEditorComponent,
     QuestionImportComponent,
+    QuestionTrashComponent,
   ],
   templateUrl: './questions.component.html',
   styleUrl: './questions.component.scss',
@@ -102,6 +105,10 @@ export class QuestionsComponent {
   /** `new`, a question id, or null; kept in the address (`?frage=12`). */
   protected readonly editing = signal<'new' | number | null>(null);
   protected readonly importing = signal(false);
+  protected readonly trashOpen = signal(false);
+  protected readonly trashCount = computed(
+    () => this.data.trash.value()?.length ?? 0,
+  );
   protected readonly categoryMenu = signal(false);
   protected readonly newCategory = signal('');
 
@@ -143,7 +150,8 @@ export class QuestionsComponent {
       event.key === '/' &&
       !typing &&
       this.editing() === null &&
-      !this.importing()
+      !this.importing() &&
+      !this.trashOpen()
     ) {
       event.preventDefault();
       this.searchInput()?.nativeElement.focus();
@@ -415,8 +423,8 @@ export class QuestionsComponent {
     if (action === 'delete') {
       const sure = await this.confirm.ask({
         title: `${count} löschen?`,
-        text: 'Die Fragen und ihre Statistik werden endgültig gelöscht. Wer sie nur vorübergehend aus dem Spiel nehmen will, pausiert sie besser.',
-        confirm: 'Endgültig löschen',
+        text: `Die Fragen kommen in den Papierkorb und lassen sich dort ${TRASH_DAYS} Tage lang mit ihrer Statistik wiederherstellen. Wer sie nur vorübergehend aus dem Spiel nehmen will, pausiert sie besser.`,
+        confirm: 'Löschen',
         danger: true,
       });
       if (!sure) {
@@ -439,10 +447,18 @@ export class QuestionsComponent {
       const labels: Record<typeof action, string> = {
         activate: 'aktiviert',
         deactivate: 'pausiert',
-        delete: 'gelöscht',
+        delete: 'in den Papierkorb gelegt',
         reset: 'zurückgesetzt',
       };
-      this.notify.success(`${count} ${labels[action]}`);
+      this.notify.success(
+        `${count} ${labels[action]}`,
+        action === 'delete'
+          ? {
+              label: 'Rückgängig',
+              run: () => void this.data.restoreQuestions(ids),
+            }
+          : undefined,
+      );
       if (action === 'delete') {
         this.clearSelection();
       }

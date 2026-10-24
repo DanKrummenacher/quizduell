@@ -5,18 +5,24 @@ import {
   NotFoundException,
   type OnModuleInit,
 } from '@nestjs/common';
-import { and, asc, count, eq, gte, inArray, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, inArray, lt, sql } from 'drizzle-orm';
 import { lastDays, zurichDay } from '../common/zurich-time.js';
 import { APP_CONFIG, type AppConfig } from '../config/app-config.js';
 import type {
   AdminQuestion,
   QuestionDay,
   QuestionInput,
+  TrashedQuestion,
 } from '../contracts/admin.contract.js';
-import { ADMIN_LIMITS } from '../contracts/admin.contract.js';
+import { ADMIN_LIMITS, TRASH_DAYS } from '../contracts/admin.contract.js';
 import { ANSWER_OPTION_COUNT } from '../contracts/game.contract.js';
 import { DatabaseService } from '../database/database.service.js';
-import { questionDaily, questions, type QuestionRow } from '../database/schema.js';
+import {
+  deletedQuestions,
+  questionDaily,
+  questions,
+  type QuestionRow,
+} from '../database/schema.js';
 import { SAMPLE_QUESTIONS } from './sample-questions.js';
 
 export interface GameQuestion {
@@ -58,6 +64,7 @@ export class QuestionsService implements OnModuleInit {
   }
 
   async removeAll(): Promise<number> {
+    await this.db.delete(deletedQuestions);
     const deleted = await this.db.delete(questions).returning({ id: questions.id });
     return deleted.length;
   }
@@ -241,11 +248,9 @@ export class QuestionsService implements OnModuleInit {
     return { before, after: after! };
   }
 
+  /** Moves the question to the trash, where it can be restored for a while. */
   async remove(id: number): Promise<QuestionRow> {
-    const [row] = await this.db
-      .delete(questions)
-      .where(eq(questions.id, id))
-      .returning();
+    const [row] = await this.trashRows([id]);
     if (!row) {
       throw new NotFoundException();
     }
@@ -272,11 +277,89 @@ export class QuestionsService implements OnModuleInit {
   }
 
   async removeMany(ids: number[]): Promise<number> {
+    return (await this.trashRows(ids)).length;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Trash
+  // ---------------------------------------------------------------------------
+
+  /** Deleted questions, newest first; older than the trash keeps are gone. */
+  async trash(): Promise<TrashedQuestion[]> {
+    await this.purgeExpired();
     const rows = await this.db
-      .delete(questions)
-      .where(inArray(questions.id, ids))
-      .returning({ id: questions.id });
+      .select()
+      .from(deletedQuestions)
+      .orderBy(desc(deletedQuestions.deletedAt), desc(deletedQuestions.id));
+    return rows.map((row) => {
+      const question = fromStored(row.question as StoredQuestion);
+      return {
+        id: row.id,
+        text: question.text,
+        options: question.options,
+        correctIndex: question.correctIndex,
+        category: question.category,
+        answers: question.timesAsked,
+        deletedAt: row.deletedAt.toISOString(),
+        expiresAt: new Date(
+          row.deletedAt.getTime() + TRASH_DAYS * 86_400_000,
+        ).toISOString(),
+      };
+    });
+  }
+
+  /** Puts a deleted question back, with its id, statistics and history. */
+  async restore(id: number): Promise<QuestionRow> {
+    return this.db.transaction(async (tx) => {
+      const [stored] = await tx
+        .delete(deletedQuestions)
+        .where(eq(deletedQuestions.id, id))
+        .returning();
+      if (!stored) {
+        throw new NotFoundException();
+      }
+      const [row] = await tx
+        .insert(questions)
+        .values(fromStored(stored.question as StoredQuestion))
+        .returning();
+      return row!;
+    });
+  }
+
+  /** Removes questions from the trash for good; without ids, all of them. */
+  async purge(ids?: number[]): Promise<number> {
+    const rows = await this.db
+      .delete(deletedQuestions)
+      .where(ids ? inArray(deletedQuestions.id, ids) : undefined)
+      .returning({ id: deletedQuestions.id });
     return rows.length;
+  }
+
+  private async trashRows(ids: number[]): Promise<QuestionRow[]> {
+    if (!ids.length) {
+      return [];
+    }
+    await this.purgeExpired();
+    return this.db.transaction(async (tx) => {
+      const rows = await tx
+        .delete(questions)
+        .where(inArray(questions.id, ids))
+        .returning();
+      if (rows.length) {
+        await tx
+          .insert(deletedQuestions)
+          .values(rows.map((row) => ({ id: row.id, question: toStored(row) })))
+          .onConflictDoNothing();
+      }
+      return rows;
+    });
+  }
+
+  private async purgeExpired(): Promise<void> {
+    const cutoff = new Date(Date.now() - TRASH_DAYS * 86_400_000);
+    await this.db
+      .delete(deletedQuestions)
+      .where(lt(deletedQuestions.deletedAt, cutoff));
   }
 
   async resetStats(ids: number[]): Promise<number> {
@@ -334,6 +417,27 @@ const RESET = {
   answerMsTotal: 0,
   picks: [0, 0, 0, 0],
 };
+
+type StoredQuestion = Omit<QuestionRow, 'createdAt' | 'updatedAt'> & {
+  createdAt: string;
+  updatedAt: string;
+};
+
+function toStored(row: QuestionRow): StoredQuestion {
+  return {
+    ...row,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+function fromStored(stored: StoredQuestion): QuestionRow {
+  return {
+    ...stored,
+    createdAt: new Date(stored.createdAt),
+    updatedAt: new Date(stored.updatedAt),
+  };
+}
 
 function toAdminQuestion(
   row: QuestionRow,

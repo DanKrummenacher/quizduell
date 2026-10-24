@@ -99,6 +99,23 @@ export interface QuestionDay {
   timeouts: number;
 }
 
+/** A deleted question, kept so it can be restored. */
+export interface TrashedQuestion {
+  id: number;
+  text: string;
+  options: string[];
+  correctIndex: number;
+  category: string | null;
+  /** Answers given while it was in play. */
+  answers: number;
+  deletedAt: string;
+  /** When it is removed for good. */
+  expiresAt: string;
+}
+
+/** Days a deleted question stays in the trash. */
+export const TRASH_DAYS = 30;
+
 export type BulkAction = 'activate' | 'deactivate' | 'delete' | 'category' | 'reset';
 
 export interface BulkRequest {
@@ -313,6 +330,8 @@ export type AuditAction =
   | 'question.create'
   | 'question.update'
   | 'question.delete'
+  | 'question.restore'
+  | 'trash.purge'
   | 'questions.bulk'
   | 'questions.import'
   | 'hint.ignore'

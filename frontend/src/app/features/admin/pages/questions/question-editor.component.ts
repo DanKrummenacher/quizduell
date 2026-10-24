@@ -19,6 +19,7 @@ import {
   ADMIN_LIMITS,
   type AdminQuestion,
   type QuestionDay,
+  TRASH_DAYS,
 } from '../../../../core/contracts/admin.contract';
 import { ANSWER_LETTERS } from '../../../../core/game/answer-letters';
 import { AdminApi } from '../../core/admin-api.service';
@@ -356,11 +357,8 @@ export class QuestionEditorComponent {
     }
     const sure = await this.confirm.ask({
       title: `F-${question.id} löschen?`,
-      text:
-        question.stats.answers > 0
-          ? `Die Frage und ihre Statistik (${formatInt(question.stats.answers)} Antworten) werden endgültig gelöscht. Pausieren nimmt sie nur aus dem Spiel.`
-          : 'Die Frage wird endgültig gelöscht.',
-      confirm: 'Endgültig löschen',
+      text: `Die Frage kommt in den Papierkorb und lässt sich dort ${TRASH_DAYS} Tage lang${question.stats.answers > 0 ? ` mit ihrer Statistik (${formatInt(question.stats.answers)} Antworten)` : ''} wiederherstellen. Pausieren nimmt sie nur aus dem Spiel.`,
+      confirm: 'Löschen',
       danger: true,
     });
     if (!sure) {
@@ -370,7 +368,10 @@ export class QuestionEditorComponent {
       this.saving.set(true);
       await this.api.deleteQuestion(question.id);
       this.data.removeQuestions([question.id]);
-      this.notify.success(`F-${question.id} gelöscht`);
+      this.notify.success(`F-${question.id} in den Papierkorb gelegt`, {
+        label: 'Rückgängig',
+        run: () => void this.data.restoreQuestions([question.id]),
+      });
       this.original = this.draft();
       this.closed.emit();
     } catch (error) {

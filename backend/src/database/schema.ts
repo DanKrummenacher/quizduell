@@ -123,6 +123,23 @@ export const auditLog = pgTable(
   (table) => [index('audit_log_at_idx').on(table.at)],
 );
 
+/**
+ * Deleted questions, kept with all their values for a while so they can be
+ * restored under their old id; the daily rows in `question_daily` stay anyway.
+ */
+export const deletedQuestions = pgTable(
+  'deleted_questions',
+  {
+    id: integer('id').primaryKey(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    /** The question row as it was, dates as ISO strings. */
+    question: jsonb('question').notNull(),
+  },
+  (table) => [index('deleted_questions_deleted_at_idx').on(table.deletedAt)],
+);
+
 /** Hints the admin decided to ignore. */
 export const dismissedHints = pgTable('dismissed_hints', {
   key: varchar('key', { length: 80 }).primaryKey(),

@@ -91,7 +91,7 @@ test.describe('admin', () => {
     expect(errors).toEqual([]);
   });
 
-  test('creates, pauses and deletes a question', async ({ page }) => {
+  test('creates, pauses, deletes and restores a question', async ({ page }) => {
     await signIn(page, '/admin/fragen');
     await page.getByRole('button', { name: 'Neue Frage' }).click();
     const editor = page.getByRole('dialog', { name: 'Frage erfassen' });
@@ -128,10 +128,19 @@ test.describe('admin', () => {
     await edit.getByRole('button', { name: 'Löschen' }).click();
     await page
       .getByRole('dialog', { name: /löschen\?/ })
-      .getByRole('button', { name: 'Endgültig löschen' })
+      .getByRole('button', { name: 'Löschen', exact: true })
       .click();
     await expect(edit).toBeHidden();
     await expect(page.getByText('Keine Frage passt')).toBeVisible();
+
+    // The deleted question waits in the trash and comes back from there.
+    await page.getByRole('button', { name: /^Papierkorb/ }).click();
+    const trash = page.getByRole('dialog', { name: 'Papierkorb' });
+    const trashed = trash.getByRole('listitem').filter({ hasText: 'Kanada' });
+    await trashed.getByRole('button', { name: 'Wiederherstellen' }).click();
+    await expect(trashed).toBeHidden();
+    await trash.getByRole('button', { name: 'Schliessen' }).first().click();
+    await expect(row).toHaveCount(1);
   });
 
   test('changes a rule and restores it from the history', async ({ page }) => {

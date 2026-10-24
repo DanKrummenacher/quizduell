@@ -18,6 +18,7 @@ import type {
   QuestionDay,
   PauseRequest,
   QuestionInput,
+  TrashedQuestion,
   QuestionUpdate,
 } from '../../../core/contracts/admin.contract';
 import { AdminSessionService } from './admin-session.service';
@@ -80,6 +81,32 @@ export class AdminApi {
   deleteQuestion(id: number): Promise<void> {
     return this.call(
       this.http.delete<void>(`${BASE}/questions/${id}`, this.options()),
+    );
+  }
+
+  trash(): Promise<TrashedQuestion[]> {
+    return this.call(
+      this.http.get<TrashedQuestion[]>(`${BASE}/trash`, this.options()),
+    );
+  }
+
+  restoreQuestion(id: number): Promise<AdminQuestion> {
+    return this.call(
+      this.http.post<AdminQuestion>(
+        `${BASE}/trash/${id}/restore`,
+        {},
+        this.options(),
+      ),
+    );
+  }
+
+  /** Deletes a question in the trash for good; without an id, all of them. */
+  purgeTrash(id?: number): Promise<void> {
+    return this.call(
+      this.http.delete<void>(
+        id === undefined ? `${BASE}/trash` : `${BASE}/trash/${id}`,
+        this.options(),
+      ),
     );
   }
 

@@ -1,0 +1,95 @@
+@use '../../styles/tokens' as t;
+
+.trash {
+  width: 600px;
+}
+
+.note {
+  margin-bottom: 18px;
+  color: t.$text-2;
+  font-size: t.$text-base;
+  line-height: 1.5;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 0;
+  border-top: 1px solid t.$line-soft;
+
+  &:last-child {
+    border-bottom: 1px solid t.$line-soft;
+  }
+}
+
+.row-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 4px;
+  color: t.$text-3;
+  font-size: t.$text-sm;
+}
+
+.row-title {
+  font-size: t.$text-md;
+  font-weight: t.$medium;
+  line-height: 1.4;
+}
+
+.row-answer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  color: t.$success-text;
+  font-size: t.$text-sm;
+}
+
+.row-side {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  flex: none;
+}
+
+.left {
+  color: t.$text-4;
+  font-size: t.$text-xs;
+  white-space: nowrap;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.count {
+  font-size: t.$text-sm;
+}
+
+@media (max-width: 640px) {
+  .row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .row-side {
+    justify-items: start;
+    width: 100%;
+  }
+}

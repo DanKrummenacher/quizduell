@@ -497,3 +497,19 @@
     height: 32px;
   }
 }
+
+// How many deleted questions wait in the trash.
+.trash-count {
+  min-width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  padding: 0 5px;
+  border-radius: t.$radius-pill;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  font-size: t.$text-xs;
+  font-weight: t.$bold;
+  line-height: 18px;
+  text-align: center;
+  @include t.numeric;
+}

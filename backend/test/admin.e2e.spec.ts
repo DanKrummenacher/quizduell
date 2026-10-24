@@ -10,6 +10,7 @@ import type {
   Hint,
   LiveSnapshot,
   QuestionInput,
+  TrashedQuestion,
 } from '../src/contracts/admin.contract.js';
 import { ClientEvents } from '../src/contracts/game.contract.js';
 import { DatabaseService } from '../src/database/database.service.js';
@@ -177,10 +178,27 @@ describe('admin API (e2e)', () => {
       expect(after.every((q) => q.active && q.category === 'Allgemein')).toBe(true);
     });
 
-    it('deletes a question', async () => {
+    it('deletes a question into the trash and restores it', async () => {
       await del(`/questions/${id}`).expect(204);
       await del(`/questions/${id}`).expect(404);
       await get(`/questions/${id}/history`).expect(404);
+
+      const trash = (await get('/trash').expect(200)).body as TrashedQuestion[];
+      expect(trash.map((q) => q.id)).toContain(id);
+
+      const restored = await post(`/trash/${id}/restore`).expect(200);
+      expect((restored.body as AdminQuestion).id).toBe(id);
+      await get(`/questions/${id}/history`).expect(200);
+      await post(`/trash/${id}/restore`).expect(404);
+    });
+
+    it('deletes a question for good from the trash', async () => {
+      await del(`/questions/${id}`).expect(204);
+      await del(`/trash/${id}`).expect(204);
+      await del(`/trash/${id}`).expect(404);
+      await post(`/trash/${id}/restore`).expect(404);
+      await del('/trash').expect(204);
+      expect((await get('/trash').expect(200)).body).toEqual([]);
     });
   });
 
