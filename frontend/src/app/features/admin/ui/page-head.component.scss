@@ -20,6 +20,11 @@ app-ad-page-head {
   margin-bottom: 28px;
   padding-bottom: 22px;
 
+  // While the menu of the path is open, the head lies above everything below.
+  &:has(.ph-menu) {
+    z-index: 10;
+  }
+
   css-icon {
     display: inline-flex;
   }

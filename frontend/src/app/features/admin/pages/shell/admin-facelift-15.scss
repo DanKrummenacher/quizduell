@@ -1,0 +1,298 @@
+// Temporary: facelift drafts of the whole admin, round 7 (data-face h1–h8).
+// One base from the chosen pieces – the leading figure of «Hauptzahl», the
+// hairlines and small labels of «Linie», the track of «Präzision» – with
+// eight ways to set the page and its head. This file: the base and h1–h4.
+//   h1 Klar         the base on today's page with its dots
+//   h2 Fläche       surfaces instead of borders on a white page
+//   h3 Zweiflächig  the head on a soft blue panel, the page below white
+//   h4 Morgenlicht  a light of colour behind the head, under the figures
+@use '../../styles/tokens' as t;
+
+$hair: rgba(0, 50, 125, 0.09);
+// Rounds 8 to 10 (i, j, k; admin-facelift-17/18/19.scss) use the same base.
+$all: "app-admin-shell .ad-frame:is([data-face^='h'], [data-face^='i'], [data-face^='j'], [data-face^='k'], [data-face^='m'])";
+
+// The base -------------------------------------------------------------------
+
+#{$all} {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    border-radius: 9px;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .btn-primary {
+    box-shadow:
+      0 1px 2px rgba(0, 50, 125, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  .btn-secondary {
+    border-color: rgba(0, 50, 125, 0.16);
+    box-shadow: 0 1px 2px rgba(0, 50, 125, 0.05);
+  }
+
+  .ad-more {
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: $hair;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(0, 50, 125, 0.04);
+  }
+
+  .ad-card.flush > .ad-card-head {
+    border-bottom: 1px solid $hair;
+  }
+
+  .ad-card-head {
+    h2 {
+      font-size: 15px;
+      letter-spacing: -0.005em;
+    }
+
+    p {
+      color: t.$text-3;
+      font-size: 12.5px;
+    }
+  }
+
+  app-ad-kpi {
+    .label {
+      color: t.$text-3;
+      font-size: 12px;
+    }
+
+    .value {
+      font-size: 28px;
+      letter-spacing: -0.025em;
+    }
+  }
+
+  // The first figure leads.
+  @media (min-width: 1201px) {
+    .kpis:has(> app-ad-kpi:nth-child(4):last-child) {
+      grid-template-columns: 1.7fr repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .kpis > app-ad-kpi:first-child {
+    border-color: transparent;
+    background:
+      radial-gradient(70% 120% at 100% 0%, rgba(0, 164, 224, 0.16), transparent 60%),
+      linear-gradient(160deg, #eef5fc, #e4eef9);
+
+    .label {
+      color: t.$text;
+      font-weight: t.$bold;
+    }
+
+    .value {
+      font-size: 46px;
+      letter-spacing: -0.035em;
+    }
+  }
+
+  // The segmented control as a track with a white thumb.
+  .ad-segmented {
+    gap: 2px;
+    padding: 3px;
+    border: 0;
+    border-radius: 10px;
+    background: rgba(0, 50, 125, 0.06);
+
+    button {
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 7px;
+      color: t.$text-2;
+
+      & + button {
+        border-left: 0;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.6);
+        color: t.$text;
+      }
+
+      &.is-active {
+        background: #fff;
+        color: t.$text;
+        font-weight: t.$bold;
+        box-shadow:
+          0 1px 2px rgba(0, 50, 125, 0.16),
+          0 0 0 0.5px rgba(0, 50, 125, 0.1);
+      }
+    }
+  }
+
+  .ad-chip {
+    height: 30px;
+    border-color: rgba(0, 50, 125, 0.16);
+    border-radius: 9px;
+
+    &.is-active {
+      border-color: t.$text;
+    }
+  }
+
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 50, 125, 0.18);
+    border-radius: 9px;
+
+    &:focus-within {
+      border-color: #0078bb;
+      box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.16);
+    }
+  }
+
+  .ad-table {
+    th {
+      background: transparent;
+      color: t.$text-3;
+    }
+
+    td {
+      border-bottom-color: $hair;
+    }
+
+    tbody tr:hover {
+      background: rgba(0, 50, 125, 0.025);
+    }
+  }
+
+  .badge {
+    border-radius: 6px;
+  }
+}
+
+// A plain page behind the frame.
+@mixin page($background) {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: $background;
+    pointer-events: none;
+  }
+}
+
+// The light of the head reaches under the figures on pages that have them.
+@mixin under-figures($depth: 90px) {
+  .ad-page:has(> .kpis, > .ad-card.metrics) .ph::before {
+    bottom: -$depth;
+  }
+
+  .ad-page > .kpis,
+  .ad-page > .ad-card.metrics {
+    position: relative;
+    z-index: 4;
+  }
+}
+
+// h2 Fläche ------------------------------------------------------------------
+
+$surface: #f3f6f9;
+
+app-admin-shell .ad-frame[data-face='h2'] {
+  @include page(#fff);
+
+  .ad-card,
+  app-ad-kpi:not(:first-child),
+  .ad-page .list .item {
+    border-color: transparent;
+    border-radius: 16px;
+    background: $surface;
+    box-shadow: none;
+  }
+
+  .ad-input,
+  .ad-select,
+  .ad-chip:not(.is-active),
+  .btn-secondary {
+    border-color: transparent;
+    background: $surface;
+    box-shadow: none;
+  }
+
+  .ad-segmented {
+    background: $surface;
+  }
+}
+
+// h3 Zweiflächig -------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='h3'] {
+  @include page(#fff);
+
+  .ph {
+    padding-bottom: 28px;
+
+    &::before {
+      inset: -32px -100vmax 0;
+      border-bottom: 1px solid #dde6f0;
+      background:
+        radial-gradient(
+          40% 160px at 70% 0,
+          rgba(0, 164, 224, 0.16),
+          transparent 100%
+        ),
+        linear-gradient(180deg, #e9f1f9, #f3f7fb);
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+// h4 Morgenlicht -------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='h4'] {
+  @include page(#fbfcfd);
+  @include under-figures;
+
+  .ph {
+    padding-bottom: 28px;
+
+    &::before {
+      inset: -32px -100vmax 0;
+      background:
+        radial-gradient(
+          30% 260px at 18% 0,
+          rgba(0, 164, 224, 0.42),
+          transparent 70%
+        ),
+        radial-gradient(
+          28% 240px at 62% 10%,
+          rgba(155, 80, 200, 0.24),
+          transparent 70%
+        ),
+        radial-gradient(
+          30% 260px at 96% 30%,
+          rgba(0, 120, 187, 0.34),
+          transparent 70%
+        ),
+        linear-gradient(180deg, #e6f0fa, rgba(242, 246, 251, 0));
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+}

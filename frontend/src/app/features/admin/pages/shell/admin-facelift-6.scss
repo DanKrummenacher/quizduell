@@ -1,0 +1,333 @@
+// Temporary: facelift drafts of the whole admin, round 2 (data-face c5–c7).
+//   c5 Bento   large radii, tinted figure tiles, generous controls
+//   c6 Raster  Swiss: no radius, a navy rule above every block, square
+//              controls, a plain page
+//   c7 Fläche  surfaces instead of borders on a white page, soft fields
+@use '../../styles/tokens' as t;
+
+$c5: "app-admin-shell .ad-frame[data-face='c5']";
+$c6: "app-admin-shell .ad-frame[data-face='c6']";
+$c7: "app-admin-shell .ad-frame[data-face='c7']";
+
+// A layer behind the page, inside the frame.
+@mixin backdrop($background) {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: $background;
+    pointer-events: none;
+  }
+}
+
+@mixin sentence-buttons($radius) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    border-radius: $radius;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-more {
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+}
+
+// c5 Bento -------------------------------------------------------------------
+
+#{$c5} {
+  @include sentence-buttons(t.$radius-pill);
+
+  .ad-grid,
+  .kpis {
+    gap: 16px;
+  }
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: transparent;
+    border-radius: 24px;
+    box-shadow:
+      0 0 0 1px rgba(0, 50, 125, 0.05),
+      0 1px 2px rgba(0, 50, 125, 0.04);
+  }
+
+  .ad-card:not(.flush) {
+    padding: 24px 26px;
+  }
+
+  .ad-card.flush > .ad-card-head {
+    padding: 22px 26px 16px;
+  }
+
+  .ad-card-head h2 {
+    font-size: 17px;
+  }
+
+  app-ad-kpi {
+    padding: 22px 24px;
+    box-shadow: none;
+
+    .value {
+      font-size: 34px;
+      letter-spacing: -0.02em;
+    }
+
+    &:nth-child(4n + 1) {
+      background: #eaf5fc;
+    }
+
+    &:nth-child(4n + 2) {
+      background: #f0eefb;
+    }
+
+    &:nth-child(4n + 3) {
+      background: #e9f6f0;
+    }
+
+    &:nth-child(4n + 4) {
+      background: #fcf1e8;
+    }
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger {
+    height: 40px;
+    padding: 0 20px;
+  }
+
+  .ad-segmented {
+    gap: 2px;
+    padding: 4px;
+    border: 0;
+    border-radius: t.$radius-pill;
+    background: #e9eef5;
+
+    button {
+      height: 32px;
+      padding: 0 16px;
+      border-radius: t.$radius-pill;
+      color: t.$text-2;
+
+      & + button {
+        border-left: 0;
+      }
+
+      &.is-active {
+        background: #fff;
+        color: t.$text;
+        font-weight: t.$bold;
+        box-shadow: 0 2px 6px -2px rgba(0, 50, 125, 0.25);
+      }
+    }
+  }
+
+  .ad-chip {
+    height: 36px;
+    padding: 0 16px;
+    border-color: transparent;
+
+    &:not(.is-active) {
+      background: #e9eef5;
+    }
+  }
+
+  .ad-input,
+  .ad-select {
+    height: 44px;
+    border-color: transparent;
+    border-radius: 16px;
+    box-shadow: 0 0 0 1px rgba(0, 50, 125, 0.1);
+
+    &:focus-within {
+      box-shadow:
+        0 0 0 1px #0078bb,
+        0 0 0 5px rgba(0, 120, 187, 0.12);
+    }
+  }
+
+  .ad-table th {
+    background: transparent;
+  }
+}
+
+// c6 Raster ------------------------------------------------------------------
+
+#{$c6} {
+  @include backdrop(#f6f6f3);
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border: 0;
+    border-top: 2px solid t.$brand;
+    border-radius: 0;
+    box-shadow: 0 1px 0 rgba(0, 50, 125, 0.08);
+  }
+
+  .ad-card-head h2 {
+    font-size: 17px;
+    letter-spacing: -0.01em;
+  }
+
+  app-ad-kpi {
+    .label {
+      color: t.$text;
+      font-size: 11px;
+      font-weight: t.$bold;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .value {
+      font-size: 36px;
+      letter-spacing: -0.03em;
+    }
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger,
+  .ad-segmented,
+  .ad-chip,
+  .ad-input,
+  .ad-select {
+    border-radius: 2px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    height: 36px;
+    letter-spacing: 0.12em;
+  }
+
+  .ad-segmented,
+  .ad-chip,
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 50, 125, 0.45);
+  }
+
+  .ad-segmented button + button {
+    border-left-color: rgba(0, 50, 125, 0.45);
+  }
+
+  .ad-table th {
+    border-bottom: 2px solid t.$brand;
+    background: transparent;
+    color: t.$text;
+    font-weight: t.$bold;
+  }
+
+  .ad-tabs {
+    border-bottom: 2px solid rgba(0, 50, 125, 0.12);
+
+    .is-active::after {
+      bottom: -2px;
+      border-radius: 0;
+    }
+  }
+}
+
+// c7 Fläche ------------------------------------------------------------------
+
+$surface: #f3f6f9;
+
+#{$c7} {
+  @include backdrop(#fff);
+  @include sentence-buttons(10px);
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: transparent;
+    border-radius: 16px;
+    background: $surface;
+  }
+
+  .ad-page .list .item:hover {
+    background: #ebf0f6;
+  }
+
+  .ad-table {
+    th {
+      border-bottom-color: #e3e9f0;
+      background: transparent;
+    }
+
+    td {
+      border-bottom-color: #e6ebf1;
+    }
+
+    tbody tr:hover {
+      background: #ebf0f6;
+    }
+  }
+
+  .btn-secondary {
+    border-color: transparent;
+    background: $surface;
+
+    &:hover:not(:disabled) {
+      background: #e7edf4;
+    }
+  }
+
+  .ad-segmented {
+    gap: 2px;
+    padding: 3px;
+    border: 0;
+    border-radius: 11px;
+    background: $surface;
+
+    button {
+      height: 28px;
+      border-radius: 8px;
+      color: t.$text-2;
+
+      & + button {
+        border-left: 0;
+      }
+
+      &.is-active {
+        background: #fff;
+        color: t.$text;
+        font-weight: t.$bold;
+        box-shadow: 0 1px 3px rgba(0, 50, 125, 0.14);
+      }
+    }
+  }
+
+  .ad-chip {
+    border-color: transparent;
+
+    &:not(.is-active) {
+      background: $surface;
+    }
+  }
+
+  .ad-input,
+  .ad-select {
+    border-color: transparent;
+    border-radius: 10px;
+    background: $surface;
+
+    &:focus-within {
+      border-color: #0078bb;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(0, 120, 187, 0.12);
+    }
+  }
+}

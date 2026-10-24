@@ -1,0 +1,298 @@
+// Temporary: facelift drafts of the whole admin, round 3 (data-face d4–d6).
+//   d4 Kontur  the shape language of the quiz itself: 2px navy outlines and a
+//              hard offset shadow, like the answer buttons of the game
+//   d5 Tiefe   layered elevation: cards rise on hover, the figures stand on a
+//              soft tinted plate, controls float
+//   d6 Bühne   the figures of a page on one navy stage, the rest calm and white
+@use '../../styles/tokens' as t;
+
+$d4: "app-admin-shell .ad-frame[data-face='d4']";
+$d5: "app-admin-shell .ad-frame[data-face='d5']";
+$d6: "app-admin-shell .ad-frame[data-face='d6']";
+$phone: 640px;
+
+// d4 Kontur ------------------------------------------------------------------
+
+$ink: t.$brand;
+$offset: 3px 3px 0 $ink;
+
+#{$d4} {
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border: 2px solid $ink;
+    border-radius: 12px;
+    box-shadow: $offset;
+  }
+
+  app-ad-kpi {
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover {
+      box-shadow: 5px 5px 0 $ink;
+      transform: translate(-2px, -2px);
+    }
+
+    .label {
+      color: t.$text;
+      font-weight: t.$bold;
+    }
+  }
+
+  .ad-card.flush > .ad-card-head {
+    border-bottom: 2px solid $ink;
+  }
+
+  .ad-card-head h2 {
+    font-size: 17px;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger {
+    border-width: 2px;
+    border-color: $ink;
+    box-shadow: 2px 2px 0 $ink;
+
+    &:active:not(:disabled) {
+      box-shadow: none;
+      transform: translate(2px, 2px);
+    }
+  }
+
+  .ad-segmented,
+  .ad-input,
+  .ad-select {
+    border: 2px solid $ink;
+    border-radius: 10px;
+  }
+
+  .ad-segmented button + button {
+    border-left: 2px solid $ink;
+  }
+
+  .ad-chip {
+    border: 2px solid $ink;
+  }
+
+  .ad-table {
+    th {
+      border-bottom: 2px solid $ink;
+      background: #eef5fb;
+      color: $ink;
+      font-weight: t.$bold;
+    }
+  }
+
+  .ad-tabs {
+    border-bottom: 2px solid $ink;
+
+    .is-active::after {
+      bottom: -2px;
+      height: 4px;
+      border-radius: 0;
+    }
+  }
+}
+
+// d5 Tiefe -------------------------------------------------------------------
+
+$lift:
+  0 1px 1px rgba(0, 50, 125, 0.04),
+  0 2px 4px rgba(0, 50, 125, 0.04),
+  0 8px 16px -4px rgba(0, 50, 125, 0.08),
+  0 20px 32px -16px rgba(0, 50, 125, 0.16);
+
+#{$d5} {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    border-radius: 11px;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-more {
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    box-shadow: $lift;
+    transition:
+      box-shadow 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .ad-card:hover,
+  app-ad-kpi:hover,
+  .ad-page .list .item:hover {
+    box-shadow:
+      $lift,
+      0 28px 44px -20px rgba(0, 50, 125, 0.26);
+    transform: translateY(-2px);
+  }
+
+  app-ad-kpi .value {
+    width: fit-content;
+    margin: 4px 0 2px;
+    padding: 2px 10px;
+    border-radius: 10px;
+    background: #eef5fb;
+    font-size: 28px;
+  }
+
+  .btn-primary {
+    box-shadow: 0 10px 20px -10px rgba(0, 50, 125, 0.8);
+  }
+
+  .btn-secondary,
+  .ad-chip:not(.is-active),
+  .ad-segmented,
+  .ad-input,
+  .ad-select {
+    border-color: transparent;
+    box-shadow:
+      0 0 0 1px rgba(0, 50, 125, 0.08),
+      0 4px 10px -4px rgba(0, 50, 125, 0.18);
+  }
+
+  .ad-segmented {
+    border-radius: 11px;
+
+    button + button {
+      border-left-color: rgba(0, 50, 125, 0.08);
+    }
+  }
+
+  .ad-input,
+  .ad-select {
+    border-radius: 11px;
+  }
+
+  .ad-table th {
+    background: transparent;
+  }
+}
+
+// d6 Bühne -------------------------------------------------------------------
+
+#{$d6} {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    border-radius: 10px;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-card,
+  .ad-page .list .item {
+    border-color: rgba(0, 50, 125, 0.09);
+    border-radius: 14px;
+  }
+
+  // The figures stand together on one navy stage.
+  .kpis,
+  .ad-card.metrics {
+    --ad-chart-accent: #7fd3f7;
+    --ad-chart-surface: #00327d;
+    gap: 0;
+    padding: 6px;
+    border: 0;
+    border-radius: 20px;
+    background:
+      radial-gradient(40% 140% at 85% 0%, rgba(0, 164, 224, 0.4), transparent 70%),
+      radial-gradient(
+        30% 120% at 0% 100%,
+        rgba(155, 80, 200, 0.22),
+        transparent 70%
+      ),
+      linear-gradient(160deg, #0a3f92, t.$brand 55%, #00245c);
+    box-shadow: 0 24px 44px -26px rgba(0, 30, 80, 0.9);
+    color: #fff;
+  }
+
+  .kpis app-ad-kpi {
+    border: 0;
+    border-radius: 14px;
+    background: transparent;
+    color: #fff;
+
+    & + app-ad-kpi {
+      box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .label,
+    .note,
+    .change,
+    .value small {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .delta {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+
+      &.good {
+        background: rgba(0, 224, 157, 0.18);
+        color: #7ff0c8;
+      }
+
+      &.bad {
+        background: rgba(255, 120, 90, 0.2);
+        color: #ffb5a3;
+      }
+    }
+
+    .value {
+      font-size: 32px;
+    }
+  }
+
+  .ad-card.metrics {
+    * {
+      color: #fff;
+    }
+
+    .metric {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .metric-label {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  @media (max-width: $phone) {
+    .kpis app-ad-kpi + app-ad-kpi {
+      box-shadow: none;
+    }
+  }
+
+  .ad-segmented,
+  .ad-chip,
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 50, 125, 0.2);
+    border-radius: 10px;
+  }
+
+  .ad-segmented button + button {
+    border-left-color: rgba(0, 50, 125, 0.12);
+  }
+
+  .ad-table th {
+    background: transparent;
+  }
+}

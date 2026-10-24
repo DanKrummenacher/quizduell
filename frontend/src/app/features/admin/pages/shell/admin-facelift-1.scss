@@ -1,0 +1,300 @@
+// Temporary: facelift drafts of the whole admin (data-face on the frame).
+//   b1 Präzision  hairlines, 12px radius, sentence-case buttons, a segmented
+//                 track with a white thumb – calm and exact
+//   b2 Weich      borderless cards on soft layered shadows, more air, pills
+@use '../../styles/tokens' as t;
+
+$b1: "app-admin-shell .ad-frame[data-face='b1']";
+$b2: "app-admin-shell .ad-frame[data-face='b2']";
+$hair: rgba(0, 50, 125, 0.1);
+
+// b1 Präzision ---------------------------------------------------------------
+
+#{$b1} {
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: $hair;
+    border-radius: 12px;
+    box-shadow:
+      0 1px 2px rgba(0, 50, 125, 0.04),
+      0 2px 6px -2px rgba(0, 50, 125, 0.04);
+  }
+
+  .ad-card.flush > .ad-card-head {
+    border-bottom: 1px solid t.$line-soft;
+  }
+
+  .ad-card-head h2 {
+    font-size: 15px;
+    letter-spacing: -0.005em;
+  }
+
+  app-ad-kpi .label {
+    color: t.$text-3;
+    font-size: 12px;
+    letter-spacing: 0.01em;
+  }
+
+  app-ad-kpi .value {
+    font-size: 30px;
+    letter-spacing: -0.025em;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 9px;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .btn-primary {
+    box-shadow:
+      0 1px 2px rgba(0, 50, 125, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  .btn-secondary {
+    border-color: rgba(0, 50, 125, 0.18);
+    box-shadow: 0 1px 2px rgba(0, 50, 125, 0.06);
+
+    &:hover:not(:disabled) {
+      border-color: rgba(0, 50, 125, 0.3);
+      background: t.$bg-subtle;
+    }
+  }
+
+  .btn-sm {
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 7px;
+    font-size: 12px;
+  }
+
+  .ad-more {
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-segmented {
+    gap: 2px;
+    padding: 3px;
+    border: 0;
+    border-radius: 10px;
+    background: rgba(0, 50, 125, 0.06);
+
+    button {
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 7px;
+      color: t.$text-2;
+
+      & + button {
+        border-left: 0;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.6);
+        color: t.$text;
+      }
+
+      &.is-active {
+        background: #fff;
+        color: t.$text;
+        font-weight: t.$bold;
+        box-shadow:
+          0 1px 2px rgba(0, 50, 125, 0.16),
+          0 0 0 0.5px rgba(0, 50, 125, 0.1);
+      }
+    }
+  }
+
+  .ad-chip {
+    height: 30px;
+    border-color: rgba(0, 50, 125, 0.16);
+    border-radius: 9px;
+
+    &.is-active {
+      border-color: t.$text;
+    }
+  }
+
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 50, 125, 0.2);
+    border-radius: 9px;
+    box-shadow: 0 1px 2px rgba(0, 50, 125, 0.04);
+
+    &:focus-within {
+      border-color: #0078bb;
+      box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.16);
+    }
+  }
+
+  .ad-table {
+    th {
+      height: 36px;
+      border-bottom-color: t.$line-soft;
+      background: transparent;
+      color: t.$text-3;
+      letter-spacing: 0.04em;
+    }
+
+    tbody tr:hover {
+      background: rgba(0, 50, 125, 0.025);
+    }
+  }
+
+  .badge {
+    border-radius: 6px;
+  }
+}
+
+// b2 Weich -------------------------------------------------------------------
+
+$soft:
+  0 1px 2px rgba(0, 50, 125, 0.05),
+  0 10px 28px -12px rgba(0, 50, 125, 0.18);
+$ring: 0 0 0 1px rgba(0, 50, 125, 0.1);
+
+#{$b2} {
+  .ad-grid {
+    gap: 24px;
+  }
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: transparent;
+    border-radius: 18px;
+    box-shadow: $soft;
+  }
+
+  .ad-card:not(.flush) {
+    padding: 24px 26px;
+  }
+
+  app-ad-kpi {
+    padding: 22px 24px;
+  }
+
+  .ad-card.flush > .ad-card-head {
+    padding: 22px 26px 18px;
+  }
+
+  .ad-card-head h2 {
+    font-size: 17px;
+  }
+
+  app-ad-kpi .value {
+    font-size: 32px;
+    letter-spacing: -0.02em;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    height: 38px;
+    padding: 0 18px;
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    text-transform: none;
+  }
+
+  .btn-primary {
+    box-shadow: 0 8px 18px -8px rgba(0, 50, 125, 0.6);
+  }
+
+  .btn-secondary {
+    border-color: transparent;
+    box-shadow:
+      $ring,
+      0 2px 6px -2px rgba(0, 50, 125, 0.12);
+  }
+
+  .btn-sm {
+    height: 30px;
+    padding: 0 12px;
+  }
+
+  .ad-more {
+    letter-spacing: 0.02em;
+    text-transform: none;
+    font-size: 13px;
+  }
+
+  .ad-segmented {
+    gap: 2px;
+    padding: 3px;
+    border: 0;
+    border-radius: t.$radius-pill;
+    background: #fff;
+    box-shadow:
+      $ring,
+      0 2px 6px -2px rgba(0, 50, 125, 0.1);
+
+    button {
+      height: 30px;
+      padding: 0 14px;
+      border-radius: t.$radius-pill;
+
+      & + button {
+        border-left: 0;
+      }
+    }
+  }
+
+  .ad-chip {
+    border-color: transparent;
+    box-shadow:
+      $ring,
+      0 2px 6px -2px rgba(0, 50, 125, 0.1);
+
+    &.is-active {
+      box-shadow: 0 6px 14px -6px rgba(0, 50, 125, 0.55);
+    }
+  }
+
+  .ad-input,
+  .ad-select {
+    height: 40px;
+    border-color: transparent;
+    border-radius: 12px;
+    box-shadow:
+      $ring,
+      0 2px 6px -2px rgba(0, 50, 125, 0.1);
+
+    &:focus-within {
+      border-color: transparent;
+      box-shadow:
+        0 0 0 1px #0078bb,
+        0 0 0 4px rgba(0, 120, 187, 0.14);
+    }
+  }
+
+  .ad-table {
+    th {
+      border-bottom-color: t.$line-soft;
+      background: transparent;
+    }
+
+    td {
+      height: 52px;
+    }
+
+    tbody tr:hover {
+      background: t.$bg-subtle;
+    }
+  }
+
+  .ad-tabs {
+    border-bottom-color: transparent;
+  }
+}

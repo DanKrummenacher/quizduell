@@ -1,0 +1,196 @@
+// Temporary: facelift drafts of the whole admin, round 5 (data-face f4–f6).
+//   f4 Morgenlicht  a light, colourful field behind the head that ends in a
+//                   soft curve; the figures lie on it as white cards
+//   f5 Blaupause    the twelve columns of the page as fine guides behind it,
+//                   square cards, a technical drawing
+//   f6 Fokus        the card under the pointer comes forward, the others step
+//                   back – calm on a busy page
+@use '../../styles/tokens' as t;
+
+$f4: "app-admin-shell .ad-frame[data-face='f4']";
+$f5: "app-admin-shell .ad-frame[data-face='f5']";
+$f6: "app-admin-shell .ad-frame[data-face='f6']";
+$hair: rgba(0, 50, 125, 0.09);
+
+app-admin-shell .ad-frame:is([data-face='f4'], [data-face='f5'], [data-face='f6']) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    border-radius: 9px;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-more {
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-segmented,
+  .ad-chip,
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 50, 125, 0.16);
+    border-radius: 9px;
+  }
+
+  .ad-segmented button + button {
+    border-left-color: rgba(0, 50, 125, 0.1);
+  }
+
+  .ad-table th {
+    background: transparent;
+  }
+}
+
+// f4 Morgenlicht -------------------------------------------------------------
+
+#{$f4} {
+  .ph {
+    padding-bottom: 28px;
+
+    &::before {
+      inset: -32px -100vmax 0;
+      background:
+        radial-gradient(30% 260px at 18% 0, rgba(0, 164, 224, 0.3), transparent 70%),
+        radial-gradient(
+          28% 240px at 62% 10%,
+          rgba(155, 80, 200, 0.16),
+          transparent 70%
+        ),
+        radial-gradient(
+          30% 260px at 96% 30%,
+          rgba(0, 120, 187, 0.24),
+          transparent 70%
+        ),
+        linear-gradient(180deg, #e6f0fa, #f2f6fb);
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+
+  // On pages with figures the field reaches under them and ends in a curve.
+  .ad-page:has(> .kpis, > .ad-card.metrics) .ph::before {
+    bottom: -90px;
+    mask:
+      radial-gradient(60% 60px at 50% 100%, transparent 98%, #000) bottom / 100% 60px
+        no-repeat,
+      linear-gradient(#000, #000) top / 100% calc(100% - 59px) no-repeat;
+  }
+
+  .ad-page > .kpis,
+  .ad-page > .ad-card.metrics {
+    position: relative;
+    z-index: 4;
+  }
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    box-shadow:
+      0 0 0 1px rgba(0, 50, 125, 0.05),
+      0 14px 30px -20px rgba(0, 50, 125, 0.35);
+  }
+}
+
+// f5 Blaupause ---------------------------------------------------------------
+
+#{$f5} {
+  .ad-page {
+    position: relative;
+    isolation: isolate;
+
+    // Twelve columns with the gap of the grid between them.
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0 32px;
+      z-index: -1;
+      background: repeating-linear-gradient(
+        90deg,
+        rgba(0, 120, 187, 0.05) 0 calc((100% - 220px) / 12),
+        transparent calc((100% - 220px) / 12) calc((100% - 220px) / 12 + 20px)
+      );
+      mask: linear-gradient(180deg, transparent, #000 260px);
+      pointer-events: none;
+    }
+  }
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: rgba(0, 120, 187, 0.28);
+    border-radius: 2px;
+  }
+
+  .ad-card-head h2::before,
+  app-ad-kpi .label::before {
+    content: '+ ';
+    color: #0078bb;
+    font-weight: t.$regular;
+  }
+
+  app-ad-kpi .value {
+    font-size: 30px;
+  }
+
+  .ad-card.flush > .ad-card-head {
+    border-bottom: 1px dashed rgba(0, 120, 187, 0.3);
+  }
+
+  .ad-table td {
+    border-bottom-style: dashed;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger,
+  .ad-segmented,
+  .ad-chip,
+  .ad-input,
+  .ad-select {
+    border-radius: 2px;
+  }
+}
+
+// f6 Fokus -------------------------------------------------------------------
+
+#{$f6} {
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: $hair;
+    border-radius: 14px;
+    transition:
+      opacity 0.3s ease,
+      filter 0.3s ease,
+      box-shadow 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  @media (hover: hover) {
+    .ad-grid:has(> .ad-card:hover) > .ad-card:not(:hover),
+    .kpis:has(> app-ad-kpi:hover) > app-ad-kpi:not(:hover) {
+      opacity: 0.55;
+      filter: saturate(0.6);
+    }
+
+    .ad-grid > .ad-card:hover,
+    .kpis > app-ad-kpi:hover {
+      box-shadow: 0 24px 44px -24px rgba(0, 50, 125, 0.45);
+      transform: translateY(-2px);
+    }
+  }
+
+  app-ad-kpi .value {
+    font-size: 30px;
+  }
+}

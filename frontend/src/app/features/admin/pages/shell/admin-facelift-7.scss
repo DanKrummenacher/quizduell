@@ -1,0 +1,285 @@
+// Temporary: facelift drafts of the whole admin, round 3 (data-face d1–d3).
+//   d1 Linie      a precise tool: hairlines, small labels, monochrome controls,
+//                 one navy action – nothing loud
+//   d2 Kante      an accent edge on the left of every card, figures with a
+//                 tinted foot, tabs as a track
+//   d3 Leuchtrand a gradient edge on every card that lights up on hover
+@use '../../styles/tokens' as t;
+
+$d1: "app-admin-shell .ad-frame[data-face='d1']";
+$d2: "app-admin-shell .ad-frame[data-face='d2']";
+$d3: "app-admin-shell .ad-frame[data-face='d3']";
+$hair: rgba(0, 50, 125, 0.09);
+
+@mixin sentence-buttons($radius) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    border-radius: $radius;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-more {
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+}
+
+@mixin track($radius: 8px) {
+  .ad-segmented {
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid $hair;
+    border-radius: $radius;
+    background: #f4f6f9;
+
+    button {
+      height: 28px;
+      border-radius: calc(#{$radius} - 2px);
+      color: t.$text-2;
+
+      & + button {
+        border-left: 0;
+      }
+
+      &.is-active {
+        background: #fff;
+        color: t.$text;
+        font-weight: t.$bold;
+        box-shadow:
+          0 0 0 1px $hair,
+          0 1px 2px rgba(0, 50, 125, 0.1);
+      }
+    }
+  }
+}
+
+// d1 Linie -------------------------------------------------------------------
+
+#{$d1} {
+  @include sentence-buttons(7px);
+  @include track(8px);
+
+  .ad-grid,
+  .kpis {
+    gap: 12px;
+  }
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: $hair;
+    border-radius: 10px;
+  }
+
+  .ad-card.flush > .ad-card-head {
+    border-bottom: 1px solid $hair;
+  }
+
+  .ad-card-head {
+    h2 {
+      font-size: 13px;
+      letter-spacing: 0.01em;
+    }
+
+    p {
+      font-size: 12px;
+    }
+  }
+
+  app-ad-kpi {
+    .label {
+      color: t.$text-3;
+      font-size: 12px;
+    }
+
+    .value {
+      font-size: 26px;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .btn-secondary {
+    border-color: $hair;
+    box-shadow: 0 1px 1px rgba(0, 50, 125, 0.05);
+    color: t.$text;
+  }
+
+  .ad-chip {
+    height: 28px;
+    border-color: $hair;
+    border-radius: 7px;
+  }
+
+  .ad-input,
+  .ad-select {
+    height: 34px;
+    border-color: rgba(0, 50, 125, 0.14);
+    border-radius: 7px;
+  }
+
+  .ad-table {
+    th {
+      background: transparent;
+      color: t.$text-3;
+      font-size: 11px;
+      letter-spacing: 0.02em;
+      text-transform: none;
+    }
+
+    td {
+      border-bottom-color: $hair;
+    }
+  }
+
+  .ad-tabs .is-active::after {
+    height: 2px;
+  }
+}
+
+// d2 Kante -------------------------------------------------------------------
+
+#{$d2} {
+  @include sentence-buttons(10px);
+  @include track(10px);
+
+  .ad-card,
+  app-ad-kpi {
+    border-color: $hair;
+    border-radius: 12px;
+    box-shadow:
+      inset 3px 0 0 #0078bb,
+      0 2px 8px -4px rgba(0, 50, 125, 0.12);
+  }
+
+  .ad-page .list .item {
+    border-color: $hair;
+    border-radius: 12px;
+  }
+
+  app-ad-kpi {
+    background: linear-gradient(180deg, #fff 60%, #f1f7fc);
+
+    .value {
+      font-size: 30px;
+    }
+  }
+
+  .ad-card-head h2 {
+    font-size: 16px;
+  }
+
+  .ad-chip,
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 50, 125, 0.18);
+    border-radius: 10px;
+  }
+
+  .ad-tabs {
+    width: fit-content;
+    gap: 2px;
+    padding: 3px;
+    border: 0;
+    border-radius: 12px;
+    background: rgba(0, 50, 125, 0.06);
+
+    button {
+      height: 32px;
+      border-radius: 9px;
+
+      &.is-active {
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 50, 125, 0.16);
+
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .ad-table th {
+    background: #f4f8fc;
+  }
+}
+
+// d3 Leuchtrand --------------------------------------------------------------
+
+#{$d3} {
+  @include sentence-buttons(t.$radius-pill);
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    position: relative;
+    border-color: transparent;
+    border-radius: 16px;
+    background:
+      linear-gradient(#fff, #fff) padding-box,
+      linear-gradient(
+          140deg,
+          rgba(0, 164, 224, 0.55),
+          rgba(219, 226, 236, 0.9) 35%,
+          rgba(219, 226, 236, 0.9) 65%,
+          rgba(0, 50, 125, 0.35)
+        )
+        border-box;
+    box-shadow: 0 10px 26px -18px rgba(0, 50, 125, 0.4);
+    transition:
+      box-shadow 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .ad-card:hover,
+  app-ad-kpi:hover {
+    box-shadow:
+      0 0 0 3px rgba(0, 164, 224, 0.1),
+      0 16px 32px -18px rgba(0, 120, 187, 0.5);
+  }
+
+  app-ad-kpi:hover {
+    transform: translateY(-2px);
+  }
+
+  app-ad-kpi .value {
+    font-size: 30px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(100deg, #0078bb, t.$brand 70%);
+    box-shadow: 0 8px 18px -10px rgba(0, 120, 187, 0.8);
+  }
+
+  .ad-segmented {
+    border-color: rgba(0, 120, 187, 0.35);
+    border-radius: t.$radius-pill;
+
+    button + button {
+      border-left-color: rgba(0, 120, 187, 0.2);
+    }
+  }
+
+  .ad-chip {
+    border-color: rgba(0, 120, 187, 0.3);
+  }
+
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 120, 187, 0.3);
+    border-radius: 12px;
+
+    &:focus-within {
+      border-color: #00a4e0;
+      box-shadow: 0 0 0 4px rgba(0, 164, 224, 0.15);
+    }
+  }
+
+  .ad-table th {
+    background: transparent;
+  }
+}

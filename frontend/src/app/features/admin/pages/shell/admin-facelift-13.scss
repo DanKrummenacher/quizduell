@@ -1,0 +1,184 @@
+// Temporary: facelift drafts of the whole admin, round 6 (data-face g1–g3).
+//   g1 Blatt      every group of cards becomes one sheet, split by hairlines
+//                 instead of gaps – calm, like a printed report
+//   g2 Hauptzahl  the first figure of a page leads: wider, larger, tinted
+//   g3 Kapitel    every card numbered like a chapter, the sections with large
+//                 numbers – the page reads in order
+@use '../../styles/tokens' as t;
+
+$g1: "app-admin-shell .ad-frame[data-face='g1']";
+$g2: "app-admin-shell .ad-frame[data-face='g2']";
+$g3: "app-admin-shell .ad-frame[data-face='g3']";
+$hair: rgba(0, 50, 125, 0.09);
+
+app-admin-shell .ad-frame:is([data-face='g1'], [data-face='g2'], [data-face='g3']) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    border-radius: 9px;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-more {
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-segmented,
+  .ad-chip,
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 50, 125, 0.16);
+    border-radius: 9px;
+  }
+
+  .ad-segmented button + button {
+    border-left-color: rgba(0, 50, 125, 0.1);
+  }
+
+  .ad-table th {
+    background: transparent;
+  }
+}
+
+// g1 Blatt -------------------------------------------------------------------
+
+#{$g1} {
+  .ad-grid,
+  .kpis {
+    gap: 1px;
+    overflow: hidden;
+    border: 1px solid $hair;
+    border-radius: 16px;
+    background: $hair;
+    box-shadow: 0 12px 32px -24px rgba(0, 50, 125, 0.45);
+
+    > .ad-card,
+    > app-ad-kpi {
+      border: 0;
+      border-radius: 0;
+    }
+  }
+
+  .kpis {
+    margin-bottom: 20px;
+  }
+
+  .ad-card-head h2 {
+    font-size: 15px;
+  }
+
+  .ad-page .list .item,
+  .ad-page > .ad-card {
+    border-color: $hair;
+    border-radius: 14px;
+  }
+}
+
+// g2 Hauptzahl ---------------------------------------------------------------
+
+#{$g2} {
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: $hair;
+    border-radius: 14px;
+  }
+
+  @media (min-width: 1201px) {
+    .kpis:has(> app-ad-kpi:nth-child(4):last-child) {
+      grid-template-columns: 1.7fr repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .kpis > app-ad-kpi:first-child {
+    border-color: transparent;
+    background:
+      radial-gradient(70% 120% at 100% 0%, rgba(0, 164, 224, 0.18), transparent 60%),
+      linear-gradient(160deg, #eef5fc, #e3eef9);
+
+    .label {
+      color: t.$text;
+      font-weight: t.$bold;
+    }
+
+    .value {
+      font-size: 46px;
+      letter-spacing: -0.035em;
+    }
+  }
+
+  app-ad-kpi .value {
+    font-size: 28px;
+  }
+}
+
+// g3 Kapitel -----------------------------------------------------------------
+
+#{$g3} {
+  .ad-page {
+    counter-reset: card section;
+  }
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: $hair;
+    border-radius: 12px;
+  }
+
+  .ad-card-head h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+
+    &::before {
+      counter-increment: card;
+      content: counter(card, decimal-leading-zero);
+      display: inline-grid;
+      place-items: center;
+      min-width: 28px;
+      height: 22px;
+      border-radius: 6px;
+      background: t.$brand-50;
+      color: #0078bb;
+      font-size: 11px;
+      font-weight: t.$bold;
+      letter-spacing: 0.04em;
+      @include t.numeric;
+    }
+  }
+
+  .section-title {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    color: t.$text;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    text-transform: none;
+
+    &::before {
+      counter-increment: section;
+      content: counter(section, decimal-leading-zero);
+      color: rgba(0, 120, 187, 0.35);
+      font-size: 34px;
+      font-weight: t.$bold;
+      letter-spacing: -0.03em;
+      @include t.numeric;
+    }
+
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: $hair;
+      align-self: center;
+    }
+  }
+}

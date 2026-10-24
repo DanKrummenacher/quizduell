@@ -1,0 +1,300 @@
+// Temporary: facelift drafts of the whole admin, round 4 (data-face e1–e3).
+//   e1 Komposition  the navy band behind the head, the page below in the calm
+//                   hairlines of «Linie»
+//   e2 Überlappung  the navy band reaches into the page; the figures lie on it
+//                   as white cards, like a premium dashboard
+//   e3 Monochrom    a white page without dots, ink and greys, one navy
+//                   accent, large light figures
+@use '../../styles/tokens' as t;
+
+$e1: "app-admin-shell .ad-frame[data-face='e1']";
+$e2: "app-admin-shell .ad-frame[data-face='e2']";
+$e3: "app-admin-shell .ad-frame[data-face='e3']";
+$navy: "app-admin-shell .ad-frame:is([data-face='e1'], [data-face='e2'])";
+$hair: rgba(0, 50, 125, 0.09);
+$on: rgba(255, 255, 255, 0.72);
+
+// Shared: buttons in sentence case, a track for the segmented control,
+// hairline cards.
+app-admin-shell .ad-frame:is([data-face='e1'], [data-face='e2'], [data-face='e3']) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    border-radius: 9px;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-more {
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: $hair;
+    border-radius: 12px;
+  }
+
+  .ad-card.flush > .ad-card-head {
+    border-bottom: 1px solid $hair;
+  }
+
+  .ad-chip,
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 50, 125, 0.16);
+    border-radius: 9px;
+  }
+
+  .ad-table th {
+    background: transparent;
+  }
+}
+
+// The navy band behind the head (e1, e2) ---------------------------------------
+
+#{$navy} .ph {
+  padding-bottom: 30px;
+
+  &::before {
+    inset: -32px -100vmax 0;
+    background:
+      radial-gradient(36% 180px at 72% 0, rgba(0, 164, 224, 0.4), transparent 100%),
+      radial-gradient(30% 160px at 10% 100%, rgba(155, 80, 200, 0.18), transparent),
+      linear-gradient(180deg, t.$brand, #0a3f92);
+  }
+
+  &::after {
+    display: none;
+  }
+
+  h1 {
+    color: #fff;
+  }
+
+  .ph-desc {
+    color: $on;
+  }
+
+  .ph-crumbs {
+    color: rgba(255, 255, 255, 0.6);
+
+    > span[aria-hidden] {
+      color: rgba(255, 255, 255, 0.32);
+    }
+  }
+
+  .ph-switch > button {
+    color: #fff;
+
+    svg {
+      stroke: rgba(255, 255, 255, 0.7);
+    }
+
+    &:hover,
+    &[aria-expanded='true'] {
+      background: rgba(255, 255, 255, 0.12);
+    }
+  }
+
+  .ph-recent {
+    color: rgba(255, 255, 255, 0.5);
+
+    a {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.88);
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.18);
+        color: #fff;
+      }
+
+      css-icon {
+        color: inherit;
+      }
+    }
+  }
+
+  .ph-symbol {
+    color: #fff;
+    opacity: 0.07;
+  }
+
+  .btn-secondary {
+    border-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.14);
+    }
+  }
+
+  .btn-primary {
+    background: #fff;
+    color: t.$brand;
+
+    &:hover:not(:disabled) {
+      background: t.$brand-50;
+    }
+  }
+
+  .ad-segmented {
+    gap: 2px;
+    padding: 3px;
+    border: 0;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+
+    button {
+      height: 28px;
+      border-radius: 7px;
+      color: #fff;
+
+      & + button {
+        border-left: 0;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      &.is-active {
+        background: #fff;
+        color: t.$brand;
+        font-weight: t.$bold;
+      }
+    }
+  }
+}
+
+// e1 Komposition -------------------------------------------------------------
+
+#{$e1} {
+  .ad-card-head h2 {
+    font-size: 15px;
+  }
+
+  app-ad-kpi .label {
+    color: t.$text-3;
+  }
+}
+
+// e2 Überlappung -------------------------------------------------------------
+
+#{$e2} {
+  // On pages with figures the band reaches under them.
+  .ad-page:has(> .kpis, > .ad-card.metrics) .ph::before {
+    bottom: -96px;
+  }
+
+  // The figures lie above the band of the head.
+  .ad-page > .kpis,
+  .ad-page > .ad-card.metrics {
+    position: relative;
+    z-index: 4;
+  }
+
+  .kpis app-ad-kpi,
+  .ad-card.metrics {
+    border-color: transparent;
+    box-shadow:
+      0 1px 2px rgba(0, 30, 80, 0.08),
+      0 18px 36px -18px rgba(0, 30, 80, 0.5);
+  }
+
+  .ad-card:not(.metrics) {
+    box-shadow: 0 1px 2px rgba(0, 50, 125, 0.04);
+  }
+
+  app-ad-kpi .value {
+    font-size: 30px;
+  }
+}
+
+// e3 Monochrom ---------------------------------------------------------------
+
+#{$e3} {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: #fbfbfa;
+  }
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: #e7e9ec;
+  }
+
+  .ad-card-head h2 {
+    font-size: 15px;
+  }
+
+  app-ad-kpi {
+    .label {
+      color: #6b7280;
+      font-size: 12px;
+    }
+
+    .value {
+      font-size: 36px;
+      font-weight: t.$regular;
+      letter-spacing: -0.03em;
+    }
+  }
+
+  .ad-overline {
+    color: #6b7280;
+  }
+
+  .btn-secondary {
+    border-color: #d9dde2;
+    color: t.$text;
+  }
+
+  .ad-segmented {
+    border-color: #d9dde2;
+    border-radius: 9px;
+
+    button + button {
+      border-left-color: #e7e9ec;
+    }
+
+    button.is-active {
+      background: t.$text;
+    }
+  }
+
+  .ad-chip {
+    border-color: #d9dde2;
+  }
+
+  .ad-input,
+  .ad-select {
+    border-color: #d9dde2;
+  }
+
+  .ad-table th {
+    border-bottom-color: #e7e9ec;
+    color: #6b7280;
+  }
+
+  .ad-table td {
+    border-bottom-color: #eef0f2;
+  }
+
+  .ad-tabs {
+    border-bottom-color: #e7e9ec;
+  }
+}

@@ -1,0 +1,274 @@
+// Temporary: facelift drafts of the whole admin, round 5 (data-face f1–f3).
+//   f1 Seitenspalte   on pages with figures they stand as a column on the left
+//                     and stay in view while the page scrolls
+//   f2 Bereichsfarbe  every group has its colour – Betrieb teal, Inhalte blue,
+//                     Analyse violet – in the light, the edges and the choices
+//   f3 Arbeitsmodus   a slim head and denser content: more on screen for work
+@use '../../styles/tokens' as t;
+
+$f1: "app-admin-shell .ad-frame[data-face='f1']";
+$f2: "app-admin-shell .ad-frame[data-face='f2']";
+$f3: "app-admin-shell .ad-frame[data-face='f3']";
+$hair: rgba(0, 50, 125, 0.09);
+$wide: 1100px;
+
+app-admin-shell .ad-frame:is([data-face='f1'], [data-face='f2'], [data-face='f3']) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    border-radius: 9px;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-more {
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: $hair;
+    border-radius: 12px;
+  }
+
+  .ad-segmented,
+  .ad-chip,
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 50, 125, 0.16);
+    border-radius: 9px;
+  }
+
+  .ad-segmented button + button {
+    border-left-color: rgba(0, 50, 125, 0.1);
+  }
+
+  .ad-table th {
+    background: transparent;
+  }
+}
+
+// f1 Seitenspalte ------------------------------------------------------------
+
+@media (min-width: $wide) {
+  #{$f1} .ad-page:has(> section.kpis) {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    column-gap: 24px;
+    align-items: start;
+
+    > * {
+      grid-column: 2;
+    }
+
+    > app-ad-page-head {
+      grid-column: 1 / -1;
+    }
+
+    > section.kpis {
+      position: sticky;
+      top: 92px;
+      grid-column: 1;
+      grid-row: 2 / span 40;
+      grid-template-columns: 1fr;
+      gap: 0;
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid $hair;
+      border-radius: 16px;
+      background: #fff;
+      box-shadow: 0 10px 30px -22px rgba(0, 50, 125, 0.4);
+
+      app-ad-kpi {
+        padding: 18px 20px;
+        border: 0;
+        border-radius: 0;
+
+        & + app-ad-kpi {
+          border-top: 1px solid t.$line-soft;
+        }
+
+        .value {
+          font-size: 26px;
+        }
+      }
+    }
+
+    // The cards share the narrower column: wide ones take the row, the
+    // others go two by two.
+    .ad-grid {
+      .span-7,
+      .span-8 {
+        grid-column: span 12;
+      }
+
+      .span-3,
+      .span-4,
+      .span-5 {
+        grid-column: span 6;
+      }
+
+      // A narrow card left alone in its row takes the whole row.
+      :is(.span-7, .span-8) + .span-4:not(:has(+ .span-4)) {
+        grid-column: 1 / -1;
+      }
+    }
+  }
+}
+
+// f2 Bereichsfarbe -----------------------------------------------------------
+
+#{$f2} {
+  --g: #0078bb;
+  --g-soft: rgba(0, 120, 187, 0.16);
+  --ad-chart-accent: var(--g);
+
+  &[data-group='Betrieb'] {
+    --g: #00877a;
+    --g-soft: rgba(0, 160, 140, 0.18);
+  }
+
+  &[data-group='Analyse'] {
+    --g: #7b45b8;
+    --g-soft: rgba(155, 80, 200, 0.18);
+  }
+
+  .ph::before {
+    background:
+      radial-gradient(40% 140px at 60% 0, var(--g-soft), transparent 100%),
+      linear-gradient(180deg, rgba(0, 50, 125, 0.05), transparent 70%);
+  }
+
+  .ph-symbol {
+    color: var(--g);
+    opacity: 0.08;
+  }
+
+  .ph-crumbs > span:nth-child(3) {
+    color: var(--g);
+    font-weight: t.$medium;
+  }
+
+  .ad-card,
+  app-ad-kpi {
+    box-shadow: inset 0 3px 0 var(--g);
+  }
+
+  .ad-segmented button.is-active,
+  .ad-chip.is-active {
+    border-color: var(--g);
+    background: var(--g);
+  }
+
+  .ad-tabs .is-active::after {
+    background: var(--g);
+  }
+
+  .ad-overline {
+    color: var(--g);
+  }
+}
+
+// f3 Arbeitsmodus ------------------------------------------------------------
+
+#{$f3} {
+  .ad-page {
+    padding-top: 20px;
+  }
+
+  .ph {
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+
+    h1 {
+      font-size: 24px;
+    }
+
+    .ph-crumbs {
+      margin-bottom: 8px;
+    }
+
+    .ph-desc {
+      margin-top: 2px;
+      font-size: 13px;
+    }
+
+    .ph-symbol {
+      display: none;
+    }
+  }
+
+  .ad-grid,
+  .kpis {
+    gap: 12px;
+  }
+
+  .kpis {
+    margin-bottom: 12px;
+  }
+
+  .ad-card:not(.flush) {
+    padding: 16px 18px;
+  }
+
+  .ad-card.flush > .ad-card-head {
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid $hair;
+  }
+
+  .ad-card-head {
+    margin-bottom: 12px;
+
+    h2 {
+      font-size: 14px;
+    }
+
+    p {
+      font-size: 12px;
+    }
+  }
+
+  app-ad-kpi {
+    padding: 14px 16px;
+
+    .value {
+      font-size: 24px;
+    }
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    height: 30px;
+    padding: 0 12px;
+  }
+
+  .ad-segmented button {
+    height: 28px;
+  }
+
+  .ad-chip {
+    height: 28px;
+  }
+
+  .ad-input,
+  .ad-select {
+    height: 32px;
+  }
+
+  .ad-table {
+    th {
+      height: 32px;
+    }
+
+    td {
+      height: 38px;
+    }
+  }
+}

@@ -1,0 +1,275 @@
+// Temporary: facelift drafts of the whole admin, round 6 (data-face g4–g6).
+//   g4 Typografie  the type does the work: clear headings, small spaced labels,
+//                  large tabular figures, thicker meters
+//   g5 Glanz       a fine sheen on every surface: a light top edge, a soft
+//                  gradient, glossy main actions – crafted like hardware
+//   g6 Interaktion every hover and press answers: cards light up, rows get a
+//                  marker, arrows move, buttons press in
+@use '../../styles/tokens' as t;
+
+$g4: "app-admin-shell .ad-frame[data-face='g4']";
+$g5: "app-admin-shell .ad-frame[data-face='g5']";
+$g6: "app-admin-shell .ad-frame[data-face='g6']";
+$hair: rgba(0, 50, 125, 0.09);
+
+app-admin-shell .ad-frame:is([data-face='g4'], [data-face='g5'], [data-face='g6']) {
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger {
+    border-radius: 10px;
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-more {
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .ad-segmented,
+  .ad-chip,
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 50, 125, 0.16);
+    border-radius: 10px;
+  }
+
+  .ad-segmented button + button {
+    border-left-color: rgba(0, 50, 125, 0.1);
+  }
+
+  .ad-table th {
+    background: transparent;
+  }
+}
+
+// g4 Typografie --------------------------------------------------------------
+
+#{$g4} {
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: $hair;
+    border-radius: 12px;
+  }
+
+  .ad-card-head {
+    h2 {
+      font-size: 18px;
+      letter-spacing: -0.015em;
+    }
+
+    p {
+      margin-top: 4px;
+      color: t.$text-3;
+      font-size: 13px;
+    }
+  }
+
+  app-ad-kpi {
+    gap: 6px;
+
+    .label {
+      color: t.$text-3;
+      font-size: 11px;
+      font-weight: t.$bold;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .value {
+      font-size: 38px;
+      letter-spacing: -0.04em;
+    }
+  }
+
+  .ad-overline,
+  .ad-table th {
+    color: t.$text-3;
+    font-size: 10.5px;
+    font-weight: t.$bold;
+    letter-spacing: 0.14em;
+  }
+
+  .ad-table td {
+    font-size: 13.5px;
+  }
+
+  .meter,
+  [class*='meter'] {
+    border-radius: 99px;
+  }
+}
+
+// g5 Glanz -------------------------------------------------------------------
+
+$sheen: linear-gradient(180deg, #fff, #fafcfe);
+$edge:
+  0 0 0 1px rgba(0, 50, 125, 0.08),
+  0 1px 1px rgba(0, 50, 125, 0.06),
+  0 8px 20px -10px rgba(0, 50, 125, 0.22),
+  inset 0 1px 0 #fff;
+
+#{$g5} {
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: transparent;
+    border-radius: 14px;
+    background: $sheen;
+    box-shadow: $edge;
+  }
+
+  .btn-primary {
+    background: linear-gradient(180deg, #154f9e, t.$brand 55%, #002a6a);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.25) inset,
+      0 0 0 1px #002a6a,
+      0 6px 14px -6px rgba(0, 40, 100, 0.6);
+  }
+
+  .btn-secondary {
+    border-color: transparent;
+    background: linear-gradient(180deg, #fff, #f3f6fa);
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 0 0 1px rgba(0, 50, 125, 0.16),
+      0 2px 4px -2px rgba(0, 50, 125, 0.18);
+  }
+
+  .ad-segmented {
+    gap: 2px;
+    padding: 3px;
+    border: 0;
+    border-radius: 11px;
+    background: linear-gradient(180deg, #e9eef5, #eef2f7);
+    box-shadow: inset 0 1px 2px rgba(0, 50, 125, 0.12);
+
+    button {
+      height: 28px;
+      border-radius: 8px;
+      color: t.$text-2;
+
+      & + button {
+        border-left: 0;
+      }
+
+      &.is-active {
+        background: linear-gradient(180deg, #fff, #f6f8fb);
+        color: t.$text;
+        font-weight: t.$bold;
+        box-shadow:
+          inset 0 1px 0 #fff,
+          0 1px 3px rgba(0, 50, 125, 0.22);
+      }
+    }
+  }
+
+  .ad-input,
+  .ad-select {
+    border-color: rgba(0, 50, 125, 0.14);
+    background: linear-gradient(180deg, #f7f9fc, #fff);
+    box-shadow: inset 0 1px 2px rgba(0, 50, 125, 0.08);
+  }
+}
+
+// g6 Interaktion -------------------------------------------------------------
+
+$ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+#{$g6} {
+  .ad-card,
+  app-ad-kpi,
+  .ad-page .list .item {
+    border-color: $hair;
+    border-radius: 14px;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.25s $ease,
+      transform 0.25s $ease;
+  }
+
+  @media (hover: hover) {
+    .ad-card:hover,
+    app-ad-kpi:hover {
+      border-color: rgba(0, 120, 187, 0.35);
+      box-shadow:
+        0 0 0 3px rgba(0, 120, 187, 0.08),
+        0 14px 28px -18px rgba(0, 50, 125, 0.45);
+    }
+
+    app-ad-kpi:hover,
+    .ad-page .list .item:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  // The arrow of a link moves ahead.
+  .ad-more {
+    css-icon {
+      transition: transform 0.2s $ease;
+    }
+
+    &:hover {
+      text-decoration: none;
+
+      css-icon {
+        transform: translateX(3px);
+      }
+    }
+  }
+
+  .ad-table tbody tr {
+    transition: background-color 0.15s ease;
+
+    td:first-child {
+      transition: box-shadow 0.15s ease;
+    }
+
+    &:hover td:first-child {
+      box-shadow: inset 3px 0 0 #0078bb;
+    }
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-danger,
+  .ad-chip {
+    transition:
+      background-color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.12s ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(1px) scale(0.98);
+    }
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    box-shadow: 0 8px 18px -8px rgba(0, 50, 125, 0.7);
+  }
+
+  .ad-tabs button:not(.is-active):hover::after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    bottom: -1px;
+    left: 14px;
+    height: 3px;
+    border-radius: 2px 2px 0 0;
+    background: t.$line;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      transition: none !important;
+    }
+  }
+}

@@ -12,8 +12,9 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { localStore } from '../../../../core/platform/safe-storage';
 import { AdminApi } from '../../core/admin-api.service';
-import { ADMIN_AREAS } from '../../core/admin-areas';
+import { ADMIN_AREAS, areaOf } from '../../core/admin-areas';
 import { AdminData } from '../../core/admin-data.service';
+import { facelift } from '../../core/facelift-preview';
 import { AdminSessionService } from '../../core/admin-session.service';
 import { ConfirmService } from '../../core/confirm.service';
 import { every } from '../../core/remote';
@@ -29,13 +30,39 @@ const SEEN_CHANGE = 'playduelio.admin.seen.change';
   imports: [RouterOutlet, AdminHeaderComponent, AdCommandPaletteComponent],
   providers: [AdminData],
   template: `
-    <div class="ad-frame">
+    <div
+      class="ad-frame"
+      [attr.data-face]="face()"
+      [attr.data-group]="face() ? group() : null"
+    >
       <app-admin-header [items]="items()" (signOut)="signOut()" />
       <router-outlet />
     </div>
     <app-ad-command-palette [areas]="items()" />
   `,
-  styleUrl: './admin-shell.component.scss',
+  styleUrls: [
+    './admin-shell.component.scss',
+    './admin-facelift-1.scss',
+    './admin-facelift-2.scss',
+    './admin-facelift-3.scss',
+    './admin-facelift-4.scss',
+    './admin-facelift-5.scss',
+    './admin-facelift-6.scss',
+    './admin-facelift-7.scss',
+    './admin-facelift-8.scss',
+    './admin-facelift-9.scss',
+    './admin-facelift-10.scss',
+    './admin-facelift-11.scss',
+    './admin-facelift-12.scss',
+    './admin-facelift-13.scss',
+    './admin-facelift-14.scss',
+    './admin-facelift-15.scss',
+    './admin-facelift-16.scss',
+    './admin-facelift-17.scss',
+    './admin-facelift-18.scss',
+    './admin-facelift-19.scss',
+    './admin-facelift-20.scss',
+  ],
   encapsulation: ViewEncapsulation.None,
 })
 export class AdminShellComponent {
@@ -45,7 +72,11 @@ export class AdminShellComponent {
   private readonly api = inject(AdminApi);
   private readonly router = inject(Router);
 
+  /** Temporary: the facelift draft. */
+  protected readonly face = facelift;
   private readonly path = signal(this.router.url.split('?')[0] ?? '');
+  /** Temporary: the group of the area, for drafts that colour by it. */
+  protected readonly group = computed(() => areaOf(this.path())?.group ?? null);
   /** Newest change of the history, and the newest one seen here. */
   private readonly latestChange = signal<number | null>(null);
   private readonly seenChange = signal(Number(localStore.get(SEEN_CHANGE) ?? 0));

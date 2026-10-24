@@ -1,0 +1,219 @@
+// Temporary: facelift drafts of the whole admin, round 8 (data-face i1–i8) –
+// the base of round 7 (admin-facelift-15.scss) with further ways to set the
+// page and its head.
+//   i1 Schatten     a soft blue panel that ends in a soft shadow, not a line
+//   i2 Bogen        the panel of the head ends in a wide, soft curve
+//   i3 Nordlicht    bands of soft light behind the head, fading into white
+//   i4 Ausklang     the navy of the bar fades out over the head into the page
+//   i5 Lichtkegel   one cone of light falls from the bar onto the title
+//   i6 Schräge      the panel of the head ends in a gentle slant
+//   i7 Kopfkarte    the head on its own white card over a calm grey page
+//   i8 Punktfeld    a field of dots at the right of the head, growing to the top
+@use '../../styles/tokens' as t;
+
+@mixin page($background) {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: $background;
+    pointer-events: none;
+  }
+}
+
+// The light of the head as one layer across the page, from the bar down.
+@mixin head-layer($background, $bottom: 0) {
+  .ph {
+    padding-bottom: 28px;
+
+    // As wide as the window, so positions in it are positions on screen.
+    &::before {
+      inset: -32px calc(50% - 50vw) $bottom;
+      background: $background;
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+$panel: linear-gradient(180deg, #e7f0f9, #f2f7fb);
+
+// i1 Schatten ----------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='i1'] {
+  @include page(#fff);
+  @include head-layer(
+    (
+      radial-gradient(40% 160px at 70% 0, rgba(0, 164, 224, 0.16), transparent 100%),
+      $panel
+    )
+  );
+
+  .ph::before {
+    box-shadow:
+      0 1px 0 rgba(0, 50, 125, 0.05),
+      0 12px 24px -12px rgba(0, 50, 125, 0.18);
+  }
+}
+
+// i2 Bogen -------------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='i2'] {
+  @include page(#fff);
+  @include head-layer(
+    (
+      radial-gradient(40% 160px at 70% 0, rgba(0, 164, 224, 0.18), transparent 100%),
+      $panel
+    ),
+    -36px
+  );
+
+  .ph::before {
+    // An ellipse hanging from the bar: its lower edge is the curve.
+    mask: radial-gradient(75% 100% at 50% 0, #000 99%, transparent 100%);
+  }
+}
+
+// i3 Nordlicht ---------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='i3'] {
+  @include page(#fcfdfe);
+  @include head-layer(
+    (
+      linear-gradient(
+        170deg,
+        transparent 30%,
+        rgba(0, 200, 190, 0.14) 45%,
+        transparent 60%
+      ),
+      linear-gradient(
+        185deg,
+        transparent 20%,
+        rgba(0, 164, 224, 0.2) 40%,
+        transparent 62%
+      ),
+      linear-gradient(
+        160deg,
+        transparent 45%,
+        rgba(155, 80, 200, 0.12) 60%,
+        transparent 75%
+      ),
+      linear-gradient(180deg, #eaf3fa, rgba(255, 255, 255, 0))
+    ),
+    -60px
+  );
+
+  .ph::before {
+    filter: blur(6px);
+  }
+}
+
+// i4 Ausklang ----------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='i4'] {
+  @include page(#fbfcfe);
+  @include head-layer(
+    (
+      radial-gradient(40% 180px at 50% 0, rgba(0, 164, 224, 0.2), transparent 100%),
+      linear-gradient(
+        180deg,
+        rgba(0, 50, 125, 0.22),
+        rgba(0, 50, 125, 0.08) 35%,
+        rgba(0, 50, 125, 0.02) 70%,
+        transparent
+      )
+    ),
+    -60px
+  );
+}
+
+// i5 Lichtkegel --------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='i5'] {
+  @include page(#fcfdfe);
+  @include head-layer(
+    (
+      conic-gradient(
+        at 26% -200px,
+        transparent 156deg,
+        rgba(0, 164, 224, 0.08) 166deg,
+        rgba(0, 164, 224, 0.2) 180deg,
+        rgba(0, 164, 224, 0.08) 194deg,
+        transparent 204deg
+      ),
+      linear-gradient(180deg, #edf4fa, rgba(255, 255, 255, 0))
+    ),
+    -80px
+  );
+
+  .ph::before {
+    mask: linear-gradient(180deg, #000 30%, transparent 95%);
+  }
+}
+
+// i6 Schräge -----------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='i6'] {
+  @include page(#fff);
+  @include head-layer(
+    (
+      radial-gradient(40% 160px at 70% 0, rgba(0, 164, 224, 0.16), transparent 100%),
+      $panel
+    ),
+    -48px
+  );
+
+  .ph::before {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 48px), 0 100%);
+  }
+}
+
+// i7 Kopfkarte ---------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='i7'] {
+  @include page(#f3f5f8);
+
+  .ph {
+    margin-bottom: 24px;
+    padding: 22px 26px 24px;
+    border: 1px solid rgba(0, 50, 125, 0.08);
+    border-radius: 18px;
+    background:
+      radial-gradient(40% 120% at 100% 0%, rgba(0, 164, 224, 0.1), transparent 70%),
+      #fff;
+    box-shadow: 0 12px 32px -22px rgba(0, 50, 125, 0.35);
+
+    &::before,
+    &::after {
+      display: none;
+    }
+  }
+
+  .ph-bg {
+    border-radius: inherit;
+  }
+}
+
+// i8 Punktfeld ---------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='i8'] {
+  @include page(#fff);
+  @include head-layer(
+    (
+      radial-gradient(rgba(0, 120, 187, 0.4) 1.3px, transparent 1.6px) 0 0 / 14px
+        14px,
+      radial-gradient(60% 140% at 90% 0, rgba(0, 164, 224, 0.14), transparent 80%)
+    ),
+    -40px
+  );
+
+  .ph::before {
+    mask: radial-gradient(40% 130% at 90% 0, #000 20%, transparent 75%);
+  }
+}

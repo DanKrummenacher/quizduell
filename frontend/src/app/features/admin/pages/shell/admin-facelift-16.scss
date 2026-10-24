@@ -1,0 +1,135 @@
+// Temporary: facelift drafts of the whole admin, round 7 (data-face h5–h8),
+// on the base of admin-facelift-15.scss.
+//   h5 Papier    a warm, plain paper page without dots; the head only a line
+//   h6 Leuchtlinie  a white page; the head ends in a fine line of light
+//   h7 Raster    a fine grid behind the head that fades into a white page
+//   h8 Nebel     soft fields of colour at the edges of a light page
+@use '../../styles/tokens' as t;
+
+@mixin page($background) {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: $background;
+    pointer-events: none;
+  }
+}
+
+// h5 Papier ------------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='h5'] {
+  @include page(#f7f6f2);
+
+  .ph {
+    &::before {
+      display: none;
+    }
+
+    &::after {
+      background: rgba(0, 50, 125, 0.14);
+    }
+  }
+
+  .ph-symbol {
+    opacity: 0.04;
+  }
+
+  .ad-card,
+  app-ad-kpi:not(:first-child),
+  .ad-page .list .item {
+    border-color: #e6e3da;
+  }
+}
+
+// h6 Leuchtlinie -------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='h6'] {
+  @include page(#fcfdfe);
+
+  .ph {
+    padding-bottom: 28px;
+
+    &::before {
+      inset: -32px -100vmax 0;
+      background: linear-gradient(180deg, #eef4fa, #f7fafd);
+    }
+
+    // The line of light at the end of the head, across the page.
+    &::after {
+      right: -100vmax;
+      left: -100vmax;
+      height: 2px;
+      background: linear-gradient(
+        90deg,
+        transparent 5%,
+        rgba(0, 164, 224, 0.5) 30%,
+        #00a4e0 50%,
+        rgba(0, 164, 224, 0.5) 70%,
+        transparent 95%
+      );
+      box-shadow:
+        0 0 10px 1px rgba(0, 164, 224, 0.55),
+        0 0 40px 6px rgba(0, 164, 224, 0.2);
+    }
+  }
+}
+
+// h7 Raster ------------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='h7'] {
+  @include page(#fff);
+
+  .ph {
+    &::before {
+      inset: -32px -100vmax -120px;
+      background:
+        radial-gradient(
+          40% 160px at 50% 0,
+          rgba(0, 164, 224, 0.14),
+          transparent 100%
+        ),
+        linear-gradient(rgba(0, 50, 125, 0.06) 1px, transparent 1px) 0 0 / 48px 48px,
+        linear-gradient(90deg, rgba(0, 50, 125, 0.06) 1px, transparent 1px) 0 0 /
+          48px 48px;
+      mask: linear-gradient(180deg, #000 30%, transparent);
+    }
+  }
+}
+
+// h8 Nebel -------------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='h8'] {
+  @include page(
+    (
+      radial-gradient(40% 50% at 0% 0%, rgba(0, 164, 224, 0.14), transparent 70%),
+      radial-gradient(36% 44% at 100% 8%, rgba(155, 80, 200, 0.1), transparent 70%),
+      radial-gradient(
+        44% 50% at 100% 100%,
+        rgba(0, 120, 187, 0.12),
+        transparent 70%
+      ),
+      radial-gradient(36% 40% at 0% 100%, rgba(0, 200, 170, 0.08), transparent 70%),
+      #f7f9fc
+    )
+  );
+
+  .ph::before {
+    display: none;
+  }
+
+  .ad-card,
+  app-ad-kpi:not(:first-child),
+  .ad-page .list .item {
+    border-color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow:
+      0 0 0 1px rgba(0, 50, 125, 0.05),
+      0 10px 26px -18px rgba(0, 50, 125, 0.3);
+    backdrop-filter: blur(12px);
+  }
+}

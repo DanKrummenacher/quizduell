@@ -1,0 +1,209 @@
+// Temporary: facelift drafts of the whole admin, round 11 (data-face m1–m6) –
+// the chosen «Klar» (round 10) with the path of «Kante», a calm leading figure,
+// and six ways to set the sections and the many cards further down the page.
+//   m1 Basis       the chosen combination, sections as today
+//   m2 Kapitel     every section with a clear heading and a rule across the page
+//   m3 Grundton    a calm blue-grey page, so the white cards stand out
+//   m4 Sektionsfläche  every section on its own soft panel, the cards on it
+//   m5 Kartenkopf  every card head on a tinted band, set apart from its body
+//   m6 Tiefe       the grey page of m3 with lifted cards and section headings
+@use '../../styles/tokens' as t;
+
+$m: "app-admin-shell .ad-frame:is([data-face^='m'])";
+$hair: rgba(0, 50, 125, 0.09);
+
+// The combination ---------------------------------------------------------------
+
+#{$m} {
+  // The leading figure: no shadow, the figure as large as the others.
+  .kpis > app-ad-kpi:first-child {
+    box-shadow: none;
+
+    .value {
+      font-size: 32px;
+    }
+  }
+
+  // The path of «Kante»: cyan under the pointer, the arrow turns when open.
+  .ph-switch > button {
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease;
+
+    svg {
+      transition:
+        stroke 0.15s ease,
+        transform 0.2s ease;
+    }
+
+    &:hover,
+    &[aria-expanded='true'] {
+      background: transparent;
+      color: #0078bb;
+
+      svg {
+        stroke: #0078bb;
+      }
+    }
+
+    &[aria-expanded='true'] svg {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+// A plain page colour behind the frame.
+@mixin page($background) {
+  &::before {
+    background: $background;
+  }
+}
+
+// A section heading with a rule that runs to the end of the page.
+@mixin chapter {
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 44px 0 16px;
+    color: t.$text;
+    font-size: 19px;
+    font-weight: t.$bold;
+    letter-spacing: -0.01em;
+    text-transform: none;
+
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(0, 50, 125, 0.12);
+    }
+  }
+}
+
+// m2 Kapitel -------------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='m2'] {
+  @include chapter;
+
+  .section-title::before {
+    content: '';
+    width: 4px;
+    height: 18px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #00a4e0, #0078bb);
+  }
+}
+
+// m3 Grundton ------------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='m3'] {
+  @include page(#eef2f7);
+
+  .ad-card,
+  app-ad-kpi:not(:first-child),
+  .ad-page .list .item {
+    border-color: rgba(0, 50, 125, 0.07);
+  }
+}
+
+// m4 Sektionsfläche -------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='m4'] {
+  @include chapter;
+
+  .section-title {
+    margin-bottom: 0;
+    padding: 18px 20px 14px;
+    border: 1px solid $hair;
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    background: #eef3f9;
+    font-size: 16px;
+
+    &::after {
+      display: none;
+    }
+  }
+
+  .section-title + .ad-grid {
+    padding: 4px 20px 20px;
+    border: 1px solid $hair;
+    border-top: 0;
+    border-radius: 0 0 18px 18px;
+    background: #eef3f9;
+  }
+
+  // Sections without a heading, such as the cards of the overview.
+  .ad-page > .ad-grid:not(.section-title + .ad-grid) {
+    padding: 20px;
+    border: 1px solid $hair;
+    border-radius: 18px;
+    background: #eef3f9;
+  }
+}
+
+// m5 Kartenkopf ----------------------------------------------------------------
+
+$band: #f3f7fb;
+
+app-admin-shell .ad-frame[data-face='m5'] {
+  @include chapter;
+
+  @media (min-width: 641px) {
+    .ad-card:not(.flush) > .ad-card-head {
+      margin: -20px -22px 18px;
+      padding: 16px 22px 14px;
+      border-bottom: 1px solid #e6edf5;
+      border-radius: 12px 12px 0 0;
+      background: $band;
+    }
+  }
+
+  .ad-card.flush > .ad-card-head {
+    background: $band;
+  }
+}
+
+// m6 Tiefe ---------------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='m6'] {
+  @include page(#edf1f6);
+  @include chapter;
+
+  .ad-card,
+  app-ad-kpi:not(:first-child),
+  .ad-page .list .item {
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow:
+      0 0 0 1px rgba(0, 50, 125, 0.05),
+      0 1px 2px rgba(0, 50, 125, 0.05),
+      0 10px 24px -16px rgba(0, 50, 125, 0.3);
+  }
+
+  .section-title::after {
+    background: rgba(0, 50, 125, 0.1);
+  }
+}
+
+// m7 / m8 Kapitel auf hellem Grundton -------------------------------------------
+// The chapters of «Kartenkopf» on a page tone lighter than «Grundton»:
+// m7 a soft blue-grey, m8 lighter still.
+
+app-admin-shell .ad-frame:is([data-face='m7'], [data-face='m8']) {
+  @include chapter;
+
+  .ad-card,
+  app-ad-kpi:not(:first-child),
+  .ad-page .list .item {
+    border-color: rgba(0, 50, 125, 0.08);
+  }
+}
+
+app-admin-shell .ad-frame[data-face='m7'] {
+  @include page(#f3f6fa);
+}
+
+app-admin-shell .ad-frame[data-face='m8'] {
+  @include page(#f6f8fb);
+}

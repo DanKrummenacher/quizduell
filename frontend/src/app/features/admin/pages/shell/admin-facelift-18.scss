@@ -1,0 +1,172 @@
+// Temporary: facelift drafts of the whole admin, round 9 (data-face j1–j8) –
+// the base of round 7 (admin-facelift-15.scss), in the direction of
+// «Zweiflächig» and «Ausklang».
+//   j1 Navykante    the blue panel ends in a fine navy line
+//   j2 Tiefblau     the navy of the bar fades out slowly and deeper
+//   j3 Übergang     the panel starts in the navy of the bar and ends in a crisp edge
+//   j4 Kühlgrau     a calm grey-blue panel with a crisp line, a white page
+//   j5 Glut         the navy fade with a soft cyan glow under the bar
+//   j6 Stufen       two tones: a panel behind the head, a lighter band below it
+//   j7 Seitenlicht  the panel stronger at the left, fading to the right
+//   j8 Tonfläche    the whole page in a soft blue, the content on white cards
+@use '../../styles/tokens' as t;
+
+@mixin page($background) {
+  position: relative;
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: $background;
+    pointer-events: none;
+  }
+}
+
+@mixin head-layer($background, $bottom: 0) {
+  .ph {
+    padding-bottom: 28px;
+
+    // As wide as the window, so positions in it are positions on screen.
+    &::before {
+      inset: -32px calc(50% - 50vw) $bottom;
+      background: $background;
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+$light: radial-gradient(
+  40% 160px at 70% 0,
+  rgba(0, 164, 224, 0.16),
+  transparent 100%
+);
+
+// j1 Navykante ---------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='j1'] {
+  @include page(#fff);
+  @include head-layer(($light, linear-gradient(180deg, #e7f0f9, #f1f6fb)));
+
+  .ph::before {
+    border-bottom: 2px solid t.$brand;
+  }
+}
+
+// j2 Tiefblau ----------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='j2'] {
+  @include page(#fbfcfe);
+  @include head-layer(
+    (
+      linear-gradient(
+        180deg,
+        rgba(0, 50, 125, 0.34),
+        rgba(0, 50, 125, 0.14) 30%,
+        rgba(0, 50, 125, 0.05) 60%,
+        transparent
+      )
+    ),
+    -140px
+  );
+}
+
+// j3 Übergang ----------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='j3'] {
+  @include page(#fff);
+  @include head-layer(
+    ($light, linear-gradient(180deg, #c9dcf0, #e4eef8 45%, #eff5fb))
+  );
+
+  .ph::before {
+    border-bottom: 1px solid #d3e0ee;
+  }
+}
+
+// j4 Kühlgrau ----------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='j4'] {
+  @include page(#fff);
+  @include head-layer(linear-gradient(180deg, #eceff4, #f3f5f8));
+
+  .ph::before {
+    border-bottom: 1px solid #dfe3ea;
+  }
+}
+
+// j5 Glut --------------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='j5'] {
+  @include page(#fbfcfe);
+  @include head-layer(
+    (
+      radial-gradient(34% 150px at 50% 0, rgba(0, 164, 224, 0.32), transparent 100%),
+      linear-gradient(
+        180deg,
+        rgba(0, 50, 125, 0.24),
+        rgba(0, 50, 125, 0.08) 40%,
+        transparent
+      )
+    ),
+    -100px
+  );
+}
+
+// j6 Stufen ------------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='j6'] {
+  @include page(#fff);
+  @include head-layer(
+    (
+      $light,
+      linear-gradient(180deg, #e3edf8, #eaf2fa) top / 100% calc(100% - 64px)
+        no-repeat,
+      linear-gradient(180deg, #f4f8fc, #fff) bottom / 100% 64px no-repeat
+    ),
+    -64px
+  );
+
+  // The figures lie above the lower band.
+  .ad-page > .kpis,
+  .ad-page > .ad-card.metrics,
+  .ad-page > app-ad-page-head + * {
+    position: relative;
+    z-index: 4;
+  }
+}
+
+// j7 Seitenlicht -------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='j7'] {
+  @include page(#fff);
+  @include head-layer(
+    (
+      radial-gradient(50% 200% at 0% 0%, rgba(0, 120, 187, 0.22), transparent 70%),
+      linear-gradient(90deg, #e3edf8, #f3f7fb 60%, #fafcfe)
+    )
+  );
+
+  .ph::before {
+    border-bottom: 1px solid #dde6f0;
+  }
+}
+
+// j8 Tonfläche ---------------------------------------------------------------
+
+app-admin-shell .ad-frame[data-face='j8'] {
+  @include page(linear-gradient(180deg, #e8f0f9, #eef3f9 400px, #f1f5f9));
+  @include head-layer($light);
+
+  .ad-card,
+  app-ad-kpi:not(:first-child),
+  .ad-page .list .item {
+    border-color: rgba(0, 50, 125, 0.06);
+    box-shadow: 0 6px 18px -12px rgba(0, 50, 125, 0.28);
+  }
+}
