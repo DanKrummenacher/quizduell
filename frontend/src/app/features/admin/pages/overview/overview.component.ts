@@ -26,11 +26,13 @@ import { duelLength, formatSetting, SETTINGS_META } from '../../core/settings-me
 import { AdLineChartComponent, AdSparklineComponent } from '../../ui/charts';
 import { AdKpiComponent } from '../../ui/kpi.component';
 import { AdStateComponent } from '../../ui/state.component';
+import { AdPageHeadComponent } from '../../ui/page-head.component';
 
 /** Start page: is everything running, how is it played, what needs attention. */
 @Component({
   selector: 'app-admin-overview',
   imports: [
+    AdPageHeadComponent,
     RouterLink,
     AdKpiComponent,
     AdLineChartComponent,

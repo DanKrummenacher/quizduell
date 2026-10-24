@@ -1,15 +1,12 @@
 <main class="ad-page">
-  <header class="ad-page-head">
-    <div>
-      <h1>Übersicht</h1>
-      <p>
-        @if (range() === 7) {
-          Die letzten 7 Tage im Vergleich zur Woche davor.
-        } @else {
-          Die letzten 30 Tage im Vergleich zu den 30 Tagen davor.
-        }
-      </p>
-    </div>
+  <app-ad-page-head title="Übersicht">
+    <p headDesc>
+      @if (range() === 7) {
+        Die letzten 7 Tage im Vergleich zur Woche davor.
+      } @else {
+        Die letzten 30 Tage im Vergleich zu den 30 Tagen davor.
+      }
+    </p>
     <div class="ad-segmented" role="group" aria-label="Zeitraum">
       <button
         type="button"
@@ -28,7 +25,7 @@
         30 Tage
       </button>
     </div>
-  </header>
+  </app-ad-page-head>
 
   @if (critical(); as hint) {
     <div class="alert" role="alert">

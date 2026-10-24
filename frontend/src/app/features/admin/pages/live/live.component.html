@@ -1,22 +1,19 @@
 <main class="ad-page">
-  <header class="ad-page-head">
-    <div>
-      <h1>Live</h1>
-      <p class="status">
-        <span
-          class="pulse"
-          [class.paused]="paused() || error()"
-          aria-hidden="true"
-        ></span>
-        @if (paused()) {
-          Angehalten · Stand {{ formatTime(now(), true) }}
-        } @else if (error()) {
-          {{ error() }} Neuer Versuch in wenigen Sekunden.
-        } @else {
-          Aktualisiert alle 2 Sekunden
-        }
-      </p>
-    </div>
+  <app-ad-page-head title="Live">
+    <p headDesc class="status">
+      <span
+        class="pulse"
+        [class.paused]="paused() || error()"
+        aria-hidden="true"
+      ></span>
+      @if (paused()) {
+        Angehalten · Stand {{ formatTime(now(), true) }}
+      } @else if (error()) {
+        {{ error() }} Neuer Versuch in wenigen Sekunden.
+      } @else {
+        Aktualisiert alle 2 Sekunden
+      }
+    </p>
     <div class="ad-actions">
       <button
         type="button"
@@ -31,7 +28,7 @@
         >{{ paused() ? 'Fortsetzen' : 'Anhalten' }}
       </button>
     </div>
-  </header>
+  </app-ad-page-head>
 
   @if (!snapshot()) {
     @if (error()) {

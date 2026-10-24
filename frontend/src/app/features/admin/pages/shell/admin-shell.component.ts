@@ -12,6 +12,7 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { localStore } from '../../../../core/platform/safe-storage';
 import { AdminApi } from '../../core/admin-api.service';
+import { ADMIN_AREAS } from '../../core/admin-areas';
 import { AdminData } from '../../core/admin-data.service';
 import { AdminSessionService } from '../../core/admin-session.service';
 import { ConfirmService } from '../../core/confirm.service';
@@ -52,62 +53,26 @@ export class AdminShellComponent {
   protected readonly items = computed<NavItem[]>(() => {
     const live = this.data.live();
     const hints = this.data.openHints();
-    return [
-      {
-        path: '/admin',
-        label: 'Übersicht',
-        icon: 'home',
-        group: 'Betrieb',
-        description: 'Die Lage auf einen Blick',
-      },
-      {
-        path: '/admin/live',
-        label: 'Live',
-        icon: 'heartbeat',
-        group: 'Betrieb',
-        description: 'Laufende Duelle in Echtzeit',
-        count: live ? live.duels.filter((d) => d.phase !== 'finished').length : null,
-        live: true,
-      },
-      {
-        path: '/admin/hinweise',
-        label: 'Hinweise',
-        icon: 'bulb',
-        group: 'Betrieb',
-        description: 'Was Aufmerksamkeit braucht',
-        count: hints?.length ?? null,
-      },
-      {
-        path: '/admin/fragen',
-        label: 'Fragen',
-        icon: 'items-list',
-        group: 'Inhalte',
-        description: 'Katalog pflegen, prüfen und importieren',
-        warn: this.data.playable() === false,
-      },
-      {
-        path: '/admin/regeln',
-        label: 'Spielregeln',
-        icon: 'settings',
-        group: 'Inhalte',
-        description: 'Ablauf und Zeiten eines Duells',
-      },
-      {
-        path: '/admin/auswertung',
-        label: 'Auswertung',
-        icon: 'statistic',
-        group: 'Analyse',
-        description: 'Nutzung und Fragen über die Zeit',
-      },
-      {
-        path: '/admin/verlauf',
-        label: 'Verlauf',
-        icon: 'time',
-        group: 'Analyse',
-        description: 'Jede Änderung im Admin',
-        fresh: (this.latestChange() ?? 0) > this.seenChange(),
-      },
-    ];
+    return ADMIN_AREAS.map((area): NavItem => {
+      switch (area.path) {
+        case '/admin/live':
+          return {
+            ...area,
+            count: live
+              ? live.duels.filter((d) => d.phase !== 'finished').length
+              : null,
+            live: true,
+          };
+        case '/admin/hinweise':
+          return { ...area, count: hints?.length ?? null };
+        case '/admin/fragen':
+          return { ...area, warn: this.data.playable() === false };
+        case '/admin/verlauf':
+          return { ...area, fresh: (this.latestChange() ?? 0) > this.seenChange() };
+        default:
+          return { ...area };
+      }
+    });
   });
 
   constructor() {

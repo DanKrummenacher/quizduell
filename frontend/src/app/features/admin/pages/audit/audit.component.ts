@@ -19,6 +19,7 @@ import { NotifyService } from '../../core/notify.service';
 import { formatSetting, SETTINGS_META } from '../../core/settings-meta';
 import { AdStateComponent } from '../../ui/state.component';
 import { messageOf } from '../questions/questions.component';
+import { AdPageHeadComponent } from '../../ui/page-head.component';
 
 type Group = 'all' | 'settings' | 'questions' | 'hints' | 'login';
 
@@ -60,7 +61,7 @@ const ICONS: Record<AuditAction, string> = {
 /** Everything that was changed in the admin, with earlier rules to restore. */
 @Component({
   selector: 'app-admin-audit',
-  imports: [AdStateComponent],
+  imports: [AdPageHeadComponent, AdStateComponent],
   templateUrl: './audit.component.html',
   styleUrl: './audit.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

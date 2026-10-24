@@ -33,6 +33,7 @@ import {
 } from '../../ui/charts';
 import { AdKpiComponent } from '../../ui/kpi.component';
 import { AdStateComponent } from '../../ui/state.component';
+import { AdPageHeadComponent } from '../../ui/page-head.component';
 
 const RANGES: { id: AnalyticsRange; label: string }[] = [
   { id: 7, label: '7 Tage' },
@@ -52,6 +53,7 @@ const WEEKDAYS = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
 @Component({
   selector: 'app-admin-analytics',
   imports: [
+    AdPageHeadComponent,
     RouterLink,
     AdColumnChartComponent,
     AdHeatmapComponent,

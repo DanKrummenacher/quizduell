@@ -10,6 +10,11 @@ $phone: 640px;
 app-admin-shell {
   display: block;
 
+  // The light of the page head runs across the whole width, never past it.
+  .ad-frame {
+    overflow-x: clip;
+  }
+
   // ---------------------------------------------------------------------------
   // Page
   // ---------------------------------------------------------------------------
@@ -23,22 +28,6 @@ app-admin-shell {
 
     @media (max-width: $phone) {
       padding: 20px 16px 72px;
-    }
-  }
-
-  .ad-page-head {
-    @include l.page-head;
-    flex-wrap: wrap;
-
-    @media (max-width: $phone) {
-      align-items: flex-start;
-      flex-direction: column;
-      gap: 16px;
-      margin-bottom: 20px;
-
-      h1 {
-        font-size: t.$text-2xl;
-      }
     }
   }
 

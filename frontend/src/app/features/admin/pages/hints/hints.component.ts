@@ -18,6 +18,7 @@ import { NotifyService } from '../../core/notify.service';
 import { AdAnswerDistributionComponent } from '../../ui/answer-distribution.component';
 import { AdStateComponent } from '../../ui/state.component';
 import { messageOf } from '../questions/questions.component';
+import { AdPageHeadComponent } from '../../ui/page-head.component';
 
 const TYPE_ICONS: Record<HintType, string> = {
   'pool-empty': 'priority-warning',
@@ -35,7 +36,12 @@ const TYPE_ICONS: Record<HintType, string> = {
  */
 @Component({
   selector: 'app-admin-hints',
-  imports: [RouterLink, AdAnswerDistributionComponent, AdStateComponent],
+  imports: [
+    AdPageHeadComponent,
+    RouterLink,
+    AdAnswerDistributionComponent,
+    AdStateComponent,
+  ],
   templateUrl: './hints.component.html',
   styleUrl: './hints.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

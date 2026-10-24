@@ -1,16 +1,13 @@
 <main class="ad-page">
-  <header class="ad-page-head">
-    <div>
-      <h1>Spielregeln</h1>
-      <p>
-        Änderungen gelten ab dem nächsten Duell. Laufende Duelle spielen mit den
-        bisherigen Regeln zu Ende.
-      </p>
-    </div>
+  <app-ad-page-head title="Spielregeln">
+    <p headDesc>
+      Änderungen gelten ab dem nächsten Duell. Laufende Duelle spielen mit den
+      bisherigen Regeln zu Ende.
+    </p>
     <a class="btn-secondary" routerLink="/admin/verlauf">
       <css-icon icon="time" size="xs"></css-icon>Frühere Regeln
     </a>
-  </header>
+  </app-ad-page-head>
 
   @if (draft()) {
     <div class="layout">

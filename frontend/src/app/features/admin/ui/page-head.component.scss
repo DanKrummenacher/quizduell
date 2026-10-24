@@ -1,0 +1,299 @@
+// Head of every admin page: the path, the title with its line and actions, a
+// rule that fades out to the right. Behind it the light of the bar falls into
+// the page, and the icon of the area sits large and faint at the right.
+// page-head-menu.scss: the menu of the path.
+@use '../styles/tokens' as t;
+
+$tablet: 1024px;
+$phone: 640px;
+$ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+app-ad-page-head {
+  display: block;
+}
+
+.ph {
+  position: relative;
+  // The path and its menu stay above the page.
+  z-index: 3;
+  isolation: isolate;
+  margin-bottom: 28px;
+  padding-bottom: 22px;
+
+  css-icon {
+    display: inline-flex;
+  }
+
+  // The light of the bar.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -32px -100vmax -40px;
+    z-index: -1;
+    background:
+      radial-gradient(40% 120px at 50% 0, rgba(0, 164, 224, 0.22), transparent 100%),
+      linear-gradient(180deg, rgba(0, 50, 125, 0.07), transparent 70%);
+    pointer-events: none;
+  }
+
+  // The rule under the head.
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      t.$line-strong,
+      rgba(128, 152, 190, 0.35) 45%,
+      transparent
+    );
+    transform-origin: left;
+    animation: ph-rule 0.9s 0.1s $ease both;
+  }
+
+  @media (max-width: $tablet) {
+    &::before {
+      inset: -24px -100vmax -40px;
+    }
+  }
+}
+
+// The icon of the area, large, turned and cut by the head.
+.ph-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.ph-symbol {
+  position: absolute;
+  right: 40px;
+  bottom: -40px;
+  color: t.$brand;
+  opacity: 0.06;
+  transform: scale(6) rotate(-10deg);
+  transform-origin: bottom right;
+}
+
+// Path ------------------------------------------------------------------------
+
+.ph-crumbs {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  // As high as the chips of «Zuletzt», so the head does not move once they come.
+  min-height: 26px;
+  margin-bottom: 16px;
+  color: t.$text-3;
+  font-size: t.$text-base;
+
+  > span[aria-hidden] {
+    color: t.$text-4;
+  }
+}
+
+.ph-switch > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: -4px -8px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: t.$text;
+  font: inherit;
+  font-weight: t.$bold;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: t.$text-3;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: stroke 0.15s ease;
+  }
+
+  &:hover {
+    background: rgba(0, 50, 125, 0.06);
+
+    svg {
+      stroke: t.$text-2;
+    }
+  }
+
+  &[aria-expanded='true'] {
+    background: rgba(0, 50, 125, 0.09);
+
+    svg {
+      stroke: t.$brand;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid t.$brand;
+    outline-offset: 1px;
+  }
+}
+
+// The areas opened last, at the end of the path.
+.ph-recent {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  color: t.$text-4;
+  font-size: t.$text-sm;
+
+  > span {
+    margin-right: 4px;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: t.$radius-pill;
+    background: rgba(0, 50, 125, 0.05);
+    color: t.$text-2;
+    font-size: t.$text-sm;
+    font-weight: t.$medium;
+    text-decoration: none;
+    transition:
+      transform 0.2s ease,
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 50, 125, 0.09);
+      color: t.$text;
+      transform: translateY(-1px);
+    }
+
+    css-icon {
+      color: t.$text-3;
+    }
+  }
+
+  @media (max-width: $phone) {
+    display: none;
+  }
+}
+
+// Title, line and actions -----------------------------------------------------
+
+.ph-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 24px;
+}
+
+.ph-text {
+  flex: 1;
+  min-width: 0;
+
+  h1 {
+    margin: 0;
+    font-size: 34px;
+    font-weight: t.$bold;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+}
+
+.ph-desc {
+  margin-top: 6px;
+  color: t.$text-2;
+  font-size: t.$text-md;
+  line-height: 1.5;
+
+  p {
+    margin: 0;
+  }
+}
+
+.ph-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+
+  &:empty {
+    display: none;
+  }
+}
+
+// Path, title, line and actions arrive one after another.
+.ph-crumbs,
+.ph-text h1,
+.ph-desc,
+.ph-actions {
+  animation: ph-in 0.55s $ease both;
+}
+
+.ph-text h1 {
+  animation-delay: 0.05s;
+}
+
+.ph-desc {
+  animation-delay: 0.1s;
+}
+
+.ph-actions {
+  animation-delay: 0.14s;
+}
+
+@keyframes ph-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes ph-rule {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@media (max-width: $phone) {
+  .ph-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ph-text {
+    flex: none;
+    width: 100%;
+
+    h1 {
+      font-size: 28px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ph::after,
+  .ph-crumbs,
+  .ph-text h1,
+  .ph-desc,
+  .ph-actions {
+    animation: none;
+  }
+}

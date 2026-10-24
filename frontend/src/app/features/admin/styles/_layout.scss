@@ -1,5 +1,5 @@
-// Page structure shared by every admin page: the content width, the page
-// head with title and actions, tabs, cards with a head, key figures and the
+// Page structure shared by every admin page: the content width, the actions
+// of a page, tabs, cards with a head, key figures and the
 // side drawer. One structure, so every area reads the same.
 @use 'tokens' as t;
 @use 'controls' as c;
@@ -11,30 +11,6 @@ $page-width: 1360px;
   max-width: $page-width;
   margin: 0 auto;
   padding: 32px 32px 104px;
-}
-
-/// Title, description and actions of a page.
-@mixin page-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 24px;
-
-  h1 {
-    margin: 0;
-    font-size: t.$text-3xl;
-    font-weight: t.$bold;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
-  }
-
-  p {
-    margin: 6px 0 0;
-    color: t.$text-2;
-    font-size: t.$text-md;
-    line-height: 1.5;
-  }
 }
 
 /// Group of actions at the right of a page head.

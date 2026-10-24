@@ -33,6 +33,7 @@ import {
 import { AdStateComponent } from '../../ui/state.component';
 import { AdToggleComponent } from '../../ui/toggle.component';
 import { messageOf } from '../questions/questions.component';
+import { AdPageHeadComponent } from '../../ui/page-head.component';
 
 /** Pages that can hold unsaved changes when the admin navigates away. */
 export interface UnsavedChanges {
@@ -42,7 +43,7 @@ export interface UnsavedChanges {
 /** The rules of the game, with what they mean before they are saved. */
 @Component({
   selector: 'app-admin-settings',
-  imports: [RouterLink, AdStateComponent, AdToggleComponent],
+  imports: [AdPageHeadComponent, RouterLink, AdStateComponent, AdToggleComponent],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

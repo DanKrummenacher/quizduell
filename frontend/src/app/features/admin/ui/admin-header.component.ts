@@ -23,16 +23,12 @@ import {
 import '@css-ch/components/icon';
 import { filter } from 'rxjs';
 import { LogoMarkComponent } from '../../../core/ui/logo-mark/logo-mark.component';
+import type { AdminArea } from '../core/admin-areas';
 import { AutofocusDirective } from './autofocus.directive';
 import { CommandPalette } from './command-palette.component';
 
-export interface NavItem {
-  path: string;
-  label: string;
-  icon: string;
-  group: 'Betrieb' | 'Inhalte' | 'Analyse';
-  /** One line on what the area is for. */
-  description: string;
+/** An area in the bar, with what is going on there. */
+export interface NavItem extends AdminArea {
   /** Running duels (live) or open hints. */
   count?: number | null;
   /** The count is of running duels. */

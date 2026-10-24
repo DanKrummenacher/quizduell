@@ -1,13 +1,10 @@
 <main class="ad-page">
-  <header class="ad-page-head">
-    <div>
-      <h1>Verlauf</h1>
-      <p>
-        Jede Änderung im Admin, neueste zuerst. Frühere Spielregeln lassen sich
-        wiederherstellen.
-      </p>
-    </div>
-  </header>
+  <app-ad-page-head title="Verlauf">
+    <p headDesc>
+      Jede Änderung im Admin, neueste zuerst. Frühere Spielregeln lassen sich
+      wiederherstellen.
+    </p>
+  </app-ad-page-head>
 
   <div class="filters" role="group" aria-label="Art der Änderung">
     @for (option of groups; track option.id) {

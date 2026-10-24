@@ -21,6 +21,7 @@ import { every } from '../../core/remote';
 import { AutofocusDirective } from '../../ui/autofocus.directive';
 import { AdLineChartComponent } from '../../ui/charts';
 import { AdStateComponent } from '../../ui/state.component';
+import { AdPageHeadComponent } from '../../ui/page-head.component';
 
 const POLL_MS = 2000;
 
@@ -52,7 +53,12 @@ const EVENT_GROUPS: Record<EventFilter, LiveEvent['kind'][] | null> = {
 /** The running operation, refreshed every two seconds. */
 @Component({
   selector: 'app-admin-live',
-  imports: [AutofocusDirective, AdLineChartComponent, AdStateComponent],
+  imports: [
+    AdPageHeadComponent,
+    AutofocusDirective,
+    AdLineChartComponent,
+    AdStateComponent,
+  ],
   templateUrl: './live.component.html',
   styleUrl: './live.component.scss',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

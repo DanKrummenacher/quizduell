@@ -1,9 +1,6 @@
 <main class="ad-page">
-  <header class="ad-page-head">
-    <div>
-      <h1>Auswertung</h1>
-      <p>Jede Zahl im Vergleich zum gleich langen Zeitraum davor.</p>
-    </div>
+  <app-ad-page-head title="Auswertung">
+    <p headDesc>Jede Zahl im Vergleich zum gleich langen Zeitraum davor.</p>
     <div class="ad-actions">
       <div class="ad-segmented" role="group" aria-label="Zeitraum">
         @for (option of ranges; track option.id) {
@@ -26,7 +23,7 @@
         <css-icon icon="download" size="xs"></css-icon>CSV
       </button>
     </div>
-  </header>
+  </app-ad-page-head>
 
   @if (analytics.error() && !analytics.value()) {
     <app-ad-state

@@ -1,16 +1,13 @@
 <main class="ad-page">
-  <header class="ad-page-head">
-    <div>
-      <h1>Fragen</h1>
-      <p>
-        @if (data.questions.value()) {
-          {{ formatInt(counts().active) }} im Spiel ·
-          {{ formatInt(counts().paused) }} pausiert
-        } @else {
-          Der ganze Fragenkatalog
-        }
-      </p>
-    </div>
+  <app-ad-page-head title="Fragen">
+    <p headDesc>
+      @if (data.questions.value()) {
+        {{ formatInt(counts().active) }} im Spiel ·
+        {{ formatInt(counts().paused) }} pausiert
+      } @else {
+        Der ganze Fragenkatalog
+      }
+    </p>
     <div class="ad-actions">
       <button type="button" class="btn-secondary" (click)="importing.set(true)">
         <css-icon icon="upload" size="xs"></css-icon>Importieren
@@ -27,7 +24,7 @@
         <css-icon icon="add" size="xs"></css-icon>Neue Frage
       </button>
     </div>
-  </header>
+  </app-ad-page-head>
 
   @if (data.playable() === false) {
     <div class="alert" role="alert">

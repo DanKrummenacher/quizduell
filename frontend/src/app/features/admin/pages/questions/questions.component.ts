@@ -41,6 +41,7 @@ import { AdStateComponent } from '../../ui/state.component';
 import { AdToggleComponent } from '../../ui/toggle.component';
 import { QuestionEditorComponent } from './question-editor.component';
 import { QuestionImportComponent } from './question-import.component';
+import { AdPageHeadComponent } from '../../ui/page-head.component';
 
 type StatusFilter = 'all' | 'active' | 'paused';
 type HealthFilter = 'all' | 'hints' | Difficulty;
@@ -62,6 +63,7 @@ const SORTS: { id: Sort; label: string }[] = [
 @Component({
   selector: 'app-admin-questions',
   imports: [
+    AdPageHeadComponent,
     AdStateComponent,
     AdToggleComponent,
     QuestionEditorComponent,
