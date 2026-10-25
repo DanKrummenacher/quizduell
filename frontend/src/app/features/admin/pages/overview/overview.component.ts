@@ -10,7 +10,10 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import '@css-ch/components/icon';
-import type { AnalyticsRange } from '../../../../core/contracts/admin.contract';
+import type {
+  AnalyticsRange,
+  AuditAction,
+} from '../../../../core/contracts/admin.contract';
 import { AdminApi } from '../../core/admin-api.service';
 import { AdminData } from '../../core/admin-data.service';
 import {
@@ -27,7 +30,7 @@ import {
   labelStep,
   share,
 } from '../../core/format';
-import { hintText, SEVERITY_LABELS } from '../../core/hint-texts';
+import { HINT_TYPE_LABELS, hintText, SEVERITY_LABELS } from '../../core/hint-texts';
 import { every, remote } from '../../core/remote';
 import { duelLength, formatSetting, SETTINGS_META } from '../../core/settings-meta';
 import { AdLineChartComponent, AdSparklineComponent } from '../../ui/charts';
@@ -83,6 +86,63 @@ export class OverviewComponent {
     };
   });
 
+  /** Each category with its hit rate over all answers. */
+  protected readonly rates = computed(() => {
+    const categories = this.analytics.value()?.categories;
+    if (!categories) {
+      return null;
+    }
+    return categories
+      .filter((c) => c.active > 0)
+      .sort((a, b) => b.active - a.active)
+      .slice(0, 6)
+      .map((c) => {
+        const rate = c.answers ? c.correct / c.answers : null;
+        return {
+          name: c.category ?? 'Ohne Kategorie',
+          active: c.active,
+          rate,
+          percent: formatPercent(rate),
+          tone:
+            rate === null
+              ? 'none'
+              : rate < 0.45
+                ? 'hard'
+                : rate > 0.85
+                  ? 'easy'
+                  : 'fair',
+        };
+      });
+  });
+
+  /** The open hints by kind. */
+  protected readonly hintKinds = computed(() => {
+    const counts = new Map<string, number>();
+    for (const hint of this.data.openHints() ?? []) {
+      const label = HINT_TYPE_LABELS[hint.type];
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+    return [...counts].map(([label, count]) => ({ label, count }));
+  });
+
+  /** An icon for each kind of change. */
+  protected readonly auditIcons: Record<AuditAction, string> = {
+    login: 'unlock',
+    'game.pause': 'lock',
+    'game.resume': 'play-circle',
+    'settings.update': 'settings',
+    'settings.restore': 'undo',
+    'question.create': 'add',
+    'question.update': 'edit',
+    'question.delete': 'trash',
+    'question.restore': 'undo',
+    'trash.purge': 'trash',
+    'questions.bulk': 'items-list',
+    'questions.import': 'upload',
+    'hint.ignore': 'hide',
+    'hint.restore': 'view',
+  };
+
   /** The key figures choose what the large chart shows. */
   protected readonly metric = signal<'games' | 'completion' | 'accuracy'>('games');
 
@@ -92,6 +152,8 @@ export class OverviewComponent {
 
   /** Wide enough for a main column beside a rail. */
   private readonly wide = mediaQuery('(min-width: 1101px)');
+  /** Phones: fewer date labels under the chart, so they never touch. */
+  private readonly narrow = mediaQuery('(max-width: 480px)');
 
   private readonly chartCard = viewChild.required<TemplateRef<unknown>>('chartCard');
   private readonly liveCard = viewChild.required<TemplateRef<unknown>>('liveCard');
@@ -279,7 +341,9 @@ export class OverviewComponent {
       ...series,
       compare: a.range === 0 ? null : series.compare,
       labels: a.days.map((d) => formatDay(d.day)),
-      every: labelStep(a.days.length),
+      every: this.narrow()
+        ? Math.max(labelStep(a.days.length), Math.ceil(a.days.length / 4))
+        : labelStep(a.days.length),
       total: a.current.finished,
       empty: a.current.games === 0 && a.previous.games === 0,
     };

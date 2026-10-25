@@ -232,29 +232,30 @@
 
 .rules {
   display: grid;
-  gap: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
   margin: 0;
 
   div {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 8px 0;
-    border-bottom: 1px solid t.$line-soft;
-
-    &:last-child {
-      border-bottom: 0;
-    }
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: t.$bg-subtle;
   }
 
   dt {
+    overflow: hidden;
     color: t.$text-2;
-    font-size: t.$text-base;
+    font-size: t.$text-sm;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   dd {
     margin: 0;
-    font-size: t.$text-base;
+    font-size: t.$text-lg;
     font-weight: t.$bold;
     @include t.numeric;
   }
@@ -266,35 +267,71 @@
   list-style: none;
   border-top: 1px solid t.$line-soft;
 
+  // A timeline: an icon per change on one fine line.
   li {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    min-height: 46px;
+    gap: 14px;
+    min-height: 48px;
     padding: 10px 22px;
-    border-bottom: 1px solid t.$line-soft;
 
-    &:last-child {
-      border-bottom: 0;
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 36px;
+      width: 1px;
+      background: t.$line;
+    }
+
+    &:first-child::before {
+      top: 50%;
+    }
+
+    &:last-child::before {
+      bottom: 50%;
+    }
+
+    &:only-child::before,
+    &.audit-empty::before {
+      display: none;
     }
 
     @media (max-width: 640px) {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 2px;
       padding: 10px 16px;
+
+      &::before {
+        left: 30px;
+      }
     }
   }
 
   time {
     flex: none;
+    margin-left: auto;
     color: t.$text-3;
     font-size: t.$text-sm;
   }
 }
 
+.audit-icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: t.$bg-muted;
+  box-shadow: 0 0 0 4px #fff;
+  color: t.$text-2;
+}
+
 .audit-text {
+  min-width: 0;
   font-size: t.$text-md;
 }
 
@@ -304,6 +341,13 @@
 
 .audit-loading {
   padding: 16px 22px 20px;
+}
+
+// Between phone and wide screens the smaller cards go two by two.
+@media (min-width: 641px) and (max-width: 1200px) {
+  .ad-grid > .span-4 {
+    grid-column: span 6;
+  }
 }
 
 // Every layout places the cards in wrappers; a card fills its cell.
@@ -328,4 +372,95 @@
   display: grid;
   gap: 20px;
   min-width: 0;
+}
+
+// Hit rate per category: hard ones red, very easy ones green.
+.rates {
+  display: grid;
+  gap: 12px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: baseline;
+    column-gap: 10px;
+    row-gap: 5px;
+  }
+}
+
+.rate-name {
+  overflow: hidden;
+  font-size: t.$text-base;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rate-count {
+  color: t.$text-3;
+  font-size: t.$text-sm;
+  white-space: nowrap;
+}
+
+.rate-value {
+  min-width: 40px;
+  font-size: t.$text-base;
+  font-weight: t.$bold;
+  text-align: right;
+  @include t.numeric;
+
+  &[data-tone='hard'] {
+    color: t.$danger-text;
+  }
+
+  &[data-tone='easy'] {
+    color: t.$success-text;
+  }
+}
+
+.rate-bar {
+  @include c.meter(6px);
+  grid-column: 1 / -1;
+
+  > span {
+    background: #0078bb;
+  }
+
+  &[data-tone='hard'] > span {
+    background: t.$danger;
+  }
+
+  &[data-tone='easy'] > span {
+    background: t.$success;
+  }
+}
+
+// The open hints by kind.
+.kinds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: t.$radius-pill;
+    background: t.$bg-muted;
+    color: t.$text-2;
+    font-size: t.$text-sm;
+    white-space: nowrap;
+  }
+
+  b {
+    color: t.$text;
+    @include t.numeric;
+  }
 }

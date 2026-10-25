@@ -252,6 +252,15 @@
       ></a>
     </header>
     @if (data.hints.value()) {
+      @if (hintKinds().length) {
+        <ul class="kinds" aria-label="Offene Hinweise nach Art">
+          @for (kind of hintKinds(); track kind.label) {
+            <li>
+              {{ kind.label }} <b>{{ kind.count }}</b>
+            </li>
+          }
+        </ul>
+      }
       <ul class="hints">
         @for (item of hints(); track item.hint.key) {
           <li>
@@ -325,16 +334,25 @@
           text="Fragen erfassen oder aus einer CSV-Datei importieren."
         />
       } @else {
-        <p class="bars-title">Aktive Fragen nach Kategorie</p>
-        <ul class="bars">
-          @for (category of c.categories; track category.name) {
-            <li>
-              <span class="bar-label">{{ category.name }}</span>
-              <span class="bar-value">{{ category.count }}</span>
-              <span class="bar"><span [style.width.%]="category.width"></span></span>
-            </li>
-          }
-        </ul>
+        <p class="bars-title">Trefferquote je Kategorie</p>
+        @if (rates(); as list) {
+          <ul class="rates">
+            @for (row of list; track row.name) {
+              <li>
+                <span class="rate-name">{{ row.name }}</span>
+                <span class="rate-count">{{ row.active }} Fragen</span>
+                <span class="rate-value" [attr.data-tone]="row.tone">{{
+                  row.percent
+                }}</span>
+                <span class="rate-bar" [attr.data-tone]="row.tone"
+                  ><span [style.width.%]="(row.rate ?? 0) * 100"></span
+                ></span>
+              </li>
+            }
+          </ul>
+        } @else {
+          <app-ad-state kind="loading" [lines]="4" />
+        }
       }
     } @else if (data.questions.error()) {
       <app-ad-state
@@ -402,6 +420,9 @@
       <ul class="audit">
         @for (entry of page.entries; track entry.id) {
           <li>
+            <span class="audit-icon"
+              ><css-icon [attr.icon]="auditIcons[entry.action]" size="xs"></css-icon
+            ></span>
             <span class="audit-text">{{ entry.summary }}</span>
             <time [attr.datetime]="entry.at">{{ formatRelative(entry.at) }}</time>
           </li>
