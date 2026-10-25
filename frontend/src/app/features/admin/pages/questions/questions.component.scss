@@ -7,7 +7,7 @@
   gap: 10px;
   margin-bottom: 20px;
   padding: 12px 16px;
-  border-radius: t.$radius;
+  border-radius: 10px;
   background: t.$danger-bg;
   color: t.$danger-text;
   font-size: t.$text-md;
@@ -31,7 +31,6 @@
 }
 
 .search {
-  height: 40px;
   flex: 1 1 300px;
   min-width: 220px;
 
@@ -42,8 +41,23 @@
 
 .ad-select {
   flex: 0 1 auto;
-  height: 40px;
   min-width: 170px;
+
+  // The difficulty names are long, the sort ones short.
+  &.health {
+    min-width: 210px;
+  }
+
+  &.sort {
+    min-width: 0;
+    width: 180px;
+    flex: none;
+
+    @media (max-width: 640px) {
+      flex: 1 1 140px;
+      width: auto;
+    }
+  }
 
   @media (max-width: 640px) {
     flex: 1 1 140px;
@@ -53,9 +67,34 @@
 .status {
   flex: none;
 
-  // Same height as the search field next to it.
-  button {
-    height: 38px;
+  @media (max-width: 640px) {
+    display: flex;
+    flex: 1 1 100%;
+
+    button {
+      flex: 1;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .search .ad-kbd {
+    display: none;
+  }
+}
+
+// Narrower, the search takes its own line and the filters share the next.
+@media (max-width: 1200px) {
+  .search {
+    flex-basis: 100%;
+  }
+
+  .ad-select,
+  .ad-select.health,
+  .ad-select.sort {
+    flex: 1 1 150px;
+    width: auto;
+    min-width: 0;
   }
 }
 
@@ -96,14 +135,6 @@
     height: 58px;
     padding-top: 8px;
     padding-bottom: 8px;
-  }
-
-  input[type='checkbox'] {
-    width: 16px;
-    height: 16px;
-    margin: 0;
-    accent-color: t.$brand;
-    cursor: pointer;
   }
 
   @media (max-width: 1200px) {
@@ -252,7 +283,6 @@
 
 .rate-value {
   font-weight: t.$bold;
-  text-align: right;
   @include t.numeric;
 }
 
@@ -328,173 +358,84 @@
 }
 
 .empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 44px 20px 48px;
+  text-align: center;
+}
+
+.state-wrap {
   padding: 8px 20px 20px;
 }
 
-// -----------------------------------------------------------------------------
-// Bulk bar
-// -----------------------------------------------------------------------------
-
-.bulk {
-  position: fixed;
-  right: 0;
-  bottom: 24px;
-  left: 0;
-  z-index: 45;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
-  max-width: calc(100vw - 32px);
-  margin: 0 auto;
-  padding: 6px 6px 6px 18px;
-  border-radius: 28px;
-  background: t.$brand;
-  color: #fff;
-  box-shadow:
-    0 0 0 1px rgba(0, 50, 125, 0.08),
-    0 18px 40px -10px rgba(0, 50, 125, 0.45);
-  animation: bulk-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
-
-  @keyframes bulk-in {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-  }
-
-  @media (max-width: 900px) {
-    flex-wrap: wrap;
-    width: auto;
-    margin: 0 16px;
-    border-radius: 18px;
-  }
-}
-
-.bulk-count {
-  flex: none;
-  margin-right: 6px;
-  font-size: t.$text-md;
-  white-space: nowrap;
-  @include t.numeric;
-}
-
-.bulk-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.bulk-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 17px;
-  background: transparent;
-  color: #fff;
-  font-size: t.$text-sm;
-  font-weight: t.$medium;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.14);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-
-  &.danger {
-    color: #ffb4a6;
-  }
-
-  &:focus-visible {
-    outline-color: #fff;
-  }
-}
-
-.bulk-close {
+.empty-icon {
   display: grid;
-  flex: none;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  margin-left: 2px;
-  padding: 0;
-  border: 0;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
-  cursor: pointer;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.24);
-  }
-
-  @media (max-width: 900px) {
-    margin-left: auto;
-  }
+  background: t.$brand-50;
+  color: t.$brand;
 }
 
-.bulk-menu-wrap {
-  position: relative;
+.empty-title {
+  font-size: t.$text-lg;
+  font-weight: t.$bold;
 }
 
-.bulk-menu {
-  position: absolute;
-  bottom: calc(100% + 12px);
-  left: 0;
-  display: grid;
-  width: 260px;
-  max-height: 320px;
-  padding: 6px;
-  overflow-y: auto;
-  border-radius: t.$radius-lg;
-  background: t.$bg;
-  color: t.$text;
-  box-shadow: t.$shadow-pop;
-
-  > button {
-    height: 36px;
-    padding: 0 10px;
-    border: 0;
-    border-radius: t.$radius;
-    background: transparent;
-    font-size: t.$text-md;
-    text-align: left;
-    cursor: pointer;
-
-    &:hover {
-      background: t.$bg-hover;
-    }
-
-    &.muted {
-      color: t.$text-2;
-    }
-  }
+.empty-text {
+  color: t.$text-2;
+  font-size: t.$text-md;
 }
 
-.new-category {
+.empty-actions {
   display: flex;
-  gap: 6px;
-  margin-bottom: 6px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid t.$line-soft;
+  gap: 8px;
+  margin-top: 12px;
+}
 
-  .ad-input {
-    flex: 1;
-    height: 32px;
+.ghost {
+  display: grid;
+  gap: 8px;
+  width: min(460px, 100%);
+  margin-bottom: 18px;
+}
+
+.ghost-row {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border: 1px dashed t.$line;
+  border-radius: 12px;
+
+  i {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    background: t.$bg-muted;
   }
 
-  .btn-primary {
-    height: 32px;
+  span,
+  b {
+    height: 8px;
+    border-radius: 4px;
+    background: t.$bg-muted;
+  }
+
+  &:nth-child(2) span {
+    width: 70%;
+  }
+
+  &:nth-child(3) {
+    opacity: 0.6;
+
+    span {
+      width: 50%;
+    }
   }
 }
 
@@ -512,4 +453,306 @@
   line-height: 18px;
   text-align: center;
   @include t.numeric;
+}
+
+// The figures on top are the quick filters.
+.quick {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+
+  // Narrower, the figures scroll sideways instead of leaving one alone.
+  @media (max-width: 900px) {
+    grid-auto-columns: 168px;
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    gap: 10px;
+    margin-right: -20px;
+    padding-right: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+
+    .quick-tile {
+      scroll-snap-align: start;
+    }
+  }
+}
+
+.quick-tile {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding: 16px 18px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 50, 125, 0.04);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover:not(.is-picked) {
+    border-color: rgba(0, 120, 187, 0.3);
+    box-shadow: 0 6px 16px -12px rgba(0, 50, 125, 0.4);
+  }
+
+  &.is-picked {
+    border-color: rgba(0, 120, 187, 0.35);
+    background: linear-gradient(160deg, #f2f8fd, #e7f0f9);
+    box-shadow: inset 0 0 0 1px rgba(0, 120, 187, 0.2);
+  }
+
+  &[data-id='hints'] .quick-value {
+    color: t.$warning-text;
+  }
+
+  &[data-id='hard'] .quick-value {
+    color: t.$danger-text;
+  }
+}
+
+.quick-label {
+  color: t.$text-2;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+
+  .is-picked > & {
+    color: t.$text;
+    font-weight: t.$bold;
+  }
+}
+
+.quick-value {
+  font-size: 28px;
+  font-weight: t.$bold;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  @include t.numeric;
+}
+
+.quick-note {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+// The arrow of a category heading and of «show all».
+.group-chev {
+  width: 7px;
+  height: 7px;
+  margin: -3px 4px 0 2px;
+  border-right: 1.5px solid t.$text-3;
+  border-bottom: 1.5px solid t.$text-3;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+
+  &.is-closed {
+    margin-top: 0;
+    transform: rotate(-45deg);
+  }
+
+  &.is-up {
+    margin-top: 3px;
+    transform: rotate(225deg);
+  }
+}
+
+// The categories as flat cards: a tinted heading while open, white when
+// closed, zebra rows and the first questions until all are shown.
+.chapters {
+  display: grid;
+  gap: 16px;
+
+  .questions-table tbody tr {
+    transition: background-color 0.12s ease;
+
+    &:nth-child(even) {
+      background: #f9fbfd;
+    }
+
+    // One clear hover over both tones, the chosen ones stay blue.
+    &:hover {
+      background: #eef3f9;
+    }
+
+    &.is-selected,
+    &.is-selected:hover {
+      background: t.$brand-50;
+    }
+  }
+
+  // The rate's track stays visible on every tone.
+  .questions-table .meter {
+    background: rgba(0, 50, 125, 0.08);
+  }
+
+  // The category stands in the heading; the columns line up in every card.
+  .questions-table {
+    table-layout: fixed;
+  }
+
+  .col-category {
+    display: none;
+  }
+
+  .col-text {
+    width: auto;
+    max-width: none;
+  }
+
+  @media (max-width: 640px) {
+    .col-rate {
+      width: 64px;
+    }
+
+    .col-active {
+      width: 62px;
+    }
+  }
+}
+
+.chapter {
+  overflow: hidden;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.chapter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  width: 100%;
+  padding: 16px 20px;
+  border: 0;
+  border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+  background: #f7f9fc;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: #f1f5fa;
+  }
+
+  &[aria-expanded='false'] {
+    border-bottom: 0;
+    background: #fff;
+
+    &:hover {
+      background: #fafbfd;
+    }
+  }
+
+  @media (max-width: 640px) {
+    padding: 14px 16px;
+  }
+}
+
+.chapter-name {
+  margin-right: 4px;
+  font-size: 17px;
+  font-weight: t.$bold;
+  letter-spacing: -0.01em;
+}
+
+.cchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid rgba(0, 50, 125, 0.12);
+  border-radius: 99px;
+  background: #fff;
+  color: t.$text-2;
+  font-size: 12.5px;
+
+  b {
+    color: t.$text;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+}
+
+.chapter-meta {
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.chapter-rate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+
+  .meter {
+    width: 110px;
+
+    > span {
+      background: t.$brand;
+    }
+  }
+}
+
+.chapter-rate-label {
+  color: t.$text-2;
+  font-size: 13px;
+  font-weight: t.$medium;
+  @include t.numeric;
+}
+
+.chapter-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 44px;
+  border: 0;
+  border-top: 1px solid rgba(0, 50, 125, 0.08);
+  background: #fafbfd;
+  color: t.$text;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover {
+    background: #f3f6fa;
+  }
+}
+
+// The count of what is shown sits in the search field.
+.search-count {
+  flex: none;
+  margin-right: 8px;
+  color: t.$text-3;
+  font-size: 13px;
+  white-space: nowrap;
+  @include t.numeric;
+}
+
+@media (max-width: 640px) {
+  .search-count {
+    display: none;
+  }
+}
+
+.summary-gap {
+  height: 20px;
+}
+
+// The pager under the categories.
+.ad-card.pager {
+  margin-top: 16px;
+  border-top: 0;
 }

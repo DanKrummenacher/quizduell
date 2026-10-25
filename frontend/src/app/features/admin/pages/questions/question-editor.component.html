@@ -125,22 +125,13 @@
         <div class="row">
           <div class="ad-field category">
             <label for="question-category">Kategorie</label>
-            <div class="ad-input">
-              <input
-                id="question-category"
-                type="text"
-                list="question-categories"
-                placeholder="Ohne Kategorie"
-                [attr.maxlength]="limits.category"
-                [value]="draft().category"
-                (input)="setCategory($event)"
-              />
-            </div>
-            <datalist id="question-categories">
-              @for (name of data.categories(); track name) {
-                <option [value]="name"></option>
-              }
-            </datalist>
+            <app-ad-category-picker
+              inputId="question-category"
+              [value]="draft().category"
+              [categories]="data.categoryCounts()"
+              [maxLength]="limits.category"
+              (changed)="setCategory($event)"
+            />
           </div>
           <div class="ad-field active">
             <span class="ad-label" id="question-active-label">Im Spiel</span>
@@ -164,16 +155,14 @@
               [checked]="resetStats()"
               (change)="setReset($event)"
             />
-            <span>
-              <b>Statistik zurücksetzen</b>
-              <span class="ad-muted">
+            <span class="reset-text">
+              <b class="reset-title"
+                >Statistik zurücksetzen
                 @if (contentChanged()) {
-                  Empfohlen: Die Antworten haben sich geändert, die bisherigen Zahlen
-                  passen nicht mehr.
-                } @else {
-                  Antworten und Trefferquote beginnen wieder bei null.
+                  <span class="reset-tag">Empfohlen</span>
                 }
-              </span>
+              </b>
+              <span class="ad-muted">{{ resetNote() }}</span>
             </span>
           </label>
         }

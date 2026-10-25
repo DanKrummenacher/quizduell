@@ -1,0 +1,163 @@
+// The bar for what is selected, at the bottom of the questions page.
+@use '../../styles/tokens' as t;
+
+.bulk {
+  position: fixed;
+  right: 0;
+  bottom: 24px;
+  left: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: calc(100vw - 32px);
+  margin: 0 auto;
+  padding: 6px 6px 6px 18px;
+  border-radius: 28px;
+  background: t.$brand;
+  color: #fff;
+  box-shadow:
+    0 0 0 1px rgba(0, 50, 125, 0.08),
+    0 18px 40px -10px rgba(0, 50, 125, 0.45);
+  animation: bulk-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes bulk-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  @media (max-width: 900px) {
+    flex-wrap: wrap;
+    width: auto;
+    margin: 0 16px;
+    border-radius: 18px;
+  }
+}
+
+.bulk-count {
+  flex: none;
+  margin-right: 6px;
+  font-size: t.$text-md;
+  white-space: nowrap;
+  @include t.numeric;
+}
+
+.bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.bulk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 17px;
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+  font-weight: t.$medium;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  &.danger {
+    color: #ffb4a6;
+  }
+
+  &:focus-visible {
+    outline-color: #fff;
+  }
+}
+
+.bulk-close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-left: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.24);
+  }
+
+  @media (max-width: 900px) {
+    margin-left: auto;
+  }
+}
+
+.bulk-menu-wrap {
+  position: relative;
+}
+
+.bulk-menu {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  display: grid;
+  width: 260px;
+  max-height: 320px;
+  padding: 6px;
+  overflow-y: auto;
+  border-radius: t.$radius-lg;
+  background: t.$bg;
+  color: t.$text;
+  box-shadow: t.$shadow-pop;
+
+  > button {
+    height: 36px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    font-size: t.$text-md;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: t.$bg-hover;
+    }
+
+    &.muted {
+      color: t.$text-2;
+    }
+  }
+}
+
+.new-category {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid t.$line-soft;
+
+  .ad-input {
+    flex: 1;
+    height: 32px;
+  }
+
+  .btn-primary {
+    height: 32px;
+  }
+}

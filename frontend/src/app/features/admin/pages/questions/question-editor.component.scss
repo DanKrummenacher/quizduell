@@ -100,12 +100,9 @@
     background: t.$bg-hover;
   }
 
-  input {
-    width: 16px;
-    height: 16px;
-    margin: 0;
-    accent-color: t.$success;
-    cursor: pointer;
+  input:checked {
+    border-color: t.$success;
+    background: t.$success;
   }
 
   .is-correct & {
@@ -138,21 +135,17 @@
 .reset {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  border: 1px solid t.$line;
-  border-radius: t.$radius;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(0, 50, 125, 0.1);
+  border-radius: 10px;
   background: t.$bg-subtle;
   font-size: t.$text-base;
   line-height: 1.5;
   cursor: pointer;
 
   input {
-    flex: none;
-    width: 16px;
-    height: 16px;
-    margin: 2px 0 0;
-    accent-color: t.$brand;
+    margin-top: 2px;
   }
 
   b {
@@ -161,12 +154,31 @@
   }
 }
 
+.reset-title {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.reset-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: t.$brand-50;
+  color: t.$brand;
+  font-size: 11.5px;
+  font-weight: t.$bold;
+}
+
 .server-error {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  border-radius: t.$radius;
+  border-radius: 10px;
   background: t.$danger-bg;
   color: t.$danger-text;
   font-size: t.$text-md;
@@ -195,7 +207,7 @@
   gap: 10px;
   padding: 12px 14px;
   border: 1px solid #f0d9a8;
-  border-radius: t.$radius;
+  border-radius: 10px;
   background: t.$warning-bg;
   color: t.$text;
   font-size: t.$text-base;
@@ -228,19 +240,24 @@
 .facts {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
   margin: 0;
-  padding: 14px 16px;
-  border-radius: t.$radius;
-  background: t.$bg-subtle;
 
   @media (max-width: 480px) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  div {
+    padding: 12px 14px;
+    border: 1px solid rgba(0, 50, 125, 0.1);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 50, 125, 0.04);
+  }
+
   dt {
     color: t.$text-3;
-    font-size: t.$text-sm;
+    font-size: 12.5px;
   }
 
   dd {
@@ -265,4 +282,10 @@
   &:hover:not(:disabled) {
     background: t.$danger-bg;
   }
+}
+
+// The text takes the room beside the checkbox.
+.reset .reset-text {
+  flex: 1;
+  min-width: 0;
 }

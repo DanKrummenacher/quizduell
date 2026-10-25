@@ -37,6 +37,7 @@ import { hintText, SEVERITY_LABELS } from '../../core/hint-texts';
 import { NotifyService } from '../../core/notify.service';
 import { checkQuestion, collapse, hasProblems } from '../../core/question-rules';
 import { AdAnswerDistributionComponent } from '../../ui/answer-distribution.component';
+import { AdCategoryPickerComponent } from '../../ui/category-picker.component';
 import { AutofocusDirective } from '../../ui/autofocus.directive';
 import { AdLineChartComponent } from '../../ui/charts';
 import { AdStateComponent } from '../../ui/state.component';
@@ -65,6 +66,7 @@ const EMPTY: Draft = {
   imports: [
     RouterLink,
     AdAnswerDistributionComponent,
+    AdCategoryPickerComponent,
     AutofocusDirective,
     AdLineChartComponent,
     AdStateComponent,
@@ -80,6 +82,11 @@ export class QuestionEditorComponent {
   /** The address names a question that does not exist (any more). */
   readonly missing = input(false);
   readonly closed = output<void>();
+  protected readonly resetNote = computed(() =>
+    this.contentChanged()
+      ? 'Die Antworten haben sich geändert, die bisherigen Zahlen passen nicht mehr.'
+      : 'Antworten und Trefferquote beginnen wieder bei null.',
+  );
 
   private readonly api = inject(AdminApi);
   protected readonly data = inject(AdminData);
@@ -205,8 +212,7 @@ export class QuestionEditorComponent {
     this.draft.update((draft) => ({ ...draft, correctIndex: index }));
   }
 
-  protected setCategory(event: Event): void {
-    const category = (event.target as HTMLInputElement).value;
+  protected setCategory(category: string): void {
     this.draft.update((draft) => ({ ...draft, category }));
   }
 

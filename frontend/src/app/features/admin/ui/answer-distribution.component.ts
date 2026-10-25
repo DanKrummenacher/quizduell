@@ -65,10 +65,10 @@ const LURE_SHARE = 0.3;
     }
     .row {
       display: grid;
-      grid-template-columns: 24px minmax(0, 1fr) auto 44px;
+      grid-template-columns: 24px minmax(0, 1fr) auto auto;
       grid-template-rows: auto 6px;
       align-items: center;
-      column-gap: 10px;
+      column-gap: 8px;
       row-gap: 6px;
     }
     .letter {
@@ -77,7 +77,7 @@ const LURE_SHARE = 0.3;
       place-items: center;
       width: 24px;
       height: 24px;
-      border-radius: 4px;
+      border-radius: 6px;
       background: #eff2f6;
       color: #4d70a4;
       font-size: 12px;
@@ -92,6 +92,7 @@ const LURE_SHARE = 0.3;
       color: #fff;
     }
     .text {
+      margin-right: 4px;
       overflow: hidden;
       font-size: 14px;
       text-overflow: ellipsis;
@@ -117,6 +118,7 @@ const LURE_SHARE = 0.3;
     }
     .share {
       grid-column: 4;
+      min-width: 38px;
       font-size: 14px;
       font-weight: 700;
       text-align: right;

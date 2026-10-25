@@ -48,284 +48,210 @@
     </div>
   }
 
-  <div class="toolbar" role="search">
-    <label class="ad-input search">
-      <css-icon icon="search" size="xs"></css-icon>
-      <span class="ad-sr">Fragen durchsuchen</span>
-      <input
-        #searchBox
-        type="search"
-        placeholder="Frage, Antwort, Kategorie oder F-12 suchen"
-        [value]="search()"
-        (input)="onSearch($event)"
-      />
-      <span class="ad-kbd" aria-hidden="true">/</span>
-    </label>
-
-    <div class="ad-segmented status" role="group" aria-label="Status">
+  <section class="quick" aria-label="Schnellfilter">
+    @for (item of quick(); track item.id) {
       <button
         type="button"
-        [class.is-active]="status() === 'all'"
-        [attr.aria-pressed]="status() === 'all'"
-        (click)="status.set('all')"
+        class="quick-tile"
+        [class.is-picked]="quickPicked() === item.id"
+        [attr.aria-pressed]="quickPicked() === item.id"
+        [attr.data-id]="item.id"
+        (click)="pickQuick(item.id)"
       >
-        Alle
+        <span class="quick-label">{{ item.label }}</span>
+        <span class="quick-value">{{ formatInt(item.value) }}</span>
+        <span class="quick-note">{{ item.note }}</span>
       </button>
-      <button
-        type="button"
-        [class.is-active]="status() === 'active'"
-        [attr.aria-pressed]="status() === 'active'"
-        (click)="status.set('active')"
-      >
-        Im Spiel
-      </button>
-      <button
-        type="button"
-        [class.is-active]="status() === 'paused'"
-        [attr.aria-pressed]="status() === 'paused'"
-        (click)="status.set('paused')"
-      >
-        Pausiert
-      </button>
-    </div>
-
-    <label class="ad-select">
-      <span class="ad-sr">Kategorie</span>
-      <select [value]="category()" (change)="onSelect(category.set, $event)">
-        <option value="">Alle Kategorien</option>
-        @for (name of data.categories(); track name) {
-          <option [value]="name">{{ name }}</option>
-        }
-        <option [value]="noCategory">Ohne Kategorie</option>
-      </select>
-    </label>
-
-    <label class="ad-select">
-      <span class="ad-sr">Auffälligkeit</span>
-      <select [value]="health()" (change)="onSelect(health.set, $event)">
-        <option value="all">Alle Schwierigkeiten</option>
-        <option value="hints">Mit Hinweis</option>
-        <option value="hard">{{ difficultyLabels.hard }}</option>
-        <option value="medium">{{ difficultyLabels.medium }}</option>
-        <option value="easy">{{ difficultyLabels.easy }}</option>
-        <option value="new">{{ difficultyLabels.new }}</option>
-      </select>
-    </label>
-
-    <label class="ad-select sort">
-      <span class="ad-sr">Sortierung</span>
-      <select [value]="sort()" (change)="onSelect(sort.set, $event)">
-        @for (option of sorts; track option.id) {
-          <option [value]="option.id">{{ option.label }}</option>
-        }
-      </select>
-    </label>
-  </div>
-
-  <div class="summary">
-    <span class="ad-num">
-      @if (filtersActive()) {
-        {{ formatInt(range().total) }} von {{ formatInt(counts().all) }} Fragen
-      } @else {
-        {{ formatInt(range().total) }} Fragen
-      }
-    </span>
-    @if (filtersActive()) {
-      <button type="button" class="btn-ghost btn-sm" (click)="resetFilters()">
-        Filter zurücksetzen
-      </button>
-    }
-    @if (selected().size > 0 && selected().size < range().total) {
-      <button type="button" class="btn-ghost btn-sm" (click)="selectAllFiltered()">
-        Alle {{ formatInt(range().total) }} auswählen
-      </button>
-    }
-  </div>
-
-  <section class="ad-card flush catalog">
-    @if (data.questions.value()) {
-      @if (rows().length) {
-        <div class="ad-table-wrap">
-          <table class="ad-table questions-table">
-            <thead>
-              <tr>
-                <th scope="col" class="col-check">
-                  <input
-                    type="checkbox"
-                    aria-label="Alle sichtbaren Fragen auswählen"
-                    [checked]="allVisibleSelected()"
-                    [indeterminate]="someVisibleSelected()"
-                    (change)="toggleAllVisible()"
-                  />
-                </th>
-                <th scope="col" class="col-id">ID</th>
-                <th scope="col">Frage</th>
-                <th scope="col" class="col-category">Kategorie</th>
-                <th scope="col" class="col-rate">
-                  <span class="long">Trefferquote</span
-                  ><span class="short">Quote</span>
-                </th>
-                <th scope="col" class="num col-answers">Antworten</th>
-                <th scope="col" class="num col-trend">14 Tage</th>
-                <th scope="col" class="num col-time">Ø Zeit</th>
-                <th scope="col" class="col-active">
-                  <span class="long">Im Spiel</span><span class="short">Aktiv</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (row of rows(); track row.question.id) {
-                <tr
-                  [class.is-selected]="selected().has(row.question.id)"
-                  [class.is-paused]="!row.question.active"
-                  (click)="open(row.question.id)"
-                >
-                  <td class="col-check" (click)="$event.stopPropagation()">
-                    <input
-                      type="checkbox"
-                      [attr.aria-label]="'F-' + row.question.id + ' auswählen'"
-                      [checked]="selected().has(row.question.id)"
-                      (change)="toggleRow(row.question.id)"
-                    />
-                  </td>
-                  <td class="col-id ad-num">F-{{ row.question.id }}</td>
-                  <td class="col-text">
-                    <button
-                      type="button"
-                      class="text-button"
-                      (click)="open(row.question.id); $event.stopPropagation()"
-                    >
-                      {{ row.question.text }}
-                    </button>
-                    <span class="answer">
-                      <span class="answer-main"
-                        ><css-icon icon="checkmark" size="xs"></css-icon
-                        ><span>{{
-                          row.question.options[row.question.correctIndex]
-                        }}</span></span
-                      >
-                      @for (hint of row.hints; track hint) {
-                        <span class="badge warning hint">{{ hint }}</span>
-                      }
-                    </span>
-                  </td>
-                  <td class="col-category">
-                    @if (row.question.category) {
-                      {{ row.question.category }}
-                    } @else {
-                      <span class="ad-muted">–</span>
-                    }
-                  </td>
-                  <td class="col-rate">
-                    @if (row.rate !== null) {
-                      <span class="rate" [attr.data-difficulty]="row.difficulty">
-                        <span class="rate-value">{{ formatPercent(row.rate) }}</span>
-                        <span class="meter"
-                          ><span [style.width.%]="row.rate * 100"></span
-                        ></span>
-                      </span>
-                    } @else {
-                      <span class="ad-muted">Noch nicht gespielt</span>
-                    }
-                  </td>
-                  <td class="num col-answers">
-                    {{ formatInt(row.question.stats.answers) }}
-                  </td>
-                  <td class="num col-trend">
-                    @if (row.trend !== null) {
-                      <span
-                        class="trend"
-                        [class.up]="row.trend >= 0.03"
-                        [class.down]="row.trend <= -0.03"
-                        title="Trefferquote der letzten 14 Tage gegenüber den 14 Tagen davor"
-                        >{{ trendText(row.trend) }}</span
-                      >
-                    } @else {
-                      <span class="ad-muted">–</span>
-                    }
-                  </td>
-                  <td class="num col-time">
-                    {{ formatSeconds(row.question.stats.avgAnswerMs) }}
-                  </td>
-                  <td class="col-active" (click)="$event.stopPropagation()">
-                    <app-ad-toggle
-                      [checked]="row.question.active"
-                      [label]="'F-' + row.question.id + ' im Spiel'"
-                      [disabled]="busy()"
-                      (toggled)="setActive(row.question, $event)"
-                    />
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-        @if (pageCount() > 1) {
-          <nav class="pager" aria-label="Seiten">
-            <span class="ad-num ad-muted"
-              >{{ formatInt(range().from) }}–{{ formatInt(range().to) }} von
-              {{ formatInt(range().total) }}</span
-            >
-            <button
-              type="button"
-              class="icon-btn"
-              aria-label="Vorherige Seite"
-              [disabled]="page() === 0"
-              (click)="goToPage(page() - 1)"
-            >
-              <css-icon icon="angle-left" size="sm"></css-icon>
-            </button>
-            <span class="ad-num">Seite {{ page() + 1 }} von {{ pageCount() }}</span>
-            <button
-              type="button"
-              class="icon-btn"
-              aria-label="Nächste Seite"
-              [disabled]="page() >= pageCount() - 1"
-              (click)="goToPage(page() + 1)"
-            >
-              <css-icon icon="angle-right" size="sm"></css-icon>
-            </button>
-          </nav>
-        }
-      } @else {
-        <div class="empty">
-          @if (counts().all === 0) {
-            <app-ad-state
-              kind="empty"
-              icon="items-list"
-              title="Noch keine Fragen"
-              text="Erfasse die erste Frage oder importiere mehrere aus einer CSV-Datei."
-            >
-              <button type="button" class="btn-primary" (click)="open('new')">
-                Neue Frage
-              </button>
-            </app-ad-state>
-          } @else {
-            <app-ad-state
-              kind="empty"
-              icon="search"
-              title="Keine Frage passt"
-              text="Suchbegriff oder Filter anpassen."
-            >
-              <button type="button" class="btn-secondary" (click)="resetFilters()">
-                Filter zurücksetzen
-              </button>
-            </app-ad-state>
-          }
-        </div>
-      }
-    } @else if (data.questions.error()) {
-      <div class="empty">
-        <app-ad-state
-          kind="error"
-          [text]="data.questions.error()"
-          (retry)="data.questions.reload()"
-        />
-      </div>
-    } @else {
-      <div class="empty"><app-ad-state kind="loading" [lines]="8" /></div>
     }
   </section>
+
+  <div class="toolbar" role="search">
+    <ng-container *ngTemplateOutlet="searchField" />
+    <ng-container *ngTemplateOutlet="statusSeg" />
+    <ng-container *ngTemplateOutlet="categorySelect" />
+    <ng-container *ngTemplateOutlet="healthSelect" />
+    <ng-container *ngTemplateOutlet="sortSelect" />
+  </div>
+  @if (filtersActive() || (selected().size > 0 && selected().size < range().total)) {
+    <div class="summary">
+      @if (filtersActive()) {
+        <button type="button" class="btn-ghost btn-sm" (click)="resetFilters()">
+          Filter zurücksetzen
+        </button>
+      }
+      @if (selected().size > 0 && selected().size < range().total) {
+        <button type="button" class="btn-ghost btn-sm" (click)="selectAllFiltered()">
+          Alle {{ formatInt(range().total) }} auswählen
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="summary-gap"></div>
+  }
+
+  @if (data.questions.value()) {
+    @if (rows().length) {
+      <div class="chapters">
+        @for (group of groups(); track group.name) {
+          <section class="chapter" [attr.aria-label]="group.label">
+            <button
+              type="button"
+              class="chapter-head"
+              [attr.aria-expanded]="!collapsed().has(group.name)"
+              (click)="toggleGroup(group.name)"
+            >
+              <span
+                class="group-chev"
+                [class.is-closed]="collapsed().has(group.name)"
+                aria-hidden="true"
+              ></span>
+              <span class="chapter-name">{{ group.label }}</span>
+              <span class="cchip"
+                ><b>{{ group.rows.length }}</b>
+                {{ group.rows.length === 1 ? 'Frage' : 'Fragen' }}</span
+              >
+              <span class="chapter-meta">{{ group.active }} im Spiel</span>
+              @if (group.average !== null) {
+                <span class="chapter-rate">
+                  <span class="chapter-rate-label"
+                    >Ø {{ formatPercent(group.average) }} richtig</span
+                  >
+                  <span class="meter"
+                    ><span [style.width.%]="group.average * 100"></span
+                  ></span>
+                </span>
+              }
+            </button>
+            @if (!collapsed().has(group.name)) {
+              <div class="ad-table-wrap">
+                <table class="ad-table questions-table">
+                  <thead>
+                    <ng-container
+                      *ngTemplateOutlet="headRow; context: { $implicit: group }"
+                    />
+                  </thead>
+                  <tbody>
+                    @for (
+                      row of fullChapters().has(group.name)
+                        ? group.rows
+                        : group.rows.slice(0, shortLength);
+                      track row.question.id
+                    ) {
+                      <ng-container
+                        *ngTemplateOutlet="rowTpl; context: { $implicit: row }"
+                      />
+                    }
+                  </tbody>
+                </table>
+              </div>
+              @if (group.rows.length > shortLength) {
+                <button
+                  type="button"
+                  class="chapter-more"
+                  (click)="toggleFull(group.name)"
+                >
+                  {{
+                    fullChapters().has(group.name)
+                      ? 'Weniger zeigen'
+                      : 'Alle ' + group.rows.length + ' Fragen zeigen'
+                  }}
+                  <span
+                    class="group-chev"
+                    [class.is-up]="fullChapters().has(group.name)"
+                    aria-hidden="true"
+                  ></span>
+                </button>
+              }
+            }
+          </section>
+        }
+      </div>
+      @if (pageCount() > 1) {
+        <nav class="ad-card pager" aria-label="Seiten">
+          <span class="ad-num ad-muted"
+            >{{ formatInt(range().from) }}–{{ formatInt(range().to) }} von
+            {{ formatInt(range().total) }}</span
+          >
+          <button
+            type="button"
+            class="icon-btn"
+            aria-label="Vorherige Seite"
+            [disabled]="page() === 0"
+            (click)="goToPage(page() - 1)"
+          >
+            <css-icon icon="angle-left" size="sm"></css-icon>
+          </button>
+          <span class="ad-num">Seite {{ page() + 1 }} von {{ pageCount() }}</span>
+          <button
+            type="button"
+            class="icon-btn"
+            aria-label="Nächste Seite"
+            [disabled]="page() >= pageCount() - 1"
+            (click)="goToPage(page() + 1)"
+          >
+            <css-icon icon="angle-right" size="sm"></css-icon>
+          </button>
+        </nav>
+      }
+    } @else {
+      <section class="ad-card catalog">
+        <div class="empty">
+          @if (counts().all === 0) {
+            <div class="ghost" aria-hidden="true">
+              @for (n of [1, 2, 3]; track n) {
+                <div class="ghost-row"><i></i><span></span><b></b></div>
+              }
+            </div>
+            <p class="empty-title">Noch keine Fragen</p>
+            <p class="empty-text">
+              Erfasse die erste Frage oder importiere mehrere aus einer CSV-Datei.
+            </p>
+            <div class="empty-actions">
+              <button
+                type="button"
+                class="btn-secondary btn-sm"
+                (click)="importing.set(true)"
+              >
+                <css-icon icon="upload" size="xs"></css-icon>Importieren
+              </button>
+              <button type="button" class="btn-primary btn-sm" (click)="open('new')">
+                <css-icon icon="add" size="xs"></css-icon>Neue Frage
+              </button>
+            </div>
+          } @else {
+            <span class="empty-icon" aria-hidden="true"
+              ><css-icon icon="search" size="sm"></css-icon
+            ></span>
+            <p class="empty-title">Keine Frage passt</p>
+            <p class="empty-text">
+              Einen anderen Filter wählen oder die Suche leeren.
+            </p>
+            <div class="empty-actions">
+              <button
+                type="button"
+                class="btn-secondary btn-sm"
+                (click)="resetFilters()"
+              >
+                Alle Fragen zeigen
+              </button>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  } @else if (data.questions.error()) {
+    <section class="ad-card catalog state-wrap">
+      <app-ad-state
+        kind="error"
+        [text]="data.questions.error()"
+        (retry)="data.questions.reload()"
+      />
+    </section>
+  } @else {
+    <section class="ad-card catalog state-wrap">
+      <app-ad-state kind="loading" [lines]="8" />
+    </section>
+  }
 </main>
 
 @if (selected().size > 0) {
@@ -452,3 +378,200 @@
 @if (trashOpen()) {
   <app-question-trash (closed)="trashOpen.set(false)" />
 }
+
+<ng-template #searchField>
+  <label class="ad-input search">
+    <css-icon icon="search" size="xs"></css-icon>
+    <span class="ad-sr">Fragen durchsuchen</span>
+    <input
+      #searchBox
+      type="search"
+      placeholder="Frage, Antwort, Kategorie oder F-12 suchen"
+      [value]="search()"
+      (input)="onSearch($event)"
+    />
+    @if (data.questions.value()) {
+      <span class="search-count"
+        >{{ formatInt(range().total) }}
+        @if (filtersActive()) {
+          von {{ formatInt(counts().all) }}
+        }
+        {{ range().total === 1 ? 'Frage' : 'Fragen' }}</span
+      >
+    }
+    <span class="ad-kbd" aria-hidden="true">/</span>
+  </label>
+</ng-template>
+
+<ng-template #statusSeg>
+  <div class="ad-segmented status" role="group" aria-label="Status">
+    <button
+      type="button"
+      [class.is-active]="status() === 'all'"
+      [attr.aria-pressed]="status() === 'all'"
+      (click)="status.set('all')"
+    >
+      Alle
+    </button>
+    <button
+      type="button"
+      [class.is-active]="status() === 'active'"
+      [attr.aria-pressed]="status() === 'active'"
+      (click)="status.set('active')"
+    >
+      Im Spiel
+    </button>
+    <button
+      type="button"
+      [class.is-active]="status() === 'paused'"
+      [attr.aria-pressed]="status() === 'paused'"
+      (click)="status.set('paused')"
+    >
+      Pausiert
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #categorySelect>
+  <label class="ad-select">
+    <span class="ad-sr">Kategorie</span>
+    <select [value]="category()" (change)="onSelect(category.set, $event)">
+      <option value="">Alle Kategorien</option>
+      @for (name of data.categories(); track name) {
+        <option [value]="name">{{ name }}</option>
+      }
+      <option [value]="noCategory">Ohne Kategorie</option>
+    </select>
+  </label>
+</ng-template>
+
+<ng-template #healthSelect>
+  <label class="ad-select health">
+    <span class="ad-sr">Auffälligkeit</span>
+    <select [value]="health()" (change)="onSelect(health.set, $event)">
+      <option value="all">Alle Schwierigkeiten</option>
+      <option value="hints">Mit Hinweis</option>
+      <option value="hard">{{ difficultyLabels.hard }}</option>
+      <option value="medium">{{ difficultyLabels.medium }}</option>
+      <option value="easy">{{ difficultyLabels.easy }}</option>
+      <option value="new">{{ difficultyLabels.new }}</option>
+    </select>
+  </label>
+</ng-template>
+
+<ng-template #sortSelect>
+  <label class="ad-select sort">
+    <span class="ad-sr">Sortierung</span>
+    <select [value]="sort()" (change)="onSelect(sort.set, $event)">
+      @for (option of sorts; track option.id) {
+        <option [value]="option.id">{{ option.label }}</option>
+      }
+    </select>
+  </label>
+</ng-template>
+
+<ng-template #rowTpl let-row>
+  <tr
+    [class.is-selected]="selected().has(row.question.id)"
+    [class.is-paused]="!row.question.active"
+    (click)="open(row.question.id)"
+  >
+    <td class="col-check" (click)="$event.stopPropagation()">
+      <input
+        type="checkbox"
+        [attr.aria-label]="'F-' + row.question.id + ' auswählen'"
+        [checked]="selected().has(row.question.id)"
+        (change)="toggleRow(row.question.id)"
+      />
+    </td>
+    <td class="col-id ad-num">F-{{ row.question.id }}</td>
+    <td class="col-text">
+      <button
+        type="button"
+        class="text-button"
+        (click)="open(row.question.id); $event.stopPropagation()"
+      >
+        {{ row.question.text }}
+      </button>
+      <span class="answer">
+        <span class="answer-main"
+          ><css-icon icon="checkmark" size="xs"></css-icon
+          ><span>{{ row.question.options[row.question.correctIndex] }}</span></span
+        >
+        @for (hint of row.hints; track hint) {
+          <span class="badge warning hint">{{ hint }}</span>
+        }
+      </span>
+    </td>
+    <td class="col-category">
+      @if (row.question.category) {
+        {{ row.question.category }}
+      } @else {
+        <span class="ad-muted">–</span>
+      }
+    </td>
+    <td class="col-rate">
+      @if (row.rate !== null) {
+        <span class="rate" [attr.data-difficulty]="row.difficulty">
+          <span class="rate-value">{{ formatPercent(row.rate) }}</span>
+          <span class="meter"><span [style.width.%]="row.rate * 100"></span></span>
+        </span>
+      } @else {
+        <span class="ad-muted">Noch nicht gespielt</span>
+      }
+    </td>
+    <td class="col-answers">
+      {{ formatInt(row.question.stats.answers) }}
+    </td>
+    <td class="col-trend">
+      @if (row.trend !== null) {
+        <span
+          class="trend"
+          [class.up]="row.trend >= 0.03"
+          [class.down]="row.trend <= -0.03"
+          title="Trefferquote der letzten 14 Tage gegenüber den 14 Tagen davor"
+          >{{ trendText(row.trend) }}</span
+        >
+      } @else {
+        <span class="ad-muted">–</span>
+      }
+    </td>
+    <td class="col-time">
+      {{ formatSeconds(row.question.stats.avgAnswerMs) }}
+    </td>
+    <td class="col-active" (click)="$event.stopPropagation()">
+      <app-ad-toggle
+        [checked]="row.question.active"
+        [label]="'F-' + row.question.id + ' im Spiel'"
+        [disabled]="busy()"
+        (toggled)="setActive(row.question, $event)"
+      />
+    </td>
+  </tr>
+</ng-template>
+
+<ng-template #headRow let-group>
+  <tr>
+    <th scope="col" class="col-check">
+      <input
+        type="checkbox"
+        [attr.aria-label]="'Alle Fragen in ' + group.label + ' auswählen'"
+        [checked]="groupSelection(group.rows) === 'all'"
+        [indeterminate]="groupSelection(group.rows) === 'some'"
+        (change)="toggleGroupRows(group.rows)"
+      />
+    </th>
+    <th scope="col" class="col-id">ID</th>
+    <th scope="col">Frage</th>
+    <th scope="col" class="col-category">Kategorie</th>
+    <th scope="col" class="col-rate">
+      <span class="long">Trefferquote</span><span class="short">Quote</span>
+    </th>
+    <th scope="col" class="col-answers">Antworten</th>
+    <th scope="col" class="col-trend">14 Tage</th>
+    <th scope="col" class="col-time">Ø Zeit</th>
+    <th scope="col" class="col-active">
+      <span class="long">Im Spiel</span><span class="short">Aktiv</span>
+    </th>
+  </tr>
+</ng-template>

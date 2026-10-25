@@ -42,12 +42,17 @@
     } @else if (!data.trash.value()) {
       <app-ad-state kind="loading" [lines]="4" />
     } @else if (!items().length) {
-      <app-ad-state
-        kind="empty"
-        icon="trash"
-        title="Der Papierkorb ist leer"
-        text="Gelöschte Fragen erscheinen hier und lassen sich wiederherstellen."
-      />
+      <div class="empty">
+        <div class="ghost" aria-hidden="true">
+          @for (n of [1, 2, 3]; track n) {
+            <div class="ghost-row"><span></span><b></b></div>
+          }
+        </div>
+        <p class="empty-title">Der Papierkorb ist leer</p>
+        <p class="empty-text">
+          Gelöschte Fragen erscheinen hier und lassen sich wiederherstellen.
+        </p>
+      </div>
     } @else {
       <ul class="list" aria-label="Gelöschte Fragen">
         @for (item of items(); track item.id) {

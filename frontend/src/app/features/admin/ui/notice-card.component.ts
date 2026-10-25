@@ -8,22 +8,24 @@ import {
 import '@css-ch/components/icon';
 import type { Notice } from '../core/notify.service';
 
-/** The notice after the game was paused or let run again. */
+/**
+ * One notice as a white card: an icon in its tone, what happened, the detail,
+ * an optional action and the close button.
+ */
 @Component({
-  selector: 'app-ad-pause-notice',
+  selector: 'app-ad-notice-card',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  host: { '[attr.data-kind]': 'notice().kind' },
+  host: { '[attr.data-tone]': 'tone()' },
   template: `
     <div class="card">
       <span class="icon" aria-hidden="true">
-        <css-icon
-          [attr.icon]="pause() ? 'pause' : 'play-circle'"
-          size="sm"
-        ></css-icon>
+        <css-icon [attr.icon]="icon()" size="sm"></css-icon>
       </span>
       <p class="text">
-        <b>{{ pause() ? 'Spiel pausiert' : 'Spiel läuft wieder' }}</b>
-        <span>{{ notice().detail }}</span>
+        <b>{{ title() }}</b>
+        @if (detail()) {
+          <span>{{ detail() }}</span>
+        }
       </p>
       @if (notice().action; as action) {
         <button type="button" class="btn" (click)="run()">
@@ -86,9 +88,13 @@ import type { Notice } from '../core/notify.service';
       background: #fff5d6;
       color: #7a4f00;
     }
-    :host([data-kind='resume']) .icon {
+    :host([data-tone='success']) .icon {
       background: #e6f4ef;
       color: #00875e;
+    }
+    :host([data-tone='error']) .icon {
+      background: #fcefec;
+      color: #a8290f;
     }
     .text {
       display: grid;
@@ -145,11 +151,50 @@ import type { Notice } from '../core/notify.service';
     }
   `,
 })
-export class AdPauseNoticeComponent {
+export class AdNoticeCardComponent {
   readonly notice = input.required<Notice>();
   readonly closed = output();
 
-  protected readonly pause = computed(() => this.notice().kind === 'pause');
+  protected readonly tone = computed(() =>
+    this.notice().kind === 'pause'
+      ? 'pause'
+      : this.notice().tone === 'error'
+        ? 'error'
+        : 'success',
+  );
+  protected readonly icon = computed(() => {
+    switch (this.notice().kind) {
+      case 'pause':
+        return 'pause';
+      case 'resume':
+        return 'play-circle';
+      default:
+        return this.notice().tone === 'error'
+          ? 'priority-warning'
+          : 'checkmark-circle';
+    }
+  });
+  protected readonly title = computed(() => {
+    switch (this.notice().kind) {
+      case 'pause':
+        return 'Spiel pausiert';
+      case 'resume':
+        return 'Spiel läuft wieder';
+      default:
+        return this.parts()[0];
+    }
+  });
+  protected readonly detail = computed(
+    () => this.notice().detail ?? this.parts()[1] ?? null,
+  );
+  /** «Done – what it means» reads as a title with its detail below. */
+  private readonly parts = computed(() => {
+    const [head = '', ...rest] = this.notice().text.split(' – ');
+    const tail = rest.join(' – ');
+    return tail
+      ? [head, tail.charAt(0).toUpperCase() + tail.slice(1) + '.']
+      : [head];
+  });
 
   protected run(): void {
     this.notice().action?.run();

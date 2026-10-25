@@ -12,6 +12,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import '@css-ch/components/icon';
 import {
@@ -51,6 +52,8 @@ type Sort = 'newest' | 'oldest' | 'rate-asc' | 'rate-desc' | 'answers' | 'text';
 
 const PAGE_SIZE = 50;
 const NO_CATEGORY = '__none__';
+/** A category shows its first questions until opened in full. */
+const SHORT_LIST = 3;
 
 const SORTS: { id: Sort; label: string }[] = [
   { id: 'newest', label: 'Neueste zuerst' },
@@ -65,6 +68,7 @@ const SORTS: { id: Sort; label: string }[] = [
 @Component({
   selector: 'app-admin-questions',
   imports: [
+    NgTemplateOutlet,
     AdPageHeadComponent,
     AdStateComponent,
     AdToggleComponent,
@@ -73,7 +77,7 @@ const SORTS: { id: Sort; label: string }[] = [
     QuestionTrashComponent,
   ],
   templateUrl: './questions.component.html',
-  styleUrl: './questions.component.scss',
+  styleUrls: ['./questions.component.scss', './questions-bulk.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class QuestionsComponent {
@@ -113,6 +117,141 @@ export class QuestionsComponent {
   protected readonly newCategory = signal('');
 
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Quick filters as figures: each sets the filters it stands for. */
+  protected readonly quick = computed(() => {
+    const all = this.data.questions.value() ?? [];
+    const hints = this.hintsByQuestion();
+    const count = (test: (q: AdminQuestion) => boolean) => all.filter(test).length;
+    return [
+      {
+        id: 'active',
+        label: 'Im Spiel',
+        value: count((q) => q.active),
+        note: `von ${formatInt(all.length)} Fragen`,
+      },
+      {
+        id: 'paused',
+        label: 'Pausiert',
+        value: count((q) => !q.active),
+        note: 'kommen in keinem Duell vor',
+      },
+      {
+        id: 'hints',
+        label: 'Mit Hinweis',
+        value: count((q) => hints.has(q.id)),
+        note: 'auffällig im Spiel',
+      },
+      {
+        id: 'hard',
+        label: DIFFICULTY_LABELS.hard,
+        value: count((q) => difficultyOf(q) === 'hard'),
+        note: 'unter 45 % richtig',
+      },
+      {
+        id: 'new',
+        label: DIFFICULTY_LABELS.new,
+        value: count((q) => difficultyOf(q) === 'new'),
+        note: 'noch ohne verlässliche Quote',
+      },
+    ] as const;
+  });
+
+  protected readonly quickPicked = computed(() => {
+    if (this.health() === 'hints') {
+      return 'hints';
+    }
+    if (this.health() === 'hard') {
+      return 'hard';
+    }
+    if (this.health() === 'new') {
+      return 'new';
+    }
+    if (this.status() === 'active') {
+      return 'active';
+    }
+    if (this.status() === 'paused') {
+      return 'paused';
+    }
+    return null;
+  });
+
+  protected pickQuick(id: string): void {
+    const same = this.quickPicked() === id;
+    this.status.set('all');
+    this.health.set('all');
+    if (same) {
+      return;
+    }
+    if (id === 'active' || id === 'paused') {
+      this.status.set(id);
+    } else {
+      this.health.set(id as HealthFilter);
+    }
+  }
+
+  /** The rows of the page by category, the ones without one last. */
+  protected readonly groups = computed(() => {
+    const map = new Map<string, ReturnType<typeof this.rows>>();
+    for (const row of this.rows()) {
+      const key = row.question.category ?? '';
+      map.set(key, [...(map.get(key) ?? []), row]);
+    }
+    return [...map.entries()]
+      .sort(([a], [b]) =>
+        a === '' ? 1 : b === '' ? -1 : a.localeCompare(b, 'de-CH'),
+      )
+      .map(([name, rows]) => {
+        const rated = rows.filter((r) => r.rate !== null);
+        return {
+          name,
+          label: name || 'Ohne Kategorie',
+          rows,
+          active: rows.filter((r) => r.question.active).length,
+          average: rated.length
+            ? rated.reduce((sum, r) => sum + r.rate!, 0) / rated.length
+            : null,
+        };
+      });
+  });
+
+  /** Closed categories, and the ones that show all their questions. */
+  protected readonly collapsed = signal<ReadonlySet<string>>(new Set());
+  protected readonly fullChapters = signal<ReadonlySet<string>>(new Set());
+  protected readonly shortLength = SHORT_LIST;
+
+  protected toggleGroup(name: string): void {
+    this.collapsed.update((current) => toggled(current, name));
+  }
+
+  protected toggleFull(name: string): void {
+    this.fullChapters.update((current) => toggled(current, name));
+  }
+
+  /** How much of one category is selected. */
+  protected groupSelection(
+    rows: { question: AdminQuestion }[],
+  ): 'all' | 'some' | 'none' {
+    const selected = this.selected();
+    const count = rows.filter((r) => selected.has(r.question.id)).length;
+    return count === 0 ? 'none' : count === rows.length ? 'all' : 'some';
+  }
+
+  /** Selects every question of one category, or none of them. */
+  protected toggleGroupRows(rows: { question: AdminQuestion }[]): void {
+    const all = this.groupSelection(rows) === 'all';
+    this.selected.update((current) => {
+      const next = new Set(current);
+      for (const row of rows) {
+        if (all) {
+          next.delete(row.question.id);
+        } else {
+          next.add(row.question.id);
+        }
+      }
+      return next;
+    });
+  }
 
   constructor() {
     this.route.queryParamMap
@@ -269,23 +408,6 @@ export class QuestionsComponent {
       this.health() !== 'all',
   );
 
-  protected readonly visibleIds = computed(() =>
-    this.rows().map((row) => row.question.id),
-  );
-
-  protected readonly allVisibleSelected = computed(() => {
-    const ids = this.visibleIds();
-    const selected = this.selected();
-    return ids.length > 0 && ids.every((id) => selected.has(id));
-  });
-
-  protected readonly someVisibleSelected = computed(() => {
-    const selected = this.selected();
-    return (
-      this.visibleIds().some((id) => selected.has(id)) && !this.allVisibleSelected()
-    );
-  });
-
   protected readonly editingQuestion = computed(() => {
     const editing = this.editing();
     return typeof editing === 'number' ? this.data.questionById(editing) : null;
@@ -327,19 +449,6 @@ export class QuestionsComponent {
         next.delete(id);
       } else {
         next.add(id);
-      }
-      return next;
-    });
-  }
-
-  protected toggleAllVisible(): void {
-    const ids = this.visibleIds();
-    this.selected.update((current) => {
-      const next = new Set(current);
-      if (this.allVisibleSelected()) {
-        ids.forEach((id) => next.delete(id));
-      } else {
-        ids.forEach((id) => next.add(id));
       }
       return next;
     });
@@ -515,6 +624,17 @@ export class QuestionsComponent {
       this.busy.set(false);
     }
   }
+}
+
+/** The set with the name added, or removed when it was in it. */
+function toggled(current: ReadonlySet<string>, name: string): ReadonlySet<string> {
+  const next = new Set(current);
+  if (next.has(name)) {
+    next.delete(name);
+  } else {
+    next.add(name);
+  }
+  return next;
 }
 
 function sortQuestions(questions: AdminQuestion[], sort: Sort): AdminQuestion[] {
