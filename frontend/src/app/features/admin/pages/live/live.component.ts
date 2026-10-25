@@ -26,24 +26,12 @@ import { AdLineChartComponent } from '../../ui/charts';
 import { AdKpiComponent } from '../../ui/kpi.component';
 import { AdPageHeadComponent } from '../../ui/page-head.component';
 import { AdStateComponent } from '../../ui/state.component';
-import { FillHeightDirective } from './fill-height.directive';
 
 const POLL_MS = 2000;
-
-/** Whether a media query matches, kept up to date. */
-function mediaQuery(query: string) {
-  const list = typeof matchMedia === 'undefined' ? null : matchMedia(query);
-  const matches = signal(list?.matches ?? true);
-  list?.addEventListener('change', (event) => matches.set(event.matches));
-  return matches.asReadonly();
-}
 
 /** Table or grid for the duels, kept per device. */
 const TABLE_KIND = 'playduelio.admin.live.view';
 type TableKind = 'table' | 'raster';
-
-/** Up to this many waiting, the queue is a band over the duels. */
-const QUIET_QUEUE = 6;
 
 /** The short log and the short queue before «show all». */
 const SHORT_LOG = 8;
@@ -85,7 +73,6 @@ const EVENT_GROUPS: Record<EventFilter, LiveEvent['kind'][] | null> = {
     AutofocusDirective,
     AdLineChartComponent,
     AdStateComponent,
-    FillHeightDirective,
   ],
   templateUrl: './live.component.html',
   styleUrls: ['./live.component.scss', './live-duel.scss'],
@@ -113,10 +100,6 @@ export class LiveComponent {
   /** The short queue and the short log show everything. */
   protected readonly waitOpen = signal(false);
   protected readonly logAll = signal(false);
-  /** Wide enough for the log beside the curve; below it is short. */
-  protected readonly wide = mediaQuery('(min-width: 1201px)');
-  /** Height the chart fills beside the log. */
-  protected readonly fillHeight = signal(0);
 
   protected readonly formatTime = formatTime;
   protected readonly String = String;
@@ -239,14 +222,6 @@ export class LiveComponent {
       },
     ];
   });
-
-  /**
-   * A short queue stands as a band over the duels; a long one gets its own
-   * column beside the curve and the log.
-   */
-  protected readonly quiet = computed(
-    () => this.searching().length + this.waiting().length <= QUIET_QUEUE,
-  );
 
   protected readonly chart = computed(() => {
     const snapshot = this.snapshot();

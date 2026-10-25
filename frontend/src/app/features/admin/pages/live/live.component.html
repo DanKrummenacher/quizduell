@@ -67,33 +67,14 @@
     </section>
 
     <div class="board">
-      @if (quiet()) {
-        <ng-container *ngTemplateOutlet="bandCard" />
-        <ng-container *ngTemplateOutlet="duelsCard" />
-        <div class="row">
-          <ng-container
-            *ngTemplateOutlet="chartCard; context: { $implicit: true }"
-          />
-          <div class="fit">
-            <ng-container
-              *ngTemplateOutlet="logCard; context: { $implicit: !wide() }"
-            />
-          </div>
+      <ng-container *ngTemplateOutlet="duelsCard" />
+      <div class="split">
+        <div class="split-main">
+          <ng-container *ngTemplateOutlet="chartCard" />
+          <ng-container *ngTemplateOutlet="logCard" />
         </div>
-      } @else {
-        <ng-container *ngTemplateOutlet="duelsCard" />
-        <div class="split">
-          <div class="split-main">
-            <ng-container
-              *ngTemplateOutlet="chartCard; context: { $implicit: false }"
-            />
-            <ng-container
-              *ngTemplateOutlet="logCard; context: { $implicit: true }"
-            />
-          </div>
-          <ng-container *ngTemplateOutlet="waitCard" />
-        </div>
-      }
+        <ng-container *ngTemplateOutlet="waitCard" />
+      </div>
     </div>
   }
 </main>
@@ -242,49 +223,8 @@
 
 <!-- Cards ---------------------------------------------------------------- -->
 
-<ng-template #bandCard>
-  <section class="ad-card band" aria-label="Warten">
-    <div class="band-head">
-      <h2>Warten</h2>
-      <dl class="band-stats">
-        <div>
-          <dt>Suchen</dt>
-          <dd>{{ searching().length }}</dd>
-        </div>
-        <div>
-          <dt>Ø Wartezeit</dt>
-          <dd>{{ waitStats()?.average ?? '–' }}</dd>
-        </div>
-        <div>
-          <dt>Mit Code</dt>
-          <dd>{{ waiting().length }}</dd>
-        </div>
-      </dl>
-    </div>
-    <ul class="queue">
-      @for (entry of searching(); track entry.name) {
-        <li class="pill" [class.long]="entry.seconds >= 30">
-          <span class="initial" aria-hidden="true">{{ entry.name.charAt(0) }}</span>
-          {{ entry.name }}
-          <span class="w-time">{{ entry.wait }}</span>
-        </li>
-      }
-      @for (entry of waiting(); track entry.code) {
-        <li class="pill">
-          <span class="code">{{ entry.code }}</span>
-          {{ entry.name }}
-          <span class="w-time">{{ entry.wait }}</span>
-        </li>
-      }
-      @if (!searching().length && !waiting().length) {
-        <li class="empty">Niemand wartet, ein Gegner wird sofort gefunden.</li>
-      }
-    </ul>
-  </section>
-</ng-template>
-
-<ng-template #chartCard let-fill>
-  <section class="ad-card chart-card" [class.is-fill]="fill">
+<ng-template #chartCard>
+  <section class="ad-card chart-card">
     <header class="ad-card-head">
       <div>
         <h2>Laufende Duelle</h2>
@@ -297,37 +237,19 @@
       </div>
     </header>
     @if (chart(); as c) {
-      @if (fill) {
-        <div class="chart-fill" (appFillHeight)="fillHeight.set($event)">
-          <div class="chart-fill-in">
-            <app-ad-line-chart
-              [values]="c.values"
-              [labels]="c.labels"
-              [labelEvery]="15"
-              [height]="fillHeight() > 180 ? fillHeight() : 180"
-              unit="Duelle"
-              ariaLabel="Laufende Duelle pro Minute, letzte 60 Minuten"
-            />
-            @if (c.quiet) {
-              <p class="chart-quiet">Kein Duell in der letzten Stunde</p>
-            }
-          </div>
-        </div>
-      } @else {
-        <div class="chart-wrap">
-          <app-ad-line-chart
-            [values]="c.values"
-            [labels]="c.labels"
-            [labelEvery]="15"
-            [height]="200"
-            unit="Duelle"
-            ariaLabel="Laufende Duelle pro Minute, letzte 60 Minuten"
-          />
-          @if (c.quiet) {
-            <p class="chart-quiet">Kein Duell in der letzten Stunde</p>
-          }
-        </div>
-      }
+      <div class="chart-wrap">
+        <app-ad-line-chart
+          [values]="c.values"
+          [labels]="c.labels"
+          [labelEvery]="15"
+          [height]="200"
+          unit="Duelle"
+          ariaLabel="Laufende Duelle pro Minute, letzte 60 Minuten"
+        />
+        @if (c.quiet) {
+          <p class="chart-quiet">Kein Duell in der letzten Stunde</p>
+        }
+      </div>
     }
   </section>
 </ng-template>
@@ -350,7 +272,7 @@
         <dd>{{ waitStats()?.average ?? '–' }}</dd>
       </div>
       <div>
-        <dt>Länger als 30 s</dt>
+        <dt>Über 30 s</dt>
         <dd [class.warn]="waitStats()?.long">{{ waitStats()?.long ?? 0 }}</dd>
       </div>
     </dl>
@@ -400,8 +322,8 @@
   </section>
 </ng-template>
 
-<ng-template #logCard let-short>
-  <section class="ad-card flush log" [class.is-short]="short">
+<ng-template #logCard>
+  <section class="ad-card flush log">
     <header class="ad-card-head">
       <div>
         <h2>Ereignisse</h2>
@@ -423,7 +345,7 @@
     </header>
     <ol class="log-list">
       @for (
-        event of short && !logAll() ? events().slice(0, shortLog) : events();
+        event of logAll() ? events() : events().slice(0, shortLog);
         track event.id
       ) {
         <li [attr.data-kind]="event.kind">
@@ -441,7 +363,7 @@
         </li>
       }
     </ol>
-    @if (short && events().length > shortLog) {
+    @if (events().length > shortLog) {
       <div class="log-more">
         <button type="button" class="ad-more" (click)="logAll.set(!logAll())">
           {{
