@@ -69,20 +69,12 @@ app-ad-page-head {
 // The icon of the area, large, turned and cut by the head.
 .ph-bg {
   position: absolute;
-  // From the bar down to the page, so the content stands in its middle: the
-  // same space above the path as under the last line.
-  inset: -$space 0 calc(16px - #{$space});
+  // Where the icon is cut: as much above the path as under the last line, so
+  // the content stands in its middle.
+  inset: -16px 0 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
-
-  @media (max-width: $tablet) {
-    inset: -32px 0 -16px;
-  }
-
-  @media (max-width: $phone) {
-    inset: -28px 0 -12px;
-  }
 }
 
 .ph-symbol {
