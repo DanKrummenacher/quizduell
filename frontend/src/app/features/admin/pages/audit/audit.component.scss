@@ -204,8 +204,12 @@ time {
 .restore {
   grid-column: 3;
   grid-row: 2;
+  align-self: end;
   justify-self: end;
-  margin: 2px -8px 0 0;
+  // The label stands on the line of the last change, without moving it.
+  position: relative;
+  top: 5px;
+  margin: -12px -8px 0 0;
 }
 
 .entry:has(.restore) .body {
@@ -217,6 +221,7 @@ time {
     grid-column: 2 / -1;
     grid-row: 2;
     justify-self: start;
+    top: 0;
     margin: 4px 0 0 -8px;
   }
 
