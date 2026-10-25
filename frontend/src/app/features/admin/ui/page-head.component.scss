@@ -69,10 +69,20 @@ app-ad-page-head {
 // The icon of the area, large, turned and cut by the head.
 .ph-bg {
   position: absolute;
-  inset: 0;
+  // From the bar down to the page, so the content stands in its middle: the
+  // same space above the path as under the last line.
+  inset: -$space 0 calc(16px - #{$space});
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+
+  @media (max-width: $tablet) {
+    inset: -32px 0 -16px;
+  }
+
+  @media (max-width: $phone) {
+    inset: -28px 0 -12px;
+  }
 }
 
 .ph-symbol {
@@ -248,6 +258,8 @@ app-ad-page-head {
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
+  // As high as the line beside it, so buttons of any height share its centre.
+  min-height: $control;
 
   &:empty {
     display: none;
