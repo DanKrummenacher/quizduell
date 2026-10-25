@@ -21,15 +21,16 @@ import { AdStateComponent } from '../../ui/state.component';
 import { messageOf } from '../questions/questions.component';
 import { AdPageHeadComponent } from '../../ui/page-head.component';
 
-type Group = 'all' | 'settings' | 'questions' | 'hints' | 'login';
+type Group = 'all' | 'settings' | 'game' | 'questions' | 'hints' | 'login';
 
 const GROUPS: { id: Group; label: string; actions: AuditAction[] | null }[] = [
   { id: 'all', label: 'Alle', actions: null },
   {
     id: 'settings',
     label: 'Spielregeln',
-    actions: ['settings.update', 'settings.restore', 'game.pause', 'game.resume'],
+    actions: ['settings.update', 'settings.restore'],
   },
+  { id: 'game', label: 'Spielbetrieb', actions: ['game.pause', 'game.resume'] },
   {
     id: 'questions',
     label: 'Fragen',
@@ -51,7 +52,7 @@ const ICONS: Record<AuditAction, string> = {
   login: 'unlock',
   'settings.update': 'settings',
   'settings.restore': 'undo',
-  'game.pause': 'lock',
+  'game.pause': 'pause-circle',
   'game.resume': 'play-circle',
   'question.create': 'add',
   'question.update': 'edit',
@@ -91,6 +92,40 @@ export class AuditComponent {
   protected readonly error = signal<string | null>(null);
   protected readonly group = signal<Group>('all');
   protected readonly restoring = signal<number | null>(null);
+  protected readonly query = signal('');
+
+  /** How many loaded entries each filter shows. */
+  protected readonly counts = computed(() => {
+    const counts: Record<Group, number> = {
+      all: 0,
+      settings: 0,
+      game: 0,
+      questions: 0,
+      hints: 0,
+      login: 0,
+    };
+    for (const entry of this.entries()) {
+      counts.all++;
+      const group = GROUPS.find((g) => g.actions?.includes(entry.action));
+      if (group) {
+        counts[group.id]++;
+      }
+    }
+    return counts;
+  });
+
+  protected readonly groupLabel = computed(
+    () => GROUPS.find((g) => g.id === this.group())?.label ?? '',
+  );
+
+  protected onQuery(event: Event): void {
+    this.query.set((event.target as HTMLInputElement).value);
+  }
+
+  protected showAll(): void {
+    this.group.set('all');
+    this.query.set('');
+  }
 
   constructor() {
     void this.load(true);
@@ -121,8 +156,11 @@ export class AuditComponent {
 
   protected readonly days = computed(() => {
     const actions = GROUPS.find((g) => g.id === this.group())?.actions ?? null;
+    const needle = this.query().trim().toLowerCase();
     const visible = this.entries().filter(
-      (entry) => !actions || actions.includes(entry.action),
+      (entry) =>
+        (!actions || actions.includes(entry.action)) &&
+        (!needle || entry.summary.toLowerCase().includes(needle)),
     );
     const days: {
       key: string;
@@ -149,7 +187,12 @@ export class AuditComponent {
       }
       day.entries.push(toView(entry));
     }
-    return days;
+    return days.map((day) => ({
+      ...day,
+      count:
+        day.entries.length === 1 ? '1 Änderung' : `${day.entries.length} Änderungen`,
+      weekday: formatLongDay(day.key),
+    }));
   });
 
   protected async restore(entry: AuditEntry): Promise<void> {

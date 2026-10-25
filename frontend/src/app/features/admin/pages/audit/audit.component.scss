@@ -1,10 +1,61 @@
 @use '../../styles/tokens' as t;
 
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 16px;
+  margin-bottom: 28px;
+}
+
 .filters {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 24px;
+}
+
+.search {
+  flex: 0 1 280px;
+  min-width: 200px;
+
+  @media (max-width: 640px) {
+    flex-basis: 100%;
+  }
+}
+
+// Without a card: the empty state stands on the page.
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 48px 16px;
+  text-align: center;
+
+  .btn-sm {
+    margin-top: 12px;
+  }
+}
+
+.empty-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: t.$brand-50;
+  color: t.$brand;
+}
+
+.empty-title {
+  font-size: t.$text-lg;
+  font-weight: t.$bold;
+}
+
+.empty-text {
+  color: t.$text-2;
+  font-size: t.$text-md;
 }
 
 .day {
@@ -14,12 +65,28 @@
 }
 
 .day-title {
-  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-bottom: 12px;
+}
+
+.day-name {
+  color: t.$text;
+  font-size: t.$text-lg;
+  font-weight: t.$bold;
+}
+
+.day-date {
   color: t.$text-2;
-  font-size: t.$text-xs;
-  font-weight: t.$medium;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: t.$text-md;
+}
+
+.day-count {
+  margin-left: auto;
+  color: t.$text-3;
+  font-size: t.$text-sm;
 }
 
 .entries {
@@ -117,10 +184,45 @@ time {
   @include t.numeric;
 }
 
+// Restoring sits at the right, under the time, so it takes no extra row.
+.entry .icon {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.entry .body {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.entry time {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+}
+
 .restore {
-  grid-column: 2 / -1;
-  justify-self: start;
-  margin: 4px 0 0 -8px;
+  grid-column: 3;
+  grid-row: 2;
+  justify-self: end;
+  margin: 2px -8px 0 0;
+}
+
+.entry:has(.restore) .body {
+  grid-row: 1 / span 2;
+}
+
+@media (max-width: 640px) {
+  .restore {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    justify-self: start;
+    margin: 4px 0 0 -8px;
+  }
+
+  .entry:has(.restore) .body {
+    grid-row: auto;
+  }
 }
 
 .more {
@@ -133,4 +235,48 @@ time {
 .load-error {
   margin-top: 12px;
   text-align: center;
+}
+
+// Without entries: a faint outline of the entries to come.
+.ghost {
+  display: grid;
+  gap: 8px;
+  width: min(420px, 100%);
+  margin-bottom: 18px;
+}
+
+.ghost-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 40px;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px dashed t.$line;
+  border-radius: 12px;
+
+  i {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: t.$bg-muted;
+  }
+
+  span,
+  b {
+    height: 8px;
+    border-radius: 4px;
+    background: t.$bg-muted;
+  }
+
+  &:nth-child(2) span {
+    width: 70%;
+  }
+
+  &:nth-child(3) {
+    opacity: 0.6;
+
+    span {
+      width: 50%;
+    }
+  }
 }

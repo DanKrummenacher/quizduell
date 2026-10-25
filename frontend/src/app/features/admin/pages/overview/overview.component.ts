@@ -128,7 +128,7 @@ export class OverviewComponent {
   /** An icon for each kind of change. */
   protected readonly auditIcons: Record<AuditAction, string> = {
     login: 'unlock',
-    'game.pause': 'lock',
+    'game.pause': 'pause-circle',
     'game.resume': 'play-circle',
     'settings.update': 'settings',
     'settings.restore': 'undo',

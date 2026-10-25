@@ -6,18 +6,33 @@
     </p>
   </app-ad-page-head>
 
-  <div class="filters" role="group" aria-label="Art der Änderung">
-    @for (option of groups; track option.id) {
-      <button
-        type="button"
-        class="ad-chip"
-        [class.is-active]="group() === option.id"
-        [attr.aria-pressed]="group() === option.id"
-        (click)="group.set(option.id)"
-      >
-        {{ option.label }}
-      </button>
-    }
+  <div class="toolbar">
+    <div class="filters" role="group" aria-label="Art der Änderung">
+      @for (option of groups; track option.id) {
+        <button
+          type="button"
+          class="ad-chip"
+          [class.is-active]="group() === option.id"
+          [attr.aria-pressed]="group() === option.id"
+          (click)="group.set(option.id)"
+        >
+          {{ option.label }}
+          @if (loaded()) {
+            <span class="chip-key">{{ counts()[option.id] }}</span>
+          }
+        </button>
+      }
+    </div>
+    <label class="ad-input search">
+      <css-icon icon="search" size="xs"></css-icon>
+      <input
+        type="search"
+        placeholder="Im Verlauf suchen"
+        aria-label="Im Verlauf suchen"
+        [value]="query()"
+        (input)="onQuery($event)"
+      />
+    </label>
   </div>
 
   @if (!loaded()) {
@@ -27,60 +42,90 @@
       <div class="ad-card"><app-ad-state kind="loading" [lines]="8" /></div>
     }
   } @else {
-    @for (day of days(); track day.key) {
-      <section class="day" [attr.aria-label]="day.label">
-        <h2 class="day-title">{{ day.label }}</h2>
-        <ol class="ad-card flush entries">
-          @for (item of day.entries; track item.entry.id) {
-            <li class="entry">
-              <span class="icon" [attr.data-action]="item.entry.action">
-                <css-icon
-                  [attr.icon]="icons[item.entry.action]"
-                  size="xs"
-                ></css-icon>
-              </span>
-              <div class="body">
-                <p class="title">{{ item.title }}</p>
-                @if (item.changes.length) {
-                  <ul class="changes">
-                    @for (change of item.changes; track change.label) {
-                      <li>
-                        {{ change.label }}
-                        <span class="before">{{ change.before }}</span>
-                        <css-icon icon="arrow-right" size="xs"></css-icon>
-                        <b>{{ change.after }}</b>
-                      </li>
-                    }
-                  </ul>
+    <div class="log">
+      @for (day of days(); track day.key) {
+        <section class="day" [attr.aria-label]="day.label">
+          <h2 class="day-title">
+            <span class="day-name">{{ day.label }}</span>
+            @if (day.label !== day.weekday) {
+              <span class="day-date">{{ day.weekday }}</span>
+            }
+            <span class="day-count">{{ day.count }}</span>
+          </h2>
+          <ol class="ad-card flush entries">
+            @for (item of day.entries; track item.entry.id) {
+              <li class="entry">
+                <span class="icon" [attr.data-action]="item.entry.action">
+                  <css-icon
+                    [attr.icon]="icons[item.entry.action]"
+                    size="xs"
+                  ></css-icon>
+                </span>
+                <div class="body">
+                  <p class="title">{{ item.title }}</p>
+                  @if (item.changes.length) {
+                    <ul class="changes">
+                      @for (change of item.changes; track change.label) {
+                        <li>
+                          {{ change.label }}
+                          <span class="before">{{ change.before }}</span>
+                          <css-icon icon="arrow-right" size="xs"></css-icon>
+                          <b>{{ change.after }}</b>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+                <time [attr.datetime]="item.entry.at">{{
+                  timeOf(item.entry.at)
+                }}</time>
+                @if (item.entry.before) {
+                  <button
+                    type="button"
+                    class="btn-ghost btn-sm restore"
+                    [disabled]="restoring() !== null"
+                    (click)="restore(item.entry)"
+                  >
+                    <css-icon icon="undo" size="xs"></css-icon>Davor wiederherstellen
+                  </button>
                 }
-              </div>
-              <time [attr.datetime]="item.entry.at">{{
-                timeOf(item.entry.at)
-              }}</time>
-              @if (item.entry.before) {
-                <button
-                  type="button"
-                  class="btn-ghost btn-sm restore"
-                  [disabled]="restoring() !== null"
-                  (click)="restore(item.entry)"
-                >
-                  <css-icon icon="undo" size="xs"></css-icon>Davor wiederherstellen
-                </button>
+              </li>
+            }
+          </ol>
+        </section>
+      } @empty {
+        <div class="empty">
+          @if (entries().length) {
+            <span class="empty-icon"
+              ><css-icon icon="search" size="sm"></css-icon
+            ></span>
+            <p class="empty-title">
+              {{
+                query()
+                  ? 'Kein Eintrag passt zur Suche'
+                  : 'Keine Einträge zu ' + groupLabel()
+              }}
+            </p>
+            <p class="empty-text">
+              Einen anderen Filter wählen oder die Suche leeren.
+            </p>
+            <button type="button" class="btn-secondary btn-sm" (click)="showAll()">
+              Alle Einträge zeigen
+            </button>
+          } @else {
+            <div class="ghost" aria-hidden="true">
+              @for (n of [1, 2, 3]; track n) {
+                <div class="ghost-row"><i></i><span></span><b></b></div>
               }
-            </li>
+            </div>
+            <p class="empty-title">Noch keine Einträge</p>
+            <p class="empty-text">
+              Sobald im Admin etwas geändert wird, steht es hier.
+            </p>
           }
-        </ol>
-      </section>
-    } @empty {
-      <div class="ad-card">
-        <app-ad-state
-          kind="empty"
-          icon="time"
-          title="Noch keine Einträge"
-          text="Sobald im Admin etwas geändert wird, steht es hier."
-        />
-      </div>
-    }
+        </div>
+      }
+    </div>
 
     @if (cursor()) {
       <div class="more">

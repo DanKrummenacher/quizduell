@@ -1,7 +1,13 @@
 import { eq } from 'drizzle-orm';
 import { lastDays, zurichMidnight } from '../common/zurich-time.js';
 import type { DatabaseService } from '../database/database.service.js';
-import { playedGames, questionDaily, questions } from '../database/schema.js';
+import {
+  auditLog,
+  playedGames,
+  questionDaily,
+  questions,
+} from '../database/schema.js';
+import { DEFAULT_SETTINGS } from '../settings/game-settings.js';
 
 /** Deterministic pseudo random numbers, so demo data looks the same every time. */
 function random(seed: number): () => number {
@@ -150,5 +156,81 @@ export async function generateDemoData(database: DatabaseService): Promise<numbe
       })
       .where(eq(questions.id, id));
   }
+  await demoHistory(database);
   return games.length;
+}
+
+/** A believable history of the last days, replacing the one before. */
+async function demoHistory(database: DatabaseService): Promise<void> {
+  const { db } = database;
+  await db.delete(auditLog);
+  const now = Date.now();
+  const at = (days: number, hour: number, minute: number) => {
+    const day = new Date(now - days * 86_400_000);
+    day.setHours(hour, minute, 0, 0);
+    return day;
+  };
+  const longer = { ...DEFAULT_SETTINGS, questionDurationSec: 15 };
+  const entries: (typeof auditLog.$inferInsert)[] = [
+    { at: at(6, 9, 12), action: 'login', summary: 'Angemeldet' },
+    {
+      at: at(6, 9, 20),
+      action: 'questions.import',
+      summary: '24 Fragen importiert, 2 doppelte übersprungen',
+    },
+    {
+      at: at(5, 14, 3),
+      action: 'settings.update',
+      summary: 'Zeit pro Frage 20 s → 15 s',
+      detail: { before: DEFAULT_SETTINGS, after: longer },
+    },
+    {
+      at: at(5, 14, 40),
+      action: 'question.update',
+      summary:
+        'Frage F-12 geändert (Text, richtige Antwort): «Wie viele Kantone hat die Schweiz?»',
+    },
+    {
+      at: at(3, 10, 5),
+      action: 'hint.ignore',
+      summary: 'Hinweis zu Frage F-9 ignoriert',
+    },
+    {
+      at: at(3, 10, 8),
+      action: 'questions.bulk',
+      summary: '3 Fragen in die Kategorie «Geografie» verschoben',
+    },
+    {
+      at: at(1, 16, 30),
+      action: 'question.delete',
+      summary:
+        'Frage F-31 in den Papierkorb gelegt: «Wie heisst der längste Fluss Europas?»',
+    },
+    {
+      at: at(1, 16, 31),
+      action: 'question.restore',
+      summary:
+        'Frage F-31 wiederhergestellt: «Wie heisst der längste Fluss Europas?»',
+    },
+    {
+      at: at(1, 17, 2),
+      action: 'settings.update',
+      summary: 'Zeit pro Frage 15 s → 20 s',
+      detail: { before: longer, after: DEFAULT_SETTINGS },
+    },
+    {
+      at: at(0, 8, 45),
+      action: 'game.pause',
+      summary: 'Spiel pausiert: keine neuen Duelle',
+    },
+    { at: at(0, 9, 10), action: 'game.resume', summary: 'Spiel wieder freigegeben' },
+    {
+      at: at(0, 9, 14),
+      action: 'question.create',
+      summary: 'Frage F-33 erfasst: «Welches Tier ist das Wappentier von Bern?»',
+    },
+  ];
+  await db
+    .insert(auditLog)
+    .values(entries.filter((entry) => entry.at! <= new Date(now)));
 }
