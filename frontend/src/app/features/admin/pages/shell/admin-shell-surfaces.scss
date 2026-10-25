@@ -11,17 +11,10 @@ $control: 38px;
 app-admin-shell .ad-frame {
   position: relative;
   isolation: isolate;
-
   // The page tone, light enough to keep the page bright, dark enough that the
   // white cards stand out.
-  &::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background: #f3f6fa;
-    pointer-events: none;
-  }
+  min-height: 100dvh;
+  background: #f3f6fa;
 
   // Buttons -------------------------------------------------------------------
 
@@ -119,14 +112,17 @@ app-admin-shell .ad-frame {
     }
   }
 
-  // The first figure leads: wider, on a calm tint with a clean edge.
+  // One figure leads, on a calm tint with a clean edge: the first one, or the
+  // one picked where the figures choose what a chart shows. The first one is
+  // also wider.
   @media (min-width: 1201px) {
-    .kpis:has(> app-ad-kpi:nth-child(4):last-child) {
+    .kpis:has(> app-ad-kpi:nth-child(4):last-child):not(:has(> .is-pickable)) {
       grid-template-columns: 1.7fr repeat(3, minmax(0, 1fr));
     }
   }
 
-  .kpis > app-ad-kpi:first-child {
+  .kpis > app-ad-kpi:first-child:not(.is-pickable),
+  .kpis > app-ad-kpi.is-picked {
     --ad-chart-accent: #0b4ea6;
     border: 1px solid rgba(0, 120, 187, 0.2);
     background:
@@ -142,6 +138,42 @@ app-admin-shell .ad-frame {
 
     .delta {
       background: #fff;
+    }
+  }
+
+  app-ad-kpi.is-pickable {
+    position: relative;
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:hover:not(.is-picked) {
+      border-color: rgba(0, 120, 187, 0.3);
+      box-shadow: 0 6px 16px -12px rgba(0, 50, 125, 0.4);
+    }
+
+    &:focus-visible {
+      outline: 2px solid t.$brand;
+      outline-offset: 2px;
+    }
+  }
+
+  // The picked figure points to the chart below.
+  app-ad-kpi.is-picked {
+    border-color: rgba(0, 120, 187, 0.35);
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 28px;
+      width: 12px;
+      height: 12px;
+      border-right: 1px solid rgba(0, 120, 187, 0.35);
+      border-bottom: 1px solid rgba(0, 120, 187, 0.35);
+      background: #e9f1fa;
+      transform: rotate(45deg);
     }
   }
 

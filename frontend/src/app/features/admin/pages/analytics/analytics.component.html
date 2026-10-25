@@ -1,6 +1,13 @@
 <main class="ad-page">
   <app-ad-page-head title="Auswertung">
-    <p headDesc>Jede Zahl im Vergleich zum gleich langen Zeitraum davor.</p>
+    <p headDesc>
+      @if (range() === 0) {
+        Alles seit {{ since() ? 'dem ' + since() : 'dem ersten Duell' }}, ohne
+        Vergleich.
+      } @else {
+        Jede Zahl im Vergleich zum gleich langen Zeitraum davor.
+      }
+    </p>
     <div class="ad-actions">
       <div class="ad-segmented" role="group" aria-label="Zeitraum">
         @for (option of ranges; track option.id) {
@@ -58,7 +65,9 @@
         <header class="ad-card-head">
           <div>
             <h2>Duelle pro Tag</h2>
-            <p>Zu Ende gespielt, grau der Zeitraum davor</p>
+            <p>
+              Zu Ende gespielt{{ range() === 0 ? '' : ', grau der Zeitraum davor' }}
+            </p>
           </div>
         </header>
         @if (games(); as g) {

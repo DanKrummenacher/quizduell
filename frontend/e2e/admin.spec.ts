@@ -71,7 +71,7 @@ test.describe('admin', () => {
     });
     await signIn(page);
     const areas = [
-      ['Übersicht', /^(Übersicht|Guten (Morgen|Tag|Abend)\.?)$/],
+      ['Übersicht', /^Guten (Morgen|Tag|Abend), Admin$/],
       ['Live', 'Live'],
       ['Fragen', 'Fragen'],
       ['Hinweise', 'Hinweise'],

@@ -140,6 +140,51 @@ export function formatLongDay(day: string): string {
   return longDay.format(new Date(`${day}T12:00:00Z`));
 }
 
+const fullDay = new Intl.DateTimeFormat('de-CH', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+/** «1. Oktober 2026» */
+export function formatFullDay(day: string): string {
+  return fullDay.format(new Date(`${day}T12:00:00Z`));
+}
+
+const today = new Intl.DateTimeFormat('de-CH', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'Europe/Zurich',
+});
+
+/** «Sonntag, 25. Oktober 2026» */
+export function formatToday(now: Date = new Date()): string {
+  return today.format(now);
+}
+
+/** «Guten Morgen», «Guten Tag» or «Guten Abend», by the hour in Zurich. */
+export function greeting(now: Date = new Date()): string {
+  const hour = Number(
+    new Intl.DateTimeFormat('en-GB', {
+      hour: 'numeric',
+      hourCycle: 'h23',
+      timeZone: 'Europe/Zurich',
+    }).format(now),
+  );
+  if (hour >= 5 && hour < 11) {
+    return 'Guten Morgen';
+  }
+  return hour >= 11 && hour < 17 ? 'Guten Tag' : 'Guten Abend';
+}
+
+/** Every how many days a chart labels its axis, for about seven labels. */
+export function labelStep(days: number): number {
+  return days <= 7 ? 1 : Math.ceil(days / 7);
+}
+
 /** Calendar day in Zurich as `YYYY-MM-DD`. */
 export function dayKey(date: Date): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Zurich' }).format(

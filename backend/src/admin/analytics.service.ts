@@ -32,9 +32,12 @@ export class AnalyticsService {
   constructor(private readonly database: DatabaseService) {}
 
   async get(range: AnalyticsRange): Promise<Analytics> {
-    const days = lastDays(range * 2);
-    const previousDays = days.slice(0, range);
-    const currentDays = days.slice(range);
+    // «Everything» spans the days since the first duel; the period before is
+    // empty, so there is nothing to compare with.
+    const span = range === 0 ? await this.daysSinceStart() : range;
+    const days = lastDays(span * 2);
+    const previousDays = days.slice(0, span);
+    const currentDays = days.slice(span);
     const from = zurichMidnight(days[0]!);
     const currentFrom = zurichMidnight(currentDays[0]!);
 
@@ -138,6 +141,30 @@ export class AnalyticsService {
       abortsByQuestion,
       categories,
     };
+  }
+
+  /** Days from the first recorded duel or answer to today, at least a week. */
+  private async daysSinceStart(): Promise<number> {
+    const [games] = await this.database.db
+      .select({ first: sql<string | null>`min(${playedGames.finishedAt})` })
+      .from(playedGames);
+    const [answers] = await this.database.db
+      .select({ first: sql<string | null>`min(${questionDaily.day})` })
+      .from(questionDaily);
+    const firsts = [games?.first, answers?.first]
+      .filter((value): value is string => !!value)
+      .map((value) => zurichDay(new Date(value)));
+    if (!firsts.length) {
+      return 7;
+    }
+    const first = firsts.sort()[0]!;
+    const today = zurichDay(new Date());
+    const span =
+      Math.round(
+        (Date.parse(`${today}T12:00:00Z`) - Date.parse(`${first}T12:00:00Z`)) /
+          86_400_000,
+      ) + 1;
+    return Math.min(Math.max(span, 7), 730);
   }
 
   private async hourBuckets(from: Date): Promise<HourBucket[]> {

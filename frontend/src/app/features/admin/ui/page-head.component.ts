@@ -49,7 +49,7 @@ const RECENT = 'playduelio.admin.recent';
               [attr.aria-expanded]="switchOpen()"
               (click)="switchOpen.set(!switchOpen()); $event.stopPropagation()"
             >
-              {{ title() }}
+              {{ a.label }}
               <svg viewBox="0 0 16 16" aria-hidden="true">
                 <path d="m5 6.5 3-3 3 3M5 9.5l3 3 3-3" />
               </svg>

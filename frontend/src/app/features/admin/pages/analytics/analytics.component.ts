@@ -18,10 +18,12 @@ import { download } from '../../core/csv';
 import {
   change,
   formatDay,
+  formatFullDay,
   formatInt,
   formatPercent,
   formatSeconds,
   formatWeekday,
+  labelStep,
   share,
 } from '../../core/format';
 import { MIN_SAMPLE } from '../../core/hint-texts';
@@ -39,6 +41,7 @@ const RANGES: { id: AnalyticsRange; label: string }[] = [
   { id: 7, label: '7 Tage' },
   { id: 30, label: '30 Tage' },
   { id: 90, label: '90 Tage' },
+  { id: 0, label: 'Alle' },
 ];
 
 const REASONS: Record<EndReason, string> = {
@@ -86,8 +89,14 @@ export class AnalyticsComponent {
   }
 
   protected readonly labelEvery = computed(() =>
-    this.range() === 7 ? 1 : this.range() === 30 ? 5 : 14,
+    labelStep(this.analytics.value()?.days.length ?? this.range()),
   );
+
+  /** «seit 1. Oktober» for the range «Alle», once loaded. */
+  protected readonly since = computed(() => {
+    const first = this.analytics.value()?.days[0]?.day;
+    return this.range() === 0 && first ? formatFullDay(first) : null;
+  });
 
   protected readonly kpis = computed(() => {
     const a = this.analytics.value();
@@ -166,7 +175,7 @@ export class AnalyticsComponent {
     return a
       ? {
           values: a.days.map((d) => d.finished),
-          compare: a.previousDays.map((d) => d.finished),
+          compare: a.range === 0 ? null : a.previousDays.map((d) => d.finished),
           labels: a.days.map((d) =>
             a.range === 7 ? formatWeekday(d.day) : formatDay(d.day),
           ),
@@ -180,9 +189,12 @@ export class AnalyticsComponent {
     return a
       ? {
           values: a.days.map((d) => (d.answers ? d.correct / d.answers : null)),
-          compare: a.previousDays.map((d) =>
-            d.answers ? d.correct / d.answers : null,
-          ),
+          compare:
+            a.range === 0
+              ? null
+              : a.previousDays.map((d) =>
+                  d.answers ? d.correct / d.answers : null,
+                ),
           labels: a.days.map((d) => formatDay(d.day)),
           empty: a.current.answers === 0,
         }

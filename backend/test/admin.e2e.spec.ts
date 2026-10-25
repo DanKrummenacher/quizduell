@@ -350,6 +350,13 @@ describe('admin API (e2e)', () => {
       expect(analytics.modes.friend).toBe(1);
       expect(analytics.heatmap.flat().reduce((a, b) => a + b, 0)).toBe(1);
       await get('/analytics?range=12').expect(400);
+
+      // «Everything»: at least a week, the same duel, nothing to compare with.
+      const all = (await get('/analytics?range=0').expect(200)).body as Analytics;
+      expect(all.range).toBe(0);
+      expect(all.days.length).toBeGreaterThanOrEqual(7);
+      expect(all.current.finished).toBe(analytics.current.finished);
+      expect(all.previous.games).toBe(0);
     });
 
     it('records an aborted duel with its reason', async () => {

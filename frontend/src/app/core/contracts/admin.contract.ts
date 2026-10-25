@@ -144,7 +144,8 @@ export interface ImportResult {
 // Analytics
 // -----------------------------------------------------------------------------
 
-export type AnalyticsRange = 7 | 30 | 90;
+/** Days to look back; 0 = everything since the first duel, without a comparison. */
+export type AnalyticsRange = 0 | 7 | 30 | 90;
 
 export interface PeriodTotals {
   /** Duels that started and ended in the period. */

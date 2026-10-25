@@ -7,6 +7,10 @@
 $tablet: 1024px;
 $phone: 640px;
 $ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+// The same space from the bar to the path as from the last line to the page.
+$space: 40px;
+// As high as the controls beside the line below the title.
+$control: 38px;
 
 app-ad-page-head {
   display: block;
@@ -17,8 +21,10 @@ app-ad-page-head {
   // The path and its menu stay above the page.
   z-index: 3;
   isolation: isolate;
-  margin-bottom: 28px;
-  padding-bottom: 30px;
+  // The page itself starts 32px under the bar.
+  margin-top: $space - 32px;
+  margin-bottom: $space - 16px;
+  padding-bottom: 16px;
 
   // While the menu of the path is open, the head lies above everything below.
   &:has(.ph-menu) {
@@ -34,7 +40,7 @@ app-ad-page-head {
   &::before {
     content: '';
     position: absolute;
-    inset: -32px calc(50% - 50vw) -140px;
+    inset: -$space calc(50% - 50vw) -140px;
     z-index: -1;
     background: linear-gradient(
       180deg,
@@ -46,9 +52,16 @@ app-ad-page-head {
     pointer-events: none;
   }
 
+  // On smaller screens the page starts 24px (phone 20px) under the bar.
   @media (max-width: $tablet) {
     &::before {
-      top: -24px;
+      top: -32px;
+    }
+  }
+
+  @media (max-width: $phone) {
+    &::before {
+      top: -28px;
     }
   }
 }
@@ -216,6 +229,14 @@ app-ad-page-head {
   color: t.$text-2;
   font-size: 15px;
   line-height: 1.5;
+
+  // Beside actions, the line stands on their centre: both read as one row.
+  .ph-row:has(.ph-actions > *) & {
+    display: flex;
+    align-items: center;
+    min-height: $control;
+    margin-top: 2px;
+  }
 
   p {
     margin: 0;

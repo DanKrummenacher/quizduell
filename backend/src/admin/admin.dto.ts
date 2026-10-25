@@ -129,8 +129,8 @@ export class AuditQueryDto {
 export class RangeQueryDto {
   @IsOptional()
   @Type(() => Number)
-  @IsIn([7, 30, 90])
-  range?: 7 | 30 | 90;
+  @IsIn([0, 7, 30, 90])
+  range?: 0 | 7 | 30 | 90;
 }
 
 export class HistoryQueryDto {
