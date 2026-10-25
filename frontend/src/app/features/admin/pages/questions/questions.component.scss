@@ -7,7 +7,7 @@
   gap: 10px;
   margin-bottom: 20px;
   padding: 12px 16px;
-  border-radius: t.$radius;
+  border-radius: 10px;
   background: t.$danger-bg;
   color: t.$danger-text;
   font-size: t.$text-md;
@@ -31,7 +31,6 @@
 }
 
 .search {
-  height: 40px;
   flex: 1 1 300px;
   min-width: 220px;
 
@@ -42,8 +41,23 @@
 
 .ad-select {
   flex: 0 1 auto;
-  height: 40px;
   min-width: 170px;
+
+  // The difficulty names are long, the sort ones short.
+  &.health {
+    min-width: 210px;
+  }
+
+  &.sort {
+    min-width: 0;
+    width: 180px;
+    flex: none;
+
+    @media (max-width: 640px) {
+      flex: 1 1 140px;
+      width: auto;
+    }
+  }
 
   @media (max-width: 640px) {
     flex: 1 1 140px;
@@ -53,9 +67,19 @@
 .status {
   flex: none;
 
-  // Same height as the search field next to it.
-  button {
-    height: 38px;
+  @media (max-width: 640px) {
+    display: flex;
+    flex: 1 1 100%;
+
+    button {
+      flex: 1;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .search .ad-kbd {
+    display: none;
   }
 }
 
@@ -96,14 +120,6 @@
     height: 58px;
     padding-top: 8px;
     padding-bottom: 8px;
-  }
-
-  input[type='checkbox'] {
-    width: 16px;
-    height: 16px;
-    margin: 0;
-    accent-color: t.$brand;
-    cursor: pointer;
   }
 
   @media (max-width: 1200px) {
@@ -252,7 +268,6 @@
 
 .rate-value {
   font-weight: t.$bold;
-  text-align: right;
   @include t.numeric;
 }
 
@@ -328,7 +343,85 @@
 }
 
 .empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 44px 20px 48px;
+  text-align: center;
+}
+
+.state-wrap {
   padding: 8px 20px 20px;
+}
+
+.empty-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  border-radius: 50%;
+  background: t.$brand-50;
+  color: t.$brand;
+}
+
+.empty-title {
+  font-size: t.$text-lg;
+  font-weight: t.$bold;
+}
+
+.empty-text {
+  color: t.$text-2;
+  font-size: t.$text-md;
+}
+
+.empty-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ghost {
+  display: grid;
+  gap: 8px;
+  width: min(460px, 100%);
+  margin-bottom: 18px;
+}
+
+.ghost-row {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border: 1px dashed t.$line;
+  border-radius: 12px;
+
+  i {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    background: t.$bg-muted;
+  }
+
+  span,
+  b {
+    height: 8px;
+    border-radius: 4px;
+    background: t.$bg-muted;
+  }
+
+  &:nth-child(2) span {
+    width: 70%;
+  }
+
+  &:nth-child(3) {
+    opacity: 0.6;
+
+    span {
+      width: 50%;
+    }
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -395,10 +488,8 @@
   border-radius: 17px;
   background: transparent;
   color: #fff;
-  font-size: t.$text-sm;
+  font-size: 13px;
   font-weight: t.$medium;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   white-space: nowrap;
   cursor: pointer;
 
@@ -465,7 +556,7 @@
     height: 36px;
     padding: 0 10px;
     border: 0;
-    border-radius: t.$radius;
+    border-radius: 10px;
     background: transparent;
     font-size: t.$text-md;
     text-align: left;
@@ -512,4 +603,1702 @@
   line-height: 18px;
   text-align: center;
   @include t.numeric;
+}
+
+// -----------------------------------------------------------------------------
+// Temporary: the facelift drafts
+// -----------------------------------------------------------------------------
+
+// Kennzahlen: the figures are the quick filters.
+.quick {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  // On phones the figures scroll sideways instead of leaving one alone.
+  @media (max-width: 640px) {
+    grid-auto-columns: 150px;
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    gap: 10px;
+    margin-right: -16px;
+    padding-right: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+
+    .quick-tile {
+      scroll-snap-align: start;
+    }
+  }
+}
+
+.quick-tile {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding: 16px 18px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 50, 125, 0.04);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover:not(.is-picked) {
+    border-color: rgba(0, 120, 187, 0.3);
+    box-shadow: 0 6px 16px -12px rgba(0, 50, 125, 0.4);
+  }
+
+  &.is-picked {
+    border-color: rgba(0, 120, 187, 0.35);
+    background: linear-gradient(160deg, #f2f8fd, #e7f0f9);
+    box-shadow: inset 0 0 0 1px rgba(0, 120, 187, 0.2);
+  }
+
+  &[data-id='hints'] .quick-value {
+    color: t.$warning-text;
+  }
+
+  &[data-id='hard'] .quick-value {
+    color: t.$danger-text;
+  }
+}
+
+.quick-label {
+  color: t.$text-2;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+
+  .is-picked > & {
+    color: t.$text;
+    font-weight: t.$bold;
+  }
+}
+
+.quick-value {
+  font-size: 28px;
+  font-weight: t.$bold;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  @include t.numeric;
+}
+
+.quick-note {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+// Seitenleiste: the categories as a rail beside the catalogue.
+.layout {
+  display: block;
+
+  &.has-rail {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    align-items: start;
+    gap: 24px;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}
+
+.layout-main {
+  min-width: 0;
+}
+
+.rail {
+  position: sticky;
+  top: 20px;
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+
+  .status {
+    display: flex;
+
+    button {
+      flex: 1;
+      padding: 0 6px;
+      white-space: nowrap;
+    }
+  }
+
+  .ad-select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  @media (max-width: 1024px) {
+    position: static;
+  }
+}
+
+.rail-title {
+  margin-top: 8px;
+  color: t.$text-3;
+  font-size: 12.5px;
+  font-weight: t.$medium;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.rail-list {
+  display: grid;
+  gap: 1px;
+  margin: 0 -8px 4px;
+  padding: 0;
+  list-style: none;
+
+  @media (max-width: 1024px) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0 0 4px;
+  }
+}
+
+.rail-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  height: 34px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: t.$text-2;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 50, 125, 0.04);
+    color: t.$text;
+  }
+
+  &.is-on {
+    background: t.$brand-50;
+    color: t.$text;
+    font-weight: t.$bold;
+  }
+
+  @media (max-width: 1024px) {
+    width: auto;
+    border: 1px solid rgba(0, 50, 125, 0.12);
+  }
+}
+
+.rail-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rail-count {
+  color: t.$text-3;
+  font-size: 12.5px;
+  font-weight: t.$regular;
+  @include t.numeric;
+}
+
+// Gruppiert: the rows under their category.
+.group-row {
+  cursor: pointer;
+
+  td {
+    height: 44px;
+    padding: 0 20px;
+    background: #f7f9fc;
+  }
+
+  &:hover td {
+    background: #f1f5fa;
+  }
+}
+
+.group-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.group-chev {
+  width: 7px;
+  height: 7px;
+  margin: -3px 4px 0 2px;
+  border-right: 1.5px solid t.$text-3;
+  border-bottom: 1.5px solid t.$text-3;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+
+  &.is-closed {
+    margin-top: 0;
+    transform: rotate(-45deg);
+  }
+}
+
+.group-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  font-size: t.$text-xs;
+  @include t.numeric;
+}
+
+.group-meta {
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+// Werkbank: search and filters inside the catalogue card.
+.bench {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+
+  h2 {
+    font-size: 17px;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin-top: 4px;
+    color: t.$text-3;
+    font-size: 13px;
+  }
+}
+
+.bench-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+
+  .search {
+    flex: 0 1 440px;
+  }
+}
+
+.bench-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.bench-space {
+  flex: 1;
+}
+
+// In groups the category stands in the heading, not in every row.
+.catalog.is-grouped .col-category {
+  display: none;
+}
+
+// Gruppiert: the count as a clear white pill on the grey heading.
+.group-row .group-count {
+  min-width: 0;
+  height: 22px;
+  padding: 0 9px;
+  border: 1px solid rgba(0, 50, 125, 0.14);
+  border-radius: 99px;
+  background: #fff;
+  color: t.$text;
+  font-size: 12px;
+  font-weight: t.$medium;
+}
+
+.group-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: t.$line-strong;
+
+  [data-tone='hard'] & {
+    background: t.$danger;
+  }
+
+  [data-tone='medium'] & {
+    background: t.$success;
+  }
+
+  [data-tone='easy'] & {
+    background: #0078bb;
+  }
+}
+
+.catalog[data-face='q8'] .col-rate .meter {
+  display: none;
+}
+
+// Karten: every question as a card, made for reading through the content.
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 20px;
+  list-style: none;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+}
+
+.qcard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px 16px;
+  border: 1px solid rgba(0, 50, 125, 0.1);
+  border-radius: 12px;
+  background: #fff;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.2);
+    box-shadow: 0 8px 20px -14px rgba(0, 50, 125, 0.4);
+  }
+
+  &.is-selected {
+    border-color: t.$brand;
+    box-shadow: 0 0 0 1px t.$brand;
+  }
+
+  &.is-paused {
+    background: t.$bg-subtle;
+
+    .qcard-text,
+    .qcard-answer {
+      opacity: 0.6;
+    }
+  }
+}
+
+.qcard-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qcard-id {
+  color: t.$text-3;
+  font-size: t.$text-sm;
+  @include t.numeric;
+}
+
+.qcard-cat {
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  font-size: t.$text-xs;
+  line-height: 20px;
+}
+
+.qcard-toggle {
+  margin-left: auto;
+}
+
+.qcard-text {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: t.$text;
+  font: inherit;
+  font-size: 15px;
+  font-weight: t.$medium;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.qcard-answer {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  color: t.$success-text;
+  font-size: t.$text-sm;
+
+  css-icon {
+    margin-top: 2px;
+  }
+}
+
+.qcard-hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.qcard-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 50, 125, 0.08);
+  font-size: t.$text-sm;
+}
+
+.qcard-meta {
+  color: t.$text-3;
+  @include t.numeric;
+}
+
+// Vorschau: the list on the left, the chosen question standing beside it.
+.peek {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  align-items: start;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.peek-list {
+  min-width: 0;
+
+  .questions-table {
+    min-width: 0;
+  }
+
+  .col-id,
+  .col-category,
+  .col-answers,
+  .col-trend,
+  .col-time {
+    display: none;
+  }
+
+  tr.is-peek {
+    background: t.$brand-50;
+
+    .col-check {
+      box-shadow: inset 3px 0 0 t.$brand;
+    }
+  }
+}
+
+.peek-panel {
+  position: sticky;
+  top: 0;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  align-self: stretch;
+  padding: 22px;
+  border-left: 1px solid rgba(0, 50, 125, 0.08);
+  background: #fbfcfe;
+
+  @media (max-width: 1200px) {
+    display: none;
+  }
+}
+
+.peek-line {
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.peek-title {
+  margin-top: -10px;
+  font-size: 18px;
+  font-weight: t.$bold;
+  line-height: 1.35;
+}
+
+.peek-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+
+  div {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: inset 0 0 0 1px rgba(0, 50, 125, 0.08);
+  }
+
+  dt {
+    color: t.$text-3;
+    font-size: 12px;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: t.$text-lg;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+}
+
+.peek-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(0, 50, 125, 0.08);
+
+  .btn-primary {
+    margin-right: auto;
+  }
+}
+
+// Übersicht zuerst: each heading shows how hard its questions are.
+.group-mix {
+  display: flex;
+  gap: 2px;
+  width: 120px;
+  height: 6px;
+  margin-left: auto;
+  overflow: hidden;
+  border-radius: 3px;
+
+  i {
+    display: block;
+    min-width: 3px;
+    background: t.$line-strong;
+
+    &[data-tone='hard'] {
+      background: t.$danger;
+    }
+
+    &[data-tone='medium'] {
+      background: t.$success;
+    }
+
+    &[data-tone='easy'] {
+      background: #0078bb;
+    }
+  }
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+}
+
+.group-mix-key {
+  display: flex;
+  gap: 12px;
+  color: t.$text-3;
+  font-size: 12px;
+  white-space: nowrap;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: t.$line-strong;
+  }
+
+  [data-tone='hard'] i {
+    background: t.$danger;
+  }
+
+  [data-tone='medium'] i {
+    background: t.$success;
+  }
+
+  [data-tone='easy'] i {
+    background: #0078bb;
+  }
+
+  @media (max-width: 1100px) {
+    display: none;
+  }
+}
+
+.catalog[data-face='r2'] .group-row td {
+  height: 56px;
+}
+
+// Kapitelkarten: every category as its own card.
+.catalog.is-chapters {
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.chapters {
+  display: grid;
+  gap: 16px;
+}
+
+.chapter {
+  overflow: hidden;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 50, 125, 0.04);
+}
+
+.chapter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  width: 100%;
+  padding: 16px 20px;
+  border: 0;
+  border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: #fafbfd;
+  }
+
+  [aria-expanded='false'] > &,
+  &[aria-expanded='false'] {
+    border-bottom: 0;
+  }
+}
+
+.chapter-name {
+  font-size: 17px;
+  font-weight: t.$bold;
+  letter-spacing: -0.01em;
+}
+
+.chapter-meta {
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.chapter-rate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+
+  .meter {
+    width: 110px;
+
+    > span {
+      background: t.$brand;
+    }
+  }
+}
+
+.chapter-rate-label {
+  color: t.$text-2;
+  font-size: 13px;
+  font-weight: t.$medium;
+  @include t.numeric;
+}
+
+// Sprungleiste: the categories as chips that jump to their heading.
+.jump {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px 12px 0 0;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+}
+
+.jump-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 6px 0 12px;
+  border: 1px solid rgba(0, 50, 125, 0.14);
+  border-radius: 99px;
+  background: #fff;
+  color: t.$text;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #0078bb;
+  }
+
+  span {
+    display: inline-grid;
+    place-items: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 99px;
+    background: t.$bg-muted;
+    color: t.$text-2;
+    font-size: 11.5px;
+    @include t.numeric;
+  }
+}
+
+.catalog[data-face='r3'] .group-row {
+  scroll-margin-top: 64px;
+}
+
+// Kompakt: one line per question, more of the catalogue at a glance.
+.catalog[data-face='r4'] {
+  .questions-table td {
+    height: 44px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .text-button {
+    -webkit-line-clamp: 1;
+    font-size: 14px;
+  }
+
+  .answer {
+    display: none;
+  }
+
+  .col-id {
+    display: none;
+  }
+
+  .group-row td {
+    height: 40px;
+  }
+}
+
+// Kategorie-Kacheln: every category with its mean rate and mix, as a filter.
+.ctiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.ctile {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 50, 125, 0.04);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover:not(.is-picked) {
+    border-color: rgba(0, 120, 187, 0.3);
+    box-shadow: 0 6px 16px -12px rgba(0, 50, 125, 0.4);
+  }
+
+  &.is-picked {
+    border-color: rgba(0, 120, 187, 0.35);
+    background: linear-gradient(160deg, #f2f8fd, #e7f0f9);
+    box-shadow: inset 0 0 0 1px rgba(0, 120, 187, 0.2);
+  }
+}
+
+.ctile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ctile-name {
+  font-size: 15px;
+  font-weight: t.$bold;
+}
+
+.ctile-count {
+  height: 22px;
+  padding: 0 9px;
+  border: 1px solid rgba(0, 50, 125, 0.14);
+  border-radius: 99px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: t.$medium;
+  line-height: 20px;
+  @include t.numeric;
+}
+
+.ctile-rate {
+  font-size: 26px;
+  font-weight: t.$bold;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  @include t.numeric;
+
+  small {
+    color: t.$text-3;
+    font-size: 12.5px;
+    font-weight: t.$regular;
+    letter-spacing: 0;
+  }
+}
+
+.ctile-mix {
+  display: flex;
+  gap: 2px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: t.$bg-muted;
+
+  i {
+    display: block;
+    min-width: 3px;
+    background: t.$line-strong;
+
+    &[data-tone='hard'] {
+      background: t.$danger;
+    }
+
+    &[data-tone='medium'] {
+      background: t.$success;
+    }
+
+    &[data-tone='easy'] {
+      background: #0078bb;
+    }
+  }
+}
+
+.ctile-note {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+// Zustand: one judgement per question instead of three numbers.
+.catalog[data-face='s2'] {
+  .col-id,
+  .col-trend,
+  .col-time,
+  .answer .hint {
+    display: none;
+  }
+}
+
+.col-state {
+  width: 180px;
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px 0 8px;
+  border-radius: 99px;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  font-size: 12.5px;
+  font-weight: t.$medium;
+  white-space: nowrap;
+
+  i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &[data-state='ok'] {
+    background: t.$success-bg;
+    color: t.$success-text;
+  }
+
+  &[data-state='check'] {
+    background: t.$warning-bg;
+    color: t.$warning-text;
+  }
+
+  &[data-state='hard'] {
+    background: t.$danger-bg;
+    color: t.$danger-text;
+  }
+
+  &[data-state='easy'] {
+    background: #e8f3fa;
+    color: #005a8c;
+  }
+}
+
+.state-note {
+  display: block;
+  margin-top: 3px;
+  overflow: hidden;
+  color: t.$text-3;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Arbeitsplatz: the list and the editor side by side.
+.layout.has-dock {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.8fr);
+  align-items: start;
+  gap: 20px;
+
+  .col-id,
+  .col-trend,
+  .col-time,
+  .col-answers {
+    display: none;
+  }
+
+  .questions-table {
+    min-width: 0;
+  }
+
+  @media (max-width: 1200px) {
+    grid-template-columns: minmax(0, 1fr);
+
+    .dock {
+      display: none;
+    }
+  }
+}
+
+.dock {
+  position: sticky;
+  top: 20px;
+  min-width: 0;
+}
+
+.dock-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 56px 28px;
+  border: 1px dashed rgba(0, 50, 125, 0.18);
+  border-radius: 12px;
+  text-align: center;
+
+  .btn-sm {
+    margin-top: 12px;
+  }
+}
+
+// Ergebniszeile: the count, the filters as chips and «fold all» on one line.
+.results {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  min-height: 34px;
+  margin: 16px 0 14px;
+  color: t.$text-2;
+  font-size: 14px;
+}
+
+.results-count b {
+  color: t.$text;
+  @include t.numeric;
+}
+
+.results-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 8px 0 12px;
+  border: 1px solid rgba(0, 120, 187, 0.3);
+  border-radius: 99px;
+  background: #eef6fc;
+  color: t.$text;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #0078bb;
+  }
+
+  css-icon {
+    color: t.$text-3;
+  }
+}
+
+.results-space {
+  flex: 1;
+}
+
+.results-fold {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: t.$text-2;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 50, 125, 0.05);
+    color: t.$text;
+  }
+}
+
+// Treffer im Suchfeld: the count sits where one searches.
+.search-count {
+  flex: none;
+  margin-right: 8px;
+  color: t.$text-3;
+  font-size: 13px;
+  white-space: nowrap;
+  @include t.numeric;
+}
+
+.summary-gap {
+  height: 20px;
+}
+
+// Inhaltsverzeichnis: the categories as a table of contents beside the cards.
+.chapters-wrap.has-toc {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.toc {
+  position: sticky;
+  top: 20px;
+  display: grid;
+  gap: 2px;
+
+  @media (max-width: 1024px) {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    .toc-title {
+      flex-basis: 100%;
+    }
+
+    .toc-bar {
+      display: none;
+    }
+  }
+}
+
+.toc-title {
+  margin-bottom: 8px;
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.toc-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: t.$text;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 50, 125, 0.05);
+  }
+}
+
+.toc-name {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: t.$medium;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toc-count {
+  color: t.$text-3;
+  font-size: 12.5px;
+  @include t.numeric;
+}
+
+.toc-bar {
+  grid-column: 1 / -1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: t.$bg-muted;
+
+  span {
+    display: block;
+    height: 100%;
+    background: t.$brand;
+  }
+}
+
+@media (max-width: 1024px) {
+  .toc-item {
+    grid-template-columns: auto auto;
+    align-items: center;
+    height: 32px;
+    padding: 0 10px 0 12px;
+    border: 1px solid rgba(0, 50, 125, 0.14);
+    border-radius: 99px;
+    background: #fff;
+  }
+
+  .toc-all {
+    margin: 0;
+    align-self: center;
+  }
+}
+
+.toc-all {
+  justify-self: start;
+  margin: 10px 0 0 10px;
+}
+
+.chapter {
+  scroll-margin-top: 20px;
+}
+
+// Starke Kapitel: an accent on the left, the mix of difficulty on the right.
+.chapters[data-face='t5'] {
+  .chapter {
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 4px;
+      background: t.$brand;
+    }
+  }
+
+  .chapter-head {
+    padding: 20px 22px 18px 26px;
+  }
+
+  .chapter-name {
+    font-size: 19px;
+  }
+
+  .chapter-rate-label {
+    font-size: 15px;
+    font-weight: t.$bold;
+    color: t.$text;
+  }
+}
+
+.chapter-mix {
+  display: flex;
+  flex-basis: 100%;
+  gap: 2px;
+  height: 4px;
+  margin-top: 8px;
+  opacity: 0.85;
+  overflow: hidden;
+  border-radius: 3px;
+
+  i {
+    display: block;
+    min-width: 3px;
+    background: t.$line-strong;
+
+    &[data-tone='hard'] {
+      background: t.$danger;
+    }
+
+    &[data-tone='medium'] {
+      background: t.$success;
+    }
+
+    &[data-tone='easy'] {
+      background: #0078bb;
+    }
+  }
+}
+
+// Kennzahlen im Kopf: three small figures and the mix on the right.
+.chapter-stats {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin-left: auto;
+
+  > span:not(.chapter-mix-mini) {
+    display: grid;
+    justify-items: end;
+    line-height: 1.2;
+  }
+
+  b {
+    font-size: 16px;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+
+  small {
+    color: t.$text-3;
+    font-size: 11.5px;
+  }
+
+  @media (max-width: 640px) {
+    gap: 14px;
+    margin-left: 0;
+    flex-basis: 100%;
+
+    > span:not(.chapter-mix-mini) {
+      justify-items: start;
+    }
+  }
+}
+
+.chapter-mix-mini {
+  display: flex;
+  gap: 2px;
+  width: 90px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+
+  i {
+    display: block;
+    min-width: 3px;
+    background: t.$line-strong;
+
+    &[data-tone='hard'] {
+      background: t.$danger;
+    }
+
+    &[data-tone='medium'] {
+      background: t.$success;
+    }
+
+    &[data-tone='easy'] {
+      background: #0078bb;
+    }
+  }
+}
+
+// Farbmarke: every category with its own calm colour and initial.
+.chapter-mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: t.$brand;
+  color: #fff;
+  font-size: 15px;
+  font-weight: t.$bold;
+
+  &[data-tone='1'] {
+    background: #0078bb;
+  }
+
+  &[data-tone='2'] {
+    background: #00875e;
+  }
+
+  &[data-tone='3'] {
+    background: #6b4fbb;
+  }
+
+  &[data-tone='4'] {
+    background: #c2620c;
+  }
+}
+
+// Kurzliste: the first questions, the rest on demand.
+.chapter-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 44px;
+  border: 0;
+  border-top: 1px solid rgba(0, 50, 125, 0.08);
+  background: #fafbfd;
+  color: t.$text;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover {
+    background: #f3f6fa;
+  }
+
+  .group-chev.is-up {
+    margin-top: 3px;
+    transform: rotate(225deg);
+  }
+}
+
+// Reiter: the categories as tabs over the cards.
+.ctabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding-bottom: 2px;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(0, 50, 125, 0.1);
+  scrollbar-width: none;
+
+  button {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 12px;
+    border: 0;
+    background: none;
+    color: t.$text-3;
+    font: inherit;
+    font-size: 14px;
+    font-weight: t.$medium;
+    cursor: pointer;
+
+    &:hover {
+      color: t.$text;
+    }
+
+    span {
+      display: inline-grid;
+      place-items: center;
+      min-width: 22px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 99px;
+      background: t.$bg-muted;
+      color: t.$text-2;
+      font-size: 11.5px;
+      @include t.numeric;
+    }
+
+    &.is-active {
+      color: t.$text;
+      font-weight: t.$bold;
+
+      &::after {
+        content: '';
+        position: absolute;
+        right: 8px;
+        bottom: -3px;
+        left: 8px;
+        height: 2px;
+        border-radius: 2px;
+        background: t.$brand;
+      }
+
+      span {
+        background: t.$brand;
+        color: #fff;
+      }
+    }
+  }
+}
+
+.chapters[data-face='u2'] .chapter-meta {
+  display: none;
+}
+
+// -----------------------------------------------------------------------------
+// Kurzliste drafts: how the chapter cards look
+// -----------------------------------------------------------------------------
+
+// Getönter Kopf: the heading on a soft blue, the table stays white.
+.chapters[data-face='v2'] .chapter-head {
+  background: linear-gradient(180deg, #f2f7fd, #eaf2fb);
+  border-bottom-color: rgba(0, 50, 125, 0.1);
+
+  &:hover {
+    background: linear-gradient(180deg, #edf4fc, #e3eefa);
+  }
+}
+
+// Navy-Kopf: the heading in the colour of the bar.
+.chapters[data-face='v3'] {
+  .chapter {
+    border-color: rgba(0, 50, 125, 0.18);
+  }
+
+  .chapter-head {
+    border-bottom: 0;
+    background: linear-gradient(120deg, #00327d, #0a4a9c);
+    color: #fff;
+
+    &:hover {
+      background: linear-gradient(120deg, #002a6a, #08448f);
+    }
+  }
+
+  .chapter-meta,
+  .chapter-rate-label {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .chapter-head .group-chev {
+    border-color: rgba(255, 255, 255, 0.8);
+  }
+
+  .chapter-rate .meter {
+    background: rgba(255, 255, 255, 0.18);
+
+    > span {
+      background: #7fd3f7;
+    }
+  }
+}
+
+// Zebra: every other row on a faint tint, the heading tinted too.
+.chapters[data-face='v4'] {
+  .chapter-head {
+    background: #f7f9fc;
+  }
+
+  .questions-table tbody tr:nth-child(even):not(.is-selected) {
+    background: #f9fbfd;
+  }
+
+  .questions-table tbody tr:hover {
+    background: #f1f5fa;
+  }
+}
+
+// Kennzahl-Chips: count, in play and paused as small chips.
+.chapters[data-face='v5'] .chapter-meta {
+  display: none;
+}
+
+.chapter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid rgba(0, 50, 125, 0.12);
+  border-radius: 99px;
+  background: #fff;
+  color: t.$text-2;
+  font-size: 12.5px;
+
+  b {
+    color: t.$text;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+
+  i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: t.$success;
+  }
+
+  &.is-live {
+    border-color: rgba(0, 135, 94, 0.22);
+    background: t.$success-bg;
+    color: t.$success-text;
+
+    b {
+      color: t.$success-text;
+    }
+  }
+
+  &.is-paused {
+    background: t.$bg-muted;
+  }
+}
+
+// Akzentkante: tinted heading with a brand edge and the rate as a pill.
+.chapters[data-face='v6'] {
+  .chapter-head {
+    position: relative;
+    padding-left: 26px;
+    background: #f6f9fd;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      bottom: 14px;
+      left: 0;
+      width: 4px;
+      border-radius: 0 4px 4px 0;
+      background: t.$brand;
+    }
+  }
+
+  .chapter-rate {
+    padding: 4px 6px 4px 12px;
+    border: 1px solid rgba(0, 50, 125, 0.1);
+    border-radius: 99px;
+    background: #fff;
+
+    .meter {
+      width: 80px;
+    }
+  }
+}
+
+// Ruhig: no table heading in every card, lighter lines, more air.
+.chapters[data-face='v7'] {
+  .chapter {
+    box-shadow: none;
+  }
+
+  .chapter-head {
+    padding: 20px 22px 14px;
+    border-bottom: 0;
+  }
+
+  .chapter-name {
+    font-size: 18px;
+  }
+
+  .questions-table thead {
+    display: none;
+  }
+
+  .questions-table td {
+    border-bottom-color: rgba(0, 50, 125, 0.05);
+  }
+
+  .questions-table tbody tr:first-child td {
+    border-top: 1px solid rgba(0, 50, 125, 0.07);
+  }
+
+  .chapter-more {
+    background: none;
+  }
+}
+
+// Final: zebra rows, a tinted heading while open, white when closed, flat.
+.chapters[data-face='w1'] {
+  .chapter {
+    box-shadow: none;
+  }
+
+  .chapter-head {
+    gap: 6px 10px;
+    background: #f7f9fc;
+    transition: background-color 0.15s ease;
+
+    &:hover {
+      background: #f1f5fa;
+    }
+
+    &[aria-expanded='false'] {
+      background: #fff;
+
+      &:hover {
+        background: #fafbfd;
+      }
+    }
+  }
+
+  .chapter-name {
+    margin-right: 4px;
+  }
+
+  .questions-table tbody tr {
+    transition: background-color 0.12s ease;
+
+    &:nth-child(even) {
+      background: #f9fbfd;
+    }
+
+    // One clear hover over both tones, the chosen ones stay blue.
+    &:hover {
+      background: #eef3f9;
+    }
+
+    &.is-selected,
+    &.is-selected:hover {
+      background: t.$brand-50;
+    }
+  }
+
+  // The rate's track stays visible on every tone.
+  .questions-table .meter {
+    background: rgba(0, 50, 125, 0.08);
+  }
 }

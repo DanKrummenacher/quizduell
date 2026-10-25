@@ -100,12 +100,9 @@
     background: t.$bg-hover;
   }
 
-  input {
-    width: 16px;
-    height: 16px;
-    margin: 0;
-    accent-color: t.$success;
-    cursor: pointer;
+  input:checked {
+    border-color: t.$success;
+    background: t.$success;
   }
 
   .is-correct & {
@@ -138,21 +135,17 @@
 .reset {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  border: 1px solid t.$line;
-  border-radius: t.$radius;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(0, 50, 125, 0.1);
+  border-radius: 10px;
   background: t.$bg-subtle;
   font-size: t.$text-base;
   line-height: 1.5;
   cursor: pointer;
 
   input {
-    flex: none;
-    width: 16px;
-    height: 16px;
-    margin: 2px 0 0;
-    accent-color: t.$brand;
+    margin-top: 2px;
   }
 
   b {
@@ -161,12 +154,31 @@
   }
 }
 
+.reset-title {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.reset-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: t.$brand-50;
+  color: t.$brand;
+  font-size: 11.5px;
+  font-weight: t.$bold;
+}
+
 .server-error {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  border-radius: t.$radius;
+  border-radius: 10px;
   background: t.$danger-bg;
   color: t.$danger-text;
   font-size: t.$text-md;
@@ -195,7 +207,7 @@
   gap: 10px;
   padding: 12px 14px;
   border: 1px solid #f0d9a8;
-  border-radius: t.$radius;
+  border-radius: 10px;
   background: t.$warning-bg;
   color: t.$text;
   font-size: t.$text-base;
@@ -228,19 +240,24 @@
 .facts {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
   margin: 0;
-  padding: 14px 16px;
-  border-radius: t.$radius;
-  background: t.$bg-subtle;
 
   @media (max-width: 480px) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  div {
+    padding: 12px 14px;
+    border: 1px solid rgba(0, 50, 125, 0.1);
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 50, 125, 0.04);
+  }
+
   dt {
     color: t.$text-3;
-    font-size: t.$text-sm;
+    font-size: 12.5px;
   }
 
   dd {
@@ -264,5 +281,248 @@
 
   &:hover:not(:disabled) {
     background: t.$danger-bg;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Temporary: the editor drafts
+// -----------------------------------------------------------------------------
+
+// Breit: the form and how it is answered side by side.
+.editor[data-view='e2'] {
+  width: min(1080px, 100vw);
+
+  .two-col {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 36px;
+
+    .stats {
+      position: sticky;
+      top: 0;
+      margin-top: 0;
+      padding: 0 0 0 32px;
+      border-top: 0;
+      border-left: 1px solid t.$line-soft;
+    }
+
+    @media (max-width: 900px) {
+      grid-template-columns: minmax(0, 1fr);
+
+      .stats {
+        position: static;
+        padding: 24px 0 0;
+        border-top: 1px solid t.$line-soft;
+        border-left: 0;
+      }
+    }
+  }
+}
+
+// Reiter: one thing at a time, the question or its numbers.
+.tabs {
+  display: flex;
+  gap: 24px;
+  padding: 0 24px;
+  border-bottom: 1px solid t.$line-soft;
+
+  button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 46px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: t.$text-3;
+    font: inherit;
+    font-size: 14px;
+    font-weight: t.$medium;
+    cursor: pointer;
+
+    &:hover {
+      color: t.$text;
+    }
+
+    &.is-active {
+      color: t.$text;
+      font-weight: t.$bold;
+
+      &::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        bottom: -1px;
+        left: 0;
+        height: 2px;
+        border-radius: 2px;
+        background: t.$brand;
+      }
+    }
+  }
+
+  @media (max-width: 640px) {
+    padding: 0 16px;
+  }
+}
+
+.tab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: t.$warning;
+}
+
+.editor[data-view='e3'] .stats {
+  h3 {
+    display: none;
+  }
+
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+// Mittig: a calm dialog in the middle of the screen.
+.editor[data-view='e4'] {
+  top: 50%;
+  right: auto;
+  bottom: auto;
+  left: 50%;
+  width: min(760px, calc(100vw - 32px));
+  max-height: min(88vh, 960px);
+  overflow: hidden;
+  border: 0;
+  border-radius: 18px;
+  box-shadow:
+    0 0 0 1px rgba(0, 50, 125, 0.08),
+    0 40px 90px -30px rgba(0, 30, 80, 0.55);
+  transform: translate(-50%, -50%);
+  animation: editor-center 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes editor-center {
+    from {
+      opacity: 0;
+      transform: translate(-50%, calc(-50% + 14px)) scale(0.98);
+    }
+  }
+
+  .ad-drawer-foot {
+    background: #fff;
+  }
+}
+
+.ad-scrim.is-center {
+  background: rgba(0, 25, 70, 0.32);
+  backdrop-filter: blur(3px);
+}
+
+// Arbeitsplatz: the editor stands beside the list, part of the page.
+.editor[data-view='dock'] {
+  position: sticky;
+  top: 20px;
+  right: auto;
+  bottom: auto;
+  z-index: 1;
+  width: auto;
+  height: calc(100vh - 40px);
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(0, 50, 125, 0.04);
+  animation: none;
+  overflow: hidden;
+}
+
+.form[hidden],
+.stats[hidden] {
+  display: none;
+}
+
+.editor[data-view='e2'] .two-col .facts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+// Statistik zurücksetzen, in four shapes.
+.reset {
+  .reset-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &[data-reset='z1'] input {
+    order: -1;
+  }
+
+  &[data-reset='z2'] {
+    align-items: center;
+
+    input {
+      margin-top: 0;
+    }
+
+    &.is-recommended {
+      border-color: #f1d58a;
+      background: t.$warning-bg;
+
+      .reset-tag {
+        background: #fff;
+        color: t.$warning-text;
+      }
+    }
+  }
+}
+
+.reset-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: #ffe7a3;
+  color: #7a4f00;
+}
+
+.reset-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 0 0;
+  border-top: 1px solid t.$line-soft;
+  font-size: t.$text-base;
+
+  b {
+    font-weight: t.$bold;
+  }
+  line-height: 1.5;
+
+  .reset-text {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.reset-quiet {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: t.$text-base;
+  line-height: 1.5;
+  cursor: pointer;
+
+  input {
+    margin-top: 3px;
+  }
+
+  b {
+    display: block;
+    font-weight: t.$medium;
+  }
+
+  .ad-muted {
+    font-size: 13px;
   }
 }

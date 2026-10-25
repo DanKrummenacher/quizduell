@@ -285,4 +285,76 @@ app-admin-shell .ad-frame {
     letter-spacing: 0;
     text-transform: none;
   }
+
+  // Checkboxes and radios in the shape of the controls: a 16px square with
+  // 4px corners, navy when set, a small mark inside.
+  input[type='checkbox'],
+  input[type='radio'] {
+    display: inline-grid;
+    flex: none;
+    place-content: center;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    border: 1.5px solid rgba(0, 50, 125, 0.32);
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    appearance: none;
+    transition:
+      background-color 0.12s ease,
+      border-color 0.12s ease;
+
+    &::before {
+      content: '';
+      width: 9px;
+      height: 9px;
+      background: #fff;
+      clip-path: polygon(14% 44%, 0 65%, 40% 100%, 100% 22%, 84% 6%, 38% 66%);
+      transform: scale(0);
+      transition: transform 0.12s ease;
+    }
+
+    &:hover:not(:checked, :indeterminate, :disabled) {
+      border-color: #0078bb;
+    }
+
+    &:checked,
+    &:indeterminate {
+      border-color: t.$brand;
+      background: t.$brand;
+
+      &::before {
+        transform: scale(1);
+      }
+    }
+
+    &:indeterminate::before {
+      width: 8px;
+      height: 2px;
+      border-radius: 1px;
+      clip-path: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #0078bb;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+  }
+
+  input[type='radio'] {
+    border-radius: 50%;
+
+    &::before {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      clip-path: none;
+    }
+  }
 }

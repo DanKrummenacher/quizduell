@@ -1,454 +1,1270 @@
-<main class="ad-page">
-  <app-ad-page-head title="Fragen">
-    <p headDesc>
-      @if (data.questions.value()) {
-        {{ formatInt(counts().active) }} im Spiel ·
-        {{ formatInt(counts().paused) }} pausiert
-      } @else {
-        Der ganze Fragenkatalog
-      }
-    </p>
-    <div class="ad-actions">
-      <button type="button" class="btn-secondary" (click)="importing.set(true)">
-        <css-icon icon="upload" size="xs"></css-icon>Importieren
-      </button>
-      <button
-        type="button"
-        class="btn-secondary"
-        [disabled]="!counts().all"
-        (click)="exportCsv()"
-      >
-        <css-icon icon="download" size="xs"></css-icon>Exportieren
-      </button>
-      <button
-        type="button"
-        class="btn-secondary"
-        [attr.aria-label]="'Papierkorb, ' + trashCount() + ' Fragen'"
-        (click)="trashOpen.set(true)"
-      >
-        <css-icon icon="trash" size="xs"></css-icon>Papierkorb
-        @if (trashCount()) {
-          <span class="trash-count">{{ formatInt(trashCount()) }}</span>
+@if (face() === '0') {
+  <app-admin-questions-today />
+} @else {
+  <main class="ad-page">
+    <app-ad-page-head title="Fragen">
+      <p headDesc>
+        @if (data.questions.value()) {
+          {{ formatInt(counts().active) }} im Spiel ·
+          {{ formatInt(counts().paused) }} pausiert
+        } @else {
+          Der ganze Fragenkatalog
         }
-      </button>
-      <button type="button" class="btn-primary" (click)="open('new')">
-        <css-icon icon="add" size="xs"></css-icon>Neue Frage
-      </button>
-    </div>
-  </app-ad-page-head>
+      </p>
+      <div class="ad-actions">
+        <button type="button" class="btn-secondary" (click)="importing.set(true)">
+          <css-icon icon="upload" size="xs"></css-icon>Importieren
+        </button>
+        <button
+          type="button"
+          class="btn-secondary"
+          [disabled]="!counts().all"
+          (click)="exportCsv()"
+        >
+          <css-icon icon="download" size="xs"></css-icon>Exportieren
+        </button>
+        <button
+          type="button"
+          class="btn-secondary"
+          [attr.aria-label]="'Papierkorb, ' + trashCount() + ' Fragen'"
+          (click)="trashOpen.set(true)"
+        >
+          <css-icon icon="trash" size="xs"></css-icon>Papierkorb
+          @if (trashCount()) {
+            <span class="trash-count">{{ formatInt(trashCount()) }}</span>
+          }
+        </button>
+        <button type="button" class="btn-primary" (click)="open('new')">
+          <css-icon icon="add" size="xs"></css-icon>Neue Frage
+        </button>
+      </div>
+    </app-ad-page-head>
 
-  @if (data.playable() === false) {
-    <div class="alert" role="alert">
-      <css-icon icon="priority-warning" size="sm"></css-icon>
-      <span
-        ><b>Zu wenige aktive Fragen.</b> Für ein Duell braucht es mindestens
-        {{ data.settings.value()?.settings?.questionsPerGame }} aktive Fragen – bis
-        dahin kann niemand spielen.</span
-      >
-    </div>
-  }
-
-  <div class="toolbar" role="search">
-    <label class="ad-input search">
-      <css-icon icon="search" size="xs"></css-icon>
-      <span class="ad-sr">Fragen durchsuchen</span>
-      <input
-        #searchBox
-        type="search"
-        placeholder="Frage, Antwort, Kategorie oder F-12 suchen"
-        [value]="search()"
-        (input)="onSearch($event)"
-      />
-      <span class="ad-kbd" aria-hidden="true">/</span>
-    </label>
-
-    <div class="ad-segmented status" role="group" aria-label="Status">
-      <button
-        type="button"
-        [class.is-active]="status() === 'all'"
-        [attr.aria-pressed]="status() === 'all'"
-        (click)="status.set('all')"
-      >
-        Alle
-      </button>
-      <button
-        type="button"
-        [class.is-active]="status() === 'active'"
-        [attr.aria-pressed]="status() === 'active'"
-        (click)="status.set('active')"
-      >
-        Im Spiel
-      </button>
-      <button
-        type="button"
-        [class.is-active]="status() === 'paused'"
-        [attr.aria-pressed]="status() === 'paused'"
-        (click)="status.set('paused')"
-      >
-        Pausiert
-      </button>
-    </div>
-
-    <label class="ad-select">
-      <span class="ad-sr">Kategorie</span>
-      <select [value]="category()" (change)="onSelect(category.set, $event)">
-        <option value="">Alle Kategorien</option>
-        @for (name of data.categories(); track name) {
-          <option [value]="name">{{ name }}</option>
-        }
-        <option [value]="noCategory">Ohne Kategorie</option>
-      </select>
-    </label>
-
-    <label class="ad-select">
-      <span class="ad-sr">Auffälligkeit</span>
-      <select [value]="health()" (change)="onSelect(health.set, $event)">
-        <option value="all">Alle Schwierigkeiten</option>
-        <option value="hints">Mit Hinweis</option>
-        <option value="hard">{{ difficultyLabels.hard }}</option>
-        <option value="medium">{{ difficultyLabels.medium }}</option>
-        <option value="easy">{{ difficultyLabels.easy }}</option>
-        <option value="new">{{ difficultyLabels.new }}</option>
-      </select>
-    </label>
-
-    <label class="ad-select sort">
-      <span class="ad-sr">Sortierung</span>
-      <select [value]="sort()" (change)="onSelect(sort.set, $event)">
-        @for (option of sorts; track option.id) {
-          <option [value]="option.id">{{ option.label }}</option>
-        }
-      </select>
-    </label>
-  </div>
-
-  <div class="summary">
-    <span class="ad-num">
-      @if (filtersActive()) {
-        {{ formatInt(range().total) }} von {{ formatInt(counts().all) }} Fragen
-      } @else {
-        {{ formatInt(range().total) }} Fragen
-      }
-    </span>
-    @if (filtersActive()) {
-      <button type="button" class="btn-ghost btn-sm" (click)="resetFilters()">
-        Filter zurücksetzen
-      </button>
+    @if (data.playable() === false) {
+      <div class="alert" role="alert">
+        <css-icon icon="priority-warning" size="sm"></css-icon>
+        <span
+          ><b>Zu wenige aktive Fragen.</b> Für ein Duell braucht es mindestens
+          {{ data.settings.value()?.settings?.questionsPerGame }} aktive Fragen – bis
+          dahin kann niemand spielen.</span
+        >
+      </div>
     }
-    @if (selected().size > 0 && selected().size < range().total) {
-      <button type="button" class="btn-ghost btn-sm" (click)="selectAllFiltered()">
-        Alle {{ formatInt(range().total) }} auswählen
-      </button>
-    }
-  </div>
 
-  <section class="ad-card flush catalog">
-    @if (data.questions.value()) {
-      @if (rows().length) {
-        <div class="ad-table-wrap">
-          <table class="ad-table questions-table">
-            <thead>
-              <tr>
-                <th scope="col" class="col-check">
-                  <input
-                    type="checkbox"
-                    aria-label="Alle sichtbaren Fragen auswählen"
-                    [checked]="allVisibleSelected()"
-                    [indeterminate]="someVisibleSelected()"
-                    (change)="toggleAllVisible()"
-                  />
-                </th>
-                <th scope="col" class="col-id">ID</th>
-                <th scope="col">Frage</th>
-                <th scope="col" class="col-category">Kategorie</th>
-                <th scope="col" class="col-rate">
-                  <span class="long">Trefferquote</span
-                  ><span class="short">Quote</span>
-                </th>
-                <th scope="col" class="num col-answers">Antworten</th>
-                <th scope="col" class="num col-trend">14 Tage</th>
-                <th scope="col" class="num col-time">Ø Zeit</th>
-                <th scope="col" class="col-active">
-                  <span class="long">Im Spiel</span><span class="short">Aktiv</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (row of rows(); track row.question.id) {
-                <tr
-                  [class.is-selected]="selected().has(row.question.id)"
-                  [class.is-paused]="!row.question.active"
-                  (click)="open(row.question.id)"
+    @if (quickOn()) {
+      <section class="quick" aria-label="Schnellfilter">
+        @for (item of quick(); track item.id) {
+          <button
+            type="button"
+            class="quick-tile"
+            [class.is-picked]="quickPicked() === item.id"
+            [attr.aria-pressed]="quickPicked() === item.id"
+            [attr.data-id]="item.id"
+            (click)="pickQuick(item.id)"
+          >
+            <span class="quick-label">{{ item.label }}</span>
+            <span class="quick-value">{{ formatInt(item.value) }}</span>
+            <span class="quick-note">{{ item.note }}</span>
+          </button>
+        }
+      </section>
+    }
+
+    @if (face() === 's1') {
+      <section class="ctiles" aria-label="Kategorien">
+        @for (tile of categoryTiles(); track tile.name) {
+          <button
+            type="button"
+            class="ctile"
+            [class.is-picked]="category() === tile.name"
+            [attr.aria-pressed]="category() === tile.name"
+            (click)="category.set(category() === tile.name ? '' : tile.name)"
+          >
+            <span class="ctile-top">
+              <span class="ctile-name">{{ tile.name }}</span>
+              <span class="ctile-count">{{ tile.count }}</span>
+            </span>
+            <span class="ctile-rate"
+              >{{ tile.average === null ? '–' : formatPercent(tile.average) }}
+              <small>Ø richtig</small></span
+            >
+            <span class="ctile-mix" aria-hidden="true">
+              @for (part of tile.mix; track part.id) {
+                @if (part.share) {
+                  <i [attr.data-tone]="part.id" [style.flex]="part.share"></i>
+                }
+              }
+            </span>
+            <span class="ctile-note"
+              >{{ tile.active }} von {{ tile.count }} im Spiel</span
+            >
+          </button>
+        }
+      </section>
+    }
+
+    <div
+      class="layout"
+      [class.has-rail]="face() === 'q3'"
+      [class.has-dock]="docked()"
+    >
+      @if (face() === 'q3') {
+        <aside class="rail" aria-label="Kategorien">
+          <p class="rail-title">Kategorien</p>
+          <ul class="rail-list">
+            @for (item of rail(); track item.id) {
+              <li>
+                <button
+                  type="button"
+                  class="rail-item"
+                  [class.is-on]="category() === item.id"
+                  [attr.aria-pressed]="category() === item.id"
+                  (click)="category.set(item.id)"
                 >
-                  <td class="col-check" (click)="$event.stopPropagation()">
-                    <input
-                      type="checkbox"
-                      [attr.aria-label]="'F-' + row.question.id + ' auswählen'"
-                      [checked]="selected().has(row.question.id)"
-                      (change)="toggleRow(row.question.id)"
-                    />
-                  </td>
-                  <td class="col-id ad-num">F-{{ row.question.id }}</td>
-                  <td class="col-text">
+                  <span class="rail-name">{{ item.label }}</span>
+                  <span class="rail-count">{{ formatInt(item.count) }}</span>
+                </button>
+              </li>
+            }
+          </ul>
+          <p class="rail-title">Status</p>
+          <ng-container *ngTemplateOutlet="statusSeg" />
+          <p class="rail-title">Schwierigkeit</p>
+          <ng-container *ngTemplateOutlet="healthSelect" />
+        </aside>
+      }
+      <div class="layout-main">
+        @if (face() !== 'q5') {
+          <div class="toolbar" role="search">
+            <ng-container *ngTemplateOutlet="searchField" />
+            @if (face() !== 'q3') {
+              <ng-container *ngTemplateOutlet="statusSeg" />
+              @if (face() !== 'u5') {
+                <ng-container *ngTemplateOutlet="categorySelect" />
+              }
+              <ng-container *ngTemplateOutlet="healthSelect" />
+            }
+            <ng-container *ngTemplateOutlet="sortSelect" />
+          </div>
+          @if (face() === 't2') {
+            <div class="results">
+              <span class="results-count"
+                ><b>{{ formatInt(range().total) }}</b>
+                {{ range().total === 1 ? 'Frage' : 'Fragen' }}
+                @if (filtersActive()) {
+                  von {{ formatInt(counts().all) }}
+                }
+                · {{ groups().length }}
+                {{ groups().length === 1 ? 'Kategorie' : 'Kategorien' }}</span
+              >
+              @for (filter of activeFilters(); track filter.label) {
+                <button type="button" class="results-chip" (click)="filter.clear()">
+                  {{ filter.label }}
+                  <css-icon icon="close" size="xs"></css-icon>
+                </button>
+              }
+              @if (activeFilters().length > 1) {
+                <button type="button" class="ad-more" (click)="resetFilters()">
+                  Alle Filter lösen
+                </button>
+              }
+              <span class="results-space"></span>
+              @if (selected().size > 0 && selected().size < range().total) {
+                <button type="button" class="ad-more" (click)="selectAllFiltered()">
+                  Alle {{ formatInt(range().total) }} auswählen
+                </button>
+              }
+              <button type="button" class="results-fold" (click)="toggleAll()">
+                <span
+                  class="group-chev"
+                  [class.is-closed]="allClosed()"
+                  aria-hidden="true"
+                ></span>
+                {{ allClosed() ? 'Alle aufklappen' : 'Alle zuklappen' }}
+              </button>
+            </div>
+          } @else if (!countInSearch() && face() !== 't4') {
+            <div class="summary">
+              <span class="ad-num">
+                @if (filtersActive()) {
+                  {{ formatInt(range().total) }} von
+                  {{ formatInt(counts().all) }} Fragen
+                } @else {
+                  {{ formatInt(range().total) }} Fragen
+                }
+              </span>
+              @if (filtersActive()) {
+                <button
+                  type="button"
+                  class="btn-ghost btn-sm"
+                  (click)="resetFilters()"
+                >
+                  Filter zurücksetzen
+                </button>
+              }
+              @if (selected().size > 0 && selected().size < range().total) {
+                <button
+                  type="button"
+                  class="btn-ghost btn-sm"
+                  (click)="selectAllFiltered()"
+                >
+                  Alle {{ formatInt(range().total) }} auswählen
+                </button>
+              }
+            </div>
+          } @else if (
+            filtersActive() ||
+            (selected().size > 0 && selected().size < range().total)
+          ) {
+            <div class="summary">
+              @if (filtersActive()) {
+                <button
+                  type="button"
+                  class="btn-ghost btn-sm"
+                  (click)="resetFilters()"
+                >
+                  Filter zurücksetzen
+                </button>
+              }
+              @if (selected().size > 0 && selected().size < range().total) {
+                <button
+                  type="button"
+                  class="btn-ghost btn-sm"
+                  (click)="selectAllFiltered()"
+                >
+                  Alle {{ formatInt(range().total) }} auswählen
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="summary-gap"></div>
+          }
+        }
+        <section
+          class="ad-card flush catalog"
+          [class.is-grouped]="grouped() || chapters()"
+          [class.is-chapters]="chapters()"
+          [attr.data-face]="face()"
+        >
+          @if (face() === 'q5') {
+            <header class="bench">
+              <div class="bench-top">
+                <div>
+                  <h2>Katalog</h2>
+                  <p>
+                    @if (filtersActive()) {
+                      {{ formatInt(range().total) }} von
+                      {{ formatInt(counts().all) }} Fragen
+                    } @else {
+                      {{ formatInt(range().total) }} Fragen
+                    }
+                  </p>
+                </div>
+                <ng-container *ngTemplateOutlet="searchField" />
+              </div>
+              <div class="bench-filters">
+                <ng-container *ngTemplateOutlet="statusSeg" />
+                <ng-container *ngTemplateOutlet="categorySelect" />
+                <ng-container *ngTemplateOutlet="healthSelect" />
+                <span class="bench-space"></span>
+                @if (filtersActive()) {
+                  <button
+                    type="button"
+                    class="btn-ghost btn-sm"
+                    (click)="resetFilters()"
+                  >
+                    Filter zurücksetzen
+                  </button>
+                }
+                <ng-container *ngTemplateOutlet="sortSelect" />
+              </div>
+            </header>
+          }
+          @if (face() === 'r3' && rows().length) {
+            <nav class="jump" aria-label="Zu einer Kategorie springen">
+              @for (group of groups(); track group.name; let gi = $index) {
+                <button
+                  type="button"
+                  class="jump-chip"
+                  (click)="jumpTo(gi, group.name)"
+                >
+                  {{ group.label }}<span>{{ group.rows.length }}</span>
+                </button>
+              }
+            </nav>
+          }
+          @if (data.questions.value()) {
+            @if (rows().length) {
+              @if (face() === 'q6') {
+                <ul class="cards">
+                  @for (row of rows(); track row.question.id) {
+                    <li
+                      class="qcard"
+                      [class.is-selected]="selected().has(row.question.id)"
+                      [class.is-paused]="!row.question.active"
+                    >
+                      <div class="qcard-top">
+                        <input
+                          type="checkbox"
+                          [attr.aria-label]="'F-' + row.question.id + ' auswählen'"
+                          [checked]="selected().has(row.question.id)"
+                          (change)="toggleRow(row.question.id)"
+                        />
+                        <span class="qcard-id">F-{{ row.question.id }}</span>
+                        @if (row.question.category) {
+                          <span class="qcard-cat">{{ row.question.category }}</span>
+                        }
+                        <span class="qcard-toggle">
+                          <app-ad-toggle
+                            [checked]="row.question.active"
+                            [label]="'F-' + row.question.id + ' im Spiel'"
+                            [disabled]="busy()"
+                            (toggled)="setActive(row.question, $event)"
+                          />
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        class="qcard-text"
+                        (click)="open(row.question.id)"
+                      >
+                        {{ row.question.text }}
+                      </button>
+                      <p class="qcard-answer">
+                        <css-icon icon="checkmark" size="xs"></css-icon
+                        >{{ row.question.options[row.question.correctIndex] }}
+                      </p>
+                      @if (row.hints.length) {
+                        <p class="qcard-hints">
+                          @for (hint of row.hints; track hint) {
+                            <span class="badge warning hint">{{ hint }}</span>
+                          }
+                        </p>
+                      }
+                      <div class="qcard-foot">
+                        @if (row.rate !== null) {
+                          <span class="rate" [attr.data-difficulty]="row.difficulty">
+                            <span class="rate-value">{{
+                              formatPercent(row.rate)
+                            }}</span>
+                            <span class="meter"
+                              ><span [style.width.%]="row.rate * 100"></span
+                            ></span>
+                          </span>
+                        } @else {
+                          <span class="ad-muted">Noch nicht gespielt</span>
+                        }
+                        <span class="qcard-meta"
+                          >{{ formatInt(row.question.stats.answers) }} Antworten · Ø
+                          {{ formatSeconds(row.question.stats.avgAnswerMs) }}</span
+                        >
+                      </div>
+                    </li>
+                  }
+                </ul>
+              } @else if (face() === 'q7') {
+                <div class="peek">
+                  <div class="peek-list">
+                    <div class="ad-table-wrap">
+                      <table class="ad-table questions-table">
+                        <thead>
+                          <tr>
+                            <th scope="col" class="col-check">
+                              <input
+                                type="checkbox"
+                                aria-label="Alle sichtbaren Fragen auswählen"
+                                [checked]="allVisibleSelected()"
+                                [indeterminate]="someVisibleSelected()"
+                                (change)="toggleAllVisible()"
+                              />
+                            </th>
+                            <th scope="col" class="col-id">ID</th>
+                            <th scope="col">Frage</th>
+                            <th scope="col" class="col-category">Kategorie</th>
+                            <th scope="col" class="col-rate">
+                              <span class="long">Trefferquote</span
+                              ><span class="short">Quote</span>
+                            </th>
+                            @if (face() === 's2') {
+                              <th scope="col" class="col-state">Zustand</th>
+                            }
+                            <th scope="col" class="col-answers">Antworten</th>
+                            <th scope="col" class="col-trend">14 Tage</th>
+                            <th scope="col" class="col-time">Ø Zeit</th>
+                            <th scope="col" class="col-active">
+                              <span class="long">Im Spiel</span
+                              ><span class="short">Aktiv</span>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @if (grouped()) {
+                            <ng-container *ngTemplateOutlet="groupRows" />
+                          } @else {
+                            @for (row of rows(); track row.question.id) {
+                              <ng-container
+                                *ngTemplateOutlet="
+                                  rowTpl;
+                                  context: { $implicit: row }
+                                "
+                              />
+                            }
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  @if (preview(); as p) {
+                    <aside class="peek-panel" aria-label="Vorschau">
+                      <p class="peek-line">
+                        F-{{ p.question.id }}
+                        @if (p.question.category) {
+                          · {{ p.question.category }}
+                        }
+                        · {{ p.question.active ? 'Im Spiel' : 'Pausiert' }}
+                      </p>
+                      <h3 class="peek-title">{{ p.question.text }}</h3>
+                      @if (p.hints.length) {
+                        <p class="qcard-hints">
+                          @for (hint of p.hints; track hint) {
+                            <span class="badge warning hint">{{ hint }}</span>
+                          }
+                        </p>
+                      }
+                      <dl class="peek-facts">
+                        <div>
+                          <dt>Trefferquote</dt>
+                          <dd>
+                            {{ p.rate === null ? '–' : formatPercent(p.rate) }}
+                          </dd>
+                        </div>
+                        <div>
+                          <dt>Antworten</dt>
+                          <dd>{{ formatInt(p.question.stats.answers) }}</dd>
+                        </div>
+                        <div>
+                          <dt>Ø Zeit</dt>
+                          <dd>{{ formatSeconds(p.question.stats.avgAnswerMs) }}</dd>
+                        </div>
+                      </dl>
+                      <app-ad-answer-distribution
+                        [question]="p.question"
+                        [footer]="false"
+                      />
+                      <div class="peek-actions">
+                        <button
+                          type="button"
+                          class="btn-primary btn-sm"
+                          (click)="open(p.question.id)"
+                        >
+                          Bearbeiten
+                        </button>
+                        <app-ad-toggle
+                          [checked]="p.question.active"
+                          [label]="'F-' + p.question.id + ' im Spiel'"
+                          [disabled]="busy()"
+                          (toggled)="setActive(p.question, $event)"
+                        />
+                        <span class="ad-muted">{{
+                          p.question.active ? 'Im Spiel' : 'Pausiert'
+                        }}</span>
+                      </div>
+                    </aside>
+                  }
+                </div>
+              } @else {
+                @if (chapters()) {
+                  <div class="chapters-wrap" [class.has-toc]="face() === 't4'">
+                    @if (face() === 't4') {
+                      <nav class="toc" aria-label="Kategorien">
+                        <p class="toc-title">
+                          {{ formatInt(range().total) }}
+                          {{ range().total === 1 ? 'Frage' : 'Fragen' }} in
+                          {{ groups().length }}
+                          {{ groups().length === 1 ? 'Kategorie' : 'Kategorien' }}
+                        </p>
+                        @for (group of groups(); track group.name; let gi = $index) {
+                          <button
+                            type="button"
+                            class="toc-item"
+                            (click)="jumpToChapter(gi, group.name)"
+                          >
+                            <span class="toc-name">{{ group.label }}</span>
+                            <span class="toc-count">{{ group.rows.length }}</span>
+                            @if (group.average !== null) {
+                              <span class="toc-bar"
+                                ><span [style.width.%]="group.average * 100"></span
+                              ></span>
+                            }
+                          </button>
+                        }
+                        <button
+                          type="button"
+                          class="ad-more toc-all"
+                          (click)="toggleAll()"
+                        >
+                          {{ allClosed() ? 'Alle aufklappen' : 'Alle zuklappen' }}
+                        </button>
+                      </nav>
+                    }
+                    @if (face() === 'u5') {
+                      <div class="ctabs" role="tablist" aria-label="Kategorie">
+                        <button
+                          type="button"
+                          role="tab"
+                          [class.is-active]="category() === ''"
+                          [attr.aria-selected]="category() === ''"
+                          (click)="category.set('')"
+                        >
+                          Alle<span>{{ formatInt(counts().all) }}</span>
+                        </button>
+                        @for (item of data.categoryCounts(); track item.name) {
+                          <button
+                            type="button"
+                            role="tab"
+                            [class.is-active]="category() === item.name"
+                            [attr.aria-selected]="category() === item.name"
+                            (click)="category.set(item.name)"
+                          >
+                            {{ item.name }}<span>{{ item.count }}</span>
+                          </button>
+                        }
+                      </div>
+                    }
+                    <div class="chapters" [attr.data-face]="face()">
+                      @for (group of groups(); track group.name; let gi = $index) {
+                        <section
+                          class="chapter"
+                          [id]="'kapitel-' + gi"
+                          [attr.aria-label]="group.label"
+                        >
+                          <button
+                            type="button"
+                            class="chapter-head"
+                            [attr.aria-expanded]="!closed(group.name)"
+                            (click)="toggleGroup(group.name)"
+                          >
+                            <span
+                              class="group-chev"
+                              [class.is-closed]="closed(group.name)"
+                              aria-hidden="true"
+                            ></span>
+                            @if (face() === 'u3') {
+                              <span
+                                class="chapter-mark"
+                                [attr.data-tone]="tone(group.name)"
+                                aria-hidden="true"
+                                >{{ group.label.charAt(0) }}</span
+                              >
+                            }
+                            <span class="chapter-name">{{ group.label }}</span>
+                            @if (face() === 'v5') {
+                              <span class="chapter-chips">
+                                <span class="cchip"
+                                  ><b>{{ group.rows.length }}</b>
+                                  {{
+                                    group.rows.length === 1 ? 'Frage' : 'Fragen'
+                                  }}</span
+                                >
+                                <span class="cchip is-live"
+                                  ><i aria-hidden="true"></i
+                                  ><b>{{ group.active }}</b> im Spiel</span
+                                >
+                                @if (group.rows.length - group.active) {
+                                  <span class="cchip is-paused"
+                                    ><b>{{ group.rows.length - group.active }}</b>
+                                    pausiert</span
+                                  >
+                                }
+                              </span>
+                            }
+                            @if (face() === 'w1') {
+                              <span class="cchip"
+                                ><b>{{ group.rows.length }}</b>
+                                {{
+                                  group.rows.length === 1 ? 'Frage' : 'Fragen'
+                                }}</span
+                              >
+                              <span class="chapter-meta"
+                                >{{ group.active }} im Spiel</span
+                              >
+                            } @else {
+                              <span class="chapter-meta"
+                                >{{ group.rows.length }}
+                                {{ group.rows.length === 1 ? 'Frage' : 'Fragen' }} ·
+                                {{ group.active }} im Spiel</span
+                              >
+                            }
+                            @if (face() === 'u2') {
+                              <span class="chapter-stats">
+                                <span
+                                  ><b>{{ group.rows.length }}</b
+                                  ><small>Fragen</small></span
+                                >
+                                <span
+                                  ><b>{{ group.active }}</b
+                                  ><small>im Spiel</small></span
+                                >
+                                <span
+                                  ><b>{{
+                                    group.average === null
+                                      ? '–'
+                                      : formatPercent(group.average)
+                                  }}</b
+                                  ><small>Ø richtig</small></span
+                                >
+                                <span class="chapter-mix-mini" aria-hidden="true">
+                                  @for (part of group.mix; track part.id) {
+                                    @if (part.share) {
+                                      <i
+                                        [attr.data-tone]="part.id"
+                                        [style.flex]="part.share"
+                                      ></i>
+                                    }
+                                  }
+                                </span>
+                              </span>
+                            } @else if (group.average !== null) {
+                              <span class="chapter-rate">
+                                <span class="chapter-rate-label"
+                                  >Ø {{ formatPercent(group.average) }} richtig</span
+                                >
+                                <span class="meter"
+                                  ><span [style.width.%]="group.average * 100"></span
+                                ></span>
+                              </span>
+                            }
+                            @if (face() === 't5') {
+                              <span class="chapter-mix" aria-hidden="true">
+                                @for (part of group.mix; track part.id) {
+                                  @if (part.share) {
+                                    <i
+                                      [attr.data-tone]="part.id"
+                                      [style.flex]="part.share"
+                                    ></i>
+                                  }
+                                }
+                              </span>
+                            }
+                          </button>
+                          @if (!closed(group.name)) {
+                            <div class="ad-table-wrap">
+                              <table class="ad-table questions-table">
+                                <thead>
+                                  <ng-container
+                                    *ngTemplateOutlet="
+                                      headRow;
+                                      context: { $implicit: group }
+                                    "
+                                  />
+                                </thead>
+                                <tbody>
+                                  @for (
+                                    row of shortList() &&
+                                    !fullChapters().has(group.name)
+                                      ? group.rows.slice(0, shortLength)
+                                      : group.rows;
+                                    track row.question.id
+                                  ) {
+                                    <ng-container
+                                      *ngTemplateOutlet="
+                                        rowTpl;
+                                        context: { $implicit: row }
+                                      "
+                                    />
+                                  }
+                                </tbody>
+                              </table>
+                            </div>
+                            @if (shortList() && group.rows.length > shortLength) {
+                              <button
+                                type="button"
+                                class="chapter-more"
+                                (click)="toggleFull(group.name)"
+                              >
+                                {{
+                                  fullChapters().has(group.name)
+                                    ? 'Weniger zeigen'
+                                    : 'Alle ' + group.rows.length + ' Fragen zeigen'
+                                }}
+                                <span
+                                  class="group-chev"
+                                  [class.is-up]="fullChapters().has(group.name)"
+                                  aria-hidden="true"
+                                ></span>
+                              </button>
+                            }
+                          }
+                        </section>
+                      }
+                    </div>
+                  </div>
+                } @else {
+                  <div class="ad-table-wrap">
+                    <table class="ad-table questions-table">
+                      <thead>
+                        <tr>
+                          <th scope="col" class="col-check">
+                            <input
+                              type="checkbox"
+                              aria-label="Alle sichtbaren Fragen auswählen"
+                              [checked]="allVisibleSelected()"
+                              [indeterminate]="someVisibleSelected()"
+                              (change)="toggleAllVisible()"
+                            />
+                          </th>
+                          <th scope="col" class="col-id">ID</th>
+                          <th scope="col">Frage</th>
+                          <th scope="col" class="col-category">Kategorie</th>
+                          <th scope="col" class="col-rate">
+                            <span class="long">Trefferquote</span
+                            ><span class="short">Quote</span>
+                          </th>
+                          @if (face() === 's2') {
+                            <th scope="col" class="col-state">Zustand</th>
+                          }
+                          <th scope="col" class="col-answers">Antworten</th>
+                          <th scope="col" class="col-trend">14 Tage</th>
+                          <th scope="col" class="col-time">Ø Zeit</th>
+                          <th scope="col" class="col-active">
+                            <span class="long">Im Spiel</span
+                            ><span class="short">Aktiv</span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @if (grouped()) {
+                          <ng-container *ngTemplateOutlet="groupRows" />
+                        } @else {
+                          @for (row of rows(); track row.question.id) {
+                            <ng-container
+                              *ngTemplateOutlet="rowTpl; context: { $implicit: row }"
+                            />
+                          }
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              }
+              @if (pageCount() > 1) {
+                <nav class="pager" aria-label="Seiten">
+                  <span class="ad-num ad-muted"
+                    >{{ formatInt(range().from) }}–{{ formatInt(range().to) }} von
+                    {{ formatInt(range().total) }}</span
+                  >
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    aria-label="Vorherige Seite"
+                    [disabled]="page() === 0"
+                    (click)="goToPage(page() - 1)"
+                  >
+                    <css-icon icon="angle-left" size="sm"></css-icon>
+                  </button>
+                  <span class="ad-num"
+                    >Seite {{ page() + 1 }} von {{ pageCount() }}</span
+                  >
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    aria-label="Nächste Seite"
+                    [disabled]="page() >= pageCount() - 1"
+                    (click)="goToPage(page() + 1)"
+                  >
+                    <css-icon icon="angle-right" size="sm"></css-icon>
+                  </button>
+                </nav>
+              }
+            } @else {
+              <div class="empty">
+                @if (counts().all === 0) {
+                  <div class="ghost" aria-hidden="true">
+                    @for (n of [1, 2, 3]; track n) {
+                      <div class="ghost-row"><i></i><span></span><b></b></div>
+                    }
+                  </div>
+                  <p class="empty-title">Noch keine Fragen</p>
+                  <p class="empty-text">
+                    Erfasse die erste Frage oder importiere mehrere aus einer
+                    CSV-Datei.
+                  </p>
+                  <div class="empty-actions">
                     <button
                       type="button"
-                      class="text-button"
-                      (click)="open(row.question.id); $event.stopPropagation()"
+                      class="btn-secondary btn-sm"
+                      (click)="importing.set(true)"
                     >
-                      {{ row.question.text }}
+                      <css-icon icon="upload" size="xs"></css-icon>Importieren
                     </button>
-                    <span class="answer">
-                      <span class="answer-main"
-                        ><css-icon icon="checkmark" size="xs"></css-icon
-                        ><span>{{
-                          row.question.options[row.question.correctIndex]
-                        }}</span></span
-                      >
-                      @for (hint of row.hints; track hint) {
-                        <span class="badge warning hint">{{ hint }}</span>
-                      }
-                    </span>
-                  </td>
-                  <td class="col-category">
-                    @if (row.question.category) {
-                      {{ row.question.category }}
-                    } @else {
-                      <span class="ad-muted">–</span>
-                    }
-                  </td>
-                  <td class="col-rate">
-                    @if (row.rate !== null) {
-                      <span class="rate" [attr.data-difficulty]="row.difficulty">
-                        <span class="rate-value">{{ formatPercent(row.rate) }}</span>
-                        <span class="meter"
-                          ><span [style.width.%]="row.rate * 100"></span
-                        ></span>
-                      </span>
-                    } @else {
-                      <span class="ad-muted">Noch nicht gespielt</span>
-                    }
-                  </td>
-                  <td class="num col-answers">
-                    {{ formatInt(row.question.stats.answers) }}
-                  </td>
-                  <td class="num col-trend">
-                    @if (row.trend !== null) {
-                      <span
-                        class="trend"
-                        [class.up]="row.trend >= 0.03"
-                        [class.down]="row.trend <= -0.03"
-                        title="Trefferquote der letzten 14 Tage gegenüber den 14 Tagen davor"
-                        >{{ trendText(row.trend) }}</span
-                      >
-                    } @else {
-                      <span class="ad-muted">–</span>
-                    }
-                  </td>
-                  <td class="num col-time">
-                    {{ formatSeconds(row.question.stats.avgAnswerMs) }}
-                  </td>
-                  <td class="col-active" (click)="$event.stopPropagation()">
-                    <app-ad-toggle
-                      [checked]="row.question.active"
-                      [label]="'F-' + row.question.id + ' im Spiel'"
-                      [disabled]="busy()"
-                      (toggled)="setActive(row.question, $event)"
-                    />
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-        @if (pageCount() > 1) {
-          <nav class="pager" aria-label="Seiten">
-            <span class="ad-num ad-muted"
-              >{{ formatInt(range().from) }}–{{ formatInt(range().to) }} von
-              {{ formatInt(range().total) }}</span
-            >
-            <button
-              type="button"
-              class="icon-btn"
-              aria-label="Vorherige Seite"
-              [disabled]="page() === 0"
-              (click)="goToPage(page() - 1)"
-            >
-              <css-icon icon="angle-left" size="sm"></css-icon>
-            </button>
-            <span class="ad-num">Seite {{ page() + 1 }} von {{ pageCount() }}</span>
-            <button
-              type="button"
-              class="icon-btn"
-              aria-label="Nächste Seite"
-              [disabled]="page() >= pageCount() - 1"
-              (click)="goToPage(page() + 1)"
-            >
-              <css-icon icon="angle-right" size="sm"></css-icon>
-            </button>
-          </nav>
-        }
-      } @else {
-        <div class="empty">
-          @if (counts().all === 0) {
-            <app-ad-state
-              kind="empty"
-              icon="items-list"
-              title="Noch keine Fragen"
-              text="Erfasse die erste Frage oder importiere mehrere aus einer CSV-Datei."
-            >
-              <button type="button" class="btn-primary" (click)="open('new')">
-                Neue Frage
-              </button>
-            </app-ad-state>
+                    <button
+                      type="button"
+                      class="btn-primary btn-sm"
+                      (click)="open('new')"
+                    >
+                      <css-icon icon="add" size="xs"></css-icon>Neue Frage
+                    </button>
+                  </div>
+                } @else {
+                  <span class="empty-icon" aria-hidden="true"
+                    ><css-icon icon="search" size="sm"></css-icon
+                  ></span>
+                  <p class="empty-title">Keine Frage passt</p>
+                  <p class="empty-text">
+                    Einen anderen Filter wählen oder die Suche leeren.
+                  </p>
+                  <div class="empty-actions">
+                    <button
+                      type="button"
+                      class="btn-secondary btn-sm"
+                      (click)="resetFilters()"
+                    >
+                      Alle Fragen zeigen
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          } @else if (data.questions.error()) {
+            <div class="state-wrap">
+              <app-ad-state
+                kind="error"
+                [text]="data.questions.error()"
+                (retry)="data.questions.reload()"
+              />
+            </div>
           } @else {
-            <app-ad-state
-              kind="empty"
-              icon="search"
-              title="Keine Frage passt"
-              text="Suchbegriff oder Filter anpassen."
-            >
-              <button type="button" class="btn-secondary" (click)="resetFilters()">
-                Filter zurücksetzen
+            <div class="state-wrap"><app-ad-state kind="loading" [lines]="8" /></div>
+          }
+        </section>
+      </div>
+      @if (docked()) {
+        <div class="dock">
+          @if (editing() !== null) {
+            <app-question-editor
+              [docked]="true"
+              [question]="editingQuestion()"
+              [creating]="editing() === 'new'"
+              [missing]="
+                editing() !== 'new' && !!data.questions.value() && !editingQuestion()
+              "
+              (closed)="closeEditor()"
+            />
+          } @else {
+            <div class="dock-empty">
+              <span class="empty-icon" aria-hidden="true"
+                ><css-icon icon="items-list" size="sm"></css-icon
+              ></span>
+              <p class="empty-title">Eine Frage wählen</p>
+              <p class="empty-text">
+                Hier stehen dann Frage, Antworten und wie sie beantwortet wird, zum
+                Bearbeiten direkt neben der Liste.
+              </p>
+              <button
+                type="button"
+                class="btn-secondary btn-sm"
+                (click)="open('new')"
+              >
+                <css-icon icon="add" size="xs"></css-icon>Neue Frage
               </button>
-            </app-ad-state>
+            </div>
           }
         </div>
       }
-    } @else if (data.questions.error()) {
-      <div class="empty">
-        <app-ad-state
-          kind="error"
-          [text]="data.questions.error()"
-          (retry)="data.questions.reload()"
-        />
-      </div>
-    } @else {
-      <div class="empty"><app-ad-state kind="loading" [lines]="8" /></div>
-    }
-  </section>
-</main>
+    </div>
+  </main>
 
-@if (selected().size > 0) {
-  <div class="bulk" role="region" aria-label="Ausgewählte Fragen">
-    <span class="bulk-count"
-      ><b>{{ formatInt(selected().size) }}</b> ausgewählt</span
-    >
-    <span class="bulk-actions">
-      <button
-        type="button"
-        class="bulk-btn"
-        [disabled]="busy()"
-        (click)="bulk('activate')"
+  @if (selected().size > 0) {
+    <div class="bulk" role="region" aria-label="Ausgewählte Fragen">
+      <span class="bulk-count"
+        ><b>{{ formatInt(selected().size) }}</b> ausgewählt</span
       >
-        Ins Spiel
-      </button>
-      <button
-        type="button"
-        class="bulk-btn"
-        [disabled]="busy()"
-        (click)="bulk('deactivate')"
-      >
-        Pausieren
-      </button>
-      <span class="bulk-menu-wrap">
+      <span class="bulk-actions">
         <button
           type="button"
           class="bulk-btn"
           [disabled]="busy()"
-          [attr.aria-expanded]="categoryMenu()"
-          (click)="categoryMenu.set(!categoryMenu())"
+          (click)="bulk('activate')"
         >
-          Kategorie<css-icon icon="angle-up" size="xs"></css-icon>
+          Ins Spiel
         </button>
-        @if (categoryMenu()) {
-          <div class="bulk-menu" role="menu">
-            <form
-              class="new-category"
-              (submit)="$event.preventDefault(); moveToCategory(newCategory())"
-            >
-              <label class="ad-input">
-                <span class="ad-sr">Neue Kategorie</span>
-                <input
-                  type="text"
-                  placeholder="Neue Kategorie"
-                  maxlength="50"
-                  [value]="newCategory()"
-                  (input)="onNewCategory($event)"
-                />
-              </label>
-              <button
-                type="submit"
-                class="btn-primary btn-sm"
-                [disabled]="!newCategory().trim()"
+        <button
+          type="button"
+          class="bulk-btn"
+          [disabled]="busy()"
+          (click)="bulk('deactivate')"
+        >
+          Pausieren
+        </button>
+        <span class="bulk-menu-wrap">
+          <button
+            type="button"
+            class="bulk-btn"
+            [disabled]="busy()"
+            [attr.aria-expanded]="categoryMenu()"
+            (click)="categoryMenu.set(!categoryMenu())"
+          >
+            Kategorie<css-icon icon="angle-up" size="xs"></css-icon>
+          </button>
+          @if (categoryMenu()) {
+            <div class="bulk-menu" role="menu">
+              <form
+                class="new-category"
+                (submit)="$event.preventDefault(); moveToCategory(newCategory())"
               >
-                OK
+                <label class="ad-input">
+                  <span class="ad-sr">Neue Kategorie</span>
+                  <input
+                    type="text"
+                    placeholder="Neue Kategorie"
+                    maxlength="50"
+                    [value]="newCategory()"
+                    (input)="onNewCategory($event)"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  class="btn-primary btn-sm"
+                  [disabled]="!newCategory().trim()"
+                >
+                  OK
+                </button>
+              </form>
+              @for (name of data.categories(); track name) {
+                <button type="button" role="menuitem" (click)="moveToCategory(name)">
+                  {{ name }}
+                </button>
+              }
+              <button
+                type="button"
+                role="menuitem"
+                class="muted"
+                (click)="moveToCategory(null)"
+              >
+                Kategorie entfernen
               </button>
-            </form>
-            @for (name of data.categories(); track name) {
-              <button type="button" role="menuitem" (click)="moveToCategory(name)">
-                {{ name }}
-              </button>
-            }
-            <button
-              type="button"
-              role="menuitem"
-              class="muted"
-              (click)="moveToCategory(null)"
-            >
-              Kategorie entfernen
-            </button>
-          </div>
-        }
+            </div>
+          }
+        </span>
+        <button
+          type="button"
+          class="bulk-btn"
+          [disabled]="busy()"
+          (click)="exportCsv()"
+        >
+          Exportieren
+        </button>
+        <button
+          type="button"
+          class="bulk-btn"
+          [disabled]="busy()"
+          (click)="bulk('reset')"
+        >
+          Statistik zurücksetzen
+        </button>
+        <button
+          type="button"
+          class="bulk-btn danger"
+          [disabled]="busy()"
+          (click)="bulk('delete')"
+        >
+          Löschen
+        </button>
       </span>
       <button
         type="button"
-        class="bulk-btn"
-        [disabled]="busy()"
-        (click)="exportCsv()"
+        class="bulk-close"
+        aria-label="Auswahl aufheben"
+        (click)="clearSelection()"
       >
-        Exportieren
+        <css-icon icon="close" size="xs"></css-icon>
       </button>
-      <button
-        type="button"
-        class="bulk-btn"
-        [disabled]="busy()"
-        (click)="bulk('reset')"
+    </div>
+  }
+
+  @if (editing() !== null && !docked()) {
+    <app-question-editor
+      [question]="editingQuestion()"
+      [creating]="editing() === 'new'"
+      [missing]="
+        editing() !== 'new' && !!data.questions.value() && !editingQuestion()
+      "
+      (closed)="closeEditor()"
+    />
+  }
+
+  @if (importing()) {
+    <app-question-import (closed)="importing.set(false)" />
+  }
+
+  @if (trashOpen()) {
+    <app-question-trash (closed)="trashOpen.set(false)" />
+  }
+}
+
+<ng-template #searchField>
+  <label class="ad-input search">
+    <css-icon icon="search" size="xs"></css-icon>
+    <span class="ad-sr">Fragen durchsuchen</span>
+    <input
+      #searchBox
+      type="search"
+      placeholder="Frage, Antwort, Kategorie oder F-12 suchen"
+      [value]="search()"
+      (input)="onSearch($event)"
+    />
+    @if (countInSearch() && data.questions.value()) {
+      <span class="search-count"
+        >{{ formatInt(range().total) }}
+        @if (filtersActive()) {
+          von {{ formatInt(counts().all) }}
+        }
+        {{ range().total === 1 ? 'Frage' : 'Fragen' }}</span
       >
-        Statistik zurücksetzen
-      </button>
-      <button
-        type="button"
-        class="bulk-btn danger"
-        [disabled]="busy()"
-        (click)="bulk('delete')"
-      >
-        Löschen
-      </button>
-    </span>
+    }
+    <span class="ad-kbd" aria-hidden="true">/</span>
+  </label>
+</ng-template>
+
+<ng-template #statusSeg>
+  <div class="ad-segmented status" role="group" aria-label="Status">
     <button
       type="button"
-      class="bulk-close"
-      aria-label="Auswahl aufheben"
-      (click)="clearSelection()"
+      [class.is-active]="status() === 'all'"
+      [attr.aria-pressed]="status() === 'all'"
+      (click)="status.set('all')"
     >
-      <css-icon icon="close" size="xs"></css-icon>
+      Alle
+    </button>
+    <button
+      type="button"
+      [class.is-active]="status() === 'active'"
+      [attr.aria-pressed]="status() === 'active'"
+      (click)="status.set('active')"
+    >
+      Im Spiel
+    </button>
+    <button
+      type="button"
+      [class.is-active]="status() === 'paused'"
+      [attr.aria-pressed]="status() === 'paused'"
+      (click)="status.set('paused')"
+    >
+      Pausiert
     </button>
   </div>
-}
+</ng-template>
 
-@if (editing() !== null) {
-  <app-question-editor
-    [question]="editingQuestion()"
-    [creating]="editing() === 'new'"
-    [missing]="editing() !== 'new' && !!data.questions.value() && !editingQuestion()"
-    (closed)="closeEditor()"
-  />
-}
+<ng-template #categorySelect>
+  <label class="ad-select">
+    <span class="ad-sr">Kategorie</span>
+    <select [value]="category()" (change)="onSelect(category.set, $event)">
+      <option value="">Alle Kategorien</option>
+      @for (name of data.categories(); track name) {
+        <option [value]="name">{{ name }}</option>
+      }
+      <option [value]="noCategory">Ohne Kategorie</option>
+    </select>
+  </label>
+</ng-template>
 
-@if (importing()) {
-  <app-question-import (closed)="importing.set(false)" />
-}
+<ng-template #healthSelect>
+  <label class="ad-select health">
+    <span class="ad-sr">Auffälligkeit</span>
+    <select [value]="health()" (change)="onSelect(health.set, $event)">
+      <option value="all">Alle Schwierigkeiten</option>
+      <option value="hints">Mit Hinweis</option>
+      <option value="hard">{{ difficultyLabels.hard }}</option>
+      <option value="medium">{{ difficultyLabels.medium }}</option>
+      <option value="easy">{{ difficultyLabels.easy }}</option>
+      <option value="new">{{ difficultyLabels.new }}</option>
+    </select>
+  </label>
+</ng-template>
 
-@if (trashOpen()) {
-  <app-question-trash (closed)="trashOpen.set(false)" />
-}
+<ng-template #sortSelect>
+  <label class="ad-select sort">
+    <span class="ad-sr">Sortierung</span>
+    <select [value]="sort()" (change)="onSelect(sort.set, $event)">
+      @for (option of sorts; track option.id) {
+        <option [value]="option.id">{{ option.label }}</option>
+      }
+    </select>
+  </label>
+</ng-template>
+
+<ng-template #rowTpl let-row>
+  <tr
+    [class.is-selected]="selected().has(row.question.id)"
+    [class.is-paused]="!row.question.active"
+    [class.is-peek]="face() === 'q7' && preview()?.question?.id === row.question.id"
+    (click)="rowClick(row.question.id)"
+  >
+    <td class="col-check" (click)="$event.stopPropagation()">
+      <input
+        type="checkbox"
+        [attr.aria-label]="'F-' + row.question.id + ' auswählen'"
+        [checked]="selected().has(row.question.id)"
+        (change)="toggleRow(row.question.id)"
+      />
+    </td>
+    <td class="col-id ad-num">F-{{ row.question.id }}</td>
+    <td class="col-text">
+      <button
+        type="button"
+        class="text-button"
+        (click)="rowClick(row.question.id); $event.stopPropagation()"
+      >
+        {{ row.question.text }}
+      </button>
+      <span class="answer">
+        <span class="answer-main"
+          ><css-icon icon="checkmark" size="xs"></css-icon
+          ><span>{{ row.question.options[row.question.correctIndex] }}</span></span
+        >
+        @for (hint of row.hints; track hint) {
+          <span class="badge warning hint">{{ hint }}</span>
+        }
+      </span>
+    </td>
+    <td class="col-category">
+      @if (row.question.category) {
+        {{ row.question.category }}
+      } @else {
+        <span class="ad-muted">–</span>
+      }
+    </td>
+    <td class="col-rate">
+      @if (row.rate !== null) {
+        <span class="rate" [attr.data-difficulty]="row.difficulty">
+          <span class="rate-value">{{ formatPercent(row.rate) }}</span>
+          <span class="meter"><span [style.width.%]="row.rate * 100"></span></span>
+        </span>
+      } @else {
+        <span class="ad-muted">Noch nicht gespielt</span>
+      }
+    </td>
+    @if (face() === 's2') {
+      <td class="col-state">
+        <span class="state" [attr.data-state]="row.state.id" [title]="row.state.note"
+          ><i aria-hidden="true"></i>{{ row.state.label }}</span
+        >
+        <span class="state-note">{{ row.state.note }}</span>
+      </td>
+    }
+    <td class="col-answers">
+      {{ formatInt(row.question.stats.answers) }}
+    </td>
+    <td class="col-trend">
+      @if (row.trend !== null) {
+        <span
+          class="trend"
+          [class.up]="row.trend >= 0.03"
+          [class.down]="row.trend <= -0.03"
+          title="Trefferquote der letzten 14 Tage gegenüber den 14 Tagen davor"
+          >{{ trendText(row.trend) }}</span
+        >
+      } @else {
+        <span class="ad-muted">–</span>
+      }
+    </td>
+    <td class="col-time">
+      {{ formatSeconds(row.question.stats.avgAnswerMs) }}
+    </td>
+    <td class="col-active" (click)="$event.stopPropagation()">
+      <app-ad-toggle
+        [checked]="row.question.active"
+        [label]="'F-' + row.question.id + ' im Spiel'"
+        [disabled]="busy()"
+        (toggled)="setActive(row.question, $event)"
+      />
+    </td>
+  </tr>
+</ng-template>
+
+<ng-template #headRow let-group>
+  <tr>
+    <th scope="col" class="col-check">
+      <input
+        type="checkbox"
+        [attr.aria-label]="'Alle Fragen in ' + group.label + ' auswählen'"
+        [checked]="groupSelection(group.rows) === 'all'"
+        [indeterminate]="groupSelection(group.rows) === 'some'"
+        (change)="toggleGroupRows(group.rows)"
+      />
+    </th>
+    <th scope="col" class="col-id">ID</th>
+    <th scope="col">Frage</th>
+    <th scope="col" class="col-category">Kategorie</th>
+    <th scope="col" class="col-rate">
+      <span class="long">Trefferquote</span><span class="short">Quote</span>
+    </th>
+    @if (face() === 's2') {
+      <th scope="col" class="col-state">Zustand</th>
+    }
+    <th scope="col" class="col-answers">Antworten</th>
+    <th scope="col" class="col-trend">14 Tage</th>
+    <th scope="col" class="col-time">Ø Zeit</th>
+    <th scope="col" class="col-active">
+      <span class="long">Im Spiel</span><span class="short">Aktiv</span>
+    </th>
+  </tr>
+</ng-template>
+
+<ng-template #groupRows>
+  @for (group of groups(); track group.name; let gi = $index) {
+    <tr
+      class="group-row"
+      [id]="'gruppe-' + gi"
+      [attr.data-tone]="group.tone"
+      (click)="toggleGroup(group.name)"
+    >
+      <td colspan="10">
+        <span class="group-line">
+          <span
+            class="group-chev"
+            [class.is-closed]="closed(group.name)"
+            aria-hidden="true"
+          ></span>
+          @if (group.tone) {
+            <span class="group-dot" aria-hidden="true"></span>
+          }
+          <b>{{ group.label }}</b>
+          <span class="group-count"
+            >{{ group.rows.length }}
+            {{ group.rows.length === 1 ? 'Frage' : 'Fragen' }}</span
+          >
+          <span class="group-meta">
+            {{ group.active }} im Spiel
+            @if (group.average !== null) {
+              · Ø {{ formatPercent(group.average) }} richtig
+            }
+          </span>
+          @if (face() === 'r2') {
+            <span class="group-mix" aria-hidden="true">
+              @for (part of group.mix; track part.id) {
+                @if (part.share) {
+                  <i [attr.data-tone]="part.id" [style.flex]="part.share"></i>
+                }
+              }
+            </span>
+            <span class="group-mix-key">
+              @for (part of group.mix; track part.id) {
+                @if (part.count) {
+                  <span [attr.data-tone]="part.id"
+                    ><i></i>{{ part.count }} {{ part.label }}</span
+                  >
+                }
+              }
+            </span>
+          }
+        </span>
+      </td>
+    </tr>
+    @if (!closed(group.name)) {
+      @for (row of group.rows; track row.question.id) {
+        <ng-container *ngTemplateOutlet="rowTpl; context: { $implicit: row }" />
+      }
+    }
+  }
+</ng-template>

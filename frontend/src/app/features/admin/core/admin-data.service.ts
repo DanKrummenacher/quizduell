@@ -45,6 +45,17 @@ export class AdminData {
     return [...names].sort((a, b) => a.localeCompare(b, 'de-CH'));
   });
 
+  /** The categories with how many questions each holds. */
+  readonly categoryCounts = computed(() => {
+    const counts = new Map<string, number>();
+    for (const question of this.questions.value() ?? []) {
+      if (question.category) {
+        counts.set(question.category, (counts.get(question.category) ?? 0) + 1);
+      }
+    }
+    return this.categories().map((name) => ({ name, count: counts.get(name) ?? 0 }));
+  });
+
   questionById(id: number | null): AdminQuestion | null {
     return id === null
       ? null

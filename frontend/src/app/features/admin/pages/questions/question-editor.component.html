@@ -1,11 +1,15 @@
-<button
-  type="button"
-  class="ad-scrim"
-  aria-label="Schliessen"
-  (click)="close()"
-></button>
+@if (view() !== 'dock') {
+  <button
+    type="button"
+    class="ad-scrim"
+    [class.is-center]="view() === 'e4'"
+    aria-label="Schliessen"
+    (click)="close()"
+  ></button>
+}
 <aside
   class="ad-drawer editor"
+  [attr.data-view]="view()"
   role="dialog"
   aria-modal="true"
   aria-labelledby="editor-title"
@@ -34,7 +38,33 @@
     </button>
   </header>
 
-  <div class="ad-drawer-body">
+  @if (view() === 'e3' && question() && !missing()) {
+    <div class="tabs" role="tablist" aria-label="Ansicht">
+      <button
+        type="button"
+        role="tab"
+        [class.is-active]="tab() === 'form'"
+        [attr.aria-selected]="tab() === 'form'"
+        (click)="tab.set('form')"
+      >
+        Frage
+      </button>
+      <button
+        type="button"
+        role="tab"
+        [class.is-active]="tab() === 'stats'"
+        [attr.aria-selected]="tab() === 'stats'"
+        (click)="tab.set('stats')"
+      >
+        So wird sie beantwortet
+        @if (hints().length) {
+          <span class="tab-dot" aria-hidden="true"></span>
+        }
+      </button>
+    </div>
+  }
+
+  <div class="ad-drawer-body" [class.two-col]="view() === 'e2' && !!question()">
     @if (missing()) {
       <app-ad-state
         kind="empty"
@@ -45,7 +75,12 @@
     } @else if (!creating() && !question()) {
       <app-ad-state kind="loading" [lines]="8" />
     } @else {
-      <form class="form" novalidate (submit)="$event.preventDefault(); save(false)">
+      <form
+        class="form"
+        [hidden]="view() === 'e3' && tab() === 'stats' && !!question()"
+        novalidate
+        (submit)="$event.preventDefault(); save(false)"
+      >
         <div class="ad-field">
           <label for="question-text">Frage</label>
           <div
@@ -125,22 +160,13 @@
         <div class="row">
           <div class="ad-field category">
             <label for="question-category">Kategorie</label>
-            <div class="ad-input">
-              <input
-                id="question-category"
-                type="text"
-                list="question-categories"
-                placeholder="Ohne Kategorie"
-                [attr.maxlength]="limits.category"
-                [value]="draft().category"
-                (input)="setCategory($event)"
-              />
-            </div>
-            <datalist id="question-categories">
-              @for (name of data.categories(); track name) {
-                <option [value]="name"></option>
-              }
-            </datalist>
+            <app-ad-category-picker
+              inputId="question-category"
+              [value]="draft().category"
+              [categories]="data.categoryCounts()"
+              [maxLength]="limits.category"
+              (changed)="setCategory($event)"
+            />
           </div>
           <div class="ad-field active">
             <span class="ad-label" id="question-active-label">Im Spiel</span>
@@ -158,24 +184,70 @@
         </div>
 
         @if (!creating() && hasStats() && (contentChanged() || dirty())) {
-          <label class="reset">
-            <input
-              type="checkbox"
-              [checked]="resetStats()"
-              (change)="setReset($event)"
-            />
-            <span>
-              <b>Statistik zurücksetzen</b>
-              <span class="ad-muted">
-                @if (contentChanged()) {
-                  Empfohlen: Die Antworten haben sich geändert, die bisherigen Zahlen
-                  passen nicht mehr.
-                } @else {
-                  Antworten und Trefferquote beginnen wieder bei null.
+          @switch (resetView()) {
+            @case ('z3') {
+              <div class="reset-row" [class.is-recommended]="contentChanged()">
+                <span class="reset-text">
+                  <b class="reset-title"
+                    >Statistik zurücksetzen
+                    @if (contentChanged()) {
+                      <span class="reset-tag">Empfohlen</span>
+                    }
+                  </b>
+                  <span class="ad-muted">{{ resetNote() }}</span>
+                </span>
+                <app-ad-toggle
+                  [checked]="resetStats()"
+                  label="Statistik zurücksetzen"
+                  (toggled)="resetChoice.set($event)"
+                />
+              </div>
+            }
+            @case ('z4') {
+              <label class="reset-quiet">
+                <input
+                  type="checkbox"
+                  [checked]="resetStats()"
+                  (change)="setReset($event)"
+                />
+                <span>
+                  <b
+                    >Statistik zurücksetzen{{
+                      contentChanged() ? ' (empfohlen)' : ''
+                    }}</b
+                  >
+                  <span class="ad-muted">{{ resetNote() }}</span>
+                </span>
+              </label>
+            }
+            @default {
+              <label
+                class="reset"
+                [attr.data-reset]="resetView()"
+                [class.is-recommended]="contentChanged()"
+              >
+                @if (resetView() === 'z2' && contentChanged()) {
+                  <span class="reset-icon" aria-hidden="true"
+                    ><css-icon icon="priority-warning" size="xs"></css-icon
+                  ></span>
                 }
-              </span>
-            </span>
-          </label>
+                <span class="reset-text">
+                  <b class="reset-title"
+                    >Statistik zurücksetzen
+                    @if (contentChanged()) {
+                      <span class="reset-tag">Empfohlen</span>
+                    }
+                  </b>
+                  <span class="ad-muted">{{ resetNote() }}</span>
+                </span>
+                <input
+                  type="checkbox"
+                  [checked]="resetStats()"
+                  (change)="setReset($event)"
+                />
+              </label>
+            }
+          }
         }
 
         @if (serverError(); as error) {
@@ -186,7 +258,11 @@
       </form>
 
       @if (question(); as q) {
-        <section class="stats" aria-labelledby="stats-title">
+        <section
+          class="stats"
+          aria-labelledby="stats-title"
+          [hidden]="view() === 'e3' && tab() === 'form'"
+        >
           <h3 id="stats-title">So wird sie beantwortet</h3>
 
           @for (item of hints(); track item.hint.key) {

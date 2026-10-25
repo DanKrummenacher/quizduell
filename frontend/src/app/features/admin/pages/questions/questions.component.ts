@@ -38,12 +38,24 @@ import {
   HINT_TYPE_LABELS,
 } from '../../core/hint-texts';
 import { NotifyService } from '../../core/notify.service';
+import { AdAnswerDistributionComponent } from '../../ui/answer-distribution.component';
 import { AdStateComponent } from '../../ui/state.component';
 import { AdToggleComponent } from '../../ui/toggle.component';
 import { QuestionEditorComponent } from './question-editor.component';
 import { QuestionImportComponent } from './question-import.component';
 import { QuestionTrashComponent } from './question-trash.component';
 import { AdPageHeadComponent } from '../../ui/page-head.component';
+import { NgTemplateOutlet } from '@angular/common';
+import { facelift } from '../../core/facelift-preview';
+import { QuestionsTodayComponent } from './questions-today.component';
+
+/** Whether a media query matches, kept up to date. */
+function mediaQuery(query: string) {
+  const list = typeof matchMedia === 'undefined' ? null : matchMedia(query);
+  const matches = signal(list?.matches ?? true);
+  list?.addEventListener('change', (event) => matches.set(event.matches));
+  return matches.asReadonly();
+}
 
 type StatusFilter = 'all' | 'active' | 'paused';
 type HealthFilter = 'all' | 'hints' | Difficulty;
@@ -65,6 +77,9 @@ const SORTS: { id: Sort; label: string }[] = [
 @Component({
   selector: 'app-admin-questions',
   imports: [
+    NgTemplateOutlet,
+    AdAnswerDistributionComponent,
+    QuestionsTodayComponent,
     AdPageHeadComponent,
     AdStateComponent,
     AdToggleComponent,
@@ -113,6 +128,346 @@ export class QuestionsComponent {
   protected readonly newCategory = signal('');
 
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Wide enough for the editor beside the list in the workplace draft. */
+  protected readonly wide = mediaQuery('(min-width: 1201px)');
+  protected readonly docked = computed(() => this.face() === 's3' && this.wide());
+
+  /** Temporary: the facelift draft shown. */
+  protected readonly face = computed(() => facelift() ?? 'q4');
+
+  /** Quick filters as figures: each sets the filters it stands for. */
+  protected readonly quick = computed(() => {
+    const all = this.data.questions.value() ?? [];
+    const hints = this.hintsByQuestion();
+    const count = (test: (q: AdminQuestion) => boolean) => all.filter(test).length;
+    return [
+      {
+        id: 'active',
+        label: 'Im Spiel',
+        value: count((q) => q.active),
+        note: `von ${formatInt(all.length)} Fragen`,
+      },
+      {
+        id: 'paused',
+        label: 'Pausiert',
+        value: count((q) => !q.active),
+        note: 'kommen in keinem Duell vor',
+      },
+      {
+        id: 'hints',
+        label: 'Mit Hinweis',
+        value: count((q) => hints.has(q.id)),
+        note: 'auffällig im Spiel',
+      },
+      {
+        id: 'hard',
+        label: DIFFICULTY_LABELS.hard,
+        value: count((q) => difficultyOf(q) === 'hard'),
+        note: 'unter 45 % richtig',
+      },
+      {
+        id: 'new',
+        label: DIFFICULTY_LABELS.new,
+        value: count((q) => difficultyOf(q) === 'new'),
+        note: 'noch ohne verlässliche Quote',
+      },
+    ] as const;
+  });
+
+  protected readonly quickPicked = computed(() => {
+    if (this.health() === 'hints') {
+      return 'hints';
+    }
+    if (this.health() === 'hard') {
+      return 'hard';
+    }
+    if (this.health() === 'new') {
+      return 'new';
+    }
+    if (this.status() === 'active') {
+      return 'active';
+    }
+    if (this.status() === 'paused') {
+      return 'paused';
+    }
+    return null;
+  });
+
+  protected pickQuick(id: string): void {
+    const same = this.quickPicked() === id;
+    this.status.set('all');
+    this.health.set('all');
+    if (same) {
+      return;
+    }
+    if (id === 'active' || id === 'paused') {
+      this.status.set(id);
+    } else {
+      this.health.set(id as HealthFilter);
+    }
+  }
+
+  /** The categories as tiles: share of questions, mean rate and mix. */
+  protected readonly categoryTiles = computed(() => {
+    const all = this.data.questions.value() ?? [];
+    return this.data.categoryCounts().map((c) => {
+      const list = all.filter((q) => q.category === c.name);
+      const rates = list
+        .map((q) => share(q.stats.correct, q.stats.answers))
+        .filter((r): r is number => r !== null);
+      const mix = (['hard', 'medium', 'easy', 'new'] as const).map((id) => ({
+        id,
+        share:
+          list.filter((q) => difficultyOf(q) === id).length / (list.length || 1),
+      }));
+      return {
+        name: c.name,
+        count: c.count,
+        active: list.filter((q) => q.active).length,
+        average: rates.length
+          ? rates.reduce((a, b) => a + b, 0) / rates.length
+          : null,
+        mix,
+      };
+    });
+  });
+
+  /** The categories for the side rail, with «all» and «none». */
+  protected readonly rail = computed(() => {
+    const all = this.data.questions.value() ?? [];
+    return [
+      { id: '', label: 'Alle Fragen', count: all.length },
+      ...this.data.categoryCounts().map((c) => ({
+        id: c.name,
+        label: c.name,
+        count: c.count,
+      })),
+      {
+        id: NO_CATEGORY,
+        label: 'Ohne Kategorie',
+        count: all.filter((q) => !q.category).length,
+      },
+    ];
+  });
+
+  /** The rows of the page by category, or by difficulty, for the grouped drafts. */
+  protected readonly groups = computed(() => {
+    const byDifficulty = this.face() === 'q8';
+    const order: Difficulty[] = ['hard', 'medium', 'easy', 'new'];
+    const map = new Map<string, ReturnType<typeof this.rows>>();
+    for (const row of this.rows()) {
+      const key = byDifficulty ? row.difficulty : (row.question.category ?? '');
+      map.set(key, [...(map.get(key) ?? []), row]);
+    }
+    return [...map.entries()]
+      .sort(([a], [b]) =>
+        byDifficulty
+          ? order.indexOf(a as Difficulty) - order.indexOf(b as Difficulty)
+          : a === ''
+            ? 1
+            : b === ''
+              ? -1
+              : a.localeCompare(b, 'de-CH'),
+      )
+      .map(([name, rows]) => {
+        const rated = rows.filter((r) => r.rate !== null);
+        const average = rated.length
+          ? rated.reduce((sum, r) => sum + r.rate!, 0) / rated.length
+          : null;
+        const mix = (['hard', 'medium', 'easy', 'new'] as const).map((id) => {
+          const count = rows.filter((r) => r.difficulty === id).length;
+          return {
+            id,
+            label: DIFFICULTY_LABELS[id].toLowerCase(),
+            count,
+            share: count / rows.length,
+          };
+        });
+        return {
+          name,
+          mix,
+          label: byDifficulty
+            ? DIFFICULTY_LABELS[name as Difficulty]
+            : name || 'Ohne Kategorie',
+          tone: byDifficulty ? name : null,
+          rows,
+          active: rows.filter((r) => r.question.active).length,
+          average,
+        };
+      });
+  });
+
+  /** A row opens the editor, or the preview beside the list in that draft. */
+  protected rowClick(id: number): void {
+    // Below 1201px the preview is hidden, so the row opens the editor.
+    if (this.face() === 'q7' && matchMedia('(min-width: 1201px)').matches) {
+      this.previewId.set(id);
+    } else {
+      this.open(id);
+    }
+  }
+
+  /** The question shown beside the list in the preview draft. */
+  protected readonly previewId = signal<number | null>(null);
+  protected readonly preview = computed(() => {
+    const rows = this.rows();
+    const row =
+      rows.find((r) => r.question.id === this.previewId()) ?? rows[0] ?? null;
+    return row;
+  });
+
+  protected readonly collapsed = signal<ReadonlySet<string>>(new Set());
+
+  /** The drafts with every category as its own card. */
+  protected readonly chapters = computed(
+    () =>
+      ['r1', 't1', 't2', 't3', 't4', 't5'].includes(this.face()) ||
+      this.face().startsWith('u') ||
+      this.face().startsWith('v') ||
+      this.face() === 'w1',
+  );
+  /** The drafts with the figures as quick filters on top. */
+  protected readonly quickOn = computed(
+    () =>
+      this.face() === 'q2' ||
+      this.face().startsWith('t') ||
+      this.face().startsWith('u') ||
+      this.face().startsWith('v') ||
+      this.face() === 'w1',
+  );
+
+  /** The filters set now, each with a way to clear it. */
+  protected readonly activeFilters = computed(() => {
+    const list: { label: string; clear: () => void }[] = [];
+    if (this.search()) {
+      list.push({ label: `«${this.search()}»`, clear: () => this.search.set('') });
+    }
+    if (this.status() !== 'all') {
+      list.push({
+        label: this.status() === 'active' ? 'Im Spiel' : 'Pausiert',
+        clear: () => this.status.set('all'),
+      });
+    }
+    if (this.category()) {
+      list.push({ label: this.categoryLabel(), clear: () => this.category.set('') });
+    }
+    const health = this.health();
+    if (health !== 'all') {
+      list.push({
+        label: health === 'hints' ? 'Mit Hinweis' : DIFFICULTY_LABELS[health],
+        clear: () => this.health.set('all'),
+      });
+    }
+    return list;
+  });
+
+  /** The count stands in the search field. */
+  protected readonly countInSearch = computed(
+    () =>
+      this.face() === 't3' ||
+      this.face().startsWith('u') ||
+      this.face().startsWith('v') ||
+      this.face() === 'w1',
+  );
+
+  /** «Kurzliste»: a chapter shows its first questions until opened in full. */
+  protected readonly shortLength = 3;
+  protected readonly fullChapters = signal<ReadonlySet<string>>(new Set());
+
+  protected toggleFull(name: string): void {
+    this.fullChapters.update((current) => {
+      const next = new Set(current);
+      if (next.has(name)) {
+        next.delete(name);
+      } else {
+        next.add(name);
+      }
+      return next;
+    });
+  }
+
+  /** The drafts that show a chapter's first questions until opened. */
+  protected readonly shortList = computed(
+    () =>
+      this.face() === 'u4' || this.face().startsWith('v') || this.face() === 'w1',
+  );
+
+  /** A calm colour per category, the same each time. */
+  protected tone(name: string): number {
+    let hash = 0;
+    for (const char of name) {
+      hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+    }
+    return hash % 5;
+  }
+
+  /** Closes every chapter, or opens them all again. */
+  protected toggleAll(): void {
+    const names = this.groups().map((g) => g.name);
+    const allClosed = names.every((n) => this.collapsed().has(n));
+    this.collapsed.set(allClosed ? new Set() : new Set(names));
+  }
+
+  protected readonly allClosed = computed(() =>
+    this.groups().every((g) => this.collapsed().has(g.name)),
+  );
+
+  /** Scrolls to a chapter of the table of contents, open. */
+  protected jumpToChapter(index: number, name: string): void {
+    if (this.collapsed().has(name)) {
+      this.toggleGroup(name);
+    }
+    requestAnimationFrame(() =>
+      document
+        .getElementById(`kapitel-${index}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+    );
+  }
+
+  /** The drafts that show the catalogue under group headings. */
+  protected readonly grouped = computed(() =>
+    ['q4', 'q8', 'r2', 'r3', 'r4', 's1', 's2', 's3'].includes(this.face()),
+  );
+
+  /** «Übersicht zuerst» starts with every group closed; a click opens it. */
+  protected closed(name: string): boolean {
+    const marked = this.collapsed().has(name);
+    return this.face() === 'r2' ? !marked : marked;
+  }
+
+  /** Scrolls to a group of the jump bar, open. */
+  protected jumpTo(index: number, name: string): void {
+    if (this.closed(name)) {
+      this.toggleGroup(name);
+    }
+    requestAnimationFrame(() =>
+      document
+        .getElementById(`gruppe-${index}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+    );
+  }
+
+  protected toggleGroup(name: string): void {
+    this.collapsed.update((current) => {
+      const next = new Set(current);
+      if (next.has(name)) {
+        next.delete(name);
+      } else {
+        next.add(name);
+      }
+      return next;
+    });
+  }
+
+  /** The label of a filter for the chips of the workbench draft. */
+  protected readonly categoryLabel = computed(() =>
+    this.category() === ''
+      ? 'Alle Kategorien'
+      : this.category() === NO_CATEGORY
+        ? 'Ohne Kategorie'
+        : this.category(),
+  );
 
   constructor() {
     this.route.queryParamMap
@@ -239,10 +594,25 @@ export class QuestionsComponent {
           previous.answers >= 10
             ? recentRate - previousRate
             : null;
+        const rowHints = hints.get(question.id) ?? [];
+        const difficulty = difficultyOf(question);
         return {
           question,
           rate,
           trend,
+          state: rowHints.length
+            ? {
+                id: 'check',
+                label: 'Prüfen',
+                note: HINT_TYPE_LABELS[rowHints[0]!.type],
+              }
+            : difficulty === 'new'
+              ? { id: 'new', label: 'Neu', note: 'Zu wenig Antworten' }
+              : difficulty === 'hard'
+                ? { id: 'hard', label: 'Schwer', note: 'Unter 45 % richtig' }
+                : difficulty === 'easy'
+                  ? { id: 'easy', label: 'Leicht', note: 'Über 85 % richtig' }
+                  : { id: 'ok', label: 'In Ordnung', note: 'Gut im Spiel' },
           difficulty: difficultyOf(question),
           hints: (hints.get(question.id) ?? []).map(
             (hint) => HINT_TYPE_LABELS[hint.type],
@@ -327,6 +697,31 @@ export class QuestionsComponent {
         next.delete(id);
       } else {
         next.add(id);
+      }
+      return next;
+    });
+  }
+
+  /** How much of one chapter is selected. */
+  protected groupSelection(
+    rows: { question: AdminQuestion }[],
+  ): 'all' | 'some' | 'none' {
+    const selected = this.selected();
+    const count = rows.filter((r) => selected.has(r.question.id)).length;
+    return count === 0 ? 'none' : count === rows.length ? 'all' : 'some';
+  }
+
+  /** Selects every question of one chapter, or none of them. */
+  protected toggleGroupRows(rows: { question: AdminQuestion }[]): void {
+    const all = this.groupSelection(rows) === 'all';
+    this.selected.update((current) => {
+      const next = new Set(current);
+      for (const row of rows) {
+        if (all) {
+          next.delete(row.question.id);
+        } else {
+          next.add(row.question.id);
+        }
       }
       return next;
     });
