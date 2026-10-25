@@ -9,8 +9,6 @@ $phone: 640px;
 $ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 // The same space from the bar to the path as from the last line to the page.
 $space: 40px;
-// As high as the controls beside the line below the title.
-$control: 38px;
 
 app-ad-page-head {
   display: block;
@@ -232,12 +230,10 @@ app-ad-page-head {
   font-size: 15px;
   line-height: 1.5;
 
-  // Beside actions, the line stands on their centre: both read as one row.
+  // Beside actions, the text stands on their lower edge: the line box is
+  // taller than the letters, so it reaches a little below it.
   .ph-row:has(.ph-actions > *) & {
-    display: flex;
-    align-items: center;
-    min-height: $control;
-    margin-top: 2px;
+    margin-bottom: -0.22em;
   }
 
   p {
@@ -248,10 +244,9 @@ app-ad-page-head {
 .ph-actions {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  // Controls of any height stand on one lower edge.
+  align-items: flex-end;
   gap: 10px;
-  // As high as the line beside it, so buttons of any height share its centre.
-  min-height: $control;
 
   &:empty {
     display: none;
