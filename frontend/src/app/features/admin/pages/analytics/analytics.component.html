@@ -48,6 +48,12 @@
     >
       @for (kpi of kpis(); track kpi.label) {
         <app-ad-kpi
+          [class.is-pickable]="pickable.includes(kpi.key)"
+          [class.is-picked]="metric() === kpi.key"
+          [attr.role]="pickable.includes(kpi.key) ? 'button' : null"
+          [attr.tabindex]="pickable.includes(kpi.key) ? 0 : null"
+          (click)="pick(kpi.key)"
+          (keydown.enter)="pick(kpi.key)"
           [label]="kpi.label"
           [value]="kpi.value"
           [delta]="kpi.delta"
@@ -60,17 +66,21 @@
     </section>
 
     <h2 class="section-title">Nutzung</h2>
+    @if (report(); as r) {
+      <p class="section-lead">{{ r.usage }}</p>
+    }
     <div class="ad-grid" [class.is-loading]="analytics.loading()">
       <section class="ad-card span-8">
         <header class="ad-card-head">
           <div>
-            <h2>Duelle pro Tag</h2>
+            <h2>{{ lead()?.title }}</h2>
             <p>
-              Zu Ende gespielt{{ range() === 0 ? '' : ', grau der Zeitraum davor' }}
+              {{ lead()?.subtitle
+              }}{{ range() === 0 ? '' : ', grau der Zeitraum davor' }}
             </p>
           </div>
         </header>
-        @if (games(); as g) {
+        @if (lead(); as g) {
           @if (g.empty) {
             <app-ad-state
               kind="empty"
@@ -85,8 +95,9 @@
               [labels]="g.labels"
               [labelEvery]="labelEvery()"
               [height]="240"
-              unit="Duelle"
-              ariaLabel="Zu Ende gespielte Duelle pro Tag"
+              [unit]="g.unit"
+              [percent]="g.percent"
+              [ariaLabel]="g.title"
             />
           }
         }
@@ -99,23 +110,59 @@
             <p>Wie Duelle zustande kommen</p>
           </div>
         </header>
-        <ul class="shares">
-          @for (mode of modes(); track mode.label) {
-            <li>
-              <span class="share-label"
-                ><b>{{ mode.label }}</b
-                ><span class="ad-muted">{{ mode.hint }}</span></span
+        @if (modeView(); as v) {
+          <div class="donut-row">
+            <div class="donut">
+              <svg viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="donut-track" cx="60" cy="60" r="50" />
+                @for (mode of v.modes; track mode.key) {
+                  <circle
+                    class="donut-part"
+                    [attr.data-mode]="mode.key"
+                    cx="60"
+                    cy="60"
+                    r="50"
+                    pathLength="100"
+                    [attr.stroke-dasharray]="mode.arc"
+                    [attr.stroke-dashoffset]="mode.start"
+                  />
+                }
+              </svg>
+              <span class="donut-center"
+                ><b>{{ v.modes[0]!.share }}</b
+                ><small>per Zufall</small></span
               >
-              <span class="share-value"
-                >{{ mode.share }}<small>{{ formatInt(mode.value) }}</small></span
-              >
-              <span class="meter"><span [style.width.%]="mode.width"></span></span>
-            </li>
-          }
-        </ul>
+            </div>
+            <ul class="donut-legend">
+              @for (mode of v.modes; track mode.key) {
+                <li [attr.data-mode]="mode.key">
+                  <span class="donut-name"><i></i>{{ mode.label }}</span>
+                  <span class="donut-share">{{ mode.share }}</span>
+                  <span class="donut-meta"
+                    >{{ formatInt(mode.value) }} Duelle · {{ mode.hint }}</span
+                  >
+                </li>
+              }
+            </ul>
+          </div>
+          <dl class="donut-facts">
+            <div>
+              <dt>Revanchen</dt>
+              <dd>{{ v.rematchShare }}</dd>
+            </div>
+            <div>
+              <dt>Ø Dauer</dt>
+              <dd>{{ v.duration }}</dd>
+            </div>
+            <div>
+              <dt>Abgebrochen</dt>
+              <dd>{{ v.abortShare }}</dd>
+            </div>
+          </dl>
+        }
       </section>
 
-      <section class="ad-card span-8">
+      <section class="ad-card span-8 heat">
         <header class="ad-card-head">
           <div>
             <h2>Wann gespielt wird</h2>
@@ -157,7 +204,7 @@
                 </li>
               }
             </ul>
-            <p class="ad-overline chart-label">Abgebrochen nach Frage</p>
+            <p class="chart-label">Abgebrochen nach Frage</p>
             <app-ad-column-chart
               [data]="ab.byQuestion"
               [height]="120"
@@ -176,71 +223,48 @@
       </section>
     </div>
 
-    <h2 class="section-title">Antworten</h2>
-    <div class="ad-grid" [class.is-loading]="analytics.loading()">
-      <section class="ad-card span-6">
-        <header class="ad-card-head">
-          <div>
-            <h2>Richtig beantwortet</h2>
-            <p>Anteil richtiger Antworten pro Tag</p>
-          </div>
-        </header>
-        @if (accuracy(); as acc) {
-          @if (acc.empty) {
-            <app-ad-state
-              kind="empty"
-              icon="statistic"
-              title="Keine Antworten im Zeitraum"
-            />
-          } @else {
-            <app-ad-line-chart
-              [values]="acc.values"
-              [compare]="acc.compare"
-              [labels]="acc.labels"
-              [labelEvery]="labelEvery()"
-              [percent]="true"
-              [height]="200"
-              ariaLabel="Anteil richtiger Antworten pro Tag"
-            />
-          }
-        }
-      </section>
-
-      <section class="ad-card span-6">
-        <header class="ad-card-head">
-          <div>
-            <h2>Antworten pro Tag</h2>
-            <p>Alle gegebenen Antworten</p>
-          </div>
-        </header>
-        @if (answers(); as list) {
-          <app-ad-column-chart
-            [data]="list"
-            [height]="200"
-            [labelEvery]="labelEvery()"
-            unit="Antworten"
-            ariaLabel="Antworten pro Tag"
-          />
-        }
-      </section>
-    </div>
-
     <h2 class="section-title">Fragen</h2>
+    @if (report(); as r) {
+      <p class="section-lead">{{ r.questions }}</p>
+    }
     <div class="ad-grid">
-      <section class="ad-card span-6">
+      <section class="ad-card span-7">
         <header class="ad-card-head">
           <div>
-            <h2>Am schwersten</h2>
+            <h2>
+              {{ ranking() === 'hardest' ? 'Am schwersten' : 'Am leichtesten' }}
+            </h2>
             <p>Aktive Fragen mit mindestens 20 Antworten, seit Beginn</p>
           </div>
+          <div class="ad-segmented" role="group" aria-label="Rangliste">
+            <button
+              type="button"
+              [class.is-active]="ranking() === 'hardest'"
+              [attr.aria-pressed]="ranking() === 'hardest'"
+              (click)="ranking.set('hardest')"
+            >
+              Schwer
+            </button>
+            <button
+              type="button"
+              [class.is-active]="ranking() === 'easiest'"
+              [attr.aria-pressed]="ranking() === 'easiest'"
+              (click)="ranking.set('easiest')"
+            >
+              Leicht
+            </button>
+          </div>
         </header>
-        <ol class="ranking">
-          @for (row of extremes().hardest; track row.id) {
+        <ol class="ranking ranking-numbered">
+          @for (row of extremes()[ranking()]; track row.id; let i = $index) {
             <li>
               <a routerLink="/admin/fragen" [queryParams]="{ frage: row.id }">
+                <span class="rank-place">{{ i + 1 }}</span>
                 <span class="rank-text">{{ row.text }}</span>
-                <span class="rank-rate hard">{{ row.rate }}</span>
-                <span class="meter hard"
+                <span class="rank-rate" [attr.data-tone]="row.tone">{{
+                  row.rate
+                }}</span>
+                <span class="meter" [attr.data-tone]="row.tone"
                   ><span [style.width.%]="row.width"></span
                 ></span>
               </a>
@@ -250,71 +274,30 @@
           }
         </ol>
       </section>
-
-      <section class="ad-card span-6">
-        <header class="ad-card-head">
-          <div>
-            <h2>Am leichtesten</h2>
-            <p>Aktive Fragen mit mindestens 20 Antworten, seit Beginn</p>
-          </div>
-        </header>
-        <ol class="ranking">
-          @for (row of extremes().easiest; track row.id) {
-            <li>
-              <a routerLink="/admin/fragen" [queryParams]="{ frage: row.id }">
-                <span class="rank-text">{{ row.text }}</span>
-                <span class="rank-rate">{{ row.rate }}</span>
-                <span class="meter"><span [style.width.%]="row.width"></span></span>
-              </a>
-            </li>
-          } @empty {
-            <li class="empty">Noch keine Frage mit genug Antworten.</li>
-          }
-        </ol>
-      </section>
-
-      <section class="ad-card flush span-12">
+      <section class="ad-card span-5">
         <header class="ad-card-head">
           <div>
             <h2>Kategorien</h2>
-            <p>Bestand und Trefferquote seit Beginn</p>
+            <p>Trefferquote seit Beginn</p>
           </div>
         </header>
-        <div class="ad-table-wrap">
-          <table class="ad-table categories">
-            <thead>
-              <tr>
-                <th scope="col">Kategorie</th>
-                <th scope="col" class="num">Fragen</th>
-                <th scope="col" class="num">Im Spiel</th>
-                <th scope="col" class="num">Antworten</th>
-                <th scope="col">Trefferquote</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (category of categories(); track category.name) {
-                <tr>
-                  <td>{{ category.name }}</td>
-                  <td class="num">{{ formatInt(category.questions) }}</td>
-                  <td class="num">{{ formatInt(category.active) }}</td>
-                  <td class="num">{{ formatInt(category.answers) }}</td>
-                  <td>
-                    <span class="rate">
-                      <span class="ad-num">{{ category.rateText }}</span>
-                      <span class="meter"
-                        ><span [style.width.%]="(category.rate ?? 0) * 100"></span
-                      ></span>
-                    </span>
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td colspan="5" class="ad-muted">Noch keine Fragen.</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+        <ul class="cat-rates">
+          @for (category of categories(); track category.name) {
+            <li>
+              <span class="cat-name">{{ category.name }}</span>
+              <span class="cat-count"
+                >{{ formatInt(category.active) }} im Spiel ·
+                {{ formatInt(category.answers) }} Antworten</span
+              >
+              <span class="cat-rate" [attr.data-tone]="category.tone">{{
+                category.rateText
+              }}</span>
+              <span class="meter" [attr.data-tone]="category.tone"
+                ><span [style.width.%]="(category.rate ?? 0) * 100"></span
+              ></span>
+            </li>
+          }
+        </ul>
       </section>
     </div>
   }
