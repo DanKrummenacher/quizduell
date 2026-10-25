@@ -1,89 +1,366 @@
-<main class="ad-page">
-  <app-ad-page-head title="Live">
-    <p headDesc class="status">
-      <span
-        class="pulse"
-        [class.paused]="paused() || error()"
-        aria-hidden="true"
-      ></span>
-      @if (paused()) {
-        Angehalten · Stand {{ formatTime(now(), true) }}
-      } @else if (error()) {
-        {{ error() }} Neuer Versuch in wenigen Sekunden.
-      } @else {
-        Aktualisiert alle 2 Sekunden
-      }
-    </p>
-    <div class="ad-actions">
-      @if (data.paused()) {
-        <button
-          type="button"
-          class="btn-primary"
-          [disabled]="play.busy()"
-          (click)="play.resume()"
-        >
-          <css-icon icon="unlock" size="xs"></css-icon>Spiel freigeben
-        </button>
-      } @else {
+@if (face() === '0') {
+  <app-admin-live-today />
+} @else {
+  <main class="ad-page">
+    <app-ad-page-head title="Live">
+      <p headDesc class="status">
+        <span
+          class="pulse"
+          [class.paused]="paused() || error()"
+          aria-hidden="true"
+        ></span>
+        @if (paused()) {
+          Angehalten · Stand {{ formatTime(now(), true) }}
+        } @else if (error()) {
+          {{ error() }} Neuer Versuch in wenigen Sekunden.
+        } @else {
+          Aktualisiert alle 2 Sekunden
+        }
+      </p>
+      <div class="ad-actions">
+        @if (data.paused()) {
+          <button
+            type="button"
+            class="btn-primary"
+            [disabled]="play.busy()"
+            (click)="play.resume()"
+          >
+            <css-icon icon="unlock" size="xs"></css-icon>Spiel freigeben
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="btn-secondary"
+            [disabled]="play.busy()"
+            (click)="play.pause()"
+          >
+            <css-icon icon="lock" size="xs"></css-icon>Spiel pausieren
+          </button>
+        }
         <button
           type="button"
           class="btn-secondary"
-          [disabled]="play.busy()"
-          (click)="play.pause()"
+          [attr.aria-pressed]="paused()"
+          (click)="togglePause()"
         >
-          <css-icon icon="lock" size="xs"></css-icon>Spiel pausieren
+          <css-icon
+            [attr.icon]="paused() ? 'play-circle' : 'pause-circle'"
+            size="xs"
+          ></css-icon
+          >{{ paused() ? 'Ansicht fortsetzen' : 'Ansicht anhalten' }}
         </button>
-      }
-      <button
-        type="button"
-        class="btn-secondary"
-        [attr.aria-pressed]="paused()"
-        (click)="togglePause()"
-      >
-        <css-icon
-          [attr.icon]="paused() ? 'play-circle' : 'pause-circle'"
-          size="xs"
-        ></css-icon
-        >{{ paused() ? 'Ansicht fortsetzen' : 'Ansicht anhalten' }}
-      </button>
-    </div>
-  </app-ad-page-head>
+      </div>
+    </app-ad-page-head>
 
-  @if (!snapshot()) {
-    @if (error()) {
-      <app-ad-state kind="error" [text]="error()" (retry)="retry()" />
+    @if (!snapshot()) {
+      @if (error()) {
+        <app-ad-state kind="error" [text]="error()" (retry)="retry()" />
+      } @else {
+        <div class="ad-card"><app-ad-state kind="loading" [lines]="6" /></div>
+      }
     } @else {
-      <div class="ad-card"><app-ad-state kind="loading" [lines]="6" /></div>
-    }
-  } @else {
-    <section class="ad-card metrics" aria-label="Jetzt">
-      @for (metric of metrics(); track metric.label) {
-        <div class="metric">
-          <span class="metric-label">{{ metric.label }}</span>
-          <span class="metric-value">{{ metric.value }}</span>
+      @if (kpiQueue()) {
+        <section class="kpis is-queue" aria-label="Jetzt">
+          @for (metric of (metrics() ?? []).slice(0, 2); track metric.label) {
+            <app-ad-kpi
+              [label]="metric.label"
+              [value]="String(metric.value)"
+              [note]="metric.note"
+            />
+          }
+          <div class="kq">
+            <p class="kq-label">Suchen einen Gegner</p>
+            <p class="kq-value">{{ searching().length }}</p>
+            @if (searching().length) {
+              <div class="kq-row">
+                <span class="kq-stack" aria-hidden="true">
+                  @for (entry of searching().slice(0, 5); track entry.name) {
+                    <span class="initial" [class.long]="entry.seconds >= 30">{{
+                      entry.name.charAt(0)
+                    }}</span>
+                  }
+                  @if (searching().length > 5) {
+                    <span class="initial more">+{{ searching().length - 5 }}</span>
+                  }
+                </span>
+                <span class="kq-note"
+                  >{{ searching()[0]!.name }} seit {{ searching()[0]!.wait }}</span
+                >
+              </div>
+            } @else {
+              <p class="kq-note">Niemand wartet</p>
+            }
+          </div>
+          <div class="kq">
+            <p class="kq-label">Warten mit Code</p>
+            <p class="kq-value">{{ waiting().length }}</p>
+            @if (waiting().length) {
+              <div class="kq-row">
+                <span class="kq-codes">
+                  @for (entry of waiting().slice(0, 3); track entry.code) {
+                    <span class="code">{{ entry.code }}</span>
+                  }
+                  @if (waiting().length > 3) {
+                    <span class="kq-more">+{{ waiting().length - 3 }}</span>
+                  }
+                </span>
+              </div>
+            } @else {
+              <p class="kq-note">Kein Code offen</p>
+            }
+          </div>
+        </section>
+      } @else {
+        <section class="kpis" aria-label="Jetzt">
+          @for (metric of metrics(); track metric.label) {
+            <app-ad-kpi
+              [label]="metric.label"
+              [value]="String(metric.value)"
+              [note]="metric.note"
+            />
+          }
+        </section>
+      }
+
+      @if (split()) {
+        <div class="ad-grid board">
+          @for (block of topBlocks(); track block.id) {
+            <div
+              class="cell"
+              [class.is-wide]="block.span === 12"
+              [style.--span]="block.span"
+            >
+              <ng-container
+                *ngTemplateOutlet="blockTpl; context: { $implicit: block }"
+              />
+            </div>
+          }
+        </div>
+        <div class="split is-even">
+          <div class="split-main">
+            @for (block of mainBlocks(); track block.id) {
+              <div class="cell">
+                <ng-container
+                  *ngTemplateOutlet="blockTpl; context: { $implicit: block }"
+                />
+              </div>
+            }
+          </div>
+          <div class="split-side">
+            @for (block of sideBlocks(); track block.id) {
+              <div class="cell">
+                <ng-container
+                  *ngTemplateOutlet="blockTpl; context: { $implicit: block }"
+                />
+              </div>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="ad-grid board">
+          @for (block of blocks(); track block.id) {
+            <div
+              class="cell"
+              [class.is-fit]="block.fit"
+              [class.is-wide]="block.span === 12"
+              [style.--span]="block.span"
+            >
+              <ng-container
+                *ngTemplateOutlet="blockTpl; context: { $implicit: block }"
+              />
+            </div>
+          }
         </div>
       }
-    </section>
+    }
+  </main>
 
-    <div class="ad-grid">
-      <section class="ad-card span-8">
-        <header class="ad-card-head">
-          <div>
-            <h2>Laufende Duelle</h2>
-            <p>
-              Höchststand pro Minute, letzte 60 Minuten
-              @if (chart()?.startedRecently) {
-                · Server läuft seit {{ chart()?.since }}
-              }
-            </p>
-          </div>
-          @if (chart()?.peak; as peak) {
-            <span class="peak"
-              >Höchststand <b>{{ peak.games }}</b> um {{ formatTime(peak.at) }}</span
-            >
+  @if (openDuel(); as open) {
+    <button
+      type="button"
+      class="ad-scrim"
+      aria-label="Schliessen"
+      (click)="openCode.set(null)"
+    ></button>
+    <aside
+      class="ad-drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="duel-title"
+    >
+      <header class="ad-drawer-head">
+        <div>
+          <p class="ad-overline">
+            <ng-container
+              *ngTemplateOutlet="duelLine; context: { $implicit: open }"
+            />
+          </p>
+          <h2 id="duel-title">
+            <ng-container
+              *ngTemplateOutlet="duelTitle; context: { $implicit: open }"
+            />
+          </h2>
+        </div>
+        <button
+          type="button"
+          class="icon-btn"
+          aria-label="Schliessen"
+          appAutofocus
+          (click)="openCode.set(null)"
+        >
+          <css-icon icon="close" size="sm"></css-icon>
+        </button>
+      </header>
+      <div class="ad-drawer-body">
+        <ng-container *ngTemplateOutlet="detailBody; context: { $implicit: open }" />
+      </div>
+    </aside>
+  }
+}
+
+<!-- Cards ---------------------------------------------------------------- -->
+
+<ng-template #blockTpl let-block>
+  @switch (block.id) {
+    @case ('hero') {
+      <ng-container *ngTemplateOutlet="heroCard" />
+    }
+    @case ('band') {
+      <ng-container *ngTemplateOutlet="bandCard" />
+    }
+    @case ('chart') {
+      <ng-container *ngTemplateOutlet="chartCard; context: { $implicit: block }" />
+    }
+    @case ('wait') {
+      <ng-container *ngTemplateOutlet="waitCard" />
+    }
+    @case ('log') {
+      <ng-container *ngTemplateOutlet="logCard; context: { $implicit: block }" />
+    }
+    @case ('detail') {
+      <ng-container *ngTemplateOutlet="detailCard" />
+    }
+    @default {
+      <ng-container
+        *ngTemplateOutlet="duelsCard; context: { $implicit: block.id }"
+      />
+    }
+  }
+</ng-template>
+
+<ng-template #bandCard>
+  <section class="ad-card band" aria-label="Warten">
+    <div class="band-head">
+      <h2>Warten</h2>
+      <dl class="band-stats">
+        <div>
+          <dt>Suchen</dt>
+          <dd>{{ searching().length }}</dd>
+        </div>
+        <div>
+          <dt>Ø Wartezeit</dt>
+          <dd>{{ waitStats()?.average ?? '–' }}</dd>
+        </div>
+        <div>
+          <dt>Mit Code</dt>
+          <dd>{{ waiting().length }}</dd>
+        </div>
+      </dl>
+    </div>
+    <ul class="waiting band-queue" data-view="queue">
+      @for (entry of searching(); track entry.name) {
+        <li class="pill" [class.long]="entry.seconds >= 30">
+          <span class="initial" aria-hidden="true">{{ entry.name.charAt(0) }}</span>
+          {{ entry.name }}
+          <span class="w-time">{{ entry.wait }}</span>
+        </li>
+      }
+      @for (entry of waiting(); track entry.code) {
+        <li class="pill">
+          <span class="code">{{ entry.code }}</span>
+          {{ entry.name }}
+          <span class="w-time">{{ entry.wait }}</span>
+        </li>
+      }
+      @if (!searching().length && !waiting().length) {
+        <li class="empty">Niemand wartet, ein Gegner wird sofort gefunden.</li>
+      }
+    </ul>
+  </section>
+</ng-template>
+
+<ng-template #heroCard>
+  <section class="ad-card hero" aria-label="Jetzt">
+    <div class="hero-figures">
+      @for (metric of metrics(); track metric.label; let first = $first) {
+        <div class="hero-figure" [class.is-lead]="first">
+          <span class="hero-label">{{ metric.label }}</span>
+          <span class="hero-value">{{ metric.value }}</span>
+          <span class="hero-note">{{ metric.note }}</span>
+        </div>
+      }
+    </div>
+    <div class="hero-chart">
+      <p class="hero-chart-title">
+        Laufende Duelle, letzte 60 Minuten
+        @if (chart()?.peak?.games) {
+          <span
+            >Höchststand {{ chart()!.peak!.games }} um
+            {{ formatTime(chart()!.peak!.at) }}</span
+          >
+        }
+      </p>
+      @if (chart(); as c) {
+        <div class="chart-wrap">
+          <app-ad-line-chart
+            [values]="c.values"
+            [labels]="c.labels"
+            [labelEvery]="15"
+            [height]="190"
+            unit="Duelle"
+            ariaLabel="Laufende Duelle pro Minute, letzte 60 Minuten"
+          />
+          @if (c.quiet) {
+            <p class="chart-quiet">Kein Duell in der letzten Stunde</p>
           }
-        </header>
-        @if (chart(); as c) {
+        </div>
+      }
+    </div>
+  </section>
+</ng-template>
+
+<ng-template #chartCard let-block>
+  <section class="ad-card chart-card" [class.is-fill]="block?.fill">
+    <header class="ad-card-head">
+      <div>
+        <h2>Laufende Duelle</h2>
+        <p>
+          Höchststand pro Minute, letzte 60 Minuten
+          @if (chart()?.startedRecently) {
+            · Server läuft seit {{ chart()?.since }}
+          }
+        </p>
+      </div>
+    </header>
+    @if (chart(); as c) {
+      @if (block?.fill) {
+        <div class="chart-fill" (appFillHeight)="fillHeight.set($event)">
+          <div class="chart-fill-in">
+            <app-ad-line-chart
+              [values]="c.values"
+              [labels]="c.labels"
+              [labelEvery]="15"
+              [height]="fillHeight() > 180 ? fillHeight() : 180"
+              unit="Duelle"
+              ariaLabel="Laufende Duelle pro Minute, letzte 60 Minuten"
+            />
+            @if (c.quiet) {
+              <p class="chart-quiet">Kein Duell in der letzten Stunde</p>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="chart-wrap">
           <app-ad-line-chart
             [values]="c.values"
             [labels]="c.labels"
@@ -92,70 +369,755 @@
             unit="Duelle"
             ariaLabel="Laufende Duelle pro Minute, letzte 60 Minuten"
           />
-        }
-      </section>
+          @if (c.quiet) {
+            <p class="chart-quiet">Kein Duell in der letzten Stunde</p>
+          }
+        </div>
+      }
+    }
+  </section>
+</ng-template>
 
-      <section class="ad-card span-4">
-        <header class="ad-card-head">
-          <div>
-            <h2>Warten</h2>
-            <p>Wer gerade einen Gegner sucht</p>
-          </div>
-        </header>
-        <p class="ad-overline group">Schnellspiel</p>
-        <ul class="waiting">
-          @for (entry of searching(); track entry.name + entry.since) {
+<ng-template #waitCard>
+  <section class="ad-card wait-card" [attr.data-view]="waitMode()">
+    <header class="ad-card-head">
+      <div>
+        <h2>Warten</h2>
+        <p>Wer gerade einen Gegner sucht</p>
+      </div>
+    </header>
+    @if (waitMode() === 'summary') {
+      <dl class="wait-stats">
+        <div>
+          <dt>Suchen</dt>
+          <dd>{{ searching().length }}</dd>
+        </div>
+        <div>
+          <dt>Ø Wartezeit</dt>
+          <dd>{{ waitStats()?.average ?? '–' }}</dd>
+        </div>
+        <div>
+          <dt>Länger als 30 s</dt>
+          <dd [class.warn]="waitStats()?.long">{{ waitStats()?.long ?? 0 }}</dd>
+        </div>
+      </dl>
+    }
+    <h3 class="group">
+      Schnellspiel<span class="group-count">{{ searching().length }}</span>
+    </h3>
+    <ul class="waiting" [attr.data-view]="waitMode()">
+      @for (
+        entry of waitMode() === 'summary' && !waitOpen()
+          ? searching().slice(0, 4)
+          : searching();
+        track entry.name
+      ) {
+        @switch (waitMode()) {
+          @case ('queue') {
+            <li class="pill" [class.long]="entry.seconds >= 30">
+              <span class="initial" aria-hidden="true">{{
+                entry.name.charAt(0)
+              }}</span>
+              {{ entry.name }}
+              <span class="w-time">{{ entry.wait }}</span>
+            </li>
+          }
+          @case ('bars') {
+            <li>
+              <span class="initial" aria-hidden="true">{{
+                entry.name.charAt(0)
+              }}</span>
+              <span class="w-name">{{ entry.name }}</span>
+              <span class="track" [class.long]="entry.seconds >= 30"
+                ><span [style.width.%]="waitShare(entry.seconds)"></span
+              ></span>
+              <span class="w-time" [class.long]="entry.seconds >= 30">{{
+                entry.wait
+              }}</span>
+            </li>
+          }
+          @case ('faces') {
+            <li [class.long]="entry.seconds >= 30">
+              <span class="face">
+                <svg viewBox="0 0 44 44" aria-hidden="true">
+                  <circle class="face-track" cx="22" cy="22" r="20" />
+                  <circle
+                    class="face-left"
+                    cx="22"
+                    cy="22"
+                    r="20"
+                    pathLength="100"
+                    [attr.stroke-dasharray]="waitShare(entry.seconds) + ' 100'"
+                  />
+                </svg>
+                <span class="initial" aria-hidden="true">{{
+                  entry.name.charAt(0)
+                }}</span>
+              </span>
+              <span class="w-name">{{ entry.name }}</span>
+              <span class="w-time" [class.long]="entry.seconds >= 30">{{
+                entry.wait
+              }}</span>
+            </li>
+          }
+          @default {
             <li>
               <span class="initial" aria-hidden="true">{{
                 entry.name.charAt(0)
               }}</span>
               <span class="w-name">{{ entry.name }}</span>
               <span class="w-time" [class.long]="entry.seconds >= 30"
-                >seit {{ entry.seconds }} s</span
+                >seit {{ entry.wait }}</span
               >
             </li>
-          } @empty {
-            <li class="empty">Niemand sucht – Gegner werden sofort gefunden.</li>
           }
-        </ul>
-        <p class="ad-overline group">Mit Code</p>
-        <ul class="waiting">
-          @for (entry of waiting(); track entry.code) {
+        }
+      } @empty {
+        <li class="empty">Niemand sucht, ein Gegner wird sofort gefunden.</li>
+      }
+    </ul>
+    <h3 class="group">
+      Mit Code<span class="group-count">{{ waiting().length }}</span>
+    </h3>
+    <ul class="waiting codes" [attr.data-view]="waitMode()">
+      @for (
+        entry of waitMode() === 'summary' && !waitOpen()
+          ? waiting().slice(0, 3)
+          : waiting();
+        track entry.code
+      ) {
+        @switch (waitMode()) {
+          @case ('queue') {
+            <li class="pill">
+              <span class="code">{{ entry.code }}</span>
+              {{ entry.name }}
+              <span class="w-time">{{ entry.wait }}</span>
+            </li>
+          }
+          @case ('bars') {
+            <li>
+              <span class="code">{{ entry.code }}</span>
+              <span class="w-name">{{ entry.name }}</span>
+              <span class="track is-code"
+                ><span [style.width.%]="waitShare(entry.seconds / 5)"></span
+              ></span>
+              <span class="w-time">{{ entry.wait }}</span>
+            </li>
+          }
+          @case ('faces') {
+            <li>
+              <span class="code">{{ entry.code }}</span>
+              <span class="w-name">{{ entry.name }}</span>
+              <span class="w-time">{{ entry.wait }}</span>
+            </li>
+          }
+          @default {
             <li>
               <span class="code">{{ entry.code }}</span>
               <span class="w-name">{{ entry.name }}</span>
               <span class="w-time">seit {{ entry.wait }}</span>
             </li>
-          } @empty {
-            <li class="empty">Keine offenen Spiele mit Code.</li>
+          }
+        }
+      } @empty {
+        <li class="empty">Kein Spiel mit Code offen.</li>
+      }
+    </ul>
+    @if (
+      waitMode() === 'summary' && (searching().length > 4 || waiting().length > 3)
+    ) {
+      <button
+        type="button"
+        class="ad-more more-wait"
+        (click)="waitOpen.set(!waitOpen())"
+      >
+        {{
+          waitOpen()
+            ? 'Weniger zeigen'
+            : 'Alle ' + (searching().length + waiting().length) + ' Wartenden zeigen'
+        }}
+      </button>
+    }
+    @if (waitMode() === 'bars' && (searching().length || waiting().length)) {
+      <p class="wait-key">
+        Strich bei 30 s, ab dann orange. Code-Balken bis 5 Minuten.
+      </p>
+    }
+  </section>
+</ng-template>
+
+<ng-template #logCard let-block>
+  <section class="ad-card flush log" [class.is-short]="block?.short">
+    <header class="ad-card-head">
+      <div>
+        <h2>Ereignisse</h2>
+        <p>Neueste zuerst</p>
+      </div>
+      <div class="log-filter" role="group" aria-label="Ereignisse filtern">
+        @for (option of eventOptions; track option.id) {
+          <button
+            type="button"
+            class="ad-chip"
+            [class.is-active]="eventFilter() === option.id"
+            [attr.aria-pressed]="eventFilter() === option.id"
+            (click)="eventFilter.set(option.id)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    </header>
+    <ol class="log-list">
+      @for (
+        event of block?.short && !logAll() ? events().slice(0, 8) : events();
+        track event.id
+      ) {
+        <li [attr.data-kind]="event.kind">
+          <time>{{ formatTime(event.at, true) }}</time>
+          <span class="log-dot" aria-hidden="true"></span>
+          <span class="log-text">{{ event.text }}</span>
+        </li>
+      } @empty {
+        <li class="log-empty">
+          <span class="log-empty-icon" aria-hidden="true"
+            ><css-icon icon="heartbeat" size="sm"></css-icon
+          ></span>
+          <span class="empty-title">Noch nichts passiert</span>
+          <span class="empty-text">{{ emptyEvents() }}</span>
+        </li>
+      }
+    </ol>
+    @if (block?.short && events().length > 8) {
+      <div class="log-more">
+        <button type="button" class="ad-more" (click)="logAll.set(!logAll())">
+          {{
+            logAll()
+              ? 'Weniger zeigen'
+              : 'Alle ' + events().length + ' Ereignisse zeigen'
+          }}
+        </button>
+      </div>
+    }
+  </section>
+</ng-template>
+
+<ng-template #duelsCard let-kind>
+  <section class="ad-card flush duels-card" [attr.data-kind]="kind">
+    <header class="ad-card-head">
+      <div>
+        <h2>Duelle</h2>
+        <p>
+          @if (kind === 'list') {
+            Ein Duell wählen, rechts steht es Frage für Frage
+          } @else {
+            Ein Duell öffnen für den Verlauf Frage für Frage
+          }
+        </p>
+        @if (face() === 'l9' && switchView.value() === 't3') {
+          <ng-container *ngTemplateOutlet="viewSwitch" />
+        }
+      </div>
+      <div class="head-tools">
+        <div class="ad-segmented" role="group" aria-label="Spielmodus">
+          @for (option of modeOptions; track option.id) {
+            <button
+              type="button"
+              [class.is-active]="mode() === option.id"
+              [attr.aria-pressed]="mode() === option.id"
+              (click)="mode.set(option.id)"
+            >
+              {{
+                kind === 'list' && option.id === 'quick' ? 'Schnell' : option.label
+              }}
+            </button>
+          }
+        </div>
+        @if (face() === 'l9' && switchView.value() !== 't3') {
+          <ng-container *ngTemplateOutlet="viewSwitch" />
+        }
+      </div>
+      @if (kind === 'stage' && (searching().length || waiting().length)) {
+        <ul class="queue" aria-label="Warten">
+          @for (entry of searching(); track entry.name + entry.since) {
+            <li>
+              <span class="initial" aria-hidden="true">{{
+                entry.name.charAt(0)
+              }}</span>
+              {{ entry.name }} sucht
+              <span class="w-time" [class.long]="entry.seconds >= 30"
+                >seit {{ entry.wait }}</span
+              >
+            </li>
+          }
+          @for (entry of waiting(); track entry.code) {
+            <li>
+              <span class="code">{{ entry.code }}</span>
+              {{ entry.name }} wartet
+              <span class="w-time">seit {{ entry.wait }}</span>
+            </li>
           }
         </ul>
-      </section>
-
-      <section class="ad-card flush span-8">
-        <header class="ad-card-head">
-          <div>
-            <h2>Duelle</h2>
-            <p>Zeile öffnen für den Verlauf Frage für Frage</p>
+      }
+    </header>
+    @if (duels().length) {
+      @switch (kind) {
+        @case ('tiles') {
+          <ul class="tiles">
+            @for (row of duels(); track row.duel.code) {
+              <li>
+                <button
+                  type="button"
+                  class="tile"
+                  [class.is-done]="row.duel.phase === 'finished'"
+                  [class.is-open]="openCode() === row.duel.code"
+                  [attr.aria-label]="'Duell ' + row.duel.code + ' öffnen'"
+                  (click)="openCode.set(row.duel.code)"
+                >
+                  <span class="tile-top">
+                    <ng-container
+                      *ngTemplateOutlet="duelTags; context: { $implicit: row }"
+                    />
+                    <span class="tile-age">{{ row.age }}</span>
+                  </span>
+                  <span class="tile-score">
+                    @for (player of row.duel.players; track $index) {
+                      <span
+                        class="side"
+                        [class.lead]="row.lead === $index"
+                        [class.offline]="!player.connected"
+                      >
+                        <span class="side-name"
+                          >{{ player.name }}
+                          <ng-container
+                            *ngTemplateOutlet="
+                              playerState;
+                              context: { $implicit: player, row: row }
+                            "
+                          />
+                        </span>
+                        <b class="side-score">{{ player.score }}</b>
+                      </span>
+                    }
+                  </span>
+                  <span class="segments wide" aria-hidden="true">
+                    @for (segment of row.segments; track $index) {
+                      <i [class]="segment"></i>
+                    }
+                  </span>
+                  <span class="tile-foot">
+                    <ng-container
+                      *ngTemplateOutlet="phaseLabel; context: { $implicit: row }"
+                    />
+                    <span class="progress-text"
+                      >Frage {{ row.duel.rounds.length }} von
+                      {{ row.duel.totalQuestions }}</span
+                    >
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+        @case ('list') {
+          <ul class="pick">
+            @for (row of duels(); track row.duel.code) {
+              <li>
+                <button
+                  type="button"
+                  class="pick-row"
+                  [class.is-on]="detailDuel()?.duel?.code === row.duel.code"
+                  [class.is-done]="row.duel.phase === 'finished'"
+                  [attr.aria-pressed]="detailDuel()?.duel?.code === row.duel.code"
+                  (click)="openCode.set(row.duel.code)"
+                >
+                  <span class="pick-top">
+                    <ng-container
+                      *ngTemplateOutlet="duelTags; context: { $implicit: row }"
+                    />
+                    <span class="score">
+                      @for (
+                        player of row.duel.players;
+                        track $index;
+                        let last = $last
+                      ) {
+                        <span [class.lead]="row.lead === $index">{{
+                          player.score
+                        }}</span>
+                        @if (!last) {
+                          <span class="colon">:</span>
+                        }
+                      }
+                    </span>
+                  </span>
+                  <span class="pick-mid">
+                    <span class="players">
+                      @for (player of row.duel.players; track $index) {
+                        <span class="player" [class.offline]="!player.connected"
+                          >{{ player.name }}
+                          <ng-container
+                            *ngTemplateOutlet="
+                              playerState;
+                              context: { $implicit: player, row: row }
+                            "
+                          />
+                        </span>
+                      }
+                    </span>
+                    <ng-container
+                      *ngTemplateOutlet="phaseLabel; context: { $implicit: row }"
+                    />
+                  </span>
+                  <span class="segments wide" aria-hidden="true">
+                    @for (segment of row.segments; track $index) {
+                      <i [class]="segment"></i>
+                    }
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+        @case ('raster') {
+          <div class="ad-table-wrap">
+            <table class="ad-table raster">
+              <thead>
+                <tr>
+                  <th class="c-pair" aria-hidden="true"></th>
+                  <th scope="col">Duell</th>
+                  <th scope="col">Spielende</th>
+                  @for (n of questionNumbers(); track n) {
+                    <th scope="col" class="q-head">{{ n }}</th>
+                  }
+                  <th scope="col">Phase</th>
+                  <th scope="col" class="num">Dauer</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of duels(); track row.duel.code) {
+                  <tr
+                    [class.is-done]="row.duel.phase === 'finished'"
+                    [class.is-open]="openCode() === row.duel.code"
+                    (click)="openCode.set(row.duel.code)"
+                  >
+                    <td class="c-pair">
+                      <ng-container
+                        *ngTemplateOutlet="pair; context: { $implicit: row }"
+                      />
+                    </td>
+                    <td class="c-duel">
+                      <button
+                        type="button"
+                        class="duel-open"
+                        [attr.aria-label]="'Duell ' + row.duel.code + ' öffnen'"
+                        (click)="
+                          openCode.set(row.duel.code); $event.stopPropagation()
+                        "
+                      >
+                        <ng-container
+                          *ngTemplateOutlet="duelTags; context: { $implicit: row }"
+                        />
+                      </button>
+                    </td>
+                    <td class="r-players">
+                      @for (player of row.duel.players; track $index) {
+                        <span
+                          class="r-player"
+                          [class.lead]="row.lead === $index"
+                          [class.offline]="!player.connected"
+                        >
+                          <span class="r-name"
+                            >{{ player.name }}
+                            <ng-container
+                              *ngTemplateOutlet="
+                                playerState;
+                                context: { $implicit: player, row: row }
+                              "
+                            />
+                          </span>
+                          <b class="r-score">{{ player.score }}</b>
+                        </span>
+                      }
+                    </td>
+                    @for (cell of row.cells; track $index) {
+                      <td class="q-cell" [attr.data-state]="cell.state">
+                        <span class="q-box">
+                          @for (mark of cell.marks; track $index) {
+                            <i [attr.data-mark]="mark"></i>
+                          }
+                        </span>
+                      </td>
+                    }
+                    <td>
+                      <ng-container
+                        *ngTemplateOutlet="phaseLabel; context: { $implicit: row }"
+                      />
+                    </td>
+                    <td class="num ad-muted">{{ row.age }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
-          <div class="ad-segmented" role="group" aria-label="Spielmodus">
-            @for (option of modeOptions; track option.id) {
-              <button
-                type="button"
-                [class.is-active]="mode() === option.id"
-                [attr.aria-pressed]="mode() === option.id"
-                (click)="mode.set(option.id)"
-              >
-                {{ option.label }}
-              </button>
+          <p class="raster-key" aria-hidden="true">
+            <span><i data-mark="right"></i>richtig</span>
+            <span><i data-mark="wrong"></i>falsch</span>
+            <span><i data-mark="none"></i>keine Antwort</span>
+            <span><i data-mark="given"></i>hat geantwortet</span>
+          </p>
+        }
+        @case ('lane') {
+          <ul class="lanes">
+            @for (row of duels(); track row.duel.code) {
+              <li>
+                <button
+                  type="button"
+                  class="lane-row"
+                  [class.is-done]="row.duel.phase === 'finished'"
+                  [class.is-open]="openCode() === row.duel.code"
+                  [attr.aria-label]="'Duell ' + row.duel.code + ' öffnen'"
+                  (click)="openCode.set(row.duel.code)"
+                >
+                  <span class="lane-head">
+                    <ng-container
+                      *ngTemplateOutlet="duelTags; context: { $implicit: row }"
+                    />
+                    <span class="lane-phase">
+                      <ng-container
+                        *ngTemplateOutlet="phaseLabel; context: { $implicit: row }"
+                      />
+                    </span>
+                    <span class="tile-age">{{ row.age }}</span>
+                  </span>
+                  @for (player of row.duel.players; track $index; let p = $index) {
+                    <span
+                      class="lane-track"
+                      [class.lead]="row.lead === p"
+                      [class.offline]="!player.connected"
+                    >
+                      <span class="lane-name"
+                        >{{ player.name }}
+                        <ng-container
+                          *ngTemplateOutlet="
+                            playerState;
+                            context: { $implicit: player, row: row }
+                          "
+                        />
+                      </span>
+                      <span class="lane-cells" aria-hidden="true">
+                        @for (cell of row.lane[p]; track $index) {
+                          <i [attr.data-mark]="cell.mark"
+                            ><b [style.width.%]="cell.width"></b
+                          ></i>
+                        }
+                      </span>
+                      <b class="lane-score">{{ player.score }}</b>
+                    </span>
+                  }
+                </button>
+              </li>
+            }
+          </ul>
+          <p class="raster-key" aria-hidden="true">
+            <span><i class="key-bar" data-mark="right"></i>richtig</span>
+            <span><i class="key-bar" data-mark="wrong"></i>falsch</span>
+            <span><i class="key-bar" data-mark="now"></i>läuft</span>
+            <span>Länge = Antwortzeit</span>
+          </p>
+        }
+        @case ('dense') {
+          <ul class="dense">
+            @for (row of duels(); track row.duel.code) {
+              <li>
+                <ng-container
+                  *ngTemplateOutlet="denseRow; context: { $implicit: row }"
+                />
+              </li>
+            }
+          </ul>
+        }
+        @case ('phase') {
+          <div class="phases">
+            @for (group of phaseGroups(); track group.phase) {
+              <section class="phase-group" [attr.data-phase]="group.phase">
+                <h3 class="phase-title">
+                  <span class="phase-dot" aria-hidden="true"></span>{{ group.label
+                  }}<span class="group-count">{{ group.rows.length }}</span>
+                </h3>
+                <ul class="dense">
+                  @for (row of group.rows; track row.duel.code) {
+                    <li>
+                      <ng-container
+                        *ngTemplateOutlet="denseRow; context: { $implicit: row }"
+                      />
+                    </li>
+                  }
+                </ul>
+              </section>
             }
           </div>
-        </header>
-        @if (duels().length) {
+        }
+        @case ('scoreboard') {
+          <ul class="boards">
+            @for (row of duels(); track row.duel.code) {
+              <li>
+                <button
+                  type="button"
+                  class="sb"
+                  [class.is-done]="row.duel.phase === 'finished'"
+                  [class.is-open]="openCode() === row.duel.code"
+                  [attr.aria-label]="'Duell ' + row.duel.code + ' öffnen'"
+                  (click)="openCode.set(row.duel.code)"
+                >
+                  <span class="sb-top">
+                    <span class="duel-code">{{ row.duel.code }}</span>
+                    <span class="sb-tag">{{
+                      row.duel.mode === 'quick' ? 'Schnell' : 'Code'
+                    }}</span>
+                    @if (row.duel.rematch) {
+                      <span class="sb-tag">Revanche</span>
+                    }
+                    <span class="sb-age">{{ row.age }}</span>
+                  </span>
+                  @for (player of row.duel.players; track $index; let p = $index) {
+                    <span
+                      class="sb-row"
+                      [class.lead]="row.lead === p"
+                      [class.offline]="!player.connected"
+                    >
+                      <span class="sb-name"
+                        >{{ player.name }}
+                        @if (!player.connected) {
+                          <span class="sb-off">getrennt</span>
+                        } @else if (
+                          row.duel.phase === 'question' && player.answered
+                        ) {
+                          <css-icon icon="checkmark" size="xs"></css-icon>
+                        }
+                      </span>
+                      <span class="sb-dots" aria-hidden="true">
+                        @for (mark of row.marks[p]; track $index) {
+                          <i [attr.data-mark]="mark"></i>
+                        }
+                      </span>
+                      <b class="sb-score">{{ player.score }}</b>
+                    </span>
+                  }
+                  <span class="sb-foot">
+                    <span class="sb-phase">
+                      @if (row.duel.phase === 'question') {
+                        <span class="sb-live" aria-hidden="true"></span>
+                      }
+                      {{ phaseOf(row.duel) }}
+                      @if (
+                        row.duel.phase === 'question' || row.duel.phase === 'reveal'
+                      ) {
+                        · Frage {{ row.duel.questionNumber }} von
+                        {{ row.duel.totalQuestions }}
+                      }
+                    </span>
+                    @if (row.secondsLeft !== null && row.duel.phase !== 'finished') {
+                      <b class="sb-sec">{{ row.secondsLeft }} s</b>
+                    }
+                  </span>
+                  @if (row.duel.phase === 'question' && row.secondsLeft !== null) {
+                    <span class="sb-time" aria-hidden="true"
+                      ><span [style.width.%]="ringShare(row.secondsLeft)"></span
+                    ></span>
+                  }
+                </button>
+              </li>
+            }
+          </ul>
+        }
+        @case ('stage') {
+          <ul class="stage">
+            @for (row of duels(); track row.duel.code) {
+              <li>
+                <button
+                  type="button"
+                  class="board-card"
+                  [class.is-done]="row.duel.phase === 'finished'"
+                  [class.is-open]="openCode() === row.duel.code"
+                  [attr.aria-label]="'Duell ' + row.duel.code + ' öffnen'"
+                  (click)="openCode.set(row.duel.code)"
+                >
+                  <span class="board-top">
+                    <ng-container
+                      *ngTemplateOutlet="duelTags; context: { $implicit: row }"
+                    />
+                    <span class="tile-age">{{ row.age }}</span>
+                  </span>
+                  <span class="board-main">
+                    @for (player of row.duel.players; track $index) {
+                      <span
+                        class="fighter"
+                        [class.lead]="row.lead === $index"
+                        [class.offline]="!player.connected"
+                        [attr.data-side]="$index"
+                      >
+                        <span class="avatar" aria-hidden="true">{{
+                          player.name.charAt(0)
+                        }}</span>
+                        <span class="fighter-name"
+                          >{{ player.name }}
+                          <ng-container
+                            *ngTemplateOutlet="
+                              playerState;
+                              context: { $implicit: player, row: row }
+                            "
+                          />
+                        </span>
+                        <b class="fighter-score">{{ player.score }}</b>
+                        <span class="dots" aria-hidden="true">
+                          @for (mark of row.marks[$index]; track $index) {
+                            <i [attr.data-mark]="mark"></i>
+                          }
+                        </span>
+                      </span>
+                      @if ($first) {
+                        <span class="board-mid">
+                          @if (
+                            row.secondsLeft !== null && row.duel.phase === 'question'
+                          ) {
+                            <span class="clock">
+                              <svg viewBox="0 0 40 40" aria-hidden="true">
+                                <circle class="ring-track" cx="20" cy="20" r="17" />
+                                <circle
+                                  class="ring-left"
+                                  cx="20"
+                                  cy="20"
+                                  r="17"
+                                  pathLength="100"
+                                  [attr.stroke-dasharray]="
+                                    ringShare(row.secondsLeft) + ' 100'
+                                  "
+                                />
+                              </svg>
+                              <b>{{ row.secondsLeft }}</b>
+                            </span>
+                          } @else {
+                            <span class="versus">:</span>
+                          }
+                          <small>{{
+                            row.duel.phase === 'question'
+                              ? 'Frage ' + row.duel.questionNumber
+                              : phaseOf(row.duel)
+                          }}</small>
+                        </span>
+                      }
+                    }
+                  </span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+        @default {
           <div class="ad-table-wrap">
             <table class="ad-table duels">
               <thead>
                 <tr>
+                  <th class="c-pair" aria-hidden="true"></th>
                   <th scope="col">Duell</th>
                   <th scope="col">Spielende</th>
                   <th scope="col">Fortschritt</th>
@@ -171,7 +1133,12 @@
                     [class.is-open]="openCode() === row.duel.code"
                     (click)="openCode.set(row.duel.code)"
                   >
-                    <td>
+                    <td class="c-pair">
+                      <ng-container
+                        *ngTemplateOutlet="pair; context: { $implicit: row }"
+                      />
+                    </td>
+                    <td class="c-duel">
                       <button
                         type="button"
                         class="duel-open"
@@ -180,41 +1147,42 @@
                           openCode.set(row.duel.code); $event.stopPropagation()
                         "
                       >
-                        <span class="duel-code">{{ row.duel.code }}</span>
-                        <span class="mode" [attr.data-mode]="row.duel.mode">{{
-                          row.duel.mode === 'quick' ? 'Schnell' : 'Code'
-                        }}</span>
-                        @if (row.duel.rematch) {
-                          <span class="mode">Revanche</span>
-                        }
+                        <ng-container
+                          *ngTemplateOutlet="duelTags; context: { $implicit: row }"
+                        />
                       </button>
                     </td>
                     <td class="players">
                       @for (player of row.duel.players; track $index) {
-                        <span class="player" [class.offline]="!player.connected">
-                          {{ player.name }}
-                          @if (!player.connected) {
-                            <span class="reconnect">getrennt</span>
-                          } @else if (
-                            row.duel.phase === 'question' && player.answered
-                          ) {
-                            <css-icon
-                              class="answered"
-                              icon="checkmark"
-                              size="xs"
-                              aria-label="hat geantwortet"
-                            ></css-icon>
-                          }
+                        <span class="player" [class.offline]="!player.connected"
+                          >{{ player.name }}
+                          <ng-container
+                            *ngTemplateOutlet="
+                              playerState;
+                              context: { $implicit: player, row: row }
+                            "
+                          />
                         </span>
                       }
                     </td>
-                    <td>
+                    <td class="c-progress">
                       <span class="progress">
-                        <span class="segments" aria-hidden="true">
-                          @for (segment of row.segments; track $index) {
-                            <i [class]="segment"></i>
-                          }
-                        </span>
+                        @if (face() === 'l4') {
+                          <span class="bar" aria-hidden="true"
+                            ><span
+                              [style.width.%]="
+                                (row.duel.rounds.length / row.duel.totalQuestions) *
+                                100
+                              "
+                            ></span
+                          ></span>
+                        } @else {
+                          <span class="segments" aria-hidden="true">
+                            @for (segment of row.segments; track $index) {
+                              <i [class]="segment"></i>
+                            }
+                          </span>
+                        }
                         <span class="progress-text"
                           >{{ row.duel.rounds.length }}/{{
                             row.duel.totalQuestions
@@ -222,15 +1190,10 @@
                         >
                       </span>
                     </td>
-                    <td>
-                      <span class="phase" [attr.data-phase]="row.duel.phase">
-                        {{ phases[row.duel.phase] }}
-                        @if (
-                          row.secondsLeft !== null && row.duel.phase !== 'finished'
-                        ) {
-                          <span class="phase-sec">{{ row.secondsLeft }} s</span>
-                        }
-                      </span>
+                    <td class="c-phase">
+                      <ng-container
+                        *ngTemplateOutlet="phaseLabel; context: { $implicit: row }"
+                      />
                     </td>
                     <td class="num score">
                       @for (
@@ -246,146 +1209,410 @@
                         }
                       }
                     </td>
-                    <td class="num ad-muted">{{ row.age }}</td>
+                    <td class="num ad-muted c-age">{{ row.age }}</td>
                   </tr>
                 }
               </tbody>
             </table>
           </div>
-        } @else {
-          <div class="table-empty">
-            <app-ad-state
-              kind="empty"
-              icon="heartbeat"
-              title="Gerade läuft kein Duell"
-              text="Neue Duelle erscheinen hier, sobald zwei Spielende verbunden sind."
-            />
-          </div>
         }
-      </section>
-
-      <section class="ad-card flush span-4 log">
-        <header class="ad-card-head">
-          <div>
-            <h2>Ereignisse</h2>
-            <p>Neueste zuerst</p>
+      }
+    } @else if (emptyDuels(); as e) {
+      <div class="duels-empty">
+        @if (e.filtered) {
+          <p class="empty-title">{{ e.title }}</p>
+          <p class="empty-text">{{ e.text }}</p>
+          <button
+            type="button"
+            class="btn-secondary btn-sm"
+            (click)="mode.set('all')"
+          >
+            Alle Duelle zeigen
+          </button>
+        } @else {
+          <div
+            class="ghost"
+            [class.tiles-ghost]="kind === 'tiles' || kind === 'stage'"
+            aria-hidden="true"
+          >
+            @for (n of [1, 2, 3]; track n) {
+              <div class="ghost-row">
+                <b class="g-code"></b><span class="g-names"></span
+                ><span class="g-bar"><i></i><i></i><i></i><i></i></span
+                ><b class="g-score"></b>
+              </div>
+            }
           </div>
-        </header>
-        <div class="log-filter" role="group" aria-label="Ereignisse filtern">
-          @for (option of eventOptions; track option.id) {
-            <button
-              type="button"
-              class="ad-chip"
-              [class.is-active]="eventFilter() === option.id"
-              [attr.aria-pressed]="eventFilter() === option.id"
-              (click)="eventFilter.set(option.id)"
-            >
-              {{ option.label }}
-            </button>
-          }
-        </div>
-        <ol class="log-list">
-          @for (event of events(); track event.id) {
-            <li [attr.data-kind]="event.kind">
-              <time>{{ formatTime(event.at, true) }}</time>
-              <span class="log-dot" aria-hidden="true"></span>
-              <span class="log-text">{{ event.text }}</span>
-            </li>
-          } @empty {
-            <li class="log-empty">Seit dem Serverstart noch nichts passiert.</li>
-          }
-        </ol>
-      </section>
-    </div>
-  }
-</main>
+          <p class="empty-title">{{ e.title }}</p>
+          <p class="empty-text">{{ e.text }}</p>
+        }
+      </div>
+    }
+  </section>
+</ng-template>
 
-@if (openDuel(); as open) {
+<ng-template #detailCard>
+  <section class="ad-card detail-card">
+    @if (detailDuel(); as open) {
+      <header class="ad-card-head detail-head">
+        <div>
+          <p class="detail-line">
+            <ng-container
+              *ngTemplateOutlet="duelLine; context: { $implicit: open }"
+            />
+          </p>
+          <h2>
+            <ng-container
+              *ngTemplateOutlet="duelTitle; context: { $implicit: open }"
+            />
+          </h2>
+        </div>
+      </header>
+      <div class="detail-body">
+        <ng-container *ngTemplateOutlet="detailBody; context: { $implicit: open }" />
+      </div>
+    } @else {
+      <div class="duels-empty detail-empty">
+        <span class="log-empty-icon" aria-hidden="true"
+          ><css-icon icon="heartbeat" size="sm"></css-icon
+        ></span>
+        <p class="empty-title">Noch kein Duell zum Anschauen</p>
+        <p class="empty-text">
+          Sobald ein Duell läuft, steht es hier Frage für Frage, mit allen Antworten
+          und Zeiten.
+        </p>
+      </div>
+    }
+  </section>
+</ng-template>
+
+<!-- Pieces --------------------------------------------------------------- -->
+
+<ng-template #denseRow let-row>
   <button
     type="button"
-    class="ad-scrim"
-    aria-label="Schliessen"
-    (click)="openCode.set(null)"
-  ></button>
-  <aside
-    class="ad-drawer"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="duel-title"
+    class="dense-row"
+    [class.is-done]="row.duel.phase === 'finished'"
+    [class.is-open]="openCode() === row.duel.code"
+    [attr.aria-label]="'Duell ' + row.duel.code + ' öffnen'"
+    (click)="openCode.set(row.duel.code)"
   >
-    <header class="ad-drawer-head">
-      <div>
-        <p class="ad-overline">
-          Duell {{ open.duel.code }} ·
-          {{ open.duel.mode === 'quick' ? 'Schnellspiel' : 'Mit Code' }}
-          @if (open.duel.rematch) {
-            · Revanche
-          }
-        </p>
-        <h2 id="duel-title">
-          @for (player of open.duel.players; track $index; let last = $last) {
-            {{ player.name }}{{ last ? '' : ' gegen ' }}
-          }
-        </h2>
-      </div>
-      <button
-        type="button"
-        class="icon-btn"
-        aria-label="Schliessen"
-        appAutofocus
-        (click)="openCode.set(null)"
-      >
-        <css-icon icon="close" size="sm"></css-icon>
-      </button>
-    </header>
-    <div class="ad-drawer-body">
-      <dl class="drawer-facts">
-        <div>
-          <dt>Stand</dt>
-          <dd>
-            @for (player of open.duel.players; track $index; let last = $last) {
-              {{ player.score }}{{ last ? '' : ' : ' }}
-            }
-          </dd>
-        </div>
-        <div>
-          <dt>Fragen</dt>
-          <dd>{{ open.duel.rounds.length }} von {{ open.duel.totalQuestions }}</dd>
-        </div>
-        <div>
-          <dt>Läuft seit</dt>
-          <dd>{{ open.age }}</dd>
-        </div>
-      </dl>
-
-      @if (open.duel.phase === 'question' && open.duel.currentQuestion) {
-        <div class="round now">
-          <span class="round-n">{{ open.duel.questionNumber }}</span>
-          <div class="round-body">
-            <p class="round-q">{{ open.duel.currentQuestion }}</p>
-            <p class="round-meta">Läuft gerade · noch {{ open.secondsLeft }} s</p>
-          </div>
-        </div>
+    <span class="pair" aria-hidden="true">
+      @for (player of row.duel.players; track $index) {
+        <span class="initial" [attr.data-side]="$index">{{
+          player.name.charAt(0)
+        }}</span>
       }
-      <ol class="rounds">
+    </span>
+    <span class="dense-names">
+      @for (player of row.duel.players; track $index; let last = $last) {
+        <span [class.lead]="row.lead === $index" [class.offline]="!player.connected"
+          >{{ player.name }}
+          <ng-container
+            *ngTemplateOutlet="
+              playerState;
+              context: { $implicit: player, row: row }
+            "
+        /></span>
+        @if (!last) {
+          <span class="vs">gegen</span>
+        }
+      }
+    </span>
+    <span class="dense-code">
+      {{ row.duel.code }}
+      <span class="mode" [attr.data-mode]="row.duel.mode">{{
+        row.duel.mode === 'quick' ? 'Schnell' : 'Code'
+      }}</span>
+    </span>
+    <span class="segments dense-seg" aria-hidden="true">
+      @for (segment of row.segments; track $index) {
+        <i [class]="segment"></i>
+      }
+    </span>
+    <span class="dense-phase">
+      @if (row.secondsLeft !== null && row.duel.phase === 'question') {
+        <svg class="ring" viewBox="0 0 20 20" aria-hidden="true">
+          <circle class="ring-track" cx="10" cy="10" r="8" />
+          <circle
+            class="ring-left"
+            cx="10"
+            cy="10"
+            r="8"
+            pathLength="100"
+            [attr.stroke-dasharray]="ringShare(row.secondsLeft) + ' 100'"
+          />
+        </svg>
+      }
+      {{ phaseOf(row.duel) }}
+      @if (row.secondsLeft !== null && row.duel.phase !== 'finished') {
+        <span class="phase-sec">{{ row.secondsLeft }} s</span>
+      }
+    </span>
+    <span class="score dense-score">
+      @for (player of row.duel.players; track $index; let last = $last) {
+        <span [class.lead]="row.lead === $index">{{ player.score }}</span>
+        @if (!last) {
+          <span class="colon">:</span>
+        }
+      }
+    </span>
+    <span class="dense-age">{{ row.age }}</span>
+  </button>
+</ng-template>
+
+<ng-template #pair let-row>
+  <span class="pair" aria-hidden="true">
+    @for (player of row.duel.players; track $index) {
+      <span class="initial" [attr.data-side]="$index">{{
+        player.name.charAt(0)
+      }}</span>
+    }
+  </span>
+</ng-template>
+
+<ng-template #viewSwitch>
+  @switch (switchView.value()) {
+    @case ('t2') {
+      <div class="view-icons" role="group" aria-label="Darstellung">
+        <button
+          type="button"
+          [class.is-active]="tableKind() === 'table'"
+          [attr.aria-pressed]="tableKind() === 'table'"
+          title="Tabelle"
+          aria-label="Als Tabelle zeigen"
+          (click)="setTableKind('table')"
+        >
+          <css-icon icon="bulleted-list" size="xs"></css-icon>
+        </button>
+        <button
+          type="button"
+          [class.is-active]="tableKind() === 'raster'"
+          [attr.aria-pressed]="tableKind() === 'raster'"
+          title="Raster"
+          aria-label="Als Raster zeigen"
+          (click)="setTableKind('raster')"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            @for (y of [3, 8, 13]; track y) {
+              @for (x of [3, 8, 13]; track x) {
+                <circle [attr.cx]="x" [attr.cy]="y" r="1.6" />
+              }
+            }
+          </svg>
+        </button>
+      </div>
+    }
+    @case ('t3') {
+      <div class="view-tabs" role="tablist" aria-label="Darstellung">
+        <button
+          type="button"
+          role="tab"
+          [class.is-active]="tableKind() === 'table'"
+          [attr.aria-selected]="tableKind() === 'table'"
+          (click)="setTableKind('table')"
+        >
+          Tabelle
+        </button>
+        <button
+          type="button"
+          role="tab"
+          [class.is-active]="tableKind() === 'raster'"
+          [attr.aria-selected]="tableKind() === 'raster'"
+          (click)="setTableKind('raster')"
+        >
+          Raster
+        </button>
+      </div>
+    }
+    @case ('t4') {
+      <div class="view-menu">
+        <button
+          type="button"
+          class="btn-secondary btn-sm view-menu-btn"
+          [attr.aria-expanded]="viewMenu()"
+          (click)="viewMenu.set(!viewMenu())"
+        >
+          <css-icon icon="view" size="xs"></css-icon>
+          {{ tableKind() === 'table' ? 'Tabelle' : 'Raster' }}
+          <span class="chev" aria-hidden="true"></span>
+        </button>
+        @if (viewMenu()) {
+          <button
+            type="button"
+            class="view-scrim"
+            aria-label="Schliessen"
+            (click)="viewMenu.set(false)"
+          ></button>
+          <div class="view-panel" role="menu">
+            <p class="view-panel-title">Darstellung</p>
+            @for (option of tableKinds; track option.id) {
+              <button
+                type="button"
+                role="menuitemradio"
+                class="view-option"
+                [class.is-active]="tableKind() === option.id"
+                [attr.aria-checked]="tableKind() === option.id"
+                (click)="setTableKind(option.id); viewMenu.set(false)"
+              >
+                <span
+                  class="view-thumb"
+                  [attr.data-kind]="option.id"
+                  aria-hidden="true"
+                >
+                  <i></i><i></i><i></i>
+                </span>
+                <span class="view-text">
+                  <b>{{ option.label }}</b>
+                  <small>{{ option.hint }}</small>
+                </span>
+                @if (tableKind() === option.id) {
+                  <css-icon icon="checkmark" size="xs"></css-icon>
+                }
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+    @default {
+      <div class="ad-segmented view-seg" role="group" aria-label="Darstellung">
+        @for (option of tableKinds; track option.id) {
+          <button
+            type="button"
+            [class.is-active]="tableKind() === option.id"
+            [attr.aria-pressed]="tableKind() === option.id"
+            (click)="setTableKind(option.id)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+    }
+  }
+</ng-template>
+
+<ng-template #duelTags let-row>
+  <span class="duel-code">{{ row.duel.code }}</span>
+  <span class="mode" [attr.data-mode]="row.duel.mode">{{
+    row.duel.mode === 'quick' ? 'Schnell' : 'Code'
+  }}</span>
+  @if (row.duel.rematch) {
+    <span class="mode">Revanche</span>
+  }
+</ng-template>
+
+<ng-template #playerState let-player let-row="row">
+  @if (!player.connected) {
+    <span class="reconnect">getrennt</span>
+  } @else if (row.duel.phase === 'question' && player.answered) {
+    <css-icon
+      class="answered"
+      icon="checkmark"
+      size="xs"
+      aria-label="hat geantwortet"
+    ></css-icon>
+  }
+</ng-template>
+
+<ng-template #phaseLabel let-row>
+  <span class="phase" [attr.data-phase]="row.duel.phase">
+    @if (
+      face() === 'l4' && row.secondsLeft !== null && row.duel.phase === 'question'
+    ) {
+      <svg class="ring" viewBox="0 0 20 20" aria-hidden="true">
+        <circle class="ring-track" cx="10" cy="10" r="8" />
+        <circle
+          class="ring-left"
+          cx="10"
+          cy="10"
+          r="8"
+          pathLength="100"
+          [attr.stroke-dasharray]="ringShare(row.secondsLeft) + ' 100'"
+        />
+      </svg>
+    }
+    {{ phaseOf(row.duel) }}
+    @if (row.secondsLeft !== null && row.duel.phase !== 'finished') {
+      <span class="phase-sec">{{ row.secondsLeft }} s</span>
+    }
+  </span>
+</ng-template>
+
+<ng-template #duelLine let-open>
+  Duell {{ open.duel.code }} ·
+  {{ open.duel.mode === 'quick' ? 'Schnellspiel' : 'Mit Code' }}
+  @if (open.duel.rematch) {
+    · Revanche
+  }
+</ng-template>
+
+<ng-template #duelTitle let-open>
+  @for (player of open.duel.players; track $index; let last = $last) {
+    {{ player.name }}{{ last ? '' : ' gegen ' }}
+  }
+</ng-template>
+
+<ng-template #detailBody let-open>
+  @switch (detailView.value()) {
+    @case ('d1') {
+      <ng-container *ngTemplateOutlet="duelFacts; context: { $implicit: open }" />
+      <ol class="tl">
+        @if (open.duel.phase === 'question' && open.duel.currentQuestion) {
+          <li class="tl-item is-now">
+            <span class="tl-dot">
+              <svg viewBox="0 0 36 36" aria-hidden="true">
+                <circle class="ring-track" cx="18" cy="18" r="15" />
+                <circle
+                  class="ring-left"
+                  cx="18"
+                  cy="18"
+                  r="15"
+                  pathLength="100"
+                  [attr.stroke-dasharray]="ringShare(open.secondsLeft ?? 0) + ' 100'"
+                />
+              </svg>
+              <b>{{ open.duel.questionNumber }}</b>
+            </span>
+            <div class="tl-body">
+              <p class="tl-meta">Läuft gerade · noch {{ open.secondsLeft }} s</p>
+              <p class="round-q">{{ open.duel.currentQuestion }}</p>
+              <div class="tl-answers">
+                @for (player of open.duel.players; track $index) {
+                  <span class="tl-answer" [class.is-given]="player.answered">
+                    <b>{{ player.name }}</b>
+                    {{ player.answered ? 'hat geantwortet' : 'überlegt noch' }}
+                  </span>
+                }
+              </div>
+            </div>
+          </li>
+        }
         @for (round of open.rounds; track round.number) {
-          <li class="round">
-            <span class="round-n">{{ round.number }}</span>
-            <div class="round-body">
+          <li class="tl-item">
+            <span class="tl-dot"
+              ><b>{{ round.number }}</b></span
+            >
+            <div class="tl-body">
               <p class="round-q">{{ round.text }}</p>
-              <p class="round-meta">Richtig: {{ round.correct }}</p>
-              <div class="answers">
+              <p class="tl-meta">Richtig: {{ round.correct }}</p>
+              <div class="tl-answers">
                 @for (answer of round.answers; track $index) {
-                  <span class="answer" [class.right]="answer.right">
+                  <span
+                    class="tl-answer"
+                    [class.is-right]="answer.right"
+                    [class.is-wrong]="!answer.right"
+                  >
                     <css-icon
                       [attr.icon]="answer.right ? 'checkmark' : 'close'"
                       size="xs"
                     ></css-icon>
                     <b>{{ answer.name }}</b>
                     @if (answer.letter) {
-                      {{ answer.letter }} · {{ answer.time }} · +{{ answer.points }}
+                      <span>{{ answer.letter }} · {{ answer.time }}</span>
+                      <span class="tl-points">+{{ answer.points }}</span>
                     } @else {
-                      keine Antwort
+                      <span>keine Antwort</span>
                     }
                   </span>
                 }
@@ -393,18 +1620,284 @@
             </div>
           </li>
         }
+        @if (open.later.length) {
+          <li class="tl-item is-later">
+            <span class="tl-dot"><b>…</b></span>
+            <div class="tl-body">
+              <p class="tl-meta">
+                Noch {{ open.later.length }}
+                {{ open.later.length === 1 ? 'Frage' : 'Fragen' }} offen
+              </p>
+            </div>
+          </li>
+        }
       </ol>
-      @if (open.upcoming > 0) {
-        <p class="upcoming">
-          Noch {{ open.upcoming }}
-          {{ open.upcoming === 1 ? 'Frage' : 'Fragen' }} offen.
-        </p>
+      <ng-container *ngTemplateOutlet="duelEnd; context: { $implicit: open }" />
+    }
+    @case ('d2') {
+      <div class="cmp-head">
+        @for (player of open.players; track $index; let p = $index) {
+          <div class="cmp-side" [attr.data-side]="p" [class.lead]="open.lead === p">
+            <span class="avatar" aria-hidden="true">{{
+              player.name.charAt(0)
+            }}</span>
+            <span class="cmp-name">{{ player.name }}</span>
+            <b class="cmp-score">{{ player.score }}</b>
+          </div>
+          @if (p === 0) {
+            <div class="cmp-mid">
+              @if (open.duel.phase === 'question' && open.secondsLeft !== null) {
+                <span class="clock">
+                  <svg viewBox="0 0 40 40" aria-hidden="true">
+                    <circle class="ring-track" cx="20" cy="20" r="17" />
+                    <circle
+                      class="ring-left"
+                      cx="20"
+                      cy="20"
+                      r="17"
+                      pathLength="100"
+                      [attr.stroke-dasharray]="ringShare(open.secondsLeft) + ' 100'"
+                    />
+                  </svg>
+                  <b>{{ open.secondsLeft }}</b>
+                </span>
+              } @else {
+                <span class="versus">:</span>
+              }
+              <small>{{ open.age }}</small>
+            </div>
+          }
+        }
+      </div>
+      <table class="cmp">
+        <thead>
+          <tr>
+            <th scope="col">Frage</th>
+            @for (player of open.players; track $index) {
+              <th scope="col">{{ player.name }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of open.table; track row.number) {
+            <tr [attr.data-state]="row.state">
+              <th scope="row">
+                <div class="cmp-row">
+                  <span class="cmp-n">{{ row.number }}</span>
+                  <span class="cmp-q">
+                    @if (row.text) {
+                      {{ row.text }}
+                      @if (row.correct) {
+                        <small>Richtig: {{ row.correct }}</small>
+                      } @else {
+                        <small>Läuft gerade · noch {{ open.secondsLeft }} s</small>
+                      }
+                    } @else {
+                      <small>Folgt</small>
+                    }
+                  </span>
+                </div>
+              </th>
+              @for (answer of row.answers; track $index) {
+                <td>
+                  @if (row.state === 'done') {
+                    <span
+                      class="cmp-cell"
+                      [class.is-right]="answer.right"
+                      [class.is-none]="answer.none"
+                    >
+                      <css-icon
+                        [attr.icon]="answer.right ? 'checkmark' : 'close'"
+                        size="xs"
+                      ></css-icon>
+                      @if (answer.none) {
+                        keine
+                      } @else {
+                        {{ answer.letter }} · {{ answer.time }}
+                        <b>+{{ answer.points }}</b>
+                      }
+                    </span>
+                  } @else if (row.state === 'now') {
+                    <span class="cmp-cell is-wait" [class.is-given]="answer.given">
+                      {{ answer.given ? 'geantwortet' : 'überlegt' }}
+                    </span>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+      <ng-container *ngTemplateOutlet="duelEnd; context: { $implicit: open }" />
+    }
+    @case ('d3') {
+      <ng-container *ngTemplateOutlet="duelFacts; context: { $implicit: open }" />
+      @if (open.duel.phase === 'question' && open.duel.currentQuestion) {
+        <div class="qcard is-now">
+          <div class="qcard-top">
+            <span class="qcard-n">Frage {{ open.duel.questionNumber }}</span>
+            <span class="qcard-time">noch {{ open.secondsLeft }} s</span>
+          </div>
+          <p class="qcard-q">{{ open.duel.currentQuestion }}</p>
+          <div class="qcard-who">
+            @for (player of open.duel.players; track $index) {
+              <span [class.is-given]="player.answered">
+                <css-icon
+                  [attr.icon]="player.answered ? 'checkmark-circle' : 'time'"
+                  size="xs"
+                ></css-icon
+                >{{ player.name }}
+              </span>
+            }
+          </div>
+          <span class="qcard-bar" aria-hidden="true"
+            ><span [style.width.%]="ringShare(open.secondsLeft ?? 0)"></span
+          ></span>
+        </div>
       }
-      @if (open.duel.phase === 'finished') {
-        <p class="upcoming">
-          Das Duell ist beendet. Beide können noch eine Revanche starten.
-        </p>
+      @for (round of open.rounds; track round.number) {
+        <div class="qcard">
+          <div class="qcard-top">
+            <span class="qcard-n">Frage {{ round.number }}</span>
+            <span class="qcard-correct"
+              ><css-icon icon="checkmark" size="xs"></css-icon
+              >{{ round.correct }}</span
+            >
+          </div>
+          <p class="qcard-q">{{ round.text }}</p>
+          <div class="qcard-answers">
+            @for (answer of round.answers; track $index) {
+              <span class="qcard-answer" [class.is-right]="answer.right">
+                <span class="qcard-name">{{ answer.name }}</span>
+                <span class="qcard-val">
+                  @if (answer.letter) {
+                    {{ answer.letter }} · {{ answer.time }}
+                  } @else {
+                    keine Antwort
+                  }
+                </span>
+                <b>+{{ answer.points }}</b>
+              </span>
+            }
+          </div>
+        </div>
       }
+      @if (open.later.length) {
+        <div class="later">
+          <span class="later-label">Folgt</span>
+          <ol aria-label="Noch offene Fragen">
+            @for (n of open.later; track n) {
+              <li class="round-n">{{ n }}</li>
+            }
+          </ol>
+        </div>
+      }
+      <ng-container *ngTemplateOutlet="duelEnd; context: { $implicit: open }" />
+    }
+    @default {
+      <ng-container *ngTemplateOutlet="duelBody; context: { $implicit: open }" />
+    }
+  }
+</ng-template>
+
+<ng-template #duelFacts let-open>
+  <dl class="drawer-facts">
+    <div>
+      <dt>Stand</dt>
+      <dd>
+        @for (player of open.duel.players; track $index; let last = $last) {
+          {{ player.score }}{{ last ? '' : ' : ' }}
+        }
+      </dd>
     </div>
-  </aside>
-}
+    <div>
+      <dt>Fragen</dt>
+      <dd>{{ open.duel.rounds.length }} von {{ open.duel.totalQuestions }}</dd>
+    </div>
+    <div>
+      <dt>Läuft seit</dt>
+      <dd>{{ open.age }}</dd>
+    </div>
+  </dl>
+</ng-template>
+
+<ng-template #duelEnd let-open>
+  @if (open.duel.phase === 'finished') {
+    <p class="upcoming">
+      Das Duell ist beendet. Beide können noch eine Revanche starten.
+    </p>
+  }
+</ng-template>
+
+<ng-template #duelBody let-open>
+  <dl class="drawer-facts">
+    <div>
+      <dt>Stand</dt>
+      <dd>
+        @for (player of open.duel.players; track $index; let last = $last) {
+          {{ player.score }}{{ last ? '' : ' : ' }}
+        }
+      </dd>
+    </div>
+    <div>
+      <dt>Fragen</dt>
+      <dd>{{ open.duel.rounds.length }} von {{ open.duel.totalQuestions }}</dd>
+    </div>
+    <div>
+      <dt>Läuft seit</dt>
+      <dd>{{ open.age }}</dd>
+    </div>
+  </dl>
+
+  @if (open.duel.phase === 'question' && open.duel.currentQuestion) {
+    <div class="round now">
+      <span class="round-n">{{ open.duel.questionNumber }}</span>
+      <div class="round-body">
+        <p class="round-q">{{ open.duel.currentQuestion }}</p>
+        <p class="round-meta">Läuft gerade · noch {{ open.secondsLeft }} s</p>
+      </div>
+    </div>
+  }
+  <ol class="rounds">
+    @for (round of open.rounds; track round.number) {
+      <li class="round">
+        <span class="round-n">{{ round.number }}</span>
+        <div class="round-body">
+          <p class="round-q">{{ round.text }}</p>
+          <p class="round-meta">Richtig: {{ round.correct }}</p>
+          <div class="answers">
+            @for (answer of round.answers; track $index) {
+              <span class="answer" [class.right]="answer.right">
+                <css-icon
+                  [attr.icon]="answer.right ? 'checkmark' : 'close'"
+                  size="xs"
+                ></css-icon>
+                <b>{{ answer.name }}</b>
+                @if (answer.letter) {
+                  {{ answer.letter }} · {{ answer.time }} · +{{ answer.points }}
+                } @else {
+                  keine Antwort
+                }
+              </span>
+            }
+          </div>
+        </div>
+      </li>
+    }
+  </ol>
+  @if (open.upcoming > 0) {
+    <div class="later">
+      <span class="later-label">Folgt</span>
+      <ol aria-label="Noch offene Fragen">
+        @for (n of open.later; track n) {
+          <li class="round-n">{{ n }}</li>
+        }
+      </ol>
+    </div>
+  }
+  @if (open.duel.phase === 'finished') {
+    <p class="upcoming">
+      Das Duell ist beendet. Beide können noch eine Revanche starten.
+    </p>
+  }
+</ng-template>

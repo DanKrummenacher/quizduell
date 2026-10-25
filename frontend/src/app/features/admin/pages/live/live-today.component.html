@@ -1,0 +1,410 @@
+<main class="ad-page">
+  <app-ad-page-head title="Live">
+    <p headDesc class="status">
+      <span
+        class="pulse"
+        [class.paused]="paused() || error()"
+        aria-hidden="true"
+      ></span>
+      @if (paused()) {
+        Angehalten · Stand {{ formatTime(now(), true) }}
+      } @else if (error()) {
+        {{ error() }} Neuer Versuch in wenigen Sekunden.
+      } @else {
+        Aktualisiert alle 2 Sekunden
+      }
+    </p>
+    <div class="ad-actions">
+      @if (data.paused()) {
+        <button
+          type="button"
+          class="btn-primary"
+          [disabled]="play.busy()"
+          (click)="play.resume()"
+        >
+          <css-icon icon="unlock" size="xs"></css-icon>Spiel freigeben
+        </button>
+      } @else {
+        <button
+          type="button"
+          class="btn-secondary"
+          [disabled]="play.busy()"
+          (click)="play.pause()"
+        >
+          <css-icon icon="lock" size="xs"></css-icon>Spiel pausieren
+        </button>
+      }
+      <button
+        type="button"
+        class="btn-secondary"
+        [attr.aria-pressed]="paused()"
+        (click)="togglePause()"
+      >
+        <css-icon
+          [attr.icon]="paused() ? 'play-circle' : 'pause-circle'"
+          size="xs"
+        ></css-icon
+        >{{ paused() ? 'Ansicht fortsetzen' : 'Ansicht anhalten' }}
+      </button>
+    </div>
+  </app-ad-page-head>
+
+  @if (!snapshot()) {
+    @if (error()) {
+      <app-ad-state kind="error" [text]="error()" (retry)="retry()" />
+    } @else {
+      <div class="ad-card"><app-ad-state kind="loading" [lines]="6" /></div>
+    }
+  } @else {
+    <section class="ad-card metrics" aria-label="Jetzt">
+      @for (metric of metrics(); track metric.label) {
+        <div class="metric">
+          <span class="metric-label">{{ metric.label }}</span>
+          <span class="metric-value">{{ metric.value }}</span>
+        </div>
+      }
+    </section>
+
+    <div class="ad-grid">
+      <section class="ad-card span-8">
+        <header class="ad-card-head">
+          <div>
+            <h2>Laufende Duelle</h2>
+            <p>
+              Höchststand pro Minute, letzte 60 Minuten
+              @if (chart()?.startedRecently) {
+                · Server läuft seit {{ chart()?.since }}
+              }
+            </p>
+          </div>
+          @if (chart()?.peak; as peak) {
+            <span class="peak"
+              >Höchststand <b>{{ peak.games }}</b> um {{ formatTime(peak.at) }}</span
+            >
+          }
+        </header>
+        @if (chart(); as c) {
+          <app-ad-line-chart
+            [values]="c.values"
+            [labels]="c.labels"
+            [labelEvery]="15"
+            [height]="200"
+            unit="Duelle"
+            ariaLabel="Laufende Duelle pro Minute, letzte 60 Minuten"
+          />
+        }
+      </section>
+
+      <section class="ad-card span-4">
+        <header class="ad-card-head">
+          <div>
+            <h2>Warten</h2>
+            <p>Wer gerade einen Gegner sucht</p>
+          </div>
+        </header>
+        <p class="ad-overline group">Schnellspiel</p>
+        <ul class="waiting">
+          @for (entry of searching(); track entry.name + entry.since) {
+            <li>
+              <span class="initial" aria-hidden="true">{{
+                entry.name.charAt(0)
+              }}</span>
+              <span class="w-name">{{ entry.name }}</span>
+              <span class="w-time" [class.long]="entry.seconds >= 30"
+                >seit {{ entry.seconds }} s</span
+              >
+            </li>
+          } @empty {
+            <li class="empty">Niemand sucht – Gegner werden sofort gefunden.</li>
+          }
+        </ul>
+        <p class="ad-overline group">Mit Code</p>
+        <ul class="waiting">
+          @for (entry of waiting(); track entry.code) {
+            <li>
+              <span class="code">{{ entry.code }}</span>
+              <span class="w-name">{{ entry.name }}</span>
+              <span class="w-time">seit {{ entry.wait }}</span>
+            </li>
+          } @empty {
+            <li class="empty">Keine offenen Spiele mit Code.</li>
+          }
+        </ul>
+      </section>
+
+      <section class="ad-card flush span-8">
+        <header class="ad-card-head">
+          <div>
+            <h2>Duelle</h2>
+            <p>Zeile öffnen für den Verlauf Frage für Frage</p>
+          </div>
+          <div class="ad-segmented" role="group" aria-label="Spielmodus">
+            @for (option of modeOptions; track option.id) {
+              <button
+                type="button"
+                [class.is-active]="mode() === option.id"
+                [attr.aria-pressed]="mode() === option.id"
+                (click)="mode.set(option.id)"
+              >
+                {{ option.label }}
+              </button>
+            }
+          </div>
+        </header>
+        @if (duels().length) {
+          <div class="ad-table-wrap">
+            <table class="ad-table duels">
+              <thead>
+                <tr>
+                  <th scope="col">Duell</th>
+                  <th scope="col">Spielende</th>
+                  <th scope="col">Fortschritt</th>
+                  <th scope="col">Phase</th>
+                  <th scope="col" class="num">Punkte</th>
+                  <th scope="col" class="num">Dauer</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of duels(); track row.duel.code) {
+                  <tr
+                    [class.is-done]="row.duel.phase === 'finished'"
+                    [class.is-open]="openCode() === row.duel.code"
+                    (click)="openCode.set(row.duel.code)"
+                  >
+                    <td>
+                      <button
+                        type="button"
+                        class="duel-open"
+                        [attr.aria-label]="'Duell ' + row.duel.code + ' öffnen'"
+                        (click)="
+                          openCode.set(row.duel.code); $event.stopPropagation()
+                        "
+                      >
+                        <span class="duel-code">{{ row.duel.code }}</span>
+                        <span class="mode" [attr.data-mode]="row.duel.mode">{{
+                          row.duel.mode === 'quick' ? 'Schnell' : 'Code'
+                        }}</span>
+                        @if (row.duel.rematch) {
+                          <span class="mode">Revanche</span>
+                        }
+                      </button>
+                    </td>
+                    <td class="players">
+                      @for (player of row.duel.players; track $index) {
+                        <span class="player" [class.offline]="!player.connected">
+                          {{ player.name }}
+                          @if (!player.connected) {
+                            <span class="reconnect">getrennt</span>
+                          } @else if (
+                            row.duel.phase === 'question' && player.answered
+                          ) {
+                            <css-icon
+                              class="answered"
+                              icon="checkmark"
+                              size="xs"
+                              aria-label="hat geantwortet"
+                            ></css-icon>
+                          }
+                        </span>
+                      }
+                    </td>
+                    <td>
+                      <span class="progress">
+                        <span class="segments" aria-hidden="true">
+                          @for (segment of row.segments; track $index) {
+                            <i [class]="segment"></i>
+                          }
+                        </span>
+                        <span class="progress-text"
+                          >{{ row.duel.rounds.length }}/{{
+                            row.duel.totalQuestions
+                          }}</span
+                        >
+                      </span>
+                    </td>
+                    <td>
+                      <span class="phase" [attr.data-phase]="row.duel.phase">
+                        {{ phases[row.duel.phase] }}
+                        @if (
+                          row.secondsLeft !== null && row.duel.phase !== 'finished'
+                        ) {
+                          <span class="phase-sec">{{ row.secondsLeft }} s</span>
+                        }
+                      </span>
+                    </td>
+                    <td class="num score">
+                      @for (
+                        player of row.duel.players;
+                        track $index;
+                        let last = $last
+                      ) {
+                        <span [class.lead]="row.lead === $index">{{
+                          player.score
+                        }}</span>
+                        @if (!last) {
+                          <span class="colon">:</span>
+                        }
+                      }
+                    </td>
+                    <td class="num ad-muted">{{ row.age }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="table-empty">
+            <app-ad-state
+              kind="empty"
+              icon="heartbeat"
+              title="Gerade läuft kein Duell"
+              text="Neue Duelle erscheinen hier, sobald zwei Spielende verbunden sind."
+            />
+          </div>
+        }
+      </section>
+
+      <section class="ad-card flush span-4 log">
+        <header class="ad-card-head">
+          <div>
+            <h2>Ereignisse</h2>
+            <p>Neueste zuerst</p>
+          </div>
+        </header>
+        <div class="log-filter" role="group" aria-label="Ereignisse filtern">
+          @for (option of eventOptions; track option.id) {
+            <button
+              type="button"
+              class="ad-chip"
+              [class.is-active]="eventFilter() === option.id"
+              [attr.aria-pressed]="eventFilter() === option.id"
+              (click)="eventFilter.set(option.id)"
+            >
+              {{ option.label }}
+            </button>
+          }
+        </div>
+        <ol class="log-list">
+          @for (event of events(); track event.id) {
+            <li [attr.data-kind]="event.kind">
+              <time>{{ formatTime(event.at, true) }}</time>
+              <span class="log-dot" aria-hidden="true"></span>
+              <span class="log-text">{{ event.text }}</span>
+            </li>
+          } @empty {
+            <li class="log-empty">Seit dem Serverstart noch nichts passiert.</li>
+          }
+        </ol>
+      </section>
+    </div>
+  }
+</main>
+
+@if (openDuel(); as open) {
+  <button
+    type="button"
+    class="ad-scrim"
+    aria-label="Schliessen"
+    (click)="openCode.set(null)"
+  ></button>
+  <aside
+    class="ad-drawer"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="duel-title"
+  >
+    <header class="ad-drawer-head">
+      <div>
+        <p class="ad-overline">
+          Duell {{ open.duel.code }} ·
+          {{ open.duel.mode === 'quick' ? 'Schnellspiel' : 'Mit Code' }}
+          @if (open.duel.rematch) {
+            · Revanche
+          }
+        </p>
+        <h2 id="duel-title">
+          @for (player of open.duel.players; track $index; let last = $last) {
+            {{ player.name }}{{ last ? '' : ' gegen ' }}
+          }
+        </h2>
+      </div>
+      <button
+        type="button"
+        class="icon-btn"
+        aria-label="Schliessen"
+        appAutofocus
+        (click)="openCode.set(null)"
+      >
+        <css-icon icon="close" size="sm"></css-icon>
+      </button>
+    </header>
+    <div class="ad-drawer-body">
+      <dl class="drawer-facts">
+        <div>
+          <dt>Stand</dt>
+          <dd>
+            @for (player of open.duel.players; track $index; let last = $last) {
+              {{ player.score }}{{ last ? '' : ' : ' }}
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>Fragen</dt>
+          <dd>{{ open.duel.rounds.length }} von {{ open.duel.totalQuestions }}</dd>
+        </div>
+        <div>
+          <dt>Läuft seit</dt>
+          <dd>{{ open.age }}</dd>
+        </div>
+      </dl>
+
+      @if (open.duel.phase === 'question' && open.duel.currentQuestion) {
+        <div class="round now">
+          <span class="round-n">{{ open.duel.questionNumber }}</span>
+          <div class="round-body">
+            <p class="round-q">{{ open.duel.currentQuestion }}</p>
+            <p class="round-meta">Läuft gerade · noch {{ open.secondsLeft }} s</p>
+          </div>
+        </div>
+      }
+      <ol class="rounds">
+        @for (round of open.rounds; track round.number) {
+          <li class="round">
+            <span class="round-n">{{ round.number }}</span>
+            <div class="round-body">
+              <p class="round-q">{{ round.text }}</p>
+              <p class="round-meta">Richtig: {{ round.correct }}</p>
+              <div class="answers">
+                @for (answer of round.answers; track $index) {
+                  <span class="answer" [class.right]="answer.right">
+                    <css-icon
+                      [attr.icon]="answer.right ? 'checkmark' : 'close'"
+                      size="xs"
+                    ></css-icon>
+                    <b>{{ answer.name }}</b>
+                    @if (answer.letter) {
+                      {{ answer.letter }} · {{ answer.time }} · +{{ answer.points }}
+                    } @else {
+                      keine Antwort
+                    }
+                  </span>
+                }
+              </div>
+            </div>
+          </li>
+        }
+      </ol>
+      @if (open.upcoming > 0) {
+        <p class="upcoming">
+          Noch {{ open.upcoming }}
+          {{ open.upcoming === 1 ? 'Frage' : 'Fragen' }} offen.
+        </p>
+      }
+      @if (open.duel.phase === 'finished') {
+        <p class="upcoming">
+          Das Duell ist beendet. Beide können noch eine Revanche starten.
+        </p>
+      }
+    </div>
+  </aside>
+}

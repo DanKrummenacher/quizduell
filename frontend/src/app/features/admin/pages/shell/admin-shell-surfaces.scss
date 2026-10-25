@@ -262,6 +262,9 @@ app-admin-shell .ad-frame {
     th {
       background: transparent;
       color: t.$text-3;
+      font-size: 12.5px;
+      letter-spacing: 0;
+      text-transform: none;
     }
 
     td {
@@ -275,5 +278,11 @@ app-admin-shell .ad-frame {
 
   .badge {
     border-radius: 6px;
+  }
+
+  .ad-overline {
+    font-size: 13px;
+    letter-spacing: 0;
+    text-transform: none;
   }
 }

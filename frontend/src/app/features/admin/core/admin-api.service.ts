@@ -22,6 +22,7 @@ import type {
   QuestionUpdate,
 } from '../../../core/contracts/admin.contract';
 import { AdminSessionService } from './admin-session.service';
+import { demoLive } from './live-demo';
 
 /** An API error with a message people can read. */
 export class AdminApiError extends Error {
@@ -41,8 +42,10 @@ export class AdminApi {
   private readonly http = inject(HttpClient);
   private readonly session = inject(AdminSessionService);
 
-  live(): Promise<LiveSnapshot> {
-    return this.call(this.http.get<LiveSnapshot>(`${BASE}/live`, this.options()));
+  async live(): Promise<LiveSnapshot> {
+    return demoLive(
+      await this.call(this.http.get<LiveSnapshot>(`${BASE}/live`, this.options())),
+    );
   }
 
   analytics(range: AnalyticsRange): Promise<Analytics> {

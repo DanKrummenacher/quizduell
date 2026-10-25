@@ -1,0 +1,514 @@
+@use '../../styles/tokens' as t;
+@use '../../styles/controls' as c;
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: t.$success;
+  animation: pulse 2s ease-out infinite;
+
+  &.paused {
+    background: t.$line-strong;
+    animation: none;
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(0, 135, 94, 0.45);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 8px rgba(0, 135, 94, 0);
+    }
+  }
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 20px;
+  padding: 0;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 16px;
+  }
+}
+
+.metric {
+  display: grid;
+  gap: 4px;
+  padding: 18px 22px;
+  border-left: 1px solid t.$line-soft;
+
+  &:first-child {
+    border-left: 0;
+  }
+
+  @media (max-width: 1024px) {
+    &:nth-child(3) {
+      border-left: 0;
+    }
+
+    &:nth-child(n + 3) {
+      border-top: 1px solid t.$line-soft;
+    }
+  }
+
+  @media (max-width: 640px) {
+    padding: 14px 16px;
+  }
+}
+
+.metric-label {
+  color: t.$text-2;
+  font-size: t.$text-base;
+  font-weight: t.$medium;
+}
+
+.metric-value {
+  font-size: t.$text-3xl;
+  font-weight: t.$bold;
+  line-height: 1.15;
+  @include t.numeric;
+}
+
+.peak {
+  flex: none;
+  color: t.$text-3;
+  font-size: t.$text-sm;
+
+  b {
+    color: t.$text;
+    @include t.numeric;
+  }
+}
+
+.group {
+  margin: 0 0 8px;
+
+  & ~ .group {
+    margin-top: 18px;
+  }
+}
+
+.waiting {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    min-height: 38px;
+  }
+
+  .empty {
+    display: block;
+    min-height: 0;
+    padding: 8px 0;
+    color: t.$text-3;
+    font-size: t.$text-base;
+  }
+}
+
+.initial {
+  @include c.avatar(26px);
+  background: t.$cyan;
+  font-size: t.$text-xs;
+  text-transform: uppercase;
+}
+
+.code {
+  display: inline-grid;
+  place-items: center;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: t.$radius;
+  background: t.$brand;
+  color: #fff;
+  font-size: t.$text-sm;
+  font-weight: t.$bold;
+  letter-spacing: 0.08em;
+}
+
+.w-name {
+  overflow: hidden;
+  font-size: t.$text-md;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.w-time {
+  color: t.$text-3;
+  font-size: t.$text-sm;
+  @include t.numeric;
+
+  &.long {
+    color: t.$warning-text;
+    font-weight: t.$medium;
+  }
+}
+
+.duels {
+  min-width: 720px;
+
+  tbody tr {
+    cursor: pointer;
+
+    &.is-open {
+      background: t.$brand-50;
+    }
+
+    &.is-done {
+      color: t.$text-2;
+    }
+  }
+
+  td:first-child,
+  th:first-child {
+    padding-left: 22px;
+  }
+
+  td:last-child,
+  th:last-child {
+    padding-right: 22px;
+  }
+}
+
+.duel-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.duel-code {
+  font-weight: t.$bold;
+  letter-spacing: 0.06em;
+}
+
+.mode {
+  @include c.badge(neutral);
+  height: 20px;
+  padding: 0 7px;
+  font-size: t.$text-xs;
+
+  &[data-mode='friend'] {
+    @include c.badge-tone(info);
+  }
+}
+
+.players {
+  min-width: 180px;
+}
+
+.player {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  & + .player::before {
+    content: '·';
+    margin: 0 6px 0 2px;
+    color: t.$text-4;
+  }
+
+  &.offline {
+    color: t.$text-3;
+  }
+}
+
+.answered {
+  color: t.$success;
+}
+
+.reconnect {
+  @include c.badge(warning);
+  height: 18px;
+  padding: 0 6px;
+  font-size: 10px;
+}
+
+.progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.segments {
+  display: inline-flex;
+  gap: 3px;
+
+  i {
+    width: 10px;
+    height: 6px;
+    border-radius: 2px;
+    background: t.$bg-muted;
+
+    &.done {
+      background: t.$brand;
+    }
+
+    &.now {
+      background: t.$cyan;
+    }
+  }
+}
+
+.progress-text {
+  color: t.$text-2;
+  font-size: t.$text-sm;
+  @include t.numeric;
+}
+
+.phase {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: t.$text-base;
+  white-space: nowrap;
+
+  &[data-phase='question'] {
+    font-weight: t.$medium;
+  }
+
+  &[data-phase='finished'] {
+    color: t.$text-3;
+  }
+}
+
+.phase-sec {
+  @include c.badge(neutral);
+  height: 20px;
+  padding: 0 7px;
+  font-size: t.$text-xs;
+  @include t.numeric;
+}
+
+.score {
+  white-space: nowrap;
+
+  .lead {
+    font-weight: t.$bold;
+  }
+
+  .colon {
+    margin: 0 4px;
+    color: t.$text-4;
+  }
+}
+
+.table-empty {
+  padding: 0 22px 22px;
+}
+
+.log {
+  display: flex;
+  flex-direction: column;
+  max-height: 560px;
+}
+
+.log-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 22px 12px;
+
+  .ad-chip {
+    height: 28px;
+    padding: 0 10px;
+    font-size: t.$text-sm;
+  }
+}
+
+.log-list {
+  flex: 1;
+  margin: 0;
+  padding: 4px 22px 16px;
+  overflow-y: auto;
+  border-top: 1px solid t.$line-soft;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: 62px 8px minmax(0, 1fr);
+    align-items: baseline;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid t.$line-soft;
+    font-size: t.$text-base;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  time {
+    color: t.$text-3;
+    font-size: t.$text-sm;
+    @include t.numeric;
+  }
+
+  .log-empty {
+    display: block;
+    color: t.$text-3;
+  }
+}
+
+.log-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: t.$line-strong;
+
+  [data-kind='finished'] > & {
+    background: t.$success;
+  }
+
+  [data-kind='aborted'] > &,
+  [data-kind='expired'] > & {
+    background: t.$danger;
+  }
+
+  [data-kind='matched'] > &,
+  [data-kind='joined'] > &,
+  [data-kind='rematch'] > & {
+    background: t.$cyan;
+  }
+}
+
+.log-text {
+  line-height: 1.45;
+}
+
+.drawer-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 22px;
+  padding: 14px 16px;
+  border-radius: t.$radius;
+  background: t.$bg-subtle;
+
+  dt {
+    color: t.$text-3;
+    font-size: t.$text-sm;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: t.$text-lg;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+}
+
+.rounds {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.round {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid t.$line-soft;
+
+  &.now {
+    margin-bottom: 4px;
+    padding: 14px 16px;
+    border: 1px solid t.$brand-200;
+    border-radius: t.$radius;
+    background: t.$brand-50;
+  }
+}
+
+.round-n {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: t.$brand;
+  color: #fff;
+  font-size: t.$text-sm;
+  font-weight: t.$bold;
+
+  .now > & {
+    background: t.$cyan;
+  }
+}
+
+.round-q {
+  font-size: t.$text-md;
+  font-weight: t.$medium;
+  line-height: 1.45;
+}
+
+.round-meta {
+  margin-top: 3px;
+  color: t.$text-3;
+  font-size: t.$text-sm;
+}
+
+.answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.answer {
+  @include c.badge(danger);
+  height: 26px;
+  font-weight: t.$regular;
+  @include t.numeric;
+
+  &.right {
+    @include c.badge-tone(success);
+  }
+
+  b {
+    font-weight: t.$bold;
+  }
+}
+
+.upcoming {
+  margin-top: 16px;
+  color: t.$text-3;
+  font-size: t.$text-base;
+}
+
+// The labels as they were, before sentence case.
+:host {
+  .ad-table th {
+    font-size: t.$text-xs;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .ad-overline {
+    font-size: t.$text-xs;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
