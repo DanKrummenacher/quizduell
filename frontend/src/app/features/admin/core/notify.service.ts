@@ -6,6 +6,9 @@ export interface Notice {
   tone: 'success' | 'error';
   /** Optional action such as «Rückgängig». */
   action?: { label: string; run: () => void };
+  /** A pause or resume of the game, shown with its own icon and detail. */
+  kind?: 'pause' | 'resume';
+  detail?: string;
 }
 
 /** Short confirmations and errors at the top of the page. */
@@ -15,8 +18,12 @@ export class NotifyService {
   private readonly timers = new Map<number, ReturnType<typeof setTimeout>>();
   readonly notices = signal<Notice[]>([]);
 
-  success(text: string, action?: Notice['action']): void {
-    this.show({ text, tone: 'success', action }, action ? 7000 : 3500);
+  success(
+    text: string,
+    action?: Notice['action'],
+    extra?: Pick<Notice, 'kind' | 'detail'>,
+  ): void {
+    this.show({ text, tone: 'success', action, ...extra }, action ? 7000 : 3500);
   }
 
   error(text: string): void {

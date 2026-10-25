@@ -1,0 +1,409 @@
+// The grid view of the duels and the duel in the drawer, beside the page
+// styles of the live view.
+@use '../../styles/tokens' as t;
+
+.drawer-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 22px;
+  padding: 14px 16px;
+  border-radius: t.$radius;
+  background: t.$bg-subtle;
+
+  dt {
+    color: t.$text-3;
+    font-size: t.$text-sm;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: t.$text-lg;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+}
+
+.round-q {
+  font-size: t.$text-md;
+  font-weight: t.$medium;
+  line-height: 1.45;
+}
+
+.upcoming {
+  margin-top: 16px;
+  color: t.$text-3;
+  font-size: t.$text-base;
+}
+
+// The grid: one row per duel, one cell per question.
+.raster {
+  min-width: 860px;
+
+  th:first-child,
+  td:first-child {
+    padding-left: 22px;
+  }
+
+  th:last-child,
+  td:last-child {
+    padding-right: 22px;
+  }
+
+  tbody tr {
+    cursor: pointer;
+
+    &.is-open {
+      background: t.$brand-50;
+    }
+  }
+
+  td {
+    height: 62px;
+  }
+
+  .q-head {
+    width: 44px;
+    padding: 0 2px;
+  }
+}
+
+.r-players {
+  min-width: 170px;
+}
+
+.r-player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  line-height: 1.5;
+
+  &.offline {
+    color: t.$text-3;
+  }
+}
+
+.r-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.r-score {
+  color: t.$text-3;
+  font-weight: t.$medium;
+  @include t.numeric;
+
+  .lead > & {
+    color: t.$text;
+    font-weight: t.$bold;
+  }
+}
+
+.q-cell {
+  padding: 0 2px;
+}
+
+.q-box {
+  display: inline-grid;
+  place-items: center;
+  gap: 5px;
+  width: 34px;
+  height: 46px;
+  padding: 7px 0;
+  border-radius: 8px;
+  background: t.$bg-subtle;
+
+  [data-state='open'] > & {
+    background: none;
+    outline: 1px dashed rgba(0, 50, 125, 0.14);
+    outline-offset: -1px;
+  }
+
+  [data-state='now'] > & {
+    position: relative;
+    background: rgba(0, 164, 224, 0.1);
+    box-shadow: inset 0 0 0 1.5px t.$cyan;
+  }
+
+  small {
+    position: absolute;
+    bottom: -16px;
+    color: t.$cyan;
+    font-size: 10.5px;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+}
+
+[data-mark] {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+
+  &[data-mark='right'] {
+    background: t.$success;
+  }
+
+  &[data-mark='wrong'] {
+    background: t.$danger;
+  }
+
+  &[data-mark='none'] {
+    box-shadow: inset 0 0 0 1.5px t.$line-strong;
+  }
+
+  &[data-mark='given'] {
+    background: t.$cyan;
+  }
+
+  &[data-mark='now'] {
+    box-shadow: inset 0 0 0 2px t.$cyan;
+  }
+
+  &[data-mark='open'] {
+    background: rgba(0, 50, 125, 0.08);
+
+    [data-state='open'] & {
+      background: none;
+    }
+  }
+}
+
+.raster-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding: 12px 22px 16px;
+  border-top: 1px solid rgba(0, 50, 125, 0.08);
+  color: t.$text-3;
+  font-size: t.$text-sm;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  i {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+// The duel in the drawer: its questions on a line, the newest first.
+.tl {
+  position: relative;
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tl-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 16px;
+  padding-bottom: 22px;
+
+  &:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    top: 36px;
+    bottom: 0;
+    left: 17.5px;
+    width: 1px;
+    background: rgba(0, 50, 125, 0.14);
+  }
+}
+
+.tl-dot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: t.$brand;
+  color: #fff;
+  font-size: t.$text-sm;
+
+  .is-now > & {
+    background: #fff;
+    color: t.$text;
+  }
+
+  .is-later > & {
+    background: none;
+    box-shadow: inset 0 0 0 1px t.$line;
+    color: t.$text-3;
+  }
+
+  svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+
+  circle {
+    fill: none;
+    stroke-width: 3;
+  }
+
+  .ring-track {
+    stroke: t.$bg-muted;
+  }
+
+  .ring-left {
+    stroke: t.$cyan;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.9s linear;
+  }
+}
+
+.tl-body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding-top: 7px;
+}
+
+.tl-meta {
+  color: t.$text-3;
+  font-size: t.$text-sm;
+
+  .is-now & {
+    color: t.$cyan;
+    font-weight: t.$medium;
+  }
+}
+
+.tl-answers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tl-answer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  padding: 8px 10px;
+  border: 1px solid rgba(0, 50, 125, 0.1);
+  border-radius: 10px;
+  color: t.$text-2;
+  font-size: t.$text-sm;
+  @include t.numeric;
+
+  b {
+    color: t.$text;
+  }
+
+  &.is-right {
+    border-color: rgba(0, 135, 94, 0.25);
+    background: t.$success-bg;
+
+    css-icon {
+      color: t.$success;
+    }
+  }
+
+  &.is-wrong {
+    border-color: rgba(200, 40, 20, 0.18);
+    background: t.$danger-bg;
+
+    css-icon {
+      color: t.$danger;
+    }
+  }
+
+  &.is-given {
+    border-color: rgba(0, 164, 224, 0.35);
+    background: rgba(0, 164, 224, 0.08);
+  }
+}
+
+.tl-points {
+  margin-left: auto;
+  color: t.$text;
+  font-weight: t.$bold;
+}
+
+// On phones the grid shows each duel as a block with its seven cells below.
+@media (max-width: 640px) {
+  .raster {
+    min-width: 0;
+
+    thead {
+      display: none;
+    }
+
+    tbody,
+    td {
+      display: block;
+    }
+
+    tbody tr {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px 4px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+
+    td,
+    th:first-child,
+    td:first-child,
+    td:last-child {
+      height: auto;
+      padding: 0;
+      border: 0;
+    }
+
+    .c-pair {
+      display: none !important;
+    }
+
+    .c-duel {
+      grid-column: 1 / 5;
+      grid-row: 1;
+    }
+
+    td:nth-last-child(2) {
+      grid-column: 5 / -1;
+      grid-row: 1;
+      justify-self: end;
+    }
+
+    td:last-child {
+      display: none;
+    }
+
+    .r-players {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+
+    .q-cell {
+      grid-row: 3;
+    }
+
+    .q-box {
+      width: 100%;
+    }
+  }
+
+  .raster-key {
+    gap: 8px 14px;
+    padding: 12px 16px 14px;
+  }
+}

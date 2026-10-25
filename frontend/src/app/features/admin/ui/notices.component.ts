@@ -1,44 +1,88 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, inject } from '@angular/core';
 import '@css-ch/components/icon';
 import { NotifyService } from '../core/notify.service';
+import { AdPauseNoticeComponent } from './pause-notice.component';
 
 /** The notices of `NotifyService`, stacked at the top of the page. */
 @Component({
   selector: 'app-ad-notices',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  imports: [AdPauseNoticeComponent],
   template: `
+    <div class="pause-layer" role="status" aria-live="polite">
+      @for (notice of notify.notices(); track notice.id) {
+        @if (notice.kind) {
+          <app-ad-pause-notice
+            [notice]="notice"
+            (closed)="notify.dismiss(notice.id)"
+          />
+        }
+      }
+    </div>
     <div class="stack" role="status" aria-live="polite">
       @for (notice of notify.notices(); track notice.id) {
-        <div class="notice" [class.error]="notice.tone === 'error'">
-          <css-icon
-            [attr.icon]="
-              notice.tone === 'error' ? 'priority-warning' : 'checkmark-circle'
-            "
-            size="sm"
-          ></css-icon>
-          <span class="text">{{ notice.text }}</span>
-          @if (notice.action; as action) {
+        @if (!notice.kind) {
+          <div class="notice" [class.error]="notice.tone === 'error'">
+            <css-icon
+              [attr.icon]="
+                notice.tone === 'error' ? 'priority-warning' : 'checkmark-circle'
+              "
+              size="sm"
+            ></css-icon>
+            <span class="text">{{ notice.text }}</span>
+            @if (notice.action; as action) {
+              <button
+                type="button"
+                class="action"
+                (click)="action.run(); notify.dismiss(notice.id)"
+              >
+                {{ action.label }}
+              </button>
+            }
             <button
               type="button"
-              class="action"
-              (click)="action.run(); notify.dismiss(notice.id)"
+              class="close"
+              aria-label="Meldung schliessen"
+              (click)="notify.dismiss(notice.id)"
             >
-              {{ action.label }}
+              <css-icon icon="close" size="xs"></css-icon>
             </button>
-          }
-          <button
-            type="button"
-            class="close"
-            aria-label="Meldung schliessen"
-            (click)="notify.dismiss(notice.id)"
-          >
-            <css-icon icon="close" size="xs"></css-icon>
-          </button>
-        </div>
+          </div>
+        }
       }
     </div>
   `,
   styles: `
+    /* The pause and resume notice, where the other notices stand. */
+    .pause-layer {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      z-index: 71;
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      width: min(540px, calc(100vw - 32px));
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    /* Under the pause strip while it shows. */
+    :host-context(body:has(.ad-paused)) .pause-layer,
+    :host-context(body:has(.ad-paused)) .stack {
+      top: 134px;
+    }
+    @media (max-width: 640px) {
+      .pause-layer {
+        right: 16px;
+        left: 16px;
+        width: auto;
+        transform: none;
+      }
+      :host-context(body:has(.ad-paused)) .pause-layer,
+      :host-context(body:has(.ad-paused)) .stack {
+        top: 184px;
+      }
+    }
     .stack {
       position: fixed;
       top: 80px;

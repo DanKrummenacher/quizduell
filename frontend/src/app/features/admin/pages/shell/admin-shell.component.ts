@@ -1,6 +1,7 @@
 import {
   Component,
   computed,
+  CUSTOM_ELEMENTS_SCHEMA,
   effect,
   inject,
   signal,
@@ -9,6 +10,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import '@css-ch/components/icon';
 import { filter } from 'rxjs';
 import { localStore } from '../../../../core/platform/safe-storage';
 import { AdminApi } from '../../core/admin-api.service';
@@ -28,6 +30,7 @@ const SEEN_CHANGE = 'playduelio.admin.seen.change';
 @Component({
   selector: 'app-admin-shell',
   imports: [RouterOutlet, AdminHeaderComponent, AdCommandPaletteComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [AdminData, PlayControl],
   template: `
     <div class="ad-frame">
@@ -41,11 +44,11 @@ const SEEN_CHANGE = 'playduelio.admin.seen.change';
           </p>
           <button
             type="button"
-            class="btn-primary btn-sm"
+            class="ad-paused-btn"
             [disabled]="play.busy()"
             (click)="play.resume()"
           >
-            Wieder freigeben
+            <css-icon icon="play-circle" size="xs"></css-icon>Wieder freigeben
           </button>
         </div>
       }

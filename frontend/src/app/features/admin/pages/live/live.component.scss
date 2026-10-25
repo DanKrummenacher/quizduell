@@ -30,73 +30,95 @@
   }
 }
 
-.metrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-bottom: 20px;
-  padding: 0;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-bottom: 16px;
-  }
+.chart-wrap {
+  position: relative;
 }
 
-.metric {
-  display: grid;
-  gap: 4px;
-  padding: 18px 22px;
-  border-left: 1px solid t.$line-soft;
-
-  &:first-child {
-    border-left: 0;
-  }
-
-  @media (max-width: 1024px) {
-    &:nth-child(3) {
-      border-left: 0;
-    }
-
-    &:nth-child(n + 3) {
-      border-top: 1px solid t.$line-soft;
-    }
-  }
-
-  @media (max-width: 640px) {
-    padding: 14px 16px;
-  }
-}
-
-.metric-label {
-  color: t.$text-2;
-  font-size: t.$text-base;
-  font-weight: t.$medium;
-}
-
-.metric-value {
-  font-size: t.$text-3xl;
-  font-weight: t.$bold;
-  line-height: 1.15;
-  @include t.numeric;
-}
-
-.peak {
-  flex: none;
+// No duel in the last hour: a quiet word over the flat line.
+.chart-quiet {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #fff;
   color: t.$text-3;
-  font-size: t.$text-sm;
-
-  b {
-    color: t.$text;
-    @include t.numeric;
-  }
+  font-size: t.$text-base;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
 }
 
 .group {
-  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  color: t.$text-2;
+  font-size: 13.5px;
+  font-weight: t.$bold;
 
   & ~ .group {
     margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 50, 125, 0.08);
   }
+}
+
+// In full width the two queues stand side by side.
+@media (min-width: 641px) and (max-width: 1200px) {
+  .wait-card {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 40px;
+
+    > .ad-card-head {
+      grid-column: 1 / -1;
+    }
+
+    .wait-stats {
+      grid-column: 1 / -1;
+      grid-row: 2;
+    }
+
+    .group:nth-of-type(1) {
+      grid-area: 3 / 1;
+    }
+
+    .waiting:nth-of-type(1) {
+      grid-area: 4 / 1;
+    }
+
+    .more-wait {
+      grid-column: 1 / -1;
+      grid-row: 5;
+      justify-self: start;
+    }
+
+    .group:nth-of-type(2) {
+      grid-area: 3 / 2;
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .waiting:nth-of-type(2) {
+      grid-area: 4 / 2;
+      align-self: start;
+    }
+  }
+}
+
+.group-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  font-size: t.$text-xs;
+  @include t.numeric;
 }
 
 .waiting {
@@ -117,7 +139,7 @@
   .empty {
     display: block;
     min-height: 0;
-    padding: 8px 0;
+    padding: 6px 0 2px;
     color: t.$text-3;
     font-size: t.$text-base;
   }
@@ -223,8 +245,8 @@
   gap: 4px;
 
   & + .player::before {
-    content: '·';
-    margin: 0 6px 0 2px;
+    content: '–';
+    margin: 0 6px;
     color: t.$text-4;
   }
 
@@ -238,6 +260,7 @@
 }
 
 .reconnect {
+  flex: none;
   @include c.badge(warning);
   height: 18px;
   padding: 0 6px;
@@ -313,21 +336,100 @@
   }
 }
 
-.table-empty {
-  padding: 0 22px 22px;
+.duels-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 36px 22px 44px;
+  text-align: center;
+
+  .btn-sm {
+    margin-top: 12px;
+  }
+}
+
+.empty-title {
+  font-size: t.$text-lg;
+  font-weight: t.$bold;
+}
+
+.empty-text {
+  max-width: 420px;
+  color: t.$text-2;
+  font-size: t.$text-md;
+  line-height: 1.5;
+}
+
+// A quiet sketch of the duels to come, as in the history.
+.ghost {
+  display: grid;
+  gap: 8px;
+  width: min(460px, 100%);
+  margin-bottom: 18px;
+}
+
+.ghost-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 72px 32px;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px dashed t.$line;
+  border-radius: 12px;
+
+  b,
+  span {
+    height: 8px;
+    border-radius: 4px;
+    background: t.$bg-muted;
+  }
+
+  .g-code {
+    height: 12px;
+  }
+
+  .g-bar {
+    display: flex;
+    gap: 3px;
+    height: auto;
+    background: none;
+
+    i {
+      flex: 1;
+      height: 6px;
+      border-radius: 2px;
+      background: t.$bg-muted;
+    }
+  }
+
+  &:nth-child(2) .g-names {
+    width: 70%;
+  }
+
+  &:nth-child(3) {
+    opacity: 0.6;
+
+    .g-names {
+      width: 50%;
+    }
+  }
 }
 
 .log {
   display: flex;
   flex-direction: column;
   max-height: 560px;
+
+  > .ad-card-head {
+    row-gap: 14px;
+  }
 }
 
 .log-filter {
   display: flex;
+  flex-basis: 100%;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 0 22px 12px;
 
   .ad-chip {
     height: 28px;
@@ -341,7 +443,6 @@
   margin: 0;
   padding: 4px 22px 16px;
   overflow-y: auto;
-  border-top: 1px solid t.$line-soft;
   list-style: none;
 
   li {
@@ -365,9 +466,30 @@
   }
 
   .log-empty {
-    display: block;
-    color: t.$text-3;
+    column-span: all;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: 6px;
+    padding: 36px 8px;
+    border: 0;
+    text-align: center;
   }
+
+  .empty-text {
+    font-size: t.$text-base;
+  }
+}
+
+.log-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: t.$brand-50;
+  color: t.$brand;
 }
 
 .log-dot {
@@ -396,18 +518,180 @@
   line-height: 1.45;
 }
 
-.drawer-facts {
+// On phones each duel is a small block instead of a wide table row.
+@media (max-width: 640px) {
+  .duels {
+    min-width: 0;
+
+    thead {
+      display: none;
+    }
+
+    tbody,
+    tr,
+    td {
+      display: block;
+    }
+
+    tbody tr {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas:
+        'pair duel score'
+        'pair players age'
+        'pair progress phase';
+      gap: 8px 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+
+    td,
+    td:first-child,
+    td:last-child {
+      height: auto;
+      padding: 0;
+      border: 0;
+    }
+
+    .c-duel {
+      grid-area: duel;
+    }
+
+    .c-pair {
+      grid-area: pair;
+      padding-top: 2px;
+    }
+
+    .players {
+      grid-area: players;
+      min-width: 0;
+    }
+
+    .c-progress {
+      grid-area: progress;
+    }
+
+    .c-phase {
+      grid-area: phase;
+      justify-self: end;
+    }
+
+    .score {
+      grid-area: score;
+      justify-self: end;
+    }
+
+    .c-age {
+      grid-area: age;
+      justify-self: end;
+    }
+  }
+
+  .ghost-row {
+    grid-template-columns: 36px minmax(0, 1fr) 32px;
+
+    .g-bar {
+      display: none;
+    }
+  }
+}
+
+// The four figures of the moment, as on the other pages.
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.pair {
+  display: flex;
+
+  .initial {
+    width: 26px;
+    height: 26px;
+    background: t.$brand;
+    box-shadow: 0 0 0 2px #fff;
+
+    & + .initial {
+      margin-left: -4px;
+      background: t.$cyan;
+    }
+  }
+}
+
+// The queue in the band: everyone as a chip, the long waiting in amber.
+.queue {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 30px;
+    padding: 0 10px 0 3px;
+    border: 1px solid rgba(0, 50, 125, 0.1);
+    border-radius: 99px;
+    font-size: t.$text-base;
+
+    &.long {
+      border-color: #f1d58a;
+      background: t.$warning-bg;
+
+      .w-time {
+        color: t.$warning-text;
+        font-weight: t.$medium;
+      }
+    }
+  }
+
+  .initial {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
+  }
+
+  .code {
+    height: 22px;
+    margin-left: 1px;
+    border-radius: 99px;
+    font-size: 11px;
+  }
+
+  .empty {
+    flex-basis: 100%;
+  }
+}
+
+.wait-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  margin: 0 0 22px;
-  padding: 14px 16px;
-  border-radius: t.$radius;
-  background: t.$bg-subtle;
+  gap: 8px;
+  margin: 0 0 18px;
+
+  div {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: t.$bg-subtle;
+  }
 
   dt {
     color: t.$text-3;
-    font-size: t.$text-sm;
+    font-size: 12px;
   }
 
   dd {
@@ -415,85 +699,264 @@
     font-size: t.$text-lg;
     font-weight: t.$bold;
     @include t.numeric;
+
+    &.warn {
+      color: t.$warning-text;
+    }
   }
 }
 
-.rounds {
-  display: grid;
-  gap: 0;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.more-wait {
+  margin: 14px 0 0;
 }
 
-.round {
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: 14px;
-  padding: 14px 0;
-  border-bottom: 1px solid t.$line-soft;
+// The two players at the start of a row.
+.c-pair {
+  width: 52px;
+  padding-right: 0 !important;
+}
 
-  &.now {
-    margin-bottom: 4px;
-    padding: 14px 16px;
-    border: 1px solid t.$brand-200;
-    border-radius: t.$radius;
-    background: t.$brand-50;
+.duels,
+.raster {
+  th.c-pair + th,
+  td.c-pair + td {
+    padding-left: 8px;
   }
 }
 
-.round-n {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: t.$brand;
-  color: #fff;
-  font-size: t.$text-sm;
-  font-weight: t.$bold;
+// Table or grid, as two icons beside the mode.
+.view-icons {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: t.$bg-muted;
 
-  .now > & {
-    background: t.$cyan;
+  button {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: t.$text-3;
+    cursor: pointer;
+
+    &:hover {
+      color: t.$text;
+    }
+
+    &.is-active {
+      background: #fff;
+      color: t.$brand;
+      box-shadow: 0 1px 2px rgba(0, 50, 125, 0.16);
+    }
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
   }
 }
 
-.round-q {
-  font-size: t.$text-md;
-  font-weight: t.$medium;
-  line-height: 1.45;
-}
-
-.round-meta {
-  margin-top: 3px;
-  color: t.$text-3;
-  font-size: t.$text-sm;
-}
-
-.answers {
+.head-tools {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 10px;
+  align-items: center;
+  gap: 10px;
 }
 
-.answer {
-  @include c.badge(danger);
-  height: 26px;
-  font-weight: t.$regular;
-  @include t.numeric;
+// The chart takes the height of its row, so no card stands half empty.
+.chart-card.is-fill {
+  display: flex;
+  flex-direction: column;
+}
 
-  &.right {
-    @include c.badge-tone(success);
+.chart-fill {
+  position: relative;
+  flex: 1;
+  min-height: 200px;
+}
+
+.chart-fill-in {
+  position: absolute;
+  inset: 0;
+}
+
+// A short log: the newest entries, the rest on demand.
+.log.is-short {
+  max-height: none;
+
+  .log-list {
+    overflow: visible;
+  }
+}
+
+.log-more {
+  padding: 10px 22px 16px;
+  border-top: 1px solid rgba(0, 50, 125, 0.08);
+}
+
+// A short queue as one calm band over the duels.
+.band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 28px;
+  padding: 16px 22px;
+
+  @media (max-width: 640px) {
+    padding: 16px;
+  }
+}
+
+.band-head {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+
+  h2 {
+    font-size: 17px;
+    letter-spacing: -0.01em;
+  }
+}
+
+.band-stats {
+  display: flex;
+  gap: 18px;
+  margin: 0;
+
+  div {
+    display: grid;
   }
 
-  b {
+  dt {
+    color: t.$text-3;
+    font-size: 12px;
+  }
+
+  dd {
+    margin: 0;
+    font-size: t.$text-md;
     font-weight: t.$bold;
+    @include t.numeric;
   }
 }
 
-.upcoming {
-  margin-top: 16px;
-  color: t.$text-3;
-  font-size: t.$text-base;
+.band .queue {
+  flex: 1;
+  min-width: 260px;
+  padding-left: 28px !important;
+  border-left: 1px solid rgba(0, 50, 125, 0.08);
+
+  @media (max-width: 900px) {
+    padding-left: 0 !important;
+    border-left: 0;
+  }
+}
+
+// The board under the figures: the duels over the full width, the rest so no
+// card stands half empty. A short queue is a band over the duels, with the
+// curve and the log of one height below; a long one gets its own column.
+.board {
+  display: grid;
+  gap: 20px;
+
+  @media (max-width: 1024px) {
+    gap: 16px;
+  }
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 20px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+
+// Beside the curve the log takes its height and scrolls inside it.
+.fit {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+
+  > .log {
+    flex: 1;
+  }
+
+  @media (min-width: 1201px) {
+    contain: size;
+    min-height: 380px;
+
+    > .log {
+      max-height: none;
+    }
+  }
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+
+.split-main {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+
+  @media (max-width: 1200px) {
+    gap: 16px;
+  }
+}
+
+// On the narrowest phones the phase takes its own line under the progress.
+@media (max-width: 380px) {
+  .duels tbody tr {
+    grid-template-areas:
+      'pair duel score'
+      'pair players age'
+      'pair progress progress'
+      'pair phase phase';
+
+    .c-phase {
+      justify-self: start;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .duels {
+    .players {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .c-duel {
+      min-width: 0;
+    }
+
+    td.c-pair + td {
+      padding-left: 0;
+    }
+
+    .duel-open {
+      flex-wrap: wrap;
+      row-gap: 4px;
+      text-align: left;
+    }
+  }
 }

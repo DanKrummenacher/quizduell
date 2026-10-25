@@ -32,11 +32,28 @@ export class PlayControl {
     await this.set(false, 'Spiel freigegeben – Duelle starten wieder');
   }
 
+  /** Duels that still play to the end. */
+  private running(): number {
+    return this.data.live()?.duels.filter((d) => d.phase !== 'finished').length ?? 0;
+  }
+
   private async set(paused: boolean, done: string): Promise<void> {
     this.busy.set(true);
     try {
       await this.data.setPaused(paused);
-      this.notify.success(done);
+      const running = this.running();
+      this.notify.success(
+        done,
+        paused ? { label: 'Rückgängig', run: () => void this.resume() } : undefined,
+        {
+          kind: paused ? 'pause' : 'resume',
+          detail: paused
+            ? running
+              ? `${running === 1 ? 'Ein laufendes Duell spielt' : `${running} laufende Duelle spielen`} noch zu Ende.`
+              : 'Gerade läuft kein Duell.'
+            : 'Neue Duelle und Revanchen starten wieder.',
+        },
+      );
     } catch {
       this.notify.error('Das hat nicht geklappt. Bitte versuche es nochmals.');
     } finally {
