@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AdConfirmDialogComponent } from '../../ui/confirm-dialog.component';
+import { AdFaceliftSwitcherComponent } from '../../ui/facelift-switcher.component';
 import { AdNoticesComponent } from '../../ui/notices.component';
 
 /**
@@ -16,11 +17,17 @@ import { AdNoticesComponent } from '../../ui/notices.component';
  */
 @Component({
   selector: 'app-admin-root',
-  imports: [RouterOutlet, AdNoticesComponent, AdConfirmDialogComponent],
+  imports: [
+    RouterOutlet,
+    AdNoticesComponent,
+    AdConfirmDialogComponent,
+    AdFaceliftSwitcherComponent,
+  ],
   template: `
     <router-outlet />
     <app-ad-notices />
     <app-ad-confirm-dialog />
+    <app-ad-facelift-switcher />
   `,
   styleUrl: './admin-root.component.scss',
   encapsulation: ViewEncapsulation.None,

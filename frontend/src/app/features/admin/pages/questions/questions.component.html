@@ -72,18 +72,11 @@
     <ng-container *ngTemplateOutlet="healthSelect" />
     <ng-container *ngTemplateOutlet="sortSelect" />
   </div>
-  @if (filtersActive() || (selected().size > 0 && selected().size < range().total)) {
+  @if (filtersActive()) {
     <div class="summary">
-      @if (filtersActive()) {
-        <button type="button" class="btn-ghost btn-sm" (click)="resetFilters()">
-          Filter zurücksetzen
-        </button>
-      }
-      @if (selected().size > 0 && selected().size < range().total) {
-        <button type="button" class="btn-ghost btn-sm" (click)="selectAllFiltered()">
-          Alle {{ formatInt(range().total) }} auswählen
-        </button>
-      }
+      <button type="button" class="btn-ghost btn-sm" (click)="resetFilters()">
+        Filter zurücksetzen
+      </button>
     </div>
   } @else {
     <div class="summary-gap"></div>
@@ -254,7 +247,7 @@
   }
 </main>
 
-@if (selected().size > 0) {
+@if (selected().size > 0 && face() === '0') {
   <div class="bulk" role="region" aria-label="Ausgewählte Fragen">
     <span class="bulk-count"
       ><b>{{ formatInt(selected().size) }}</b> ausgewählt</span
@@ -361,6 +354,431 @@
     </button>
   </div>
 }
+
+@if (selected().size > 0 && face() !== '0') {
+  <div
+    class="sb"
+    [attr.data-v]="face()"
+    role="region"
+    aria-label="Ausgewählte Fragen"
+  >
+    <span class="sb-badge" aria-hidden="true"
+      ><css-icon icon="checkmark" size="sm"></css-icon
+      ><i>{{ formatInt(selection().count) }}</i></span
+    >
+    <span class="sb-main">
+      <b>{{
+        selection().count === 1
+          ? '1 Frage ausgewählt'
+          : formatInt(selection().count) + ' Fragen ausgewählt'
+      }}</b>
+      @if (face() === 'b5') {
+        <span class="sb-sub"
+          >{{ selection().active }} im Spiel · {{ selection().paused }} pausiert ·
+          {{
+            selection().categories.length === 1
+              ? selection().categories[0]
+              : selection().categories.length + ' Kategorien'
+          }}</span
+        >
+      } @else {
+        <span class="sb-sub">
+          @if (selection().count < filtered().length) {
+            <button type="button" class="sb-link" (click)="selectAllFiltered()">
+              Alle {{ formatInt(filtered().length) }} auswählen
+            </button>
+            ·
+          }
+          <button type="button" class="sb-link" (click)="clearSelection()">
+            Auswahl aufheben
+          </button>
+        </span>
+      }
+    </span>
+    <div class="sb-actions">
+      @switch (face().startsWith('k') ? 'b4' : face()) {
+        @case ('b2') {
+          <button
+            type="button"
+            class="sb-btn"
+            [disabled]="busy()"
+            (click)="bulk('activate')"
+          >
+            Ins Spiel
+          </button>
+          <button
+            type="button"
+            class="sb-btn"
+            [disabled]="busy()"
+            (click)="bulk('deactivate')"
+          >
+            Pausieren
+          </button>
+          <ng-container *ngTemplateOutlet="catBtn" />
+          <button
+            type="button"
+            class="sb-btn"
+            [disabled]="busy()"
+            (click)="exportCsv()"
+          >
+            Exportieren
+          </button>
+          <button
+            type="button"
+            class="sb-btn"
+            [disabled]="busy()"
+            (click)="bulk('reset')"
+          >
+            Statistik zurücksetzen
+          </button>
+          <span class="sb-sep" aria-hidden="true"></span>
+          <button
+            type="button"
+            class="sb-btn is-danger"
+            [disabled]="busy()"
+            (click)="bulk('delete')"
+          >
+            Löschen
+          </button>
+        }
+        @case ('b3') {
+          <span class="sb-group">
+            <span class="sb-group-label">Spiel</span>
+            <button
+              type="button"
+              class="sb-btn"
+              [disabled]="busy()"
+              (click)="bulk('activate')"
+            >
+              Ins Spiel
+            </button>
+            <button
+              type="button"
+              class="sb-btn"
+              [disabled]="busy()"
+              (click)="bulk('deactivate')"
+            >
+              Pausieren
+            </button>
+          </span>
+          <span class="sb-sep" aria-hidden="true"></span>
+          <span class="sb-group">
+            <span class="sb-group-label">Ordnen</span>
+            <ng-container *ngTemplateOutlet="catBtn" />
+            <button
+              type="button"
+              class="sb-btn"
+              [disabled]="busy()"
+              (click)="exportCsv()"
+            >
+              Exportieren
+            </button>
+          </span>
+          <span class="sb-sep" aria-hidden="true"></span>
+          <ng-container *ngTemplateOutlet="moreBtn; context: { $implicit: false }" />
+        }
+        @case ('b4') {
+          <ng-container *ngTemplateOutlet="playPause" />
+          <span class="sb-menu-wrap">
+            <button
+              type="button"
+              class="sb-icon"
+              data-tip="Kategorie"
+              aria-label="Kategorie ändern"
+              [disabled]="busy()"
+              [attr.aria-expanded]="categoryMenu()"
+              (click)="categoryMenu.set(!categoryMenu()); moreMenu.set(false)"
+            >
+              <css-icon icon="items-list" size="sm"></css-icon>
+            </button>
+            @if (categoryMenu()) {
+              <ng-container *ngTemplateOutlet="catMenu" />
+            }
+          </span>
+          <button
+            type="button"
+            class="sb-icon"
+            data-tip="Exportieren"
+            aria-label="Exportieren"
+            [disabled]="busy()"
+            (click)="exportCsv()"
+          >
+            <css-icon icon="download" size="sm"></css-icon>
+          </button>
+          <button
+            type="button"
+            class="sb-icon"
+            data-tip="Statistik zurücksetzen"
+            aria-label="Statistik zurücksetzen"
+            [disabled]="busy()"
+            (click)="bulk('reset')"
+          >
+            <css-icon icon="reload" size="sm"></css-icon>
+          </button>
+          <span class="sb-sep" aria-hidden="true"></span>
+          <button
+            type="button"
+            class="sb-icon is-danger"
+            data-tip="Löschen"
+            aria-label="Löschen"
+            [disabled]="busy()"
+            (click)="bulk('delete')"
+          >
+            <css-icon icon="trash" size="sm"></css-icon>
+          </button>
+        }
+        @default {
+          <button
+            type="button"
+            class="sb-btn"
+            [disabled]="busy()"
+            (click)="bulk('activate')"
+          >
+            Ins Spiel
+          </button>
+          <button
+            type="button"
+            class="sb-btn"
+            [disabled]="busy()"
+            (click)="bulk('deactivate')"
+          >
+            Pausieren
+          </button>
+          <ng-container *ngTemplateOutlet="moreBtn; context: { $implicit: true }" />
+        }
+      }
+    </div>
+    <button
+      type="button"
+      class="sb-close"
+      aria-label="Auswahl aufheben"
+      (click)="clearSelection()"
+    >
+      <css-icon icon="close" size="xs"></css-icon>
+    </button>
+  </div>
+}
+
+<ng-template #playPause>
+  @let sel = selection();
+  @let toPlay = sel.paused;
+  @let toPause = sel.active;
+  @switch (face()) {
+    @case ('k2') {
+      @if (toPlay > 0) {
+        <button
+          type="button"
+          class="sb-icon"
+          [attr.data-tip]="
+            toPlay === 1 ? '1 Frage ins Spiel' : toPlay + ' Fragen ins Spiel'
+          "
+          aria-label="Ins Spiel"
+          [disabled]="busy()"
+          (click)="bulk('activate')"
+        >
+          <css-icon icon="play-circle" size="sm"></css-icon>
+        </button>
+      }
+      @if (toPause > 0) {
+        <button
+          type="button"
+          class="sb-icon"
+          [attr.data-tip]="
+            toPause === 1 ? '1 Frage pausieren' : toPause + ' Fragen pausieren'
+          "
+          aria-label="Pausieren"
+          [disabled]="busy()"
+          (click)="bulk('deactivate')"
+        >
+          <css-icon icon="pause-circle" size="sm"></css-icon>
+        </button>
+      }
+    }
+    @case ('k3') {
+      <button
+        type="button"
+        class="sb-icon"
+        [attr.data-tip]="
+          toPlay === 0
+            ? 'Schon alle im Spiel'
+            : toPlay === 1
+              ? '1 Frage ins Spiel'
+              : toPlay + ' Fragen ins Spiel'
+        "
+        aria-label="Ins Spiel"
+        [disabled]="busy() || toPlay === 0"
+        (click)="bulk('activate')"
+      >
+        <css-icon icon="play-circle" size="sm"></css-icon>
+        @if (toPlay > 0 && toPlay < sel.count) {
+          <i class="sb-icon-count">{{ toPlay }}</i>
+        }
+      </button>
+      <button
+        type="button"
+        class="sb-icon"
+        [attr.data-tip]="
+          toPause === 0
+            ? 'Schon alle pausiert'
+            : toPause === 1
+              ? '1 Frage pausieren'
+              : toPause + ' Fragen pausieren'
+        "
+        aria-label="Pausieren"
+        [disabled]="busy() || toPause === 0"
+        (click)="bulk('deactivate')"
+      >
+        <css-icon icon="pause-circle" size="sm"></css-icon>
+        @if (toPause > 0 && toPause < sel.count) {
+          <i class="sb-icon-count">{{ toPause }}</i>
+        }
+      </button>
+    }
+    @default {
+      <button
+        type="button"
+        class="sb-icon"
+        [attr.data-tip]="toPlay === 0 ? 'Schon alle im Spiel' : 'Ins Spiel'"
+        aria-label="Ins Spiel"
+        [disabled]="busy() || toPlay === 0"
+        (click)="bulk('activate')"
+      >
+        <css-icon icon="play-circle" size="sm"></css-icon>
+      </button>
+      <button
+        type="button"
+        class="sb-icon"
+        [attr.data-tip]="toPause === 0 ? 'Schon alle pausiert' : 'Pausieren'"
+        aria-label="Pausieren"
+        [disabled]="busy() || toPause === 0"
+        (click)="bulk('deactivate')"
+      >
+        <css-icon icon="pause-circle" size="sm"></css-icon>
+      </button>
+    }
+  }
+</ng-template>
+
+<ng-template #catBtn>
+  <span class="sb-menu-wrap">
+    <button
+      type="button"
+      class="sb-btn"
+      [disabled]="busy()"
+      [attr.aria-expanded]="categoryMenu()"
+      (click)="categoryMenu.set(!categoryMenu()); moreMenu.set(false)"
+    >
+      Kategorie<span
+        class="sb-chev"
+        [class.is-open]="categoryMenu()"
+        aria-hidden="true"
+      ></span>
+    </button>
+    @if (categoryMenu()) {
+      <ng-container *ngTemplateOutlet="catMenu" />
+    }
+  </span>
+</ng-template>
+
+<ng-template #moreBtn let-withCategory>
+  <span class="sb-menu-wrap">
+    <button
+      type="button"
+      class="sb-btn"
+      [disabled]="busy()"
+      [attr.aria-expanded]="moreMenu()"
+      (click)="moreMenu.set(!moreMenu()); categoryMenu.set(false)"
+    >
+      Mehr<span
+        class="sb-chev"
+        [class.is-open]="moreMenu()"
+        aria-hidden="true"
+      ></span>
+    </button>
+    @if (moreMenu()) {
+      <div class="sb-menu" role="menu">
+        @if (withCategory) {
+          <button
+            type="button"
+            role="menuitem"
+            (click)="moreMenu.set(false); categoryMenu.set(true)"
+          >
+            <css-icon icon="items-list" size="xs"></css-icon>In Kategorie verschieben
+            …
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            (click)="moreMenu.set(false); exportCsv()"
+          >
+            <css-icon icon="download" size="xs"></css-icon>Exportieren
+          </button>
+        }
+        <button
+          type="button"
+          role="menuitem"
+          (click)="moreMenu.set(false); bulk('reset')"
+        >
+          <css-icon icon="reload" size="xs"></css-icon>Statistik zurücksetzen
+        </button>
+        <span class="sb-menu-sep" aria-hidden="true"></span>
+        <button
+          type="button"
+          role="menuitem"
+          class="is-danger"
+          (click)="moreMenu.set(false); bulk('delete')"
+        >
+          <css-icon icon="trash" size="xs"></css-icon>Löschen
+        </button>
+      </div>
+    }
+    @if (categoryMenu() && withCategory) {
+      <ng-container *ngTemplateOutlet="catMenu" />
+    }
+  </span>
+</ng-template>
+
+<ng-template #catMenu>
+  <div class="sb-menu is-category" role="menu">
+    <span class="sb-menu-title">In Kategorie verschieben</span>
+    <form
+      class="sb-new"
+      (submit)="$event.preventDefault(); moveToCategory(newCategory())"
+    >
+      <label class="ad-input">
+        <span class="ad-sr">Neue Kategorie</span>
+        <input
+          type="text"
+          placeholder="Neue Kategorie"
+          maxlength="50"
+          [value]="newCategory()"
+          (input)="onNewCategory($event)"
+        />
+      </label>
+      <button
+        type="submit"
+        class="btn-primary btn-sm"
+        [disabled]="!newCategory().trim()"
+      >
+        OK
+      </button>
+    </form>
+    @for (name of data.categories(); track name) {
+      <button type="button" role="menuitem" (click)="moveToCategory(name)">
+        {{ name }}
+      </button>
+    }
+    <span class="sb-menu-sep" aria-hidden="true"></span>
+    <button
+      type="button"
+      role="menuitem"
+      class="is-muted"
+      (click)="moveToCategory(null)"
+    >
+      Kategorie entfernen
+    </button>
+  </div>
+</ng-template>
 
 @if (editing() !== null) {
   <app-question-editor

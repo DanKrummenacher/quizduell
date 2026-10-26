@@ -15,6 +15,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import '@css-ch/components/icon';
+import { facelift } from '../../core/facelift-preview';
 import {
   type AdminQuestion,
   type BulkAction,
@@ -77,7 +78,11 @@ const SORTS: { id: Sort; label: string }[] = [
     QuestionTrashComponent,
   ],
   templateUrl: './questions.component.html',
-  styleUrls: ['./questions.component.scss', './questions-bulk.scss'],
+  styleUrls: [
+    './questions.component.scss',
+    './questions-bulk.scss',
+    './questions-bar.scss',
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class QuestionsComponent {
@@ -114,6 +119,26 @@ export class QuestionsComponent {
     () => this.data.trash.value()?.length ?? 0,
   );
   protected readonly categoryMenu = signal(false);
+
+  /** Temporary: the draft of the selection bar shown. */
+  protected readonly face = computed(() => facelift() ?? '0');
+  /** The menu with the rarer actions of the bar. */
+  protected readonly moreMenu = signal(false);
+
+  /** The selected questions by their state, for the bar. */
+  protected readonly selection = computed(() => {
+    const selected = this.selected();
+    const all = this.data.questions.value() ?? [];
+    const picked = all.filter((q) => selected.has(q.id));
+    const active = picked.filter((q) => q.active).length;
+    const categories = new Set(picked.map((q) => q.category ?? 'Ohne Kategorie'));
+    return {
+      count: picked.length,
+      active,
+      paused: picked.length - active,
+      categories: [...categories],
+    };
+  });
   protected readonly newCategory = signal('');
 
   private readonly destroyRef = inject(DestroyRef);
