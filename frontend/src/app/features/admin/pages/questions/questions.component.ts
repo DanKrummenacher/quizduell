@@ -114,6 +114,21 @@ export class QuestionsComponent {
     () => this.data.trash.value()?.length ?? 0,
   );
   protected readonly categoryMenu = signal(false);
+
+  /** The selected questions by their state, for the bar. */
+  protected readonly selection = computed(() => {
+    const selected = this.selected();
+    const all = this.data.questions.value() ?? [];
+    const picked = all.filter((q) => selected.has(q.id));
+    const active = picked.filter((q) => q.active).length;
+    const categories = new Set(picked.map((q) => q.category ?? 'Ohne Kategorie'));
+    return {
+      count: picked.length,
+      active,
+      paused: picked.length - active,
+      categories: [...categories],
+    };
+  });
   protected readonly newCategory = signal('');
 
   private readonly destroyRef = inject(DestroyRef);
