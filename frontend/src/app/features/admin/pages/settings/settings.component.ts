@@ -2,16 +2,19 @@ import {
   Component,
   computed,
   CUSTOM_ELEMENTS_SCHEMA,
+  DestroyRef,
   effect,
   HostListener,
   inject,
   signal,
   untracked,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import '@css-ch/components/icon';
 import type {
   AdminSettings,
+  AuditEntry,
   NumericSettingKey,
 } from '../../../../core/contracts/admin.contract';
 import { AdminApi } from '../../core/admin-api.service';
@@ -32,6 +35,7 @@ import {
 } from '../../core/settings-meta';
 import { AdStateComponent } from '../../ui/state.component';
 import { AdToggleComponent } from '../../ui/toggle.component';
+import { AutofocusDirective } from '../../ui/autofocus.directive';
 import { messageOf } from '../questions/questions.component';
 import { AdPageHeadComponent } from '../../ui/page-head.component';
 
@@ -40,12 +44,51 @@ export interface UnsavedChanges {
   hasUnsavedChanges(): boolean;
 }
 
-/** The rules of the game, with what they mean before they are saved. */
+/** A rule with its value, limits and standard, as the rows show it. */
+interface Row {
+  meta: SettingMeta;
+  value: number | boolean;
+  number: number;
+  limit: { min: number; max: number } | null;
+  changed: boolean;
+  invalid: boolean;
+  defaultText: string | null;
+  rangeText: string;
+}
+
+/** The values offered in a rule's menu; any other is typed in. */
+const QUICK_VALUES: Partial<Record<keyof AdminSettings, number[]>> = {
+  questionsPerGame: [5, 7, 10, 15],
+  questionDurationSec: [10, 15, 20, 30],
+  revealDurationSec: [3, 4, 6, 8],
+  rematchTimeoutSec: [30, 45, 60, 90],
+  idleResetSec: [0, 60, 120, 300],
+};
+
+/** How long «Verwerfen» can be taken back, and «Gespeichert» stays. */
+const UNDO_MS = 6000;
+const SAVED_MS = 2600;
+
+/**
+ * The rules of the game in two steps: a preset for the flow of a duel, then
+ * every rule on its own. Changes wait in a bar and are reviewed before saving.
+ */
 @Component({
   selector: 'app-admin-settings',
-  imports: [AdPageHeadComponent, RouterLink, AdStateComponent, AdToggleComponent],
+  imports: [
+    AdPageHeadComponent,
+    AdStateComponent,
+    AdToggleComponent,
+    AutofocusDirective,
+    NgTemplateOutlet,
+    RouterLink,
+  ],
   templateUrl: './settings.component.html',
-  styleUrl: './settings.component.scss',
+  styleUrls: [
+    './settings.component.scss',
+    './settings-rules.scss',
+    './settings-bar.scss',
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class SettingsComponent implements UnsavedChanges {
@@ -54,13 +97,28 @@ export class SettingsComponent implements UnsavedChanges {
   private readonly notify = inject(NotifyService);
   private readonly confirm = inject(ConfirmService);
 
-  protected readonly meta = SETTINGS_META;
   protected readonly formatSetting = formatSetting;
-  protected readonly formatRelative = formatRelative;
 
   protected readonly draft = signal<AdminSettings | null>(null);
   protected readonly saving = signal(false);
   protected readonly error = signal<string | null>(null);
+
+  /** The chapters open; the first one at the start. */
+  protected readonly openChapters = signal<ReadonlySet<number>>(new Set([0]));
+  /** The rule whose value menu is open, and the option under the keys. */
+  protected readonly menuKey = signal<string | null>(null);
+  protected readonly menuActive = signal(0);
+  /** The review above the bar, and the short notes after saving or discarding. */
+  protected readonly reviewOpen = signal(false);
+  protected readonly justSaved = signal(false);
+  protected readonly discarded = signal<AdminSettings | null>(null);
+
+  /** When the first unsaved change was made; the clock refreshes the text. */
+  private readonly dirtySince = signal<number | null>(null);
+  private readonly now = signal(Date.now());
+  /** The last saves of the rules, from the log. */
+  private readonly history = signal<AuditEntry[] | null>(null);
+  private discardTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor() {
     // Take over the saved rules when they arrive, unless the admin is editing.
@@ -70,6 +128,23 @@ export class SettingsComponent implements UnsavedChanges {
         this.draft.set({ ...view.settings });
       }
     });
+    effect(() => {
+      const dirty = this.dirty();
+      untracked(() => {
+        if (!dirty) {
+          this.dirtySince.set(null);
+          this.reviewOpen.set(false);
+        } else if (this.dirtySince() === null) {
+          this.dirtySince.set(Date.now());
+        }
+      });
+    });
+    const clock = setInterval(() => this.now.set(Date.now()), 30_000);
+    inject(DestroyRef).onDestroy(() => {
+      clearInterval(clock);
+      clearTimeout(this.discardTimer);
+    });
+    void this.loadHistory();
   }
 
   hasUnsavedChanges(): boolean {
@@ -80,6 +155,29 @@ export class SettingsComponent implements UnsavedChanges {
   protected onBeforeUnload(event: BeforeUnloadEvent): void {
     if (this.dirty()) {
       event.preventDefault();
+    }
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  protected onKey(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      this.menuKey.set(null);
+      this.reviewOpen.set(false);
+    } else if (
+      (event.metaKey || event.ctrlKey) &&
+      event.key.toLowerCase() === 's' &&
+      this.dirty()
+    ) {
+      event.preventDefault();
+      void this.save();
+    }
+  }
+
+  @HostListener('document:mousedown', ['$event'])
+  protected onPointer(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (this.menuKey() && !target?.closest('[data-menu]')) {
+      this.menuKey.set(null);
     }
   }
 
@@ -101,6 +199,8 @@ export class SettingsComponent implements UnsavedChanges {
     }
     return SETTINGS_META.filter((meta) => draft[meta.key] !== saved[meta.key]).map(
       (meta) => ({
+        key: meta.key,
+        meta,
         label: meta.label,
         before: formatSetting(meta.key, saved[meta.key]),
         after: formatSetting(meta.key, draft[meta.key]),
@@ -129,7 +229,7 @@ export class SettingsComponent implements UnsavedChanges {
   });
 
   /** One row per rule with everything the template shows. */
-  protected readonly rows = computed(() => {
+  protected readonly rows = computed((): Row[] => {
     const draft = this.draft();
     const saved = this.saved();
     const limits = this.limits();
@@ -159,20 +259,47 @@ export class SettingsComponent implements UnsavedChanges {
     });
   });
 
+  /** The rules in the order of a duel: how it runs, the points, what follows. */
+  protected readonly chapters = computed(() => {
+    const rows = this.rows();
+    const pick = (keys: (keyof AdminSettings)[]) =>
+      rows.filter((r) => keys.includes(r.meta.key));
+    return [
+      {
+        title: 'Ablauf eines Duells',
+        rows: pick(['questionsPerGame', 'questionDurationSec', 'revealDurationSec']),
+      },
+      { title: 'Punkte', rows: pick(['speedBonusEnabled']) },
+      { title: 'Nach dem Duell', rows: pick(['rematchTimeoutSec', 'idleResetSec']) },
+    ];
+  });
+
+  protected readonly allOpen = computed(
+    () => this.openChapters().size === this.chapters().length,
+  );
+
+  private readonly avgAnswerMs = computed(() => {
+    const questions = this.data.questions.value() ?? [];
+    const answered = questions.reduce((sum, q) => sum + q.stats.answers, 0);
+    const answerMs = questions.reduce(
+      (sum, q) => sum + (q.stats.avgAnswerMs ?? 0) * q.stats.answers,
+      0,
+    );
+    return answered > 0 ? answerMs / answered : null;
+  });
+
+  private readonly activeQuestions = computed(
+    () => (this.data.questions.value() ?? []).filter((q) => q.active).length,
+  );
+
   /** What the rules mean for players, with the measured answer time. */
   protected readonly impact = computed(() => {
     const draft = this.draft();
     if (!draft) {
       return null;
     }
-    const questions = this.data.questions.value() ?? [];
-    const active = questions.filter((q) => q.active).length;
-    const answered = questions.reduce((sum, q) => sum + q.stats.answers, 0);
-    const answerMs = questions.reduce(
-      (sum, q) => sum + (q.stats.avgAnswerMs ?? 0) * q.stats.answers,
-      0,
-    );
-    const avgAnswerMs = answered > 0 ? answerMs / answered : null;
+    const active = this.activeQuestions();
+    const avgAnswerMs = this.avgAnswerMs();
     const length = duelLength(draft, avgAnswerMs ?? undefined);
     const maxPoints = draft.questionsPerGame * (draft.speedBonusEnabled ? 200 : 100);
     const warnings: string[] = [];
@@ -197,10 +324,298 @@ export class SettingsComponent implements UnsavedChanges {
       duelsWithoutRepeat: draft.questionsPerGame
         ? Math.max(0, Math.floor(active / draft.questionsPerGame))
         : 0,
-      avgAnswer: avgAnswerMs === null ? null : formatSeconds(avgAnswerMs),
       warnings,
     };
   });
+
+  /** The same three figures saved and now, with the difference in words. */
+  protected readonly effects = computed(() => {
+    const draft = this.draft();
+    const saved = this.saved();
+    if (!draft || !saved) {
+      return [];
+    }
+    const avg = this.avgAnswerMs() ?? undefined;
+    const active = this.activeQuestions();
+    const of = (s: AdminSettings) => [
+      duelLength(s, avg).typical,
+      s.questionsPerGame * (s.speedBonusEnabled ? 200 : 100),
+      s.questionsPerGame ? Math.floor(active / s.questionsPerGame) : 0,
+    ];
+    const before = of(saved);
+    const after = of(draft);
+    const figures = [
+      {
+        label: 'Ein Duell dauert',
+        show: (n: number) => formatDuration(n),
+        words: (d: number) =>
+          `${Math.round(Math.abs(d) / 1000)} s ${d < 0 ? 'kürzer' : 'länger'}`,
+      },
+      {
+        label: 'Höchstpunktzahl',
+        show: (n: number) => formatInt(n),
+        words: (d: number) =>
+          `${formatInt(Math.abs(d))} ${d < 0 ? 'weniger' : 'mehr'}`,
+      },
+      {
+        label: 'Ohne Wiederholung',
+        show: (n: number) => `${n} Duelle`,
+        words: (d: number) => `${Math.abs(d)} ${d < 0 ? 'weniger' : 'mehr'}`,
+      },
+    ];
+    return figures.map((figure, i) => {
+      const b = before[i]!;
+      const a = after[i]!;
+      return {
+        label: figure.label,
+        before: figure.show(b),
+        after: figure.show(a),
+        changed: a !== b,
+        words: figure.words(a - b),
+      };
+    });
+  });
+
+  /** Three presets for the flow of a duel; «Eigene» is any other mix. */
+  protected readonly presets = computed(() => {
+    const defaults = this.defaults();
+    const draft = this.draft();
+    if (!defaults || !draft) {
+      return [];
+    }
+    const list = [
+      {
+        id: 'short',
+        label: 'Kurz',
+        values: {
+          questionsPerGame: 5,
+          questionDurationSec: 15,
+          revealDurationSec: 3,
+        },
+      },
+      {
+        id: 'default',
+        label: 'Standard',
+        values: {
+          questionsPerGame: defaults.questionsPerGame,
+          questionDurationSec: defaults.questionDurationSec,
+          revealDurationSec: defaults.revealDurationSec,
+        },
+      },
+      {
+        id: 'long',
+        label: 'Ausführlich',
+        values: {
+          questionsPerGame: 10,
+          questionDurationSec: 25,
+          revealDurationSec: 5,
+        },
+      },
+    ];
+    const avg = this.avgAnswerMs() ?? undefined;
+    return list.map((preset) => ({
+      ...preset,
+      length: formatDuration(
+        duelLength({ ...draft, ...preset.values }, avg).typical,
+      ),
+    }));
+  });
+
+  protected readonly activePreset = computed(() => {
+    const draft = this.draft();
+    return (
+      this.presets().find(
+        (preset) =>
+          draft &&
+          Object.entries(preset.values).every(
+            ([key, value]) => draft[key as keyof AdminSettings] === value,
+          ),
+      )?.id ?? null
+    );
+  });
+
+  protected readonly atDefault = computed(() => {
+    const draft = this.draft();
+    const defaults = this.defaults();
+    return (
+      !!draft &&
+      !!defaults &&
+      SETTINGS_META.every((meta) => draft[meta.key] === defaults[meta.key])
+    );
+  });
+
+  /** The last save of the rules as a short figure and a line below it. */
+  protected readonly lastChange = computed(() => {
+    const entry = this.history()?.[0];
+    const at = entry?.at ?? this.data.settings.value()?.updatedAt ?? null;
+    if (!at) {
+      return { value: 'Noch nie', note: 'Es gelten die Standardregeln' };
+    }
+    const date = new Date(at);
+    const now = new Date(this.now());
+    const minutes = Math.round((now.getTime() - date.getTime()) / 60_000);
+    const time = date.toLocaleTimeString('de-CH', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const yesterday = new Date(now.getTime() - 86_400_000);
+    const value =
+      minutes < 1
+        ? 'Gerade eben'
+        : minutes < 60
+          ? `vor ${minutes} Min.`
+          : date.toDateString() === now.toDateString()
+            ? 'Heute'
+            : date.toDateString() === yesterday.toDateString()
+              ? 'Gestern'
+              : date.toLocaleDateString('de-CH', { day: 'numeric', month: 'short' });
+    const count =
+      entry?.before && entry.after
+        ? SETTINGS_META.filter(
+            (meta) => entry.before![meta.key] !== entry.after![meta.key],
+          ).length
+        : 0;
+    const what =
+      entry?.action === 'settings.restore'
+        ? 'wiederhergestellt'
+        : count === 1
+          ? '1 Regel'
+          : count > 1
+            ? `${count} Regeln`
+            : null;
+    return { value, note: what ? `um ${time} · ${what}` : `um ${time}` };
+  });
+
+  protected readonly sinceText = computed(() => {
+    const since = this.dirtySince();
+    return since === null ? '' : formatRelative(since, this.now());
+  });
+
+  private async loadHistory(): Promise<void> {
+    try {
+      const page = await this.api.audit(undefined, 50, false);
+      this.history.set(page.entries.filter((e) => e.action.startsWith('settings.')));
+    } catch {
+      this.history.set([]);
+    }
+  }
+
+  protected summaryOf(rows: Row[]): string {
+    return rows
+      .map((r) =>
+        r.meta.key === 'questionsPerGame'
+          ? `${r.value} Fragen`
+          : r.meta.key === 'speedBonusEnabled'
+            ? `Tempo-Bonus ${r.value ? 'an' : 'aus'}`
+            : `${r.meta.label} ${formatSetting(r.meta.key, r.value)}`,
+      )
+      .join(' · ');
+  }
+
+  protected changedIn(rows: Row[]): number {
+    return rows.filter((r) => r.changed).length;
+  }
+
+  /** The standard of a rule for its column, «An» rather than «an». */
+  protected standardText(row: Row): string {
+    const text = row.defaultText ?? formatSetting(row.meta.key, row.value);
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  protected defaultOf(meta: SettingMeta): number | boolean | null {
+    return this.defaults()?.[meta.key] ?? null;
+  }
+
+  protected quickFor(meta: SettingMeta): number[] {
+    return QUICK_VALUES[meta.key] ?? [];
+  }
+
+  /** What a value would mean, beside it in the menu. */
+  protected optionNote(meta: SettingMeta, value: number): string {
+    const draft = this.draft();
+    if (!draft) {
+      return '';
+    }
+    if (meta.key === 'questionDurationSec') {
+      const avg = this.avgAnswerMs();
+      if (avg !== null && value * 1000 < avg * 1.4) {
+        return 'Zeit läuft oft ab';
+      }
+      return `Duell bis ${formatDuration(duelLength({ ...draft, [meta.key]: value }).max)}`;
+    }
+    if (meta.key === 'questionsPerGame' || meta.key === 'revealDurationSec') {
+      const length = duelLength(
+        { ...draft, [meta.key]: value },
+        this.avgAnswerMs() ?? undefined,
+      );
+      return `Duell ≈ ${formatDuration(length.typical)}`;
+    }
+    if (meta.key === 'idleResetSec') {
+      return value === 0 ? 'Geräte bleiben stehen' : 'nach Ruhe zur Startseite';
+    }
+    return 'zum Einigen';
+  }
+
+  protected toggleChapter(index: number): void {
+    this.openChapters.update((current) => {
+      const next = new Set(current);
+      if (next.has(index)) {
+        next.delete(index);
+      } else {
+        next.add(index);
+      }
+      return next;
+    });
+  }
+
+  protected toggleAll(): void {
+    this.openChapters.set(
+      this.allOpen() ? new Set() : new Set(this.chapters().map((_, i) => i)),
+    );
+  }
+
+  protected toggleMenu(meta: SettingMeta): void {
+    if (this.menuKey() === meta.key) {
+      this.menuKey.set(null);
+      return;
+    }
+    const current = this.draft()?.[meta.key];
+    this.menuActive.set(Math.max(0, this.quickFor(meta).indexOf(current as number)));
+    this.menuKey.set(meta.key);
+  }
+
+  protected closeMenu(row: Row): void {
+    if (!row.invalid) {
+      this.menuKey.set(null);
+    }
+  }
+
+  protected pick(meta: SettingMeta, value: number): void {
+    this.update(meta.key as NumericSettingKey, value);
+    this.menuKey.set(null);
+  }
+
+  /** Arrow keys move through the values, Enter takes one. */
+  protected onMenuKey(event: KeyboardEvent, row: Row): void {
+    const values = this.quickFor(row.meta);
+    if (!values.length || (event.target as HTMLElement).tagName === 'INPUT') {
+      return;
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const step = event.key === 'ArrowDown' ? 1 : -1;
+      this.menuActive.set(
+        (this.menuActive() + step + values.length) % values.length,
+      );
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      this.pick(row.meta, values[this.menuActive()]!);
+    }
+  }
+
+  protected applyPreset(values: Partial<AdminSettings>): void {
+    this.draft.update((draft) => (draft ? { ...draft, ...values } : draft));
+  }
 
   protected setNumber(meta: SettingMeta, event: Event): void {
     const value = Number((event.target as HTMLInputElement).value);
@@ -208,18 +623,6 @@ export class SettingsComponent implements UnsavedChanges {
       meta.key as NumericSettingKey,
       Number.isFinite(value) ? Math.round(value) : 0,
     );
-  }
-
-  protected step(meta: SettingMeta, direction: 1 | -1): void {
-    const key = meta.key as NumericSettingKey;
-    const draft = this.draft();
-    const limits = this.limits();
-    if (!draft || !limits) {
-      return;
-    }
-    const step = meta.step ?? 1;
-    const next = Math.round((draft[key] + direction * step) / step) * step;
-    this.update(key, Math.min(limits[key].max, Math.max(limits[key].min, next)));
   }
 
   protected setBonus(value: boolean): void {
@@ -237,16 +640,52 @@ export class SettingsComponent implements UnsavedChanges {
     }
   }
 
+  /** One change back to its saved value. */
+  protected undo(meta: SettingMeta): void {
+    const saved = this.saved();
+    if (saved) {
+      this.draft.update((draft) =>
+        draft ? { ...draft, [meta.key]: saved[meta.key] } : draft,
+      );
+    }
+  }
+
+  protected async resetAll(): Promise<void> {
+    const sure = await this.confirm.ask({
+      title: 'Alle Regeln auf Standard?',
+      text: 'Alle Werte gehen auf ihren Standard zurück. Gespeichert wird erst mit «Prüfen und speichern».',
+      confirm: 'Auf Standard setzen',
+    });
+    const defaults = this.defaults();
+    if (sure && defaults) {
+      this.draft.set({ ...defaults });
+    }
+  }
+
   private update(key: NumericSettingKey, value: number): void {
     this.draft.update((draft) => (draft ? { ...draft, [key]: value } : draft));
     this.error.set(null);
   }
 
-  protected discard(): void {
+  /** Back to the saved rules; the bar offers them again for a moment. */
+  protected discardSoft(): void {
+    const draft = this.draft();
     const saved = this.saved();
-    if (saved) {
-      this.draft.set({ ...saved });
+    if (!draft || !saved) {
+      return;
     }
+    this.draft.set({ ...saved });
+    this.discarded.set({ ...draft });
+    clearTimeout(this.discardTimer);
+    this.discardTimer = setTimeout(() => this.discarded.set(null), UNDO_MS);
+  }
+
+  protected restoreDiscarded(): void {
+    const draft = this.discarded();
+    if (draft) {
+      this.draft.set(draft);
+    }
+    this.discarded.set(null);
   }
 
   protected async save(): Promise<void> {
@@ -254,9 +693,7 @@ export class SettingsComponent implements UnsavedChanges {
     if (!draft || this.saving() || this.invalid().size > 0) {
       return;
     }
-    const active = (this.data.questions.value() ?? []).filter(
-      (q) => q.active,
-    ).length;
+    const active = this.activeQuestions();
     if (active < draft.questionsPerGame && this.data.questions.value()) {
       const sure = await this.confirm.ask({
         title: 'Trotzdem speichern?',
@@ -274,6 +711,10 @@ export class SettingsComponent implements UnsavedChanges {
       this.data.settings.set(view);
       this.draft.set({ ...view.settings });
       void this.data.hints.reload();
+      void this.loadHistory();
+      this.discarded.set(null);
+      this.justSaved.set(true);
+      setTimeout(() => this.justSaved.set(false), SAVED_MS);
       this.notify.success('Spielregeln gespeichert – gelten ab dem nächsten Duell');
     } catch (error) {
       this.error.set(messageOf(error));

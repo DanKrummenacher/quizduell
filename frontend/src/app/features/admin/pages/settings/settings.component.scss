@@ -1,221 +1,129 @@
 @use '../../styles/tokens' as t;
 
-.layout {
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+
+.ad-page.has-bar {
+  padding-bottom: 120px;
+}
+
+// The figures on top, the fourth leads to the log.
+.figures {
   display: grid;
-  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
-  align-items: start;
-  gap: 20px;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-.rule {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 16px 32px;
-  padding: 20px 24px;
-  border-bottom: 1px solid t.$line-soft;
-  transition: background-color 0.15s ease;
-
-  &:last-child {
-    border-bottom: 0;
-  }
-
-  &.is-changed {
-    background: t.$brand-50;
-    box-shadow: inset 3px 0 0 t.$brand;
-  }
-
-  @media (max-width: 640px) {
-    grid-template-columns: minmax(0, 1fr);
-    padding: 16px;
-  }
-}
-
-.rule-text {
-  display: grid;
-  justify-items: start;
-  gap: 4px;
-}
-
-.rule-label {
-  font-size: t.$text-lg;
-  font-weight: t.$bold;
-}
-
-.rule-description {
-  max-width: 520px;
-  color: t.$text-2;
-  font-size: t.$text-base;
-  line-height: 1.55;
-}
-
-.to-default {
-  margin-top: 2px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: t.$brand;
-  font-size: t.$text-sm;
-  font-weight: t.$medium;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-}
-
-.rule-control {
-  display: grid;
-  justify-items: end;
-  gap: 6px;
-
-  @media (max-width: 640px) {
-    justify-items: start;
-  }
-}
-
-.stepper {
-  display: inline-flex;
-  align-items: center;
-  height: 40px;
-  border: 1px solid t.$line-strong;
-  border-radius: t.$radius;
-  background: t.$bg;
-  // The buttons' hover fill follows the rounded corners.
-  overflow: hidden;
-
-  &:focus-within {
-    border-color: t.$brand;
-  }
-
-  &.is-invalid {
-    border-color: t.$danger;
-  }
-
-  button {
-    display: grid;
-    place-items: center;
-    width: 38px;
-    height: 100%;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: t.$brand;
-    cursor: pointer;
-
-    &:hover:not(:disabled) {
-      background: t.$bg-hover;
-    }
-
-    &:disabled {
-      color: t.$text-4;
-      cursor: default;
-    }
-
-    &:focus-visible {
-      outline-offset: -3px;
-    }
-
-    &:first-child {
-      border-right: 1px solid t.$line-soft;
-    }
-
-    &:last-child {
-      border-left: 1px solid t.$line-soft;
-    }
-  }
-
-  input {
-    width: 56px;
-    height: 100%;
-    padding: 0 0 0 8px;
-    border: 0;
-    background: transparent;
-    font-size: t.$text-lg;
-    font-weight: t.$bold;
-    text-align: right;
-    outline: 0;
-    @include t.numeric;
-    -moz-appearance: textfield;
-
-    &::-webkit-inner-spin-button,
-    &::-webkit-outer-spin-button {
-      margin: 0;
-      -webkit-appearance: none;
-    }
-  }
-}
-
-.unit {
-  width: 26px;
-  padding-left: 4px;
-  color: t.$text-2;
-  font-size: t.$text-md;
-}
-
-.range {
-  color: t.$text-3;
-  font-size: t.$text-sm;
-  @include t.numeric;
-}
-
-.switch {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  height: 40px;
-  font-size: t.$text-md;
-  font-weight: t.$medium;
-}
-
-.side {
-  position: sticky;
-  top: 90px;
-
-  @media (max-width: 1024px) {
-    position: static;
-  }
-}
-
-.facts {
-  display: grid;
+  grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr));
   gap: 16px;
-  margin: 0;
+  margin-bottom: 36px;
 
-  div {
-    display: grid;
-    gap: 2px;
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  dt {
-    color: t.$text-2;
-    font-size: t.$text-base;
-    font-weight: t.$medium;
+  @media (max-width: 480px) {
+    gap: 10px;
+  }
+}
+
+.figure {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  min-width: 0;
+  padding: 20px 22px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  text-decoration: none;
+
+  &.is-lead {
+    border-color: rgba(0, 120, 187, 0.2);
+    background:
+      radial-gradient(60% 90% at 100% 0%, rgba(0, 164, 224, 0.12), transparent 70%),
+      linear-gradient(160deg, #f2f8fd, #e7f0f9);
+
+    .figure-label {
+      color: t.$text;
+      font-weight: t.$bold;
+    }
   }
 
-  dd {
-    margin: 0;
-    font-size: t.$text-2xl;
-    font-weight: t.$bold;
-    @include t.numeric;
+  &.is-link {
+    transition:
+      border-color 0.12s ease,
+      box-shadow 0.12s ease;
+
+    &:hover,
+    &:focus-visible {
+      outline: 0;
+      border-color: rgba(0, 120, 187, 0.35);
+      box-shadow: 0 10px 24px -18px rgba(0, 40, 100, 0.5);
+
+      .figure-go {
+        background: $blue;
+        color: #fff;
+      }
+    }
   }
 
-  .sub {
-    color: t.$text-3;
-    font-size: t.$text-sm;
-    font-weight: t.$regular;
+  @media (max-width: 480px) {
+    padding: 14px 16px;
   }
+}
+
+.figure-label {
+  color: t.$text-3;
+  font-size: 13.5px;
+}
+
+.figure-value {
+  overflow: hidden;
+  font-size: 32px;
+  font-weight: t.$bold;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  @include t.numeric;
+
+  @media (max-width: 480px) {
+    font-size: 24px;
+  }
+}
+
+.figure-note {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.figure-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.figure-go {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
 }
 
 .warning {
   display: flex;
   align-items: flex-start;
   gap: 8px;
-  margin-top: 16px;
+  margin: -20px 0 36px;
   padding: 12px 14px;
-  border-radius: t.$radius;
+  border-radius: 10px;
   background: t.$warning-bg;
   color: t.$warning-text;
   font-size: t.$text-base;
@@ -225,110 +133,257 @@
     flex: none;
     margin-top: 1px;
   }
+
+  & + & {
+    margin-top: -28px;
+  }
 }
 
-.save-bar {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  z-index: 45;
+// The two steps of the page.
+.block {
+  margin-bottom: 36px;
+}
+
+.step {
   display: flex;
   align-items: center;
-  gap: 20px;
-  width: min(880px, calc(100vw - 32px));
-  padding: 10px 10px 10px 22px;
-  border-radius: 30px;
-  background: t.$brand;
-  color: #fff;
-  box-shadow: 0 18px 40px -10px rgba(0, 50, 125, 0.45);
-  transform: translateX(-50%);
-  animation: bar-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
-
-  @keyframes bar-in {
-    from {
-      opacity: 0;
-      transform: translate(-50%, 12px);
-    }
-  }
-
-  @media (max-width: 640px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    border-radius: 18px;
-    padding: 14px 16px;
-  }
+  gap: 14px;
+  margin-bottom: 14px;
 }
 
-.save-text {
+.step-no {
   display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: t.$text;
+  color: #fff;
+  font-size: 14px;
+  font-weight: t.$bold;
+}
+
+.step-text {
   flex: 1;
   min-width: 0;
-  gap: 2px;
-  font-size: t.$text-md;
-}
 
-.save-list {
-  overflow: hidden;
-  color: rgba(255, 255, 255, 0.75);
-  font-size: t.$text-sm;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  h2 {
+    font-size: 17px;
+    font-weight: t.$bold;
+  }
 
-  span + span::before {
-    content: ' · ';
+  p {
+    margin-top: 2px;
+    color: t.$text-3;
+    font-size: 13.5px;
   }
 }
 
-.save-error {
-  color: #ffc5b8;
-  font-size: t.$text-sm;
-  font-weight: t.$medium;
-}
-
-.save-actions {
-  display: flex;
+.link-btn {
   flex: none;
-  gap: 8px;
-
-  @media (max-width: 640px) {
-    justify-content: flex-end;
-  }
-}
-
-.bar-btn {
-  height: 40px;
-  padding: 0 18px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: t.$radius-pill;
-  background: transparent;
-  color: #fff;
-  font-size: t.$text-sm;
-  font-weight: t.$medium;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $blue;
+  font: inherit;
+  font-size: 13px;
   cursor: pointer;
 
-  &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.12);
+  &:hover {
+    text-decoration: underline;
   }
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
+  @media (max-width: 480px) {
+    align-self: flex-start;
+    margin-top: 6px;
+  }
+}
+
+// Presets.
+.presets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  &.primary {
-    border-color: #fff;
-    background: #fff;
-    color: t.$brand;
+  @media (max-width: 480px) {
+    gap: 8px;
+  }
+}
 
-    &:hover:not(:disabled) {
-      background: t.$brand-50;
-    }
+.preset {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+
+  &:hover:not(.is-own) {
+    border-color: rgba(0, 50, 125, 0.22);
   }
 
   &:focus-visible {
-    outline-color: #fff;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.2);
+  }
+
+  &.is-active {
+    border-color: t.$text;
+    box-shadow: inset 0 0 0 1px t.$text;
+  }
+
+  &.is-own {
+    border-style: dashed;
+    cursor: default;
+
+    &.is-active {
+      border-style: solid;
+      background: t.$bg-subtle;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 12px 14px;
+  }
+}
+
+.preset-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+
+  b {
+    font-size: 15px;
+    font-weight: t.$bold;
+  }
+}
+
+.preset-tag {
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: t.$brand-50;
+  color: t.$text-2;
+  font-size: 11.5px;
+  font-weight: t.$medium;
+  line-height: 20px;
+
+  @media (max-width: 480px) {
+    display: none;
+  }
+}
+
+.radio {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-left: auto;
+  border: 1.5px solid rgba(0, 50, 125, 0.28);
+  border-radius: 50%;
+  background: #fff;
+
+  .is-active & {
+    border: 5px solid t.$text;
+  }
+}
+
+.preset-facts {
+  display: grid;
+  gap: 3px;
+  color: t.$text-3;
+  font-size: 13px;
+  @include t.numeric;
+
+  b {
+    color: t.$text;
+    font-weight: t.$medium;
+  }
+}
+
+.preset-length {
+  padding-top: 10px;
+  border-top: 1px solid t.$line-soft;
+  color: t.$text-2;
+  font-size: 12.5px;
+  @include t.numeric;
+}
+
+.preset-own {
+  color: t.$text-3;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+// A small tooltip for buttons that show only an icon.
+[data-tip] {
+  position: relative;
+
+  &::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    z-index: 5;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: t.$text;
+    color: #fff;
+    font-size: 12px;
+    font-weight: t.$medium;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 4px);
+    transition:
+      opacity 0.12s ease,
+      transform 0.12s ease;
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+// Small phones: figures may wrap, the step's action goes under its text.
+@media (max-width: 400px) {
+  .figure-value {
+    font-size: 20px;
+    white-space: normal;
+  }
+
+  .step {
+    flex-wrap: wrap;
+  }
+
+  .link-btn {
+    width: 100%;
+    margin: 0 0 0 44px;
+    text-align: left;
   }
 }

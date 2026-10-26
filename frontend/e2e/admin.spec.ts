@@ -145,9 +145,17 @@ test.describe('admin', () => {
 
   test('changes a rule and restores it from the history', async ({ page }) => {
     await signIn(page, '/admin/regeln');
-    await page.getByRole('button', { name: 'Fragen pro Duell erhöhen' }).click();
-    await expect(page.getByText('Fragen pro Duell 3 → 4')).toBeVisible();
-    await page.getByRole('button', { name: 'Speichern' }).click();
+    await page.getByRole('button', { name: /^Fragen pro Duell ändern/ }).click();
+    await page.getByLabel('Fragen pro Duell, eigener Wert').fill('4');
+    await page.getByRole('button', { name: 'Fertig' }).click();
+    await expect(
+      page.getByText('Eine Änderung wartet aufs Speichern'),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Prüfen und speichern' }).click();
+    const review = page.getByRole('row', { name: /Fragen pro Duell/ });
+    await expect(review.getByRole('cell', { name: '3', exact: true })).toBeVisible();
+    await expect(review.getByRole('cell', { name: '4', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: 'Jetzt speichern' }).click();
     await expect(page.getByText(/Spielregeln gespeichert/)).toBeVisible();
 
     await page.getByRole('link', { name: 'Frühere Regeln' }).click();

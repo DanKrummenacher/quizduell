@@ -1,0 +1,326 @@
+// The floating bar of unsaved changes and the review above it.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$green: #2e8540;
+
+.bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  z-index: 45;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  width: min(820px, calc(100vw - 32px));
+  min-height: 64px;
+  padding: 10px 10px 10px 14px;
+  border: 1px solid rgba(0, 50, 125, 0.12);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    0 24px 50px -18px rgba(0, 40, 100, 0.38),
+    0 2px 6px rgba(0, 50, 125, 0.05);
+  transform: translateX(-50%);
+  animation: bar-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  &.is-note {
+    width: min(440px, calc(100vw - 32px));
+    padding-left: 12px;
+  }
+
+  @media (max-width: 640px) {
+    bottom: 12px;
+  }
+}
+
+@keyframes bar-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+}
+
+.bar-icon,
+.bar-badge {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: t.$brand-50;
+  color: t.$text-2;
+
+  &.is-ok {
+    background: #e8f4ec;
+    color: $green;
+  }
+}
+
+.bar-badge i {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border: 2px solid #fff;
+  border-radius: 9px;
+  background: $blue;
+  color: #fff;
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: t.$bold;
+}
+
+.bar-main {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+
+  > b {
+    font-size: 14px;
+  }
+}
+
+.bar-sub {
+  overflow: hidden;
+  color: t.$text-3;
+  font-size: 12.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-error {
+  flex-basis: 100%;
+  font-size: 12.5px;
+}
+
+.bar-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+
+  @media (max-width: 640px) {
+    width: 100%;
+
+    button {
+      flex: 1;
+    }
+  }
+}
+
+.bar-ghost {
+  height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: t.$text-2;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: t.$bg-hover;
+    color: t.$text;
+  }
+
+  &.is-strong {
+    color: $blue;
+  }
+}
+
+.bar-save {
+  gap: 8px;
+}
+
+.spin {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// The review: the changes, each to take back, and what they mean.
+.review {
+  flex-basis: 100%;
+  display: grid;
+  gap: 14px;
+  max-height: calc(100vh - 220px);
+  padding: 6px 4px 14px 0;
+  overflow-y: auto;
+  border-bottom: 1px solid t.$line-soft;
+  animation: review-in 0.16s ease-out;
+}
+
+@keyframes review-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.review-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+
+  > div {
+    display: grid;
+    gap: 2px;
+  }
+
+  b {
+    font-size: 16px;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: 12.5px;
+  }
+}
+
+.review-btn {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: $blue;
+  cursor: pointer;
+
+  &:hover {
+    background: t.$bg-hover;
+  }
+
+  &.is-close {
+    width: 30px;
+    height: 30px;
+    margin: -4px -4px 0 0;
+    color: t.$text-3;
+
+    &:hover {
+      color: t.$text;
+    }
+  }
+}
+
+.review-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  @include t.numeric;
+
+  th,
+  td {
+    padding: 8px 0;
+    border-bottom: 1px solid t.$line-soft;
+    text-align: left;
+  }
+
+  thead th {
+    padding-top: 0;
+    color: t.$text-3;
+    font-size: 12px;
+    font-weight: t.$regular;
+  }
+
+  tbody th {
+    font-weight: t.$regular;
+  }
+
+  td {
+    width: 90px;
+
+    &:last-child {
+      width: 32px;
+      text-align: right;
+    }
+  }
+
+  .was {
+    color: t.$text-3;
+  }
+}
+
+.effects {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+}
+
+.effect {
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  border: 1px solid t.$line;
+  border-radius: 10px;
+  background: t.$bg-subtle;
+  @include t.numeric;
+
+  &:not(.is-changed) .effect-value {
+    color: t.$text-3;
+    font-weight: t.$medium;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 2px 10px;
+    padding: 9px 12px;
+
+    .effect-value {
+      grid-row: 1;
+      grid-column: 2;
+      font-size: 15px;
+    }
+
+    .effect-note {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.effect-label {
+  color: t.$text-3;
+  font-size: 12px;
+}
+
+.effect-value {
+  font-size: 18px;
+  font-weight: t.$bold;
+  letter-spacing: -0.01em;
+}
+
+.effect-note {
+  color: t.$text-3;
+  font-size: 12px;
+}

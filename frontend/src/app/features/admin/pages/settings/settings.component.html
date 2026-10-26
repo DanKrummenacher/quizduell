@@ -1,132 +1,180 @@
-<main class="ad-page">
+<main class="ad-page" [class.has-bar]="dirty()">
   <app-ad-page-head title="Spielregeln">
     <p headDesc>
       Änderungen gelten ab dem nächsten Duell. Laufende Duelle spielen mit den
       bisherigen Regeln zu Ende.
     </p>
+    <button
+      type="button"
+      class="btn-secondary"
+      [disabled]="atDefault()"
+      (click)="resetAll()"
+    >
+      <css-icon icon="undo" size="xs"></css-icon>Alles auf Standard
+    </button>
     <a class="btn-secondary" routerLink="/admin/verlauf">
       <css-icon icon="time" size="xs"></css-icon>Frühere Regeln
     </a>
   </app-ad-page-head>
 
   @if (draft()) {
-    <div class="layout">
-      <section class="ad-card flush rules" aria-label="Regeln">
-        @for (row of rows(); track row.meta.key) {
-          <div class="rule" [class.is-changed]="row.changed">
-            <div class="rule-text">
-              <label class="rule-label" [attr.for]="'rule-' + row.meta.key">{{
-                row.meta.label
-              }}</label>
-              <p
-                class="rule-description"
-                [id]="'rule-' + row.meta.key + '-description'"
-              >
-                {{ row.meta.description }}
-              </p>
-              @if (row.defaultText) {
-                <button
-                  type="button"
-                  class="to-default"
-                  (click)="toDefault(row.meta)"
-                >
-                  Standard: {{ row.defaultText }}
-                </button>
-              }
-            </div>
-            <div class="rule-control">
-              @if (row.limit; as limit) {
-                <div class="stepper" [class.is-invalid]="row.invalid">
-                  <button
-                    type="button"
-                    [attr.aria-label]="row.meta.label + ' verringern'"
-                    [disabled]="row.number <= limit.min"
-                    (click)="step(row.meta, -1)"
-                  >
-                    <css-icon icon="minus" size="xs"></css-icon>
-                  </button>
-                  <input
-                    [id]="'rule-' + row.meta.key"
-                    type="number"
-                    inputmode="numeric"
-                    [min]="limit.min"
-                    [max]="limit.max"
-                    [step]="row.meta.step ?? 1"
-                    [value]="row.number"
-                    [attr.aria-describedby]="'rule-' + row.meta.key + '-description'"
-                    [attr.aria-invalid]="row.invalid"
-                    (input)="setNumber(row.meta, $event)"
-                  />
-                  <span class="unit" aria-hidden="true">{{
-                    row.meta.unit ?? ''
-                  }}</span>
-                  <button
-                    type="button"
-                    [attr.aria-label]="row.meta.label + ' erhöhen'"
-                    [disabled]="row.number >= limit.max"
-                    (click)="step(row.meta, 1)"
-                  >
-                    <css-icon icon="add" size="xs"></css-icon>
-                  </button>
-                </div>
-                <p class="range" [class.ad-error]="row.invalid">
-                  {{ row.rangeText }}
-                </p>
-              } @else {
-                <span class="switch">
-                  <app-ad-toggle
-                    [checked]="row.value === true"
-                    [label]="row.meta.label"
-                    (toggled)="setBonus($event)"
-                  />
-                  <span>{{ row.value ? 'An' : 'Aus' }}</span>
-                </span>
-              }
-            </div>
-          </div>
-        }
+    @if (impact(); as i) {
+      <section class="figures" aria-label="Was die Regeln bedeuten">
+        <div class="figure is-lead">
+          <span class="figure-label">Ein Duell dauert</span>
+          <span class="figure-value">{{ i.typical }}</span>
+          <span class="figure-note">typisch, höchstens {{ i.max }}</span>
+        </div>
+        <div class="figure">
+          <span class="figure-label">Höchstpunktzahl</span>
+          <span class="figure-value">{{ i.maxPoints }}</span>
+          <span class="figure-note">pro Person und Duell</span>
+        </div>
+        <div class="figure">
+          <span class="figure-label">Ohne Wiederholung</span>
+          <span class="figure-value">{{ i.duelsWithoutRepeat }} Duelle</span>
+          <span class="figure-note">mit {{ i.active }} aktiven Fragen</span>
+        </div>
+        <a
+          class="figure is-link"
+          routerLink="/admin/verlauf"
+          [queryParams]="{ gruppe: 'spielregeln' }"
+        >
+          <span class="figure-label">Zuletzt geändert</span>
+          <span class="figure-value">{{ lastChange().value }}</span>
+          <span class="figure-note figure-row"
+            >{{ lastChange().note }}
+            <span class="figure-go" aria-hidden="true"
+              ><css-icon icon="angle-right" size="xs"></css-icon></span
+          ></span>
+        </a>
       </section>
+      @for (warning of i.warnings; track warning) {
+        <p class="warning">
+          <css-icon icon="priority-warning" size="sm"></css-icon>{{ warning }}
+        </p>
+      }
+    }
 
-      <aside class="side">
-        <section class="ad-card impact">
-          <header class="ad-card-head">
-            <div>
-              <h2>Was das bedeutet</h2>
-              <p>Mit den Regeln links</p>
-            </div>
-          </header>
-          @if (impact(); as i) {
-            <dl class="facts">
-              <div>
-                <dt>Ein Duell dauert</dt>
-                <dd>{{ i.typical }}</dd>
-                <dd class="sub">typisch, höchstens {{ i.max }}</dd>
+    <section class="block" aria-labelledby="presets-title">
+      <div class="step">
+        <span class="step-no" aria-hidden="true">1</span>
+        <div class="step-text">
+          <h2 id="presets-title">Vorlage wählen</h2>
+          <p>
+            Setzt Fragen pro Duell, Zeit pro Frage und Auflösung in einem Schritt.
+          </p>
+        </div>
+      </div>
+      <div class="presets" role="radiogroup" aria-labelledby="presets-title">
+        @for (preset of presets(); track preset.id) {
+          <button
+            type="button"
+            role="radio"
+            class="preset"
+            [class.is-active]="activePreset() === preset.id"
+            [attr.aria-checked]="activePreset() === preset.id"
+            (click)="applyPreset(preset.values)"
+          >
+            <span class="preset-top">
+              <b>{{ preset.label }}</b>
+              @if (preset.id === 'default') {
+                <span class="preset-tag">Empfohlen</span>
+              }
+              <span class="radio" aria-hidden="true"></span>
+            </span>
+            <span class="preset-facts">
+              <span
+                ><b>{{ preset.values.questionsPerGame }}</b> Fragen</span
+              >
+              <span
+                ><b>{{ preset.values.questionDurationSec }} s</b> pro Frage</span
+              >
+              <span
+                ><b>{{ preset.values.revealDurationSec }} s</b> Auflösung</span
+              >
+            </span>
+            <span class="preset-length">Duell ≈ {{ preset.length }}</span>
+          </button>
+        }
+        <div
+          class="preset is-own"
+          role="radio"
+          [class.is-active]="!activePreset()"
+          [attr.aria-checked]="!activePreset()"
+          aria-disabled="true"
+        >
+          <span class="preset-top">
+            <b>Eigene</b>
+            <span class="radio" aria-hidden="true"></span>
+          </span>
+          @if (activePreset()) {
+            <span class="preset-own"
+              >Entsteht, sobald ein Wert von den Vorlagen abweicht.</span
+            >
+          } @else {
+            <span class="preset-facts">
+              <span
+                ><b>{{ draft()!.questionsPerGame }}</b> Fragen</span
+              >
+              <span
+                ><b>{{ draft()!.questionDurationSec }} s</b> pro Frage</span
+              >
+              <span
+                ><b>{{ draft()!.revealDurationSec }} s</b> Auflösung</span
+              >
+            </span>
+            <span class="preset-length">Duell ≈ {{ impact()?.typical }}</span>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="rules-title">
+      <div class="step">
+        <span class="step-no" aria-hidden="true">2</span>
+        <div class="step-text">
+          <h2 id="rules-title">Regeln anpassen</h2>
+          <p>Einzelne Werte ändern. Alles gilt ab dem nächsten Duell.</p>
+        </div>
+        <button type="button" class="link-btn" (click)="toggleAll()">
+          {{ allOpen() ? 'Alle zuklappen' : 'Alle aufklappen' }}
+        </button>
+      </div>
+      <div class="chapters">
+        @for (chapter of chapters(); track chapter.title; let ci = $index) {
+          <section class="chapter" [class.is-open]="openChapters().has(ci)">
+            <button
+              type="button"
+              class="chapter-head"
+              [attr.aria-expanded]="openChapters().has(ci)"
+              (click)="toggleChapter(ci)"
+            >
+              <span class="chev" aria-hidden="true"></span>
+              <span class="chapter-title">
+                <b>{{ chapter.title }}</b>
+                <span>{{ summaryOf(chapter.rows) }}</span>
+              </span>
+              @if (changedIn(chapter.rows); as count) {
+                <span class="changed-tag">{{ count }} geändert</span>
+              }
+            </button>
+            @if (openChapters().has(ci)) {
+              <div class="rules-head" aria-hidden="true">
+                <span>Regel</span>
+                <span>Standard</span>
+                <span>Wert</span>
               </div>
-              <div>
-                <dt>Höchstpunktzahl</dt>
-                <dd>{{ i.maxPoints }}</dd>
-                <dd class="sub">pro Person und Duell</dd>
-              </div>
-              <div>
-                <dt>Ohne Wiederholung</dt>
-                <dd>{{ i.duelsWithoutRepeat }} Duelle</dd>
-                <dd class="sub">mit {{ i.active }} aktiven Fragen</dd>
-              </div>
-            </dl>
-            @for (warning of i.warnings; track warning) {
-              <p class="warning">
-                <css-icon icon="priority-warning" size="sm"></css-icon>{{ warning }}
-              </p>
+              @for (row of chapter.rows; track row.meta.key) {
+                <ng-container
+                  *ngTemplateOutlet="ruleRow; context: { $implicit: row }"
+                />
+              }
             }
-          }
-          @if (data.settings.value()?.updatedAt; as updated) {
-            <p class="ad-card-foot">
-              Zuletzt geändert {{ formatRelative(updated) }}
-            </p>
-          }
-        </section>
-      </aside>
-    </div>
+          </section>
+        }
+      </div>
+    </section>
   } @else if (data.settings.error()) {
     <app-ad-state
       kind="error"
@@ -138,38 +186,296 @@
   }
 </main>
 
-@if (dirty()) {
-  <div class="save-bar" role="region" aria-label="Ungespeicherte Änderungen">
-    <div class="save-text">
-      <b>{{
-        changes().length === 1 ? '1 Änderung' : changes().length + ' Änderungen'
-      }}</b>
-      <span class="save-list">
-        @for (change of changes(); track change.label) {
-          <span>{{ change.label }} {{ change.before }} → {{ change.after }}</span>
+<ng-template #ruleRow let-row>
+  <div class="rule" [class.is-changed]="row.changed">
+    <div class="rule-text">
+      <span class="rule-label">{{ row.meta.label }}</span>
+      <p class="rule-description">{{ row.meta.description }}</p>
+    </div>
+    <div class="rule-control">
+      <span class="rule-standard" [class.is-off]="!!row.defaultText">
+        <span class="rule-standard-label">Standard</span>
+        {{ standardText(row) }}
+        @if (row.defaultText) {
+          <button
+            type="button"
+            class="icon-btn"
+            [attr.aria-label]="row.meta.label + ' auf Standard ' + row.defaultText"
+            data-tip="Auf Standard"
+            (click)="toDefault(row.meta)"
+          >
+            <css-icon icon="undo" size="xs"></css-icon>
+          </button>
+        } @else {
+          <css-icon class="check" icon="checkmark" size="xs"></css-icon>
         }
       </span>
-      @if (error(); as text) {
-        <span class="save-error" role="alert">{{ text }}</span>
+      @if (!row.limit) {
+        <span class="value is-switch" [class.is-on]="row.value === true">
+          <span>{{ row.value ? 'An' : 'Aus' }}</span>
+          <app-ad-toggle
+            [checked]="row.value === true"
+            [label]="row.meta.label"
+            (toggled)="setBonus($event)"
+          />
+        </span>
+      } @else {
+        <div class="value-wrap" data-menu>
+          <button
+            type="button"
+            class="value"
+            [class.is-open]="menuKey() === row.meta.key"
+            aria-haspopup="dialog"
+            [attr.aria-expanded]="menuKey() === row.meta.key"
+            [attr.aria-label]="
+              row.meta.label +
+              ' ändern, jetzt ' +
+              formatSetting(row.meta.key, row.value)
+            "
+            (click)="toggleMenu(row.meta)"
+          >
+            <b>{{ formatSetting(row.meta.key, row.value) }}</b>
+            <css-icon icon="edit" size="xs"></css-icon>
+          </button>
+          @if (menuKey() === row.meta.key) {
+            <ng-container
+              *ngTemplateOutlet="valueMenu; context: { $implicit: row }"
+            />
+          }
+        </div>
       }
     </div>
-    <div class="save-actions">
+  </div>
+</ng-template>
+
+<ng-template #valueMenu let-row>
+  <div
+    appAutofocus
+    tabindex="-1"
+    class="menu"
+    role="dialog"
+    [attr.aria-label]="row.meta.label"
+    (keydown)="onMenuKey($event, row)"
+  >
+    <b class="menu-title">{{ row.meta.label }}</b>
+    <div class="options" role="listbox" [attr.aria-label]="row.meta.label">
+      @for (value of quickFor(row.meta); track value; let i = $index) {
+        <button
+          type="button"
+          role="option"
+          class="option"
+          [class.is-active]="row.number === value"
+          [class.is-focus]="menuActive() === i"
+          [attr.aria-selected]="row.number === value"
+          (mouseenter)="menuActive.set(i)"
+          (click)="pick(row.meta, value)"
+        >
+          <span class="option-radio" aria-hidden="true"></span>
+          <span class="option-value">{{ formatSetting(row.meta.key, value) }}</span>
+          <span class="option-note">{{ optionNote(row.meta, value) }}</span>
+          @if (defaultOf(row.meta) === value) {
+            <span class="option-tag">Standard</span>
+          }
+          <span class="option-check">
+            @if (row.number === value) {
+              <css-icon icon="checkmark" size="xs"></css-icon>
+            }
+          </span>
+        </button>
+      }
+    </div>
+    <div class="own">
+      <span class="own-text">
+        <b>Eigener Wert</b>
+        <span>{{ row.rangeText }}</span>
+      </span>
+      <label class="own-field" [class.is-invalid]="row.invalid">
+        <input
+          type="number"
+          inputmode="numeric"
+          [attr.aria-label]="row.meta.label + ', eigener Wert'"
+          [attr.aria-invalid]="row.invalid"
+          [min]="row.limit!.min"
+          [max]="row.limit!.max"
+          [step]="row.meta.step ?? 1"
+          [value]="row.number"
+          (input)="setNumber(row.meta, $event)"
+          (keydown.enter)="closeMenu(row)"
+        />
+        <span>{{ row.meta.unit ?? '' }}</span>
+      </label>
+    </div>
+    <div class="menu-foot">
       <button
         type="button"
-        class="bar-btn"
-        [disabled]="saving()"
-        (click)="discard()"
+        class="btn-secondary btn-sm"
+        [disabled]="!row.defaultText"
+        (click)="toDefault(row.meta)"
       >
-        Verwerfen
+        <css-icon icon="undo" size="xs"></css-icon>Standard ({{
+          formatSetting(row.meta.key, defaultOf(row.meta) ?? 0)
+        }})
       </button>
       <button
         type="button"
-        class="bar-btn primary"
-        [disabled]="saving() || invalid().size > 0"
-        (click)="save()"
+        class="btn-primary btn-sm"
+        [disabled]="row.invalid"
+        (click)="closeMenu(row)"
       >
-        {{ saving() ? 'Speichert…' : 'Speichern' }}
+        Fertig
       </button>
     </div>
+  </div>
+</ng-template>
+
+@if (dirty() || justSaved() || discarded()) {
+  <div
+    class="bar"
+    [class.is-note]="!dirty()"
+    role="region"
+    aria-label="Ungespeicherte Änderungen"
+    aria-live="polite"
+  >
+    @if (!dirty()) {
+      @if (justSaved()) {
+        <span class="bar-icon is-ok"
+          ><css-icon icon="checkmark-circle" size="sm"></css-icon
+        ></span>
+        <div class="bar-main">
+          <b>Gespeichert</b>
+          <span class="bar-sub">Die Regeln gelten ab dem nächsten Duell.</span>
+        </div>
+      } @else {
+        <span class="bar-icon"><css-icon icon="undo" size="sm"></css-icon></span>
+        <div class="bar-main">
+          <b>Änderungen verworfen</b>
+        </div>
+        <button
+          type="button"
+          class="bar-ghost is-strong"
+          (click)="restoreDiscarded()"
+        >
+          Wiederherstellen
+        </button>
+      }
+    } @else {
+      @if (reviewOpen()) {
+        <div class="review">
+          <div class="review-head">
+            <div>
+              <b>Änderungen prüfen</b>
+              <span
+                >Gilt ab dem nächsten Duell, laufende Duelle bleiben unberührt.</span
+              >
+            </div>
+            <button
+              type="button"
+              class="review-btn is-close"
+              aria-label="Prüfung schliessen"
+              (click)="reviewOpen.set(false)"
+            >
+              <css-icon icon="close" size="xs"></css-icon>
+            </button>
+          </div>
+          <table class="review-table">
+            <thead>
+              <tr>
+                <th scope="col">Regel</th>
+                <th scope="col">Bisher</th>
+                <th scope="col">Neu</th>
+                <th scope="col"><span class="sr-only">Zurücknehmen</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (change of changes(); track change.key) {
+                <tr>
+                  <th scope="row">{{ change.label }}</th>
+                  <td class="was">{{ change.before }}</td>
+                  <td>
+                    <b>{{ change.after }}</b>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="review-btn"
+                      [attr.aria-label]="
+                        change.label + ' zurück auf ' + change.before
+                      "
+                      title="Zurücknehmen"
+                      (click)="undo(change.meta)"
+                    >
+                      <css-icon icon="undo" size="xs"></css-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <div class="effects">
+            @for (effect of effects(); track effect.label) {
+              <div class="effect" [class.is-changed]="effect.changed">
+                <span class="effect-label">{{ effect.label }}</span>
+                <b class="effect-value">{{ effect.after }}</b>
+                <span class="effect-note">{{
+                  effect.changed
+                    ? 'bisher ' + effect.before + ' · ' + effect.words
+                    : 'unverändert'
+                }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+      <span class="bar-badge" aria-hidden="true"
+        ><css-icon icon="edit" size="sm"></css-icon
+        ><i>{{ changes().length }}</i></span
+      >
+      <span class="bar-main">
+        <b>{{
+          changes().length === 1
+            ? 'Eine Änderung wartet aufs Speichern'
+            : changes().length + ' Änderungen warten aufs Speichern'
+        }}</b>
+        <span class="bar-sub"
+          >Geändert {{ sinceText() }} · gilt ab dem nächsten Duell</span
+        >
+      </span>
+      @if (error(); as text) {
+        <span class="ad-error bar-error" role="alert">{{ text }}</span>
+      }
+      <div class="bar-actions">
+        <button
+          type="button"
+          class="bar-ghost"
+          [disabled]="saving()"
+          (click)="discardSoft()"
+        >
+          Verwerfen
+        </button>
+        @if (!reviewOpen()) {
+          <button
+            type="button"
+            class="btn-primary bar-save"
+            [disabled]="invalid().size > 0"
+            (click)="reviewOpen.set(true)"
+          >
+            Prüfen und speichern
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="btn-primary bar-save"
+            [disabled]="saving() || invalid().size > 0"
+            (click)="save()"
+          >
+            @if (saving()) {
+              <span class="spin" aria-hidden="true"></span>Speichert…
+            } @else {
+              Jetzt speichern
+            }
+          </button>
+        }
+      </div>
+    }
   </div>
 }
