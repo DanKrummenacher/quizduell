@@ -5,6 +5,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import '@css-ch/components/icon';
 import type {
   AdminSettings,
@@ -128,6 +129,12 @@ export class AuditComponent {
   }
 
   constructor() {
+    // «Im Verlauf ansehen» elsewhere opens the log on its group.
+    const wanted = inject(ActivatedRoute).snapshot.queryParamMap.get('gruppe');
+    const group = GROUPS.find((g) => g.label.toLowerCase() === wanted);
+    if (group) {
+      this.group.set(group.id);
+    }
     void this.load(true);
   }
 

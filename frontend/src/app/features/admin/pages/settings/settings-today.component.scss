@@ -1,0 +1,340 @@
+@use '../../styles/tokens' as t;
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+  align-items: start;
+  gap: 20px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.rule {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 32px;
+  padding: 20px 24px;
+  border-bottom: 1px solid t.$line-soft;
+  transition: background-color 0.15s ease;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &.is-changed {
+    background: t.$brand-50;
+    box-shadow: inset 3px 0 0 t.$brand;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+  }
+}
+
+.rule-text {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+
+.rule-label {
+  font-size: t.$text-lg;
+  font-weight: t.$bold;
+}
+
+.rule-description {
+  max-width: 520px;
+  color: t.$text-2;
+  font-size: t.$text-base;
+  line-height: 1.55;
+}
+
+.to-default {
+  margin-top: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: t.$brand;
+  font-size: t.$text-sm;
+  font-weight: t.$medium;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.rule-control {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+
+  @media (max-width: 640px) {
+    justify-items: start;
+  }
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  border: 1px solid t.$line-strong;
+  border-radius: t.$radius;
+  background: t.$bg;
+  // The buttons' hover fill follows the rounded corners.
+  overflow: hidden;
+
+  &:focus-within {
+    border-color: t.$brand;
+  }
+
+  &.is-invalid {
+    border-color: t.$danger;
+  }
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: t.$brand;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: t.$bg-hover;
+    }
+
+    &:disabled {
+      color: t.$text-4;
+      cursor: default;
+    }
+
+    &:focus-visible {
+      outline-offset: -3px;
+    }
+
+    &:first-child {
+      border-right: 1px solid t.$line-soft;
+    }
+
+    &:last-child {
+      border-left: 1px solid t.$line-soft;
+    }
+  }
+
+  input {
+    width: 56px;
+    height: 100%;
+    padding: 0 0 0 8px;
+    border: 0;
+    background: transparent;
+    font-size: t.$text-lg;
+    font-weight: t.$bold;
+    text-align: right;
+    outline: 0;
+    @include t.numeric;
+    -moz-appearance: textfield;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      margin: 0;
+      -webkit-appearance: none;
+    }
+  }
+}
+
+.unit {
+  width: 26px;
+  padding-left: 4px;
+  color: t.$text-2;
+  font-size: t.$text-md;
+}
+
+.range {
+  color: t.$text-3;
+  font-size: t.$text-sm;
+  @include t.numeric;
+}
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  font-size: t.$text-md;
+  font-weight: t.$medium;
+}
+
+.side {
+  position: sticky;
+  top: 90px;
+
+  @media (max-width: 1024px) {
+    position: static;
+  }
+}
+
+.facts {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+
+  div {
+    display: grid;
+    gap: 2px;
+  }
+
+  dt {
+    color: t.$text-2;
+    font-size: t.$text-base;
+    font-weight: t.$medium;
+  }
+
+  dd {
+    margin: 0;
+    font-size: t.$text-2xl;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+
+  .sub {
+    color: t.$text-3;
+    font-size: t.$text-sm;
+    font-weight: t.$regular;
+  }
+}
+
+.warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: t.$radius;
+  background: t.$warning-bg;
+  color: t.$warning-text;
+  font-size: t.$text-base;
+  line-height: 1.5;
+
+  css-icon {
+    flex: none;
+    margin-top: 1px;
+  }
+}
+
+.save-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: min(880px, calc(100vw - 32px));
+  padding: 10px 10px 10px 22px;
+  border-radius: 30px;
+  background: t.$brand;
+  color: #fff;
+  box-shadow: 0 18px 40px -10px rgba(0, 50, 125, 0.45);
+  transform: translateX(-50%);
+  animation: bar-in 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  @keyframes bar-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 12px);
+    }
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    border-radius: 18px;
+    padding: 14px 16px;
+  }
+}
+
+.save-text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+  font-size: t.$text-md;
+}
+
+.save-list {
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: t.$text-sm;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  span + span::before {
+    content: ' · ';
+  }
+}
+
+.save-error {
+  color: #ffc5b8;
+  font-size: t.$text-sm;
+  font-weight: t.$medium;
+}
+
+.save-actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+
+  @media (max-width: 640px) {
+    justify-content: flex-end;
+  }
+}
+
+.bar-btn {
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: t.$radius-pill;
+  background: transparent;
+  color: #fff;
+  font-size: t.$text-sm;
+  font-weight: t.$medium;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  &.primary {
+    border-color: #fff;
+    background: #fff;
+    color: t.$brand;
+
+    &:hover:not(:disabled) {
+      background: t.$brand-50;
+    }
+  }
+
+  &:focus-visible {
+    outline-color: #fff;
+  }
+}
+
+// The bar's buttons as they were.
+:host .bar-btn {
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

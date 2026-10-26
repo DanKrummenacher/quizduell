@@ -1,0 +1,234 @@
+// Temporary: Runde 26 of the rules page, the tag and the aligned table.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$ink: #00508a;
+$chip: 124px;
+$col: 140px;
+
+// Every value chip has the same width: the value left, the pencil right.
+.d-row.is-even-chips .t-trigger[data-kind='chip'] {
+  justify-content: space-between;
+  width: $chip;
+}
+
+// Als Marke: the tag itself is the button.
+.d-row.is-even-chips[data-pos='pill'] .d-side {
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.d-tag {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid t.$line;
+  border-radius: 14px;
+  background: t.$bg-subtle;
+  color: t.$text-2;
+  font: inherit;
+  font-size: 12.5px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background-color 0.12s ease,
+    color 0.12s ease;
+  @include t.numeric;
+
+  css-icon {
+    color: t.$text-3;
+  }
+
+  &:hover,
+  &:focus-visible {
+    outline: 0;
+    border-color: $blue;
+    background: #fff;
+    color: $blue;
+
+    css-icon {
+      color: currentColor;
+    }
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.18);
+  }
+
+  &.is-changed {
+    border-color: rgba(0, 120, 187, 0.3);
+    background: #fff;
+    color: $ink;
+
+    css-icon {
+      color: $blue;
+    }
+  }
+
+  &.is-std {
+    padding: 0 10px;
+    border-color: transparent;
+    background: none;
+    color: t.$text-3;
+    cursor: default;
+
+    i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: t.$text-4;
+    }
+  }
+}
+
+// Wird zu «Zurücksetzen»: on hover the tag says what a click does.
+.d-tag[data-style='swap'] {
+  > span {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .d-tag-b {
+    visibility: hidden;
+  }
+
+  &:hover,
+  &:focus-visible {
+    .d-tag-a {
+      visibility: hidden;
+    }
+
+    .d-tag-b {
+      visibility: visible;
+    }
+  }
+}
+
+// Zweiteilig: text and reset in one tag, divided by a line.
+.d-tag[data-style='split'] {
+  gap: 0;
+  padding: 0;
+
+  .d-tag-text {
+    padding: 0 10px 0 12px;
+  }
+
+  .d-tag-icon {
+    display: grid;
+    place-items: center;
+    align-self: stretch;
+    width: 30px;
+    border-left: 1px solid t.$line;
+  }
+
+  &:hover .d-tag-icon,
+  &.is-changed .d-tag-icon {
+    border-left-color: rgba(0, 120, 187, 0.3);
+  }
+}
+
+// Alter Wert gestrichen.
+.d-tag[data-style='strike'] s {
+  color: t.$text-3;
+  text-decoration-color: rgba(0, 50, 125, 0.4);
+}
+
+// In Worten: a quiet link in tag form.
+.d-tag[data-style='words'] {
+  border-color: transparent;
+  background: none;
+  color: $blue;
+
+  &:hover {
+    border-color: rgba(0, 120, 187, 0.3);
+    background: #f2f8fe;
+  }
+
+  &.is-changed {
+    border-color: transparent;
+    background: none;
+  }
+}
+
+// Tabelle: header and cells in the same grid, all left aligned.
+.d-thead[data-thead] {
+  grid-template-columns: minmax(0, 1fr) $col $chip;
+  gap: 16px;
+  padding-right: 22px;
+
+  .d-thead-std,
+  .d-thead-val {
+    text-align: left;
+  }
+}
+
+.d-row[data-pos='table'][data-thead] {
+  .d-ctl {
+    gap: 16px;
+  }
+
+  .d-tcell {
+    justify-content: flex-start;
+    width: $col;
+  }
+
+  .d-chipwrap {
+    justify-content: flex-start;
+    min-width: $chip;
+  }
+}
+
+// Mit Streifen.
+.a7:has(.d-thead[data-thead='zebra']) .d-row:nth-of-type(even):not(.is-changed) {
+  background: t.$bg-subtle;
+}
+
+// Mit Spaltenlinien.
+.d-thead[data-thead='lines'] {
+  .d-thead-std,
+  .d-thead-val {
+    margin-left: -16px;
+    padding-left: 15px;
+    border-left: 1px solid t.$line;
+  }
+}
+
+.d-row[data-pos='table'][data-thead='lines'] {
+  .d-tcell,
+  .d-chipwrap {
+    align-self: stretch;
+    margin: -18px 0;
+    padding: 18px 0 18px 15px;
+    border-left: 1px solid t.$line-soft;
+  }
+
+  .d-tcell {
+    width: calc(#{$col} + 16px);
+    margin-left: -16px;
+  }
+
+  .d-chipwrap {
+    margin-left: -16px;
+  }
+}
+
+// Kräftiger Kopf.
+.d-thead[data-thead='strong'] {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid t.$line;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  font-size: 12px;
+  font-weight: t.$bold;
+  letter-spacing: 0;
+}

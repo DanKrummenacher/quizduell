@@ -1,0 +1,240 @@
+// Temporary: Runde 23 of the rules page.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$ink: #00508a;
+
+// Als Spalte: the standard as its own small column, aligned in every row.
+.d-col {
+  display: grid;
+  justify-items: end;
+  width: 104px;
+  margin-right: 6px;
+  padding-right: 16px;
+  border-right: 1px solid t.$line-soft;
+  @include t.numeric;
+
+  @media (max-width: 760px) {
+    justify-items: start;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+}
+
+.d-col-cap {
+  color: t.$text-4;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.d-col-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: t.$text-3;
+  font-size: 13.5px;
+
+  .d-act {
+    height: 22px;
+    min-width: 22px;
+    margin: 0 -4px 0 2px;
+  }
+
+  .is-off & {
+    color: t.$text;
+  }
+
+  .is-changed & {
+    color: $ink;
+  }
+}
+
+// Punkt mit Hinweis: a dot that explains itself on hover.
+.d-hint-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: t.$text-4;
+  cursor: help;
+
+  &.is-changed {
+    background: $blue;
+  }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.2);
+  }
+}
+
+// Segment am Chip: the standard or old value attached on the left.
+.d-chipwrap.has-seg .t-trigger[data-kind='chip'] {
+  border-radius: 0 9px 9px 0;
+}
+
+.d-seg {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 12px;
+  border: 0;
+  border-right: 1px solid rgba(0, 50, 125, 0.1);
+  border-radius: 9px 0 0 9px;
+  background: t.$bg-subtle;
+  box-shadow: inset 0 0 0 1px t.$line;
+  color: t.$text-3;
+  font: inherit;
+  font-size: 12.5px;
+  white-space: nowrap;
+  cursor: pointer;
+  @include t.numeric;
+
+  &:hover {
+    color: $blue;
+  }
+
+  &.is-changed {
+    background: #f2f8fe;
+    color: $ink;
+  }
+}
+
+// Karte beim Überfahren.
+.d-chipwrap {
+  position: relative;
+}
+
+.d-card {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  gap: 4px;
+  min-width: 200px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 50, 125, 0.12);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 16px 34px -14px rgba(0, 40, 100, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease,
+    visibility 0.12s;
+
+  .d-chipwrap:hover &,
+  .d-chipwrap:focus-within & {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  // Keeps the card open on the way from the chip to it.
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    height: 12px;
+  }
+}
+
+.d-card-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12.5px;
+  @include t.numeric;
+
+  span {
+    color: t.$text-3;
+  }
+}
+
+.d-card-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 6px 0 0;
+  border: 0;
+  border-top: 1px solid t.$line-soft;
+  background: none;
+  color: $blue;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: t.$medium;
+  cursor: pointer;
+}
+
+// Geändert -------------------------------------------------------------------
+// Chip gestrichelt: unsaved is a draft, the edge says so.
+.d-row[data-chg='dashed'].is-changed .t-trigger[data-kind='chip'] {
+  background: #fff;
+  box-shadow: none;
+  outline: 1.5px dashed $blue;
+  outline-offset: -1.5px;
+}
+
+// Nummeriert: the same numbers as in the review list.
+.d-num {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: $blue;
+  color: #fff;
+  font-size: 11px;
+  font-weight: t.$bold;
+}
+
+// Zeile angehoben: the changed row lifts off the list.
+.d-row[data-chg='raised'].is-changed {
+  position: relative;
+  z-index: 1;
+  margin: 0 -6px;
+  padding-right: 28px;
+  padding-left: 50px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgba(0, 120, 187, 0.25),
+    0 10px 24px -14px rgba(0, 40, 100, 0.45);
+
+  @media (max-width: 760px) {
+    padding-left: 28px;
+  }
+}
+
+// Wertseite gefärbt: the value side becomes a small tinted panel.
+.d-row[data-chg='valuepanel'].is-changed .r7-control {
+  margin: -8px -10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #eaf3fc;
+
+  .t-trigger[data-kind='chip'] {
+    background: #fff;
+  }
+}
+
+// Verlauf von links.
+.d-row[data-chg='fade'].is-changed {
+  background: linear-gradient(90deg, #e4f0fb 0%, rgba(228, 240, 251, 0) 55%);
+}
+
+// Titel unterstrichen.
+.d-row[data-chg='underline'].is-changed .d-label-text {
+  color: $ink;
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 120, 187, 0.5);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}

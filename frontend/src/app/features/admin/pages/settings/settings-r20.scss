@@ -1,0 +1,140 @@
+// Temporary: Runde 20 of the rules page, how a changed rule looks.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$tint: #dfeefb;
+$ink: #00508a;
+
+$styles: 'chipundo', 'arrow', 'under', 'tooltip', 'line', 'tint', 'quiet', 'tagnew';
+
+// In all of them the changed value chip turns a quiet blue.
+@each $style in $styles {
+  .t-row[data-chg='#{$style}'].is-changed .t-trigger[data-kind='chip'] {
+    background: $tint;
+    box-shadow: inset 0 0 0 1px rgba(0, 120, 187, 0.28);
+
+    b {
+      color: $ink;
+    }
+
+    css-icon {
+      color: rgba(0, 80, 138, 0.6);
+    }
+
+    &:hover {
+      background: #d2e6f8;
+    }
+  }
+}
+
+// Chip + Rückgängig-Symbol / Vorher → neu: a round undo after the chip.
+.t-undo.is-after {
+  width: 30px;
+  height: 30px;
+  border-color: transparent;
+  background: none;
+  color: t.$text-3;
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.14);
+    background: #fff;
+    color: $blue;
+  }
+}
+
+.t-was.is-plain {
+  color: rgba(0, 80, 138, 0.55);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.t-arrow {
+  margin: 0 -2px;
+  color: rgba(0, 80, 138, 0.45);
+  font-size: 12px;
+}
+
+// Hinweis unter dem Text.
+.t-under {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  color: $ink;
+  font-size: 12.5px;
+  @include t.numeric;
+
+  i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $blue;
+  }
+
+  button {
+    margin-left: 4px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: $blue;
+    font: inherit;
+    font-weight: t.$medium;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Bisher beim Überfahren.
+.t-changed-word {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: $ink;
+
+  i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $blue;
+  }
+}
+
+// Linie links: a full-height line at the edge of the card.
+.t-row[data-chg='line'].is-changed::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: $blue;
+}
+
+// Zeile getönt.
+.t-row[data-chg='tint'].is-changed {
+  background: #f6faff;
+}
+
+// Marke am Titel.
+.t-tagnew {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+  padding: 0 8px;
+  border: 1px solid rgba(0, 120, 187, 0.3);
+  border-radius: 10px;
+  color: $ink;
+  font-size: 11.5px;
+  font-weight: t.$medium;
+
+  i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: $blue;
+  }
+}

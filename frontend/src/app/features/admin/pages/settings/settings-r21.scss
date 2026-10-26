@@ -1,0 +1,221 @@
+// Temporary: Runde 21 of the rules page, Standard / Bisher and the change mark.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$tint: #dfeefb;
+$ink: #00508a;
+
+// One line: the row is as tall as its text, not taller.
+.d-row {
+  align-items: center;
+  padding-top: 18px;
+  padding-bottom: 18px;
+
+  .r7-label::after {
+    display: none;
+  }
+
+  .r7-control {
+    gap: 4px;
+  }
+}
+
+.d-ctl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  @media (max-width: 760px) {
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+  }
+}
+
+.d-side {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 28px;
+  color: t.$text-3;
+  font-size: 12.5px;
+  white-space: nowrap;
+  @include t.numeric;
+}
+
+.d-info {
+  &.is-changed {
+    color: $ink;
+  }
+
+  &.is-std {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    i {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: t.$text-4;
+    }
+  }
+}
+
+.d-act {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 26px;
+  height: 26px;
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: $blue;
+  font: inherit;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover {
+    background: t.$bg-hover;
+  }
+}
+
+.d-below {
+  .d-act {
+    margin-left: 8px;
+    padding: 0;
+
+    &:hover {
+      background: none;
+      text-decoration: underline;
+    }
+  }
+}
+
+// Am Titel: the note sits after the rule name, in its line.
+.d-at-label {
+  min-height: 0;
+  margin-left: 6px;
+  font-weight: t.$regular;
+
+  &::before {
+    content: '·';
+    margin-right: 6px;
+    color: t.$text-4;
+  }
+
+  .d-act {
+    height: 22px;
+    min-width: 22px;
+  }
+}
+
+// Beim Überfahren: the note waits until the row is pointed at.
+.d-row[data-pos='hover'] .d-side {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.d-row[data-pos='hover']:hover .d-side,
+.d-row[data-pos='hover']:focus-within .d-side,
+.d-row[data-pos='hover'].is-changed .d-side {
+  opacity: 1;
+}
+
+// Markierungen.
+.d-row.is-changed .t-trigger[data-kind='chip'] {
+  background: $tint;
+  box-shadow: inset 0 0 0 1px rgba(0, 120, 187, 0.28);
+
+  b {
+    color: $ink;
+  }
+
+  css-icon {
+    color: rgba(0, 80, 138, 0.6);
+  }
+
+  &:hover {
+    background: #d2e6f8;
+  }
+}
+
+.d-row[data-chg='outline'].is-changed .t-trigger[data-kind='chip'] {
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px $blue;
+}
+
+.d-row[data-chg='chipdot'].is-changed .t-trigger[data-kind='chip'] {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 9px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: $blue;
+  }
+}
+
+.d-row[data-chg='label'].is-changed {
+  .t-trigger[data-kind='chip'] {
+    background: t.$bg-muted;
+    box-shadow: none;
+
+    b {
+      color: t.$text;
+    }
+  }
+
+  .d-label-text {
+    color: $ink;
+  }
+}
+
+.d-dot {
+  width: 7px;
+  height: 7px;
+  margin-right: -2px;
+  border-radius: 50%;
+  background: $blue;
+}
+
+// Rückgängig am Chip: the chip and its undo are one control.
+.d-chipwrap {
+  display: inline-flex;
+  align-items: center;
+
+  &.has-undo .t-trigger[data-kind='chip'] {
+    border-radius: 9px 0 0 9px;
+  }
+}
+
+.d-chip-undo {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid rgba(0, 120, 187, 0.25);
+  border-radius: 0 9px 9px 0;
+  background: $tint;
+  box-shadow: inset 0 0 0 1px rgba(0, 120, 187, 0.28);
+  color: $blue;
+  cursor: pointer;
+
+  &:hover {
+    background: #d2e6f8;
+  }
+}
+
+.d-at-label .d-info.is-std i {
+  display: none;
+}

@@ -25,7 +25,7 @@
   }
 
   &.is-changed {
-    background: t.$brand-50;
+    background: #f4f8fd;
     box-shadow: inset 3px 0 0 t.$brand;
   }
 
@@ -54,16 +54,22 @@
 }
 
 .to-default {
-  margin-top: 2px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: t.$brand;
-  font-size: t.$text-sm;
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  margin-top: 4px;
+  padding: 0 10px;
+  border: 1px solid rgba(0, 50, 125, 0.14);
+  border-radius: 99px;
+  background: #fff;
+  color: t.$text;
+  font-size: 12.5px;
   font-weight: t.$medium;
-  text-decoration: underline;
-  text-underline-offset: 3px;
   cursor: pointer;
+
+  &:hover {
+    border-color: #0078bb;
+  }
 }
 
 .rule-control {
@@ -79,15 +85,16 @@
 .stepper {
   display: inline-flex;
   align-items: center;
-  height: 40px;
-  border: 1px solid t.$line-strong;
-  border-radius: t.$radius;
+  height: 38px;
+  border: 1px solid rgba(0, 50, 125, 0.18);
+  border-radius: 9px;
   background: t.$bg;
   // The buttons' hover fill follows the rounded corners.
   overflow: hidden;
 
   &:focus-within {
-    border-color: t.$brand;
+    border-color: #0078bb;
+    box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.16);
   }
 
   &.is-invalid {
@@ -215,7 +222,7 @@
   gap: 8px;
   margin-top: 16px;
   padding: 12px 14px;
-  border-radius: t.$radius;
+  border-radius: 10px;
   background: t.$warning-bg;
   color: t.$warning-text;
   font-size: t.$text-base;
@@ -229,7 +236,7 @@
 
 .save-bar {
   position: fixed;
-  bottom: 24px;
+  bottom: calc(24px + var(--switcher-h, 0px));
   left: 50%;
   z-index: 45;
   display: flex;
@@ -300,13 +307,11 @@
   height: 40px;
   padding: 0 18px;
   border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: t.$radius-pill;
+  border-radius: 99px;
   background: transparent;
   color: #fff;
-  font-size: t.$text-sm;
+  font-size: 13.5px;
   font-weight: t.$medium;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   cursor: pointer;
 
   &:hover:not(:disabled) {
@@ -331,4 +336,554 @@
   &:focus-visible {
     outline-color: #fff;
   }
+}
+
+// Room for the save bar under the last rule.
+.ad-page.has-bar {
+  padding-bottom: 120px;
+}
+
+// -----------------------------------------------------------------------------
+// Temporary: the facelift drafts
+// -----------------------------------------------------------------------------
+
+// Kapitel: the rules in three chapters of a duel.
+.chapters {
+  display: grid;
+  gap: 24px;
+}
+
+.chapter-head {
+  margin-bottom: 10px;
+
+  h2 {
+    font-size: 17px;
+    font-weight: t.$bold;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin-top: 2px;
+    color: t.$text-3;
+    font-size: 13px;
+  }
+}
+
+// Zeitleiste: one duel as a strip, start, questions and reveals.
+.impact-timeline {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid t.$line-soft;
+}
+
+.impact-big {
+  font-size: 28px;
+  font-weight: t.$bold;
+  letter-spacing: -0.02em;
+  @include t.numeric;
+
+  small {
+    display: block;
+    margin-top: 2px;
+    color: t.$text-3;
+    font-size: 12.5px;
+    font-weight: t.$regular;
+    letter-spacing: 0;
+  }
+}
+
+.timeline {
+  display: flex;
+  gap: 2px;
+  height: 14px;
+}
+
+.tl-seg {
+  display: block;
+  min-width: 2px;
+  border-radius: 3px;
+
+  &.is-count {
+    background: t.$line-strong;
+  }
+
+  &.is-question {
+    background: t.$brand;
+  }
+
+  &.is-reveal {
+    background: #7fd3f7;
+  }
+}
+
+.tl-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  color: t.$text-3;
+  font-size: 12px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  i {
+    width: 10px;
+    height: 6px;
+    border-radius: 2px;
+
+    &.is-count {
+      background: t.$line-strong;
+    }
+
+    &.is-question {
+      background: t.$brand;
+    }
+
+    &.is-reveal {
+      background: #7fd3f7;
+    }
+  }
+}
+
+.facts.is-pair {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  dd {
+    font-size: t.$text-xl;
+  }
+
+  dd.sub {
+    font-size: t.$text-sm;
+  }
+}
+
+// Kacheln: every rule a tile with its value large.
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 20px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+
+  &.is-changed {
+    border-color: rgba(0, 120, 187, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(0, 120, 187, 0.2);
+  }
+
+  .rule-description {
+    flex: 1;
+  }
+}
+
+.tile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  .rule-label {
+    font-size: 15px;
+  }
+}
+
+.changed-tag {
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: t.$brand-50;
+  color: t.$brand;
+  font-size: 11.5px;
+  font-weight: t.$bold;
+  line-height: 20px;
+}
+
+.tile-value {
+  font-size: 28px;
+  font-weight: t.$bold;
+  letter-spacing: -0.02em;
+  @include t.numeric;
+}
+
+.tile-control {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid t.$line-soft;
+}
+
+// Vorschau oben: what the rules mean first, the rules below in two columns.
+.hero {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 20px;
+  padding: 22px 24px;
+}
+
+.hero-figures {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  > div {
+    display: grid;
+    gap: 2px;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.hero-label {
+  color: t.$text-2;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+}
+
+.hero-value {
+  font-size: 30px;
+  font-weight: t.$bold;
+  letter-spacing: -0.025em;
+  @include t.numeric;
+}
+
+.hero-note {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.hero-timeline {
+  display: grid;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid t.$line-soft;
+}
+
+.rules.is-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  .rule {
+    border-right: 1px solid t.$line-soft;
+
+    &:nth-child(2n) {
+      border-right: 0;
+    }
+
+    @media (min-width: 1025px) {
+      &:nth-last-child(2):nth-child(odd) {
+        border-bottom: 0;
+      }
+    }
+  }
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+
+    .rule {
+      border-right: 0;
+    }
+  }
+}
+
+// Schieberegler: each value on a slider between its limits.
+.rule.is-slide {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.slide-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.slide-value {
+  font-size: 20px;
+  font-weight: t.$bold;
+  @include t.numeric;
+}
+
+.slide {
+  display: grid;
+  gap: 4px;
+  margin-top: 4px;
+
+  input {
+    width: 100%;
+    height: 6px;
+    margin: 0;
+    border-radius: 3px;
+    background: linear-gradient(
+      90deg,
+      t.$brand 0 var(--fill),
+      rgba(0, 50, 125, 0.1) var(--fill) 100%
+    );
+    cursor: pointer;
+    appearance: none;
+
+    &::-webkit-slider-thumb {
+      width: 20px;
+      height: 20px;
+      border: 2px solid t.$brand;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 50, 125, 0.3);
+      appearance: none;
+    }
+
+    &::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border: 2px solid t.$brand;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #0078bb;
+      outline-offset: 6px;
+    }
+  }
+}
+
+.slide-scale {
+  display: flex;
+  justify-content: space-between;
+  color: t.$text-3;
+  font-size: 12px;
+  @include t.numeric;
+}
+
+// Vorlagen: three sets of timing, one click each.
+.main-col {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+
+.presets {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px;
+}
+
+.presets-head {
+  h2 {
+    font-size: 17px;
+    font-weight: t.$bold;
+  }
+
+  p {
+    margin-top: 2px;
+    color: t.$text-3;
+    font-size: 13px;
+  }
+}
+
+.preset-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.preset {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  padding: 14px 16px;
+  border: 1px solid rgba(0, 50, 125, 0.12);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover:not(.is-on) {
+    border-color: rgba(0, 120, 187, 0.35);
+  }
+
+  &.is-on {
+    border-color: rgba(0, 120, 187, 0.4);
+    background: linear-gradient(160deg, #f2f8fd, #e7f0f9);
+    box-shadow: inset 0 0 0 1px rgba(0, 120, 187, 0.25);
+  }
+}
+
+.preset-name {
+  font-size: 15px;
+  font-weight: t.$bold;
+}
+
+.preset-note {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.preset-length {
+  margin-top: 6px;
+  font-size: 20px;
+  font-weight: t.$bold;
+  @include t.numeric;
+}
+
+// Spielvorschau: a question as the players see it.
+.phone {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 16px;
+  border-radius: 18px;
+  background: linear-gradient(160deg, #0a3a80, t.$brand 60%, #02265e);
+  color: #fff;
+}
+
+.phone-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 12.5px;
+}
+
+.phone-ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+
+  svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+
+  circle {
+    fill: none;
+    stroke-width: 3;
+  }
+
+  .ring-track {
+    stroke: rgba(255, 255, 255, 0.18);
+  }
+
+  .ring-left {
+    stroke: #7fd3f7;
+    stroke-linecap: round;
+  }
+
+  b {
+    color: #fff;
+    font-size: 12.5px;
+    @include t.numeric;
+  }
+}
+
+.phone-q {
+  font-size: 16px;
+  font-weight: t.$bold;
+  line-height: 1.35;
+}
+
+.phone-answers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+
+  span {
+    padding: 8px 10px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 13px;
+
+    &.is-right {
+      background: #00875e;
+    }
+  }
+}
+
+.phone-points {
+  display: grid;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12.5px;
+
+  span {
+    color: #7fd3f7;
+  }
+}
+
+.flow {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: flow;
+
+  li {
+    position: relative;
+    padding-left: 30px;
+    color: t.$text-2;
+    font-size: 13.5px;
+    counter-increment: flow;
+
+    &::before {
+      content: counter(flow);
+      position: absolute;
+      top: -1px;
+      left: 0;
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: t.$brand-50;
+      color: t.$brand;
+      font-size: 11px;
+      font-weight: t.$bold;
+    }
+  }
+
+  b {
+    color: t.$text;
+    @include t.numeric;
+  }
+}
+
+.preview-foot {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid t.$line-soft;
+  color: t.$text-3;
+  font-size: 13px;
 }

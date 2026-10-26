@@ -1,0 +1,591 @@
+// Temporary: Runde 9 of the rules page, the building blocks.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+
+// The draft panel of the blocks.
+.bb {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  border: 1px dashed rgba(0, 50, 125, 0.25);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.bb-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 13px;
+
+  span {
+    color: t.$text-3;
+  }
+}
+
+.bb-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  @media (max-width: 760px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+.bb-label {
+  flex: none;
+  width: 96px;
+  color: t.$text-2;
+  font-size: 12.5px;
+}
+
+.bb-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  button {
+    height: 28px;
+    padding: 0 10px;
+    border: 1px solid rgba(0, 50, 125, 0.14);
+    border-radius: 7px;
+    background: #fff;
+    color: t.$text-2;
+    font: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+
+    &:hover {
+      color: t.$text;
+    }
+
+    &.is-active {
+      border-color: t.$text;
+      background: t.$text;
+      color: #fff;
+    }
+  }
+}
+
+// Rows.
+.q-row {
+  &:not([data-chg='dot']):not([data-chg='strike']) .r7-label::after {
+    display: none;
+  }
+
+  &[data-chg='strip'].is-changed {
+    background: #f6f9fd;
+    box-shadow: inset 3px 0 0 $blue;
+  }
+
+  &.is-tiles {
+    grid-template-columns: minmax(0, 1fr);
+
+    .r7-control {
+      justify-items: stretch;
+    }
+
+    .r7-meta {
+      justify-content: flex-start;
+    }
+  }
+}
+
+.q-card .r7 {
+  padding-left: 24px;
+}
+
+.q-info {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: t.$text-4;
+  cursor: pointer;
+
+  &:hover,
+  &.is-open {
+    background: t.$bg-hover;
+    color: t.$text;
+  }
+}
+
+.q-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 2px 0 8px;
+  border-radius: 7px;
+  background: #e6f1fa;
+  color: t.$text-2;
+  font-size: 12.5px;
+  font-weight: t.$regular;
+  @include t.numeric;
+
+  b {
+    color: t.$text;
+  }
+}
+
+.q-badge-undo {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: $blue;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.q-effect {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  font-size: 12.5px;
+  @include t.numeric;
+}
+
+.q-strike {
+  s {
+    color: t.$text-4;
+  }
+
+  b {
+    color: t.$text;
+    font-weight: t.$medium;
+  }
+}
+
+.q-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+
+  @media (max-width: 760px) {
+    justify-content: flex-start;
+  }
+}
+
+.q-tiles {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+// Alle offen and Eine Karte.
+.q-title {
+  .changed-tag {
+    order: 1;
+  }
+
+  &::after {
+    order: 2;
+  }
+
+  &.is-first {
+    margin-top: 8px;
+  }
+}
+
+.q-sub {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid t.$line-soft;
+  background: t.$bg-subtle;
+
+  &:not(:first-child) {
+    border-top: 1px solid $hair;
+  }
+}
+
+.q-sub-text {
+  display: grid;
+  gap: 1px;
+
+  b {
+    font-size: 15px;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: 12.5px;
+  }
+}
+
+// Reiter.
+.q-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  overflow-x: auto;
+  border-bottom: 1px solid $hair;
+}
+
+.q-tab {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 52px;
+  padding: 0 10px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: t.$text-2;
+  font: inherit;
+  font-size: 14.5px;
+  cursor: pointer;
+
+  &:hover {
+    color: t.$text;
+  }
+
+  &.is-active {
+    border-bottom-color: t.$text;
+    color: t.$text;
+    font-weight: t.$bold;
+  }
+}
+
+.q-tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: $blue;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: t.$bold;
+}
+
+.q-tab-note {
+  padding: 16px 24px 0;
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+// Mit Navigation.
+.q-nav-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  align-items: start;
+  gap: 28px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.q-nav {
+  position: sticky;
+  top: 16px;
+  display: grid;
+  gap: 2px;
+  margin-top: 8px;
+
+  @media (max-width: 1024px) {
+    position: static;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+  }
+}
+
+.q-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.8);
+  }
+}
+
+.q-nav-text {
+  display: grid;
+  flex: 1;
+  gap: 1px;
+
+  b {
+    font-size: 14px;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: 12.5px;
+  }
+}
+
+.q-nav-main .q-title.is-first {
+  margin-top: 8px;
+}
+
+.q-nav-main .section-title {
+  scroll-margin-top: 16px;
+}
+
+// Leiste oben and Fusszeile.
+.q-top {
+  padding-left: 16px;
+
+  .tb7-state {
+    width: auto;
+  }
+}
+
+.q-top-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 14px;
+  min-width: 0;
+}
+
+.q-top-list {
+  color: t.$text-3;
+  font-size: 12.5px;
+  @include t.numeric;
+
+  > span + span::before {
+    content: ' · ';
+  }
+
+  b {
+    color: t.$text;
+    font-weight: t.$medium;
+  }
+}
+
+.q-foot {
+  position: sticky;
+  bottom: calc(16px + var(--switcher-h, 0px));
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-top: 20px;
+  padding: 14px 16px 14px 22px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &.is-dirty {
+    border-color: rgba(0, 50, 125, 0.2);
+    box-shadow: 0 16px 34px -18px rgba(0, 50, 125, 0.55);
+  }
+
+  @media (max-width: 640px) {
+    .one7-actions {
+      width: 100%;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+}
+
+// Prüfen-Dialog.
+.rv-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 30, 80, 0.32);
+  animation: rv-fade 0.15s ease-out;
+}
+
+@keyframes rv-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.rv {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 61;
+  display: grid;
+  gap: 18px;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  padding: 24px;
+  overflow-y: auto;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 30px 60px -20px rgba(0, 30, 80, 0.5);
+  transform: translate(-50%, -50%);
+  animation: rv-in 0.18s ease-out;
+}
+
+@keyframes rv-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 8px));
+  }
+}
+
+.rv-head {
+  h2 {
+    font-size: 20px;
+    font-weight: t.$bold;
+  }
+
+  p {
+    margin-top: 4px;
+    color: t.$text-2;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+}
+
+.rv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  @include t.numeric;
+
+  th,
+  td {
+    padding: 9px 0;
+    border-bottom: 1px solid t.$line-soft;
+    text-align: left;
+  }
+
+  thead th {
+    padding-top: 0;
+    color: t.$text-3;
+    font-size: 12.5px;
+    font-weight: t.$regular;
+  }
+
+  tbody th {
+    font-weight: t.$regular;
+  }
+
+  td {
+    width: 90px;
+  }
+}
+
+.rv-was {
+  color: t.$text-3;
+}
+
+.rv-figs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.rv-fig {
+  display: grid;
+  gap: 1px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: t.$bg-subtle;
+  font-size: 12.5px;
+  @include t.numeric;
+
+  > span:first-child {
+    color: t.$text-3;
+  }
+
+  b {
+    font-size: 17px;
+  }
+}
+
+.rv-delta {
+  color: $blue;
+  font-weight: t.$medium;
+
+  .is-same & {
+    color: t.$text-4;
+    font-weight: t.$regular;
+  }
+}
+
+.rv-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+
+  @media (max-width: 480px) {
+    button {
+      flex: 1;
+    }
+  }
+}
+
+.q-sub-text b,
+.q-nav-text b {
+  font-weight: t.$bold;
+}
+
+.q-row .range {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .q-nav {
+    gap: 6px;
+    margin: 0 0 -12px;
+  }
+
+  .q-nav-item {
+    padding: 7px 12px;
+    border: 1px solid rgba(0, 50, 125, 0.14);
+    border-radius: 99px;
+    background: #fff;
+  }
+
+  .q-nav-text span {
+    display: none;
+  }
+}

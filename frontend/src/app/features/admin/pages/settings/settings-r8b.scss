@@ -1,0 +1,651 @@
+// Temporary: second part of settings-r8.scss.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+$green: #2e8540;
+
+// Regler ---------------------------------------------------------------------
+.last8-tile {
+  position: relative;
+}
+
+.last8-tile-note {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.last8-tile-btn {
+  justify-self: start;
+  margin-top: 10px;
+}
+
+.pb8 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin-bottom: 20px;
+  padding: 8px 18px 8px 8px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+
+  @media (max-width: 760px) {
+    padding: 8px;
+
+    .ad-segmented {
+      display: flex;
+      width: 100%;
+
+      button {
+        flex: 1;
+        padding: 0 4px;
+      }
+    }
+  }
+}
+
+.pb8-text {
+  flex: 1;
+  min-width: 240px;
+  color: t.$text-2;
+  font-size: 13.5px;
+  line-height: 1.5;
+
+  b {
+    color: t.$text;
+  }
+
+  @media (max-width: 760px) {
+    padding: 0 6px 4px;
+  }
+}
+
+.pb8-note {
+  display: block;
+  color: t.$text-3;
+  font-size: 12.5px;
+  @include t.numeric;
+}
+
+.r7.is-slider {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+
+  @media (max-width: 760px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .r7-control {
+    justify-items: stretch;
+  }
+}
+
+.sl8 {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sl8-track {
+  position: relative;
+  flex: 1;
+  padding-top: 8px;
+
+  input[type='range'] {
+    --fill: 0%;
+    width: 100%;
+    height: 18px;
+    margin: 0;
+    background: none;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+
+    &::-webkit-slider-runnable-track {
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(
+        to right,
+        t.$text var(--fill),
+        rgba(0, 50, 125, 0.12) var(--fill)
+      );
+    }
+
+    &::-webkit-slider-thumb {
+      width: 18px;
+      height: 18px;
+      margin-top: -7px;
+      border: 2px solid t.$text;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 50, 125, 0.3);
+      -webkit-appearance: none;
+    }
+
+    &::-moz-range-track {
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(0, 50, 125, 0.12);
+    }
+
+    &::-moz-range-progress {
+      height: 4px;
+      border-radius: 2px;
+      background: t.$text;
+    }
+
+    &::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      border: 2px solid t.$text;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    &:focus-visible {
+      outline: 0;
+
+      &::-webkit-slider-thumb {
+        box-shadow: 0 0 0 4px rgba(0, 120, 187, 0.2);
+      }
+    }
+  }
+}
+
+.sl8-ticks {
+  position: relative;
+  height: 24px;
+  margin: 2px 9px 0;
+}
+
+.sl8-tick {
+  position: absolute;
+  top: 0;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 5px;
+  background: none;
+  color: t.$text-3;
+  font: inherit;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  transform: translateX(-50%);
+  @include t.numeric;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    width: 1px;
+    height: 4px;
+    background: rgba(0, 50, 125, 0.25);
+  }
+
+  &:hover {
+    color: t.$text;
+  }
+
+  &.is-default::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    right: -2px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: t.$text-4;
+  }
+
+  &.is-active {
+    color: t.$text;
+    font-weight: t.$bold;
+  }
+}
+
+// Vorlagen im Vergleich -----------------------------------------------------
+.cmp8,
+.hist8 {
+  margin-bottom: 24px;
+}
+
+.hist8 {
+  margin: 24px 0 0;
+}
+
+.cmp8-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  padding: 18px 22px;
+  border-bottom: 1px solid $hair;
+
+  h2 {
+    font-size: 17px;
+    font-weight: t.$bold;
+  }
+
+  p {
+    margin-top: 2px;
+    color: t.$text-3;
+    font-size: 13.5px;
+  }
+
+  a {
+    gap: 6px;
+  }
+}
+
+.cmp8-scroll {
+  overflow-x: auto;
+}
+
+.cmp8-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  font-size: 14px;
+  @include t.numeric;
+
+  th,
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid t.$line-soft;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  thead th {
+    padding-top: 16px;
+    font-weight: t.$regular;
+    vertical-align: bottom;
+  }
+
+  tbody th {
+    padding-left: 22px;
+    color: t.$text-2;
+    font-weight: t.$regular;
+  }
+
+  td.is-diff {
+    color: t.$text-2;
+  }
+
+  .is-active {
+    background: #f4f8fd;
+  }
+
+  .is-current {
+    border-left: 1px solid $hair;
+    font-weight: t.$bold;
+  }
+
+  tfoot td {
+    border-bottom: 0;
+    padding-bottom: 16px;
+  }
+
+  th:first-child {
+    width: 22%;
+  }
+}
+
+.cmp8-total th,
+.cmp8-total td {
+  font-weight: t.$bold;
+}
+
+.cmp8-name {
+  display: block;
+  font-size: 15px;
+  font-weight: t.$bold;
+}
+
+.cmp8-purpose {
+  display: block;
+  max-width: 200px;
+  margin-top: 2px;
+  color: t.$text-3;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.cmp8-on {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  color: $green;
+  font-size: 13px;
+  font-weight: t.$medium;
+}
+
+.hist8-list {
+  margin: 0;
+  padding: 6px 22px 10px;
+  list-style: none;
+
+  li {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 0;
+
+    & + li {
+      border-top: 1px solid t.$line-soft;
+    }
+  }
+
+  time {
+    flex: none;
+    color: t.$text-3;
+    font-size: 12.5px;
+  }
+}
+
+.hist8-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: t.$text-4;
+
+  li:first-child & {
+    background: $blue;
+  }
+}
+
+.hist8-text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+  font-size: 14px;
+
+  > span {
+    color: t.$text-3;
+    font-size: 12.5px;
+    @include t.numeric;
+
+    > span + span::before {
+      content: ' · ';
+    }
+  }
+
+  b b {
+    font-weight: t.$medium;
+  }
+}
+
+.hist8-empty {
+  color: t.$text-3;
+  font-size: 13.5px;
+}
+
+// Kompakt + Popover --------------------------------------------------------
+.quick8 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.quick8-label {
+  margin-right: 4px;
+  color: t.$text-3;
+  font-size: 13.5px;
+}
+
+.quick8-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid rgba(0, 50, 125, 0.16);
+  border-radius: 99px;
+  background: #fff;
+  color: t.$text;
+  font: inherit;
+  font-size: 13.5px;
+  cursor: pointer;
+
+  span {
+    color: t.$text-3;
+    font-size: 12.5px;
+    @include t.numeric;
+  }
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.32);
+  }
+
+  &.is-active {
+    border-color: t.$text;
+    background: t.$text;
+    color: #fff;
+
+    span {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+}
+
+.quick8-own {
+  color: t.$text-2;
+  font-size: 13px;
+  font-style: italic;
+}
+
+.pop8-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 12px 0 16px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: t.$bg-muted;
+  color: t.$text;
+  font: inherit;
+  font-size: 15px;
+  font-weight: t.$bold;
+  cursor: pointer;
+  @include t.numeric;
+
+  css-icon {
+    color: t.$text-3;
+  }
+
+  &:hover {
+    background: t.$bg-pressed;
+  }
+
+  &.is-open,
+  &:focus-visible {
+    outline: 0;
+    border-color: $blue;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.16);
+  }
+
+  &.is-changed {
+    background: #e6f1fa;
+  }
+}
+
+.pop8 {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 40;
+  display: grid;
+  gap: 14px;
+  width: 320px;
+  padding: 16px;
+  border: 1px solid rgba(0, 50, 125, 0.1);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 22px 48px -18px rgba(0, 50, 125, 0.45);
+  animation: menu8-in 0.12s ease-out;
+
+  &.is-right {
+    right: 0;
+    left: auto;
+  }
+
+  @media (max-width: 760px) {
+    &.is-right {
+      right: auto;
+      left: 0;
+    }
+
+    width: min(320px, calc(100vw - 64px));
+  }
+
+  .range {
+    display: none;
+  }
+}
+
+.pop8-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+
+  b {
+    font-size: 14px;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: 12px;
+  }
+}
+
+.pop8-stepper .stepper {
+  width: 100%;
+
+  input {
+    flex: 1;
+  }
+}
+
+.pop8-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pop8-chip {
+  position: relative;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(0, 50, 125, 0.14);
+  border-radius: 99px;
+  background: #fff;
+  color: t.$text-2;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  @include t.numeric;
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.3);
+    color: t.$text;
+  }
+
+  &.is-active {
+    border-color: t.$text;
+    color: t.$text;
+    font-weight: t.$bold;
+  }
+
+  &.is-default::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: t.$text-4;
+  }
+}
+
+.pop8-effect {
+  color: t.$text-3;
+  font-size: 12.5px;
+  @include t.numeric;
+}
+
+.pop8-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid t.$line-soft;
+
+  .r7-link:disabled {
+    color: t.$text-4;
+    cursor: default;
+    text-decoration: none;
+  }
+}
+
+// Menus and popovers reach out of the chapter card.
+.a7 {
+  overflow: visible;
+
+  > .acc-head {
+    border-radius: 12px;
+  }
+
+  &.is-open > .acc-head {
+    border-radius: 12px 12px 0 0;
+  }
+
+  .range {
+    display: none;
+  }
+}
+
+.r7.is-slider .r7-control {
+  gap: 2px;
+}
+
+.cmp8,
+.hist8 {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .st8-last {
+    display: flex;
+    flex-basis: 100%;
+    gap: 6px;
+    margin: 0;
+    text-align: left;
+  }
+
+  .st8-side .menu8-wrap {
+    flex: 1;
+
+    > .btn-secondary {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+}

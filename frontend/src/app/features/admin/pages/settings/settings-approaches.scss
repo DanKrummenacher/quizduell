@@ -1,0 +1,768 @@
+// Temporary: the new approaches for the rules page.
+@use '../../styles/tokens' as t;
+
+// Einstellungsseite: a calm form, sections with their title on the left.
+.form-page {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  align-items: start;
+  gap: 40px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}
+
+.form-nav {
+  position: sticky;
+  top: 24px;
+  display: grid;
+  gap: 2px;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+.form-nav-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: t.$text-2;
+  font-size: 14px;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(0, 50, 125, 0.05);
+    color: t.$text;
+  }
+}
+
+.form-body {
+  display: grid;
+  gap: 16px;
+}
+
+.form-section {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 32px;
+  padding: 26px 28px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  scroll-margin-top: 24px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 20px;
+  }
+}
+
+.form-section-head {
+  h2 {
+    font-size: 17px;
+    font-weight: t.$bold;
+  }
+
+  p {
+    margin-top: 4px;
+    color: t.$text-3;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+}
+
+.form-rows {
+  display: grid;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 28px;
+  padding: 18px 0;
+  border-top: 1px solid t.$line-soft;
+
+  &:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  &.is-changed .rule-label::after {
+    content: 'Geändert';
+    margin-left: 8px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: t.$brand-50;
+    color: t.$brand;
+    font-size: 11px;
+    font-weight: t.$bold;
+    vertical-align: 2px;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.form-effect {
+  margin-top: 6px;
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.form-control {
+  display: grid;
+  justify-items: end;
+  align-content: start;
+  gap: 6px;
+
+  @media (max-width: 640px) {
+    justify-items: start;
+  }
+}
+
+// Als Satz: the rules read as a short text with the values inside.
+.sentence {
+  display: grid;
+  gap: 18px;
+  max-width: 880px;
+  padding: 32px 36px;
+
+  @media (max-width: 640px) {
+    padding: 22px 20px;
+  }
+}
+
+.sentence-lead {
+  color: t.$text-3;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+}
+
+.sentence-text {
+  font-size: 22px;
+  line-height: 2;
+  letter-spacing: -0.005em;
+
+  @media (max-width: 640px) {
+    font-size: 18px;
+  }
+}
+
+.istep {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 40px;
+  margin: 0 2px;
+  padding: 0 3px;
+  border-radius: 10px;
+  background: t.$brand-50;
+  vertical-align: middle;
+
+  &.is-changed {
+    box-shadow: inset 0 0 0 1.5px t.$brand;
+  }
+
+  b {
+    min-width: 54px;
+    padding: 0 4px;
+    color: t.$brand;
+    font-size: 20px;
+    text-align: center;
+    @include t.numeric;
+  }
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: t.$brand;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: #fff;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+  }
+}
+
+.ichip {
+  height: 40px;
+  margin: 0 2px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: t.$brand-50;
+  color: t.$brand;
+  font: inherit;
+  font-size: 20px;
+  font-weight: t.$bold;
+  vertical-align: middle;
+  cursor: pointer;
+
+  &.is-off {
+    background: t.$bg-muted;
+    color: t.$text-2;
+  }
+}
+
+.sentence-sum {
+  padding-top: 18px;
+  border-top: 1px solid t.$line-soft;
+  color: t.$text-2;
+  font-size: 15px;
+  line-height: 1.6;
+
+  b {
+    color: t.$text;
+  }
+}
+
+// Tabelle: every rule on a line with its value, the default and the range.
+.rtable {
+  td {
+    height: auto;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  th:first-child,
+  td:first-child {
+    padding-left: 22px;
+  }
+
+  th:last-child,
+  td:last-child {
+    padding-right: 22px;
+  }
+
+  tr.is-changed td {
+    background: #f4f8fd;
+  }
+
+  tr.is-changed td:first-child {
+    box-shadow: inset 3px 0 0 t.$brand;
+  }
+}
+
+.rtable-group th {
+  height: 36px;
+  padding-top: 14px;
+  background: #f7f9fc !important;
+  color: t.$text !important;
+  font-size: 13px !important;
+  font-weight: t.$bold;
+}
+
+.rt-rule {
+  display: grid;
+  gap: 2px;
+  min-width: 260px;
+
+  .rule-label {
+    font-size: 15px;
+  }
+}
+
+.rt-desc {
+  max-width: 460px;
+  color: t.$text-3;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.rt-value {
+  .range {
+    display: none;
+  }
+}
+
+.rt-same,
+.rt-range {
+  color: t.$text-3;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
+.rtable-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  padding: 14px 22px;
+  border-top: 1px solid t.$line-soft;
+  background: #fafbfd;
+  color: t.$text-2;
+  font-size: 13.5px;
+
+  b {
+    color: t.$text;
+  }
+}
+
+// Liste + Detail: the rules on the left, the chosen one large on the right.
+.md {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.md-list {
+  padding: 8px;
+}
+
+.md-group {
+  padding: 12px 12px 6px;
+  color: t.$text-3;
+  font-size: 12.5px;
+  font-weight: t.$medium;
+}
+
+.md-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: t.$text;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(0, 50, 125, 0.04);
+  }
+
+  &.is-on {
+    background: t.$brand-50;
+    font-weight: t.$bold;
+  }
+
+  &.is-changed .md-value::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 6px;
+    border-radius: 50%;
+    background: t.$brand;
+    vertical-align: 2px;
+  }
+}
+
+.md-value {
+  color: t.$text-2;
+  font-weight: t.$medium;
+  @include t.numeric;
+}
+
+.md-detail {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  padding: 28px 30px;
+
+  h2 {
+    font-size: 20px;
+    font-weight: t.$bold;
+  }
+
+  .rule-description {
+    max-width: 520px;
+  }
+}
+
+.md-kicker {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.md-big {
+  font-size: 44px;
+  font-weight: t.$bold;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  @include t.numeric;
+}
+
+.md-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.md-effect {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 520px;
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f4f8fd;
+  color: t.$text-2;
+  font-size: 13.5px;
+  line-height: 1.5;
+
+  css-icon {
+    flex: none;
+    margin-top: 2px;
+    color: #0078bb;
+  }
+}
+
+// Kennzahlen oben: the figures as on the other pages, the rules below.
+.kfig {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.kfig-tile {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: 20px 22px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+
+  &.is-lead {
+    border-color: rgba(0, 120, 187, 0.2);
+    background:
+      radial-gradient(60% 90% at 100% 0%, rgba(0, 164, 224, 0.12), transparent 70%),
+      linear-gradient(160deg, #f2f8fd, #e7f0f9);
+
+    .kfig-label {
+      color: t.$text;
+      font-weight: t.$bold;
+    }
+  }
+}
+
+.kfig-label {
+  color: t.$text-3;
+  font-size: 13.5px;
+}
+
+.kfig-value {
+  font-size: 32px;
+  font-weight: t.$bold;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  @include t.numeric;
+
+  &.is-small {
+    font-size: 20px;
+    line-height: 1.6;
+  }
+}
+
+.kfig-note {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.kfig-link {
+  color: #0078bb;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.kfig-warning {
+  margin: -6px 0 20px;
+}
+
+.kchapters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 20px;
+
+  .chapter:first-child {
+    grid-row: span 2;
+  }
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+
+    .chapter:first-child {
+      grid-row: auto;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// The calm drafts, built on the cards of the other pages
+// -----------------------------------------------------------------------------
+
+// Every chapter a card with its heading inside.
+.ccard {
+  > .ad-card-head + .rule {
+    border-top: 0;
+  }
+}
+
+// Kartenraster: the long chapter on the left, the two short ones beside it.
+.cgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 20px;
+
+  > .ccard:first-child {
+    grid-row: span 2;
+  }
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+
+    > .ccard:first-child {
+      grid-row: auto;
+    }
+  }
+}
+
+.cstack {
+  display: grid;
+  gap: 20px;
+}
+
+// Kapitel + Zusammenfassung: chapters as on the analytics page, the state of
+// the rules and the save beside them.
+.section-title.is-first {
+  margin-top: 4px;
+}
+
+.summary {
+  display: grid;
+  gap: 16px;
+}
+
+.sum-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+
+  div {
+    padding: 10px 12px;
+    border: 1px solid rgba(0, 50, 125, 0.08);
+    border-radius: 10px;
+
+    &.is-changed {
+      border-color: rgba(0, 120, 187, 0.35);
+      background: #f4f8fd;
+    }
+  }
+
+  dt {
+    color: t.$text-3;
+    font-size: 12px;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: 16px;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+}
+
+.sum-line {
+  color: t.$text-2;
+  font-size: 13px;
+  line-height: 1.55;
+
+  b {
+    color: t.$text;
+  }
+}
+
+.sum-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid t.$line-soft;
+}
+
+// Auswahlwerte: common values as a segmented choice, «Andere» for the rest.
+.seg {
+  flex-wrap: wrap;
+
+  button {
+    padding: 0 12px;
+    @include t.numeric;
+  }
+}
+
+// Ansehen + Ändern: values read calmly, a field opens on demand.
+.view-row {
+  align-items: center;
+}
+
+.view-side {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  .range {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    justify-content: space-between;
+  }
+}
+
+.view-value {
+  min-width: 60px;
+  font-size: 18px;
+  font-weight: t.$bold;
+  text-align: right;
+  @include t.numeric;
+}
+
+// Mit Wirkung: rule, setting and what it does in three columns.
+.wt-head,
+.wt-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) 220px minmax(0, 1fr);
+  align-items: start;
+  gap: 28px;
+  padding: 0 24px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding: 0 18px;
+  }
+}
+
+.wt-head {
+  height: 40px;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+  color: t.$text-3;
+  font-size: 12.5px;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+.wt-group {
+  padding: 18px 24px 4px;
+  color: t.$text;
+  font-size: 13px;
+  font-weight: t.$bold;
+}
+
+.wt-row {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid t.$line-soft;
+
+  &.is-changed {
+    background: #f4f8fd;
+    box-shadow: inset 3px 0 0 t.$brand;
+  }
+}
+
+.wt-control {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+}
+
+.wt-effect {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f7f9fc;
+  color: t.$text-2;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .seg {
+    width: 100%;
+
+    button {
+      flex: 1;
+      padding: 0 6px;
+    }
+  }
+
+  .rule-control:has(.seg) {
+    width: 100%;
+  }
+}
+
+// Title over its description and the value beside on one line on phones.
+@media (max-width: 640px) {
+  .view-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .kfig {
+    gap: 10px;
+  }
+
+  .kfig-tile {
+    padding: 14px 16px;
+  }
+
+  .kfig-value {
+    font-size: 24px;
+
+    &.is-small {
+      font-size: 16px;
+    }
+  }
+
+  .view-value {
+    min-width: 0;
+    text-align: left;
+  }
+}

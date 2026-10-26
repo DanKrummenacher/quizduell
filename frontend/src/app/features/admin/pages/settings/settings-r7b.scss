@@ -1,0 +1,594 @@
+// Temporary: second part of settings-r7.scss.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+$green: #2e8540;
+
+// Leiste oben ---------------------------------------------------------------
+.tb7 {
+  position: sticky;
+  top: 12px;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  margin-bottom: 20px;
+  padding: 8px 8px 8px 18px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &.is-dirty {
+    border-color: rgba(0, 50, 125, 0.18);
+    box-shadow: 0 12px 28px -18px rgba(0, 50, 125, 0.5);
+  }
+
+  @media (max-width: 760px) {
+    padding-left: 8px;
+  }
+}
+
+.tb7-preset {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+
+  @media (max-width: 760px) {
+    width: 100%;
+
+    .tb7-label {
+      display: none;
+    }
+
+    .ad-segmented {
+      display: flex;
+      width: 100%;
+
+      button {
+        flex: 1;
+        padding: 0 4px;
+      }
+    }
+  }
+}
+
+.tb7-label {
+  color: t.$text-3;
+  font-size: 13.5px;
+}
+
+.tb7-own {
+  cursor: default;
+
+  &:not(.is-active) {
+    color: t.$text-4;
+  }
+
+  &:hover:not(.is-active) {
+    background: none !important;
+  }
+}
+
+.tb7-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+
+  @media (max-width: 760px) {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+.tb7-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 6px;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+
+  @media (max-width: 760px) {
+    margin-right: auto;
+  }
+}
+
+.tb7-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $blue;
+  box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.18);
+}
+
+.tb7-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 10px;
+  color: t.$text-3;
+  font-size: 13.5px;
+
+  css-icon {
+    color: #2e8540;
+  }
+}
+
+// Seitenspalte -------------------------------------------------------------
+.side7-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  gap: 24px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: minmax(0, 1fr);
+
+    .side7 {
+      position: static;
+      order: -1;
+    }
+  }
+}
+
+.side7 {
+  position: sticky;
+  top: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.s7 {
+  display: grid;
+  gap: 12px;
+  padding: 18px 20px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+
+  h3 {
+    font-size: 15px;
+    font-weight: t.$bold;
+  }
+
+  &.is-dirty {
+    border-color: rgba(0, 50, 125, 0.2);
+    box-shadow: 0 14px 30px -20px rgba(0, 50, 125, 0.55);
+  }
+}
+
+.s7-ok {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  css-icon {
+    color: #2e8540;
+  }
+}
+
+.s7-note {
+  margin-top: -6px;
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.s7-changes {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    @include t.numeric;
+
+    > span:first-child {
+      flex: 1;
+      color: t.$text-2;
+    }
+
+    css-icon {
+      color: t.$text-4;
+    }
+  }
+}
+
+.s7-was {
+  color: t.$text-3;
+  text-decoration: line-through;
+}
+
+.s7-actions button {
+  flex: 1;
+}
+
+.s7-presets {
+  display: grid;
+  gap: 6px;
+}
+
+.s7-preset {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid $hair;
+  border-radius: 10px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  .pre-radio {
+    order: -1;
+    margin-left: 0;
+  }
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.22);
+  }
+
+  &.is-active {
+    border-color: t.$text;
+    box-shadow: inset 0 0 0 1px t.$text;
+  }
+}
+
+.s7-preset-text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+
+  b {
+    font-size: 14px;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: 12.5px;
+    @include t.numeric;
+  }
+}
+
+.s7-len {
+  color: t.$text-2;
+  font-size: 12.5px;
+  @include t.numeric;
+}
+
+.s7-figs {
+  display: grid;
+  margin: 0;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-top: 1px solid t.$line-soft;
+    font-size: 13.5px;
+
+    &:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+  }
+
+  dt {
+    color: t.$text-2;
+  }
+
+  dd {
+    margin: 0;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+}
+
+.s7-warn {
+  display: flex;
+  gap: 8px;
+  color: #8a5a00;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+// Ansehen, dann ändern ------------------------------------------------------
+.v7 {
+  border-bottom: 1px solid t.$line-soft;
+  transition: background-color 0.15s ease;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &.is-editing {
+    background: t.$bg-subtle;
+  }
+}
+
+.v7-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px 32px;
+  padding: 18px 22px 18px 44px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+    padding-left: 22px;
+  }
+}
+
+.v7-value {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  > b {
+    min-width: 56px;
+    font-size: 15px;
+    text-align: right;
+    @include t.numeric;
+  }
+
+  @media (max-width: 640px) {
+    justify-content: space-between;
+
+    > b {
+      text-align: left;
+    }
+  }
+}
+
+.v7-sub {
+  margin-top: -10px;
+  padding: 0 22px 16px 44px;
+
+  .r7-meta {
+    justify-content: flex-start;
+  }
+
+  @media (max-width: 640px) {
+    padding-left: 22px;
+  }
+}
+
+.v7-edit {
+  display: grid;
+  gap: 14px;
+  padding: 0 22px 20px 44px;
+
+  @media (max-width: 640px) {
+    padding-left: 22px;
+  }
+}
+
+.v7-tiles {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.v7-tile {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid rgba(0, 50, 125, 0.12);
+  border-radius: 10px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.28);
+  }
+
+  &.is-active {
+    border-color: t.$text;
+    box-shadow: inset 0 0 0 1px t.$text;
+  }
+
+  &.is-invalid {
+    border-color: #c0392b;
+    box-shadow: inset 0 0 0 1px #c0392b;
+  }
+
+  &.is-own {
+    cursor: text;
+  }
+}
+
+.v7-tile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+
+  b {
+    font-size: 15px;
+    @include t.numeric;
+  }
+}
+
+.v7-std {
+  color: t.$text-3;
+  font-size: 11.5px;
+}
+
+.v7-note {
+  color: t.$text-3;
+  font-size: 12px;
+  @include t.numeric;
+}
+
+.v7-own-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: t.$text-3;
+  font-size: 12px;
+
+  input {
+    width: 100%;
+    min-width: 0;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid rgba(0, 50, 125, 0.2);
+    outline: 0;
+    background: none;
+    color: t.$text;
+    font: inherit;
+    font-size: 13px;
+    -moz-appearance: textfield;
+
+    &:focus {
+      border-bottom-color: $blue;
+    }
+
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+  }
+}
+
+.v7-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.v7-grow {
+  flex: 1;
+}
+
+// Eine Karte ----------------------------------------------------------------
+.one7 {
+  overflow: visible;
+}
+
+.one7-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 24px;
+  padding: 20px 22px;
+  border-bottom: 1px solid $hair;
+
+  h2 {
+    font-size: 17px;
+    font-weight: t.$bold;
+  }
+
+  p {
+    margin-top: 2px;
+    color: t.$text-3;
+    font-size: 13.5px;
+  }
+
+  @media (max-width: 760px) {
+    .ad-segmented {
+      display: flex;
+      width: 100%;
+
+      button {
+        flex: 1;
+        padding: 0 4px;
+      }
+    }
+  }
+}
+
+.one7-chap {
+  border-bottom: 1px solid $hair;
+
+  .r7:first-of-type {
+    border-top: 1px solid t.$line-soft;
+  }
+}
+
+.one7-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  padding: 14px 22px;
+  border-radius: 0 0 12px 12px;
+  background: #fff;
+  transition: box-shadow 0.15s ease;
+
+  &.is-dirty {
+    box-shadow: 0 -10px 24px -18px rgba(0, 50, 125, 0.45);
+  }
+
+  @media (max-width: 640px) {
+    .one7-actions {
+      width: 100%;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+}
+
+.one7-state {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.one7-list {
+  color: t.$text-3;
+  font-size: 12.5px;
+  @include t.numeric;
+
+  span + span::before {
+    content: ' · ';
+  }
+
+  b {
+    color: t.$text;
+    font-weight: t.$medium;
+  }
+}
+
+.a7 .changed-tag,
+.one7 .changed-tag {
+  flex: none;
+  margin-left: auto;
+  white-space: nowrap;
+}

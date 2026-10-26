@@ -1,0 +1,472 @@
+// Temporary: Runde 28 of the rules page, whole pages.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+
+// Mit Seitenspalte.
+.q-side-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: 24px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: minmax(0, 1fr);
+
+    .q-side {
+      position: static;
+      order: -1;
+    }
+  }
+}
+
+.q-side-main .q-rtitle {
+  margin-top: 0;
+}
+
+.q-side .is-own {
+  cursor: default;
+}
+
+// Regeln-Titel with the preset switch on the right.
+.q-rtitle-preset {
+  display: inline-flex;
+  order: 2;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: t.$regular;
+  letter-spacing: 0;
+
+  @media (max-width: 760px) {
+    .q-rtitle-label {
+      display: none;
+    }
+  }
+}
+
+.q-rtitle-label {
+  color: t.$text-3;
+}
+
+@media (max-width: 760px) {
+  .q-rtitle:has(.q-rtitle-preset) {
+    flex-wrap: wrap;
+
+    &::after {
+      display: none;
+    }
+
+    .q-rtitle-preset {
+      width: 100%;
+
+      .ad-segmented {
+        display: flex;
+        width: 100%;
+
+        button {
+          flex: 1;
+          padding: 0 4px;
+        }
+      }
+    }
+  }
+}
+
+// Vorlagen-Leiste mit Text.
+.q-pbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 28px;
+  padding: 16px 18px 16px 20px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+
+  h2 {
+    font-size: 16px;
+    font-weight: t.$bold;
+  }
+
+  p {
+    margin-top: 2px;
+    color: t.$text-3;
+    font-size: 13px;
+    @include t.numeric;
+
+    b {
+      color: t.$text;
+      font-weight: t.$medium;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .ad-segmented {
+      display: flex;
+      width: 100%;
+
+      button {
+        flex: 1;
+        padding: 0 4px;
+      }
+    }
+  }
+}
+
+// Mit Navigation.
+.q-nav-cap {
+  margin: 4px 12px 2px;
+  color: t.$text-4;
+  font-size: 11.5px;
+  font-weight: t.$medium;
+
+  & ~ .q-nav-cap {
+    margin-top: 14px;
+  }
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+.q-nav-presets {
+  display: grid;
+  gap: 2px;
+
+  @media (max-width: 1024px) {
+    display: contents;
+  }
+}
+
+.q-nav-preset {
+  gap: 10px;
+
+  .pre-radio {
+    margin: 0;
+  }
+
+  &.is-active {
+    background: #fff;
+    box-shadow: inset 0 0 0 1px t.$line;
+  }
+}
+
+.q-nav-main .a7 {
+  scroll-margin-top: 16px;
+}
+
+// Phones: the table rows stack, value first, standard beside it.
+@media (max-width: 760px) {
+  .d-row[data-pos='table'],
+  .d-row[data-pos='table'][data-thead] {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding-left: 22px;
+
+    .r7-control {
+      justify-items: stretch;
+    }
+
+    .d-ctl {
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .d-tcell {
+      width: auto;
+    }
+
+    .d-chipwrap {
+      min-width: 0;
+    }
+  }
+}
+
+// Runde 29: the same rhythm between the three parts of the page.
+.ad-page[data-face^='X'] {
+  .kfig,
+  .kfig-warning:last-of-type {
+    margin-bottom: 36px;
+  }
+
+  .pre {
+    margin-bottom: 36px;
+  }
+
+  .p-title {
+    margin-top: 0;
+  }
+}
+
+// Runde 29: more titles.
+.x-rhead,
+.x-phead-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 14px;
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+  }
+}
+
+.x-active {
+  color: t.$text-3;
+  font-size: 13px;
+  white-space: nowrap;
+
+  b {
+    color: t.$text;
+  }
+}
+
+.x-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.x-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+
+  h2 {
+    font-size: 17px;
+    font-weight: t.$bold;
+  }
+
+  p {
+    margin-top: 2px;
+    color: t.$text-3;
+    font-size: 13.5px;
+  }
+
+  > div {
+    flex: 1;
+  }
+}
+
+.x-step-no {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: t.$text;
+  color: #fff;
+  font-size: 14px;
+  font-weight: t.$bold;
+}
+
+.p-title-note .p-title-act {
+  font-size: inherit;
+}
+
+// The finalists share the rhythm of Runde 29.
+.ad-page[data-face^='Y'] {
+  .kfig,
+  .kfig-warning:last-of-type,
+  .pre {
+    margin-bottom: 36px;
+  }
+
+  .p-title {
+    margin-top: 0;
+  }
+}
+
+// Final: the last change as the fourth tile.
+.y-last {
+  position: relative;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+
+  &.is-link {
+    transition:
+      border-color 0.12s ease,
+      box-shadow 0.12s ease;
+
+    &:hover,
+    &:focus-visible {
+      outline: 0;
+      border-color: rgba(0, 120, 187, 0.35);
+      box-shadow: 0 10px 24px -18px rgba(0, 40, 100, 0.5);
+
+      .y-last-arrow {
+        color: $blue;
+        transform: translateX(2px);
+      }
+    }
+  }
+}
+
+.y-last-note {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.y-last-arrow {
+  position: absolute;
+  top: 22px;
+  right: 20px;
+  color: t.$text-4;
+  transition:
+    color 0.12s ease,
+    transform 0.12s ease;
+}
+
+.y-last-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: $blue;
+  font-weight: t.$medium;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.y-last-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  css-icon {
+    color: t.$text-4;
+  }
+}
+
+.y-last-changes {
+  display: grid;
+  gap: 1px;
+  color: t.$text-3;
+  font-size: 12.5px;
+  @include t.numeric;
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  s {
+    margin-right: 5px;
+    color: t.$text-4;
+  }
+
+  b {
+    color: t.$text;
+    font-weight: t.$medium;
+  }
+}
+
+// Zuletzt geändert, same size as the other figures.
+.y-last-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.y-go {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  transition:
+    background-color 0.12s ease,
+    color 0.12s ease;
+
+  .is-link:hover & {
+    background: $blue;
+    color: #fff;
+  }
+}
+
+.y-chipbtn {
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid t.$line;
+  border-radius: 7px;
+  background: #fff;
+  color: t.$text;
+  font-size: 12px;
+  font-weight: t.$medium;
+  line-height: 22px;
+  text-decoration: none;
+  transition: border-color 0.12s ease;
+
+  &:hover {
+    border-color: $blue;
+    color: $blue;
+  }
+}
+
+.y-iconbtn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px -6px -4px 0;
+  border: 1px solid t.$line;
+  border-radius: 8px;
+  background: #fff;
+  color: t.$text-2;
+
+  &:hover {
+    border-color: $blue;
+    color: $blue;
+  }
+}
+
+.y-has-foot {
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.y-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px -22px -20px;
+  padding: 10px 22px;
+  border-top: 1px solid t.$line-soft;
+  border-radius: 0 0 12px 12px;
+  color: $blue;
+  font-size: 12.5px;
+  font-weight: t.$medium;
+  text-decoration: none;
+
+  &:hover {
+    background: t.$bg-subtle;
+  }
+}
+
+.y-chipbtn {
+  margin: -4px 0;
+}
+
+.y-last-head {
+  min-height: 19px;
+}

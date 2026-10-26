@@ -1,0 +1,967 @@
+// Temporary: more drafts for the rules page.
+@use '../../styles/tokens' as t;
+
+// Reiter: one card, the chapters as tabs.
+.tabbar {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  overflow-x: auto;
+  border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+  scrollbar-width: none;
+
+  button {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    height: 52px;
+    padding: 0 12px;
+    border: 0;
+    background: none;
+    color: t.$text-3;
+    font: inherit;
+    font-size: 14.5px;
+    font-weight: t.$medium;
+    cursor: pointer;
+
+    &:hover {
+      color: t.$text;
+    }
+
+    &.is-active {
+      color: t.$text;
+      font-weight: t.$bold;
+
+      &::after {
+        content: '';
+        position: absolute;
+        right: 10px;
+        bottom: -1px;
+        left: 10px;
+        height: 2px;
+        border-radius: 2px;
+        background: t.$brand;
+      }
+    }
+  }
+}
+
+.tab-badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 99px;
+  background: t.$brand;
+  color: #fff;
+  font-size: 11px;
+  font-weight: t.$bold;
+}
+
+.tab-note {
+  padding: 16px 24px 0;
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.tabcard .rule:first-of-type {
+  border-top: 0;
+}
+
+// Regelkarten: every rule a card with its value large and the choice below.
+.rcards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.rcard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 22px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+
+  &.is-changed {
+    border-color: rgba(0, 120, 187, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(0, 120, 187, 0.2);
+  }
+
+  .rule-description {
+    flex: 1;
+  }
+}
+
+.rcard-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  .rule-label {
+    color: t.$text-2;
+    font-size: 13.5px;
+    font-weight: t.$medium;
+  }
+}
+
+.rcard-value {
+  font-size: 30px;
+  font-weight: t.$bold;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  @include t.numeric;
+}
+
+.rcard-control {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+
+  .seg {
+    width: 100%;
+
+    button {
+      flex: 1;
+      padding: 0 4px;
+    }
+  }
+}
+
+// Wie Fragen: flat chapter cards with a tinted heading and a count chip.
+.qchapters {
+  display: grid;
+  gap: 16px;
+}
+
+.qchapter {
+  overflow: hidden;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+
+  .rule:nth-of-type(even) {
+    background: #f9fbfd;
+  }
+
+  .rule.is-changed {
+    background: #f4f8fd;
+  }
+}
+
+.qchapter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+  background: #f7f9fc;
+
+  .changed-tag {
+    margin-left: auto;
+  }
+
+  @media (max-width: 640px) {
+    padding: 14px 16px;
+  }
+}
+
+.qchapter-name {
+  margin-right: 4px;
+  font-size: 17px;
+  font-weight: t.$bold;
+  letter-spacing: -0.01em;
+}
+
+.qchapter-note {
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+// Seitenspalte: the figures stacked beside the chapters.
+.sidefigs {
+  display: grid;
+  gap: 12px;
+}
+
+.side-foot {
+  padding: 0 4px;
+  color: t.$text-3;
+  font-size: 12.5px;
+
+  a {
+    color: #0078bb;
+    text-decoration: none;
+  }
+}
+
+// Navy-Kopf: the figures and the state of the rules in one navy band.
+.navyhead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  padding: 24px 28px;
+  border-radius: 14px;
+  background: linear-gradient(120deg, #00327d, #0a4a9c);
+  color: #fff;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    padding: 20px;
+  }
+}
+
+.navy-figs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+
+  > div {
+    display: grid;
+    gap: 2px;
+  }
+
+  > div + div {
+    padding-left: 24px;
+    border-left: 1px solid rgba(255, 255, 255, 0.16);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+
+    > div + div {
+      padding: 14px 0 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+      border-left: 0;
+    }
+  }
+}
+
+.navy-label {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+}
+
+.navy-value {
+  font-size: 28px;
+  font-weight: t.$bold;
+  letter-spacing: -0.02em;
+  @include t.numeric;
+}
+
+.navy-note {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12.5px;
+}
+
+.navy-state {
+  display: grid;
+  justify-items: end;
+  gap: 10px;
+
+  @media (max-width: 1024px) {
+    justify-items: start;
+  }
+}
+
+.navy-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: t.$medium;
+
+  i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00e09d;
+  }
+
+  &.is-dirty i {
+    background: #ffc94d;
+  }
+}
+
+.navy-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.rcard-kicker {
+  color: t.$text-3;
+  font-size: 12px;
+}
+
+.qchapter-head .cchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid rgba(0, 50, 125, 0.12);
+  border-radius: 99px;
+  background: #fff;
+  color: t.$text-2;
+  font-size: 12.5px;
+
+  b {
+    color: t.$text;
+    @include t.numeric;
+  }
+}
+
+@media (max-width: 640px) {
+  .tabbar {
+    padding: 0 6px;
+
+    button {
+      flex: 1 0 auto;
+      height: 48px;
+      padding: 0 10px;
+      font-size: 13.5px;
+    }
+  }
+
+  .tab-note {
+    padding: 14px 16px 0;
+  }
+}
+
+// Kapitel mit Wirkung: each chapter shows what it decides in its heading.
+.ecard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+  background: #f7f9fc;
+
+  h2 {
+    font-size: 17px;
+    font-weight: t.$bold;
+  }
+
+  p {
+    margin-top: 2px;
+    color: t.$text-3;
+    font-size: 13px;
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+  }
+}
+
+.ecard-effect {
+  display: grid;
+  justify-items: end;
+  min-width: 170px;
+  padding: 10px 16px;
+  border: 1px solid rgba(0, 120, 187, 0.2);
+  border-radius: 10px;
+  background: #fff;
+
+  @media (max-width: 640px) {
+    justify-items: start;
+    width: 100%;
+  }
+}
+
+.ecard-label {
+  color: t.$text-3;
+  font-size: 12px;
+}
+
+.ecard-value {
+  font-size: 22px;
+  font-weight: t.$bold;
+  line-height: 1.2;
+  @include t.numeric;
+}
+
+.ecard-note {
+  color: t.$text-3;
+  font-size: 12px;
+}
+
+// Gruppierte Liste: compact grouped rows, the description behind an info.
+.glist {
+  display: grid;
+  gap: 8px;
+}
+
+.glist-title {
+  margin: 14px 4px 2px;
+  color: t.$text-2;
+  font-size: 13px;
+  font-weight: t.$bold;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.grow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px 20px;
+  padding: 14px 20px;
+  border-bottom: 1px solid t.$line-soft;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &.is-changed {
+    background: #f4f8fd;
+    box-shadow: inset 3px 0 0 t.$brand;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px 16px;
+  }
+}
+
+.grow-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: t.$bold;
+}
+
+.grow-main .rule-description {
+  margin-top: 4px;
+}
+
+.grow-control {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+
+  @media (max-width: 640px) {
+    justify-items: stretch;
+  }
+}
+
+.info-btn {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: t.$text-3;
+  cursor: pointer;
+
+  &:hover,
+  &[aria-expanded='true'] {
+    background: t.$brand-50;
+    color: t.$brand;
+  }
+}
+
+// Abschnitte links: the chapters as a vertical menu inside the card.
+.vtabs {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.vtabs-nav {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 12px;
+  border-right: 1px solid rgba(0, 50, 125, 0.08);
+  background: #f9fbfd;
+
+  button {
+    position: relative;
+    display: grid;
+    gap: 2px;
+    padding: 12px 14px;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(0, 50, 125, 0.04);
+    }
+
+    &.is-active {
+      background: #fff;
+      box-shadow:
+        0 1px 2px rgba(0, 50, 125, 0.08),
+        inset 0 0 0 1px rgba(0, 50, 125, 0.08);
+
+      .vt-name {
+        font-weight: t.$bold;
+      }
+    }
+
+    .tab-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+    }
+  }
+
+  @media (max-width: 900px) {
+    display: flex;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+
+    button {
+      flex: none;
+    }
+
+    .vt-note {
+      display: none;
+    }
+  }
+}
+
+.vt-name {
+  font-size: 14.5px;
+  font-weight: t.$medium;
+}
+
+.vt-note {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.vtabs-body {
+  min-width: 0;
+
+  .rule:first-of-type {
+    border-top: 0;
+  }
+}
+
+.vt-title {
+  padding: 20px 24px 4px;
+  font-size: 17px;
+  font-weight: t.$bold;
+}
+
+// Getönte Karten: the value on a tinted top, the choice on white below.
+.tcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+
+  &.is-changed {
+    border-color: rgba(0, 120, 187, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(0, 120, 187, 0.2);
+  }
+}
+
+.tcard-top {
+  display: grid;
+  gap: 2px;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+  background:
+    radial-gradient(60% 100% at 100% 0%, rgba(0, 164, 224, 0.1), transparent 70%),
+    linear-gradient(160deg, #f4f8fd, #eef4fb);
+
+  .rule-label {
+    color: t.$text-2;
+    font-size: 13.5px;
+    font-weight: t.$medium;
+  }
+}
+
+.tcard-tag {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+.tcard-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px 20px;
+
+  .rule-description {
+    flex: 1;
+  }
+
+  .rcard-control {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .vt-title {
+    display: none;
+  }
+
+  .vtabs-nav button {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ecard-head {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+// Aufklappbar: closed chapters show their values in one line.
+.acc {
+  overflow: hidden;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+
+  .rule:first-of-type {
+    border-top: 1px solid rgba(0, 50, 125, 0.08);
+  }
+}
+
+.acc-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 18px 22px;
+  border: 0;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: #fafbfd;
+  }
+
+  .is-open > & {
+    background: #f7f9fc;
+  }
+
+  .changed-tag {
+    margin-left: auto;
+  }
+}
+
+.acc-chev {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid t.$text-3;
+  border-bottom: 1.5px solid t.$text-3;
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+
+  .is-open & {
+    transform: rotate(45deg);
+  }
+}
+
+.acc-title {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+
+  b {
+    font-size: 17px;
+  }
+}
+
+.acc-sum {
+  color: t.$text-3;
+  font-size: 13px;
+  @include t.numeric;
+}
+
+// Drei Spalten: one column per chapter.
+.cols3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 20px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.col3-rule {
+  display: grid;
+  gap: 8px;
+  padding: 18px 22px;
+  border-top: 1px solid rgba(0, 50, 125, 0.08);
+
+  &.is-changed {
+    background: #f4f8fd;
+    box-shadow: inset 3px 0 0 t.$brand;
+  }
+
+  .seg {
+    width: 100%;
+
+    button {
+      flex: 1;
+      padding: 0 4px;
+    }
+  }
+}
+
+.col3-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.col3-value {
+  font-size: 18px;
+  font-weight: t.$bold;
+  @include t.numeric;
+}
+
+// Standard markiert: the default value carries a dot.
+.std-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.std-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: t.$text-3;
+  font-size: 13px;
+
+  i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #0078bb;
+  }
+}
+
+.seg.std button {
+  position: relative;
+
+  &.is-default::after {
+    content: '';
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #0078bb;
+    transform: translateX(-50%);
+  }
+}
+
+// Helles Kopfband: the figures and the save on one light band.
+.lighthead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  padding: 22px 26px;
+  border: 1px solid rgba(0, 120, 187, 0.2);
+  border-radius: 14px;
+  background:
+    radial-gradient(50% 120% at 100% 0%, rgba(0, 164, 224, 0.12), transparent 70%),
+    linear-gradient(160deg, #f2f8fd, #e9f1fa);
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.lh-figs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+
+  > div {
+    display: grid;
+    gap: 2px;
+  }
+
+  > div + div {
+    padding-left: 24px;
+    border-left: 1px solid rgba(0, 50, 125, 0.1);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+
+    > div + div {
+      padding: 12px 0 0;
+      border-top: 1px solid rgba(0, 50, 125, 0.1);
+      border-left: 0;
+    }
+  }
+}
+
+.lh-value {
+  font-size: 28px;
+  font-weight: t.$bold;
+  letter-spacing: -0.02em;
+  @include t.numeric;
+}
+
+.lh-state {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+
+  @media (max-width: 1024px) {
+    justify-items: start;
+  }
+}
+
+.lh-status {
+  color: t.$text;
+}
+
+// Übersicht + Fenster: values as tiles, each opens a calm drawer.
+.vtiles {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.vtile {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  padding: 20px 22px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover {
+    border-color: rgba(0, 120, 187, 0.3);
+    box-shadow: 0 6px 16px -12px rgba(0, 50, 125, 0.4);
+  }
+
+  &.is-changed {
+    border-color: rgba(0, 120, 187, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(0, 120, 187, 0.2);
+  }
+}
+
+.vtile-label {
+  color: t.$text-2;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+}
+
+.vtile-value {
+  font-size: 30px;
+  font-weight: t.$bold;
+  letter-spacing: -0.025em;
+  @include t.numeric;
+}
+
+.vtile-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  color: #0078bb;
+  font-size: 13px;
+  font-weight: t.$medium;
+}
+
+.rule-drawer {
+  width: 480px;
+}
+
+.rd-body {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+
+  .seg {
+    width: 100%;
+
+    button {
+      flex: 1;
+      padding: 0 4px;
+    }
+  }
+}
+
+.acc-title b {
+  font-weight: t.$bold;
+}
+
+.rd-body {
+  align-content: start;
+}

@@ -1,0 +1,218 @@
+// Temporary: Runde 17 of the rules page, the closed bar and «Prüfen».
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+
+// Zugeklappt.
+.bv-pill {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: $blue;
+  color: #fff;
+  font-size: 11.5px;
+  font-weight: t.$bold;
+  line-height: 1;
+  vertical-align: 1px;
+}
+
+.bv-lead {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bv-badge-icon {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: t.$brand-50;
+  color: t.$text-2;
+
+  i {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    display: grid;
+    place-items: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border: 2px solid #fff;
+    border-radius: 9px;
+    background: $blue;
+    color: #fff;
+    font-size: 10.5px;
+    font-style: normal;
+    font-weight: t.$bold;
+  }
+}
+
+.bv-main-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+
+  > b {
+    margin-right: 4px;
+  }
+}
+
+.bv-label-tag {
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid t.$line;
+  border-radius: 7px;
+  background: t.$bg-subtle;
+  color: t.$text-2;
+  font-size: 12.5px;
+  line-height: 22px;
+}
+
+// Prüfen: Symbol + Text.
+.bv-revicontext {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: t.$text;
+
+  css-icon {
+    color: t.$text-3;
+  }
+
+  &.is-open {
+    background: t.$bg-hover;
+  }
+}
+
+// Mit Zahl.
+.bv-revbadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: t.$text;
+
+  .bv-pill {
+    background: t.$brand-50;
+    color: t.$text;
+  }
+
+  &.is-open {
+    background: t.$bg-hover;
+  }
+}
+
+// Pfeil vorne: a disclosure toggle before the text.
+.bv-disclose {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-left: -6px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+
+  &:hover,
+  &.is-open {
+    background: t.$bg-hover;
+  }
+
+  .bv-chev {
+    margin-top: 4px;
+  }
+
+  .bv-chev.is-open {
+    margin-top: -3px;
+  }
+}
+
+.bv[data-bar='sheet']:has(.bv-disclose) {
+  padding-left: 14px;
+}
+
+// Knopfgruppe: «Prüfen» and «Verwerfen» as one control.
+.bv-group {
+  display: inline-flex;
+  height: 38px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 50, 125, 0.18);
+  border-radius: 9px;
+
+  button {
+    padding: 0 14px;
+    border: 0;
+    background: #fff;
+    color: t.$text;
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: t.$medium;
+    cursor: pointer;
+
+    & + button {
+      border-left: 1px solid rgba(0, 50, 125, 0.18);
+    }
+
+    &:hover:not(:disabled),
+    &.is-open {
+      background: t.$bg-hover;
+    }
+  }
+
+  @media (max-width: 640px) {
+    flex: 1;
+
+    button {
+      flex: 1;
+    }
+  }
+}
+
+// Am Speichern-Knopf: a caret beside «Speichern» opens the review.
+.bv-splitbtn {
+  display: inline-flex;
+
+  .bv-save {
+    border-radius: 9px 0 0 9px;
+  }
+
+  @media (max-width: 640px) {
+    flex: 1;
+
+    .bv-save {
+      flex: 1;
+    }
+  }
+}
+
+.bv-split-caret {
+  width: 38px;
+  min-width: 0;
+  padding: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0 9px 9px 0;
+
+  .bv-chev {
+    margin: 4px auto 0;
+    border-color: #fff;
+  }
+
+  .bv-chev.is-open {
+    margin-top: -3px;
+  }
+
+  @media (max-width: 640px) {
+    flex: none !important;
+  }
+}

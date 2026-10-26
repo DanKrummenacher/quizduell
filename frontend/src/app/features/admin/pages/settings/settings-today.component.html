@@ -1,0 +1,175 @@
+<main class="ad-page">
+  <app-ad-page-head title="Spielregeln">
+    <p headDesc>
+      Änderungen gelten ab dem nächsten Duell. Laufende Duelle spielen mit den
+      bisherigen Regeln zu Ende.
+    </p>
+    <a class="btn-secondary" routerLink="/admin/verlauf">
+      <css-icon icon="time" size="xs"></css-icon>Frühere Regeln
+    </a>
+  </app-ad-page-head>
+
+  @if (draft()) {
+    <div class="layout">
+      <section class="ad-card flush rules" aria-label="Regeln">
+        @for (row of rows(); track row.meta.key) {
+          <div class="rule" [class.is-changed]="row.changed">
+            <div class="rule-text">
+              <label class="rule-label" [attr.for]="'rule-' + row.meta.key">{{
+                row.meta.label
+              }}</label>
+              <p
+                class="rule-description"
+                [id]="'rule-' + row.meta.key + '-description'"
+              >
+                {{ row.meta.description }}
+              </p>
+              @if (row.defaultText) {
+                <button
+                  type="button"
+                  class="to-default"
+                  (click)="toDefault(row.meta)"
+                >
+                  Standard: {{ row.defaultText }}
+                </button>
+              }
+            </div>
+            <div class="rule-control">
+              @if (row.limit; as limit) {
+                <div class="stepper" [class.is-invalid]="row.invalid">
+                  <button
+                    type="button"
+                    [attr.aria-label]="row.meta.label + ' verringern'"
+                    [disabled]="row.number <= limit.min"
+                    (click)="step(row.meta, -1)"
+                  >
+                    <css-icon icon="minus" size="xs"></css-icon>
+                  </button>
+                  <input
+                    [id]="'rule-' + row.meta.key"
+                    type="number"
+                    inputmode="numeric"
+                    [min]="limit.min"
+                    [max]="limit.max"
+                    [step]="row.meta.step ?? 1"
+                    [value]="row.number"
+                    [attr.aria-describedby]="'rule-' + row.meta.key + '-description'"
+                    [attr.aria-invalid]="row.invalid"
+                    (input)="setNumber(row.meta, $event)"
+                  />
+                  <span class="unit" aria-hidden="true">{{
+                    row.meta.unit ?? ''
+                  }}</span>
+                  <button
+                    type="button"
+                    [attr.aria-label]="row.meta.label + ' erhöhen'"
+                    [disabled]="row.number >= limit.max"
+                    (click)="step(row.meta, 1)"
+                  >
+                    <css-icon icon="add" size="xs"></css-icon>
+                  </button>
+                </div>
+                <p class="range" [class.ad-error]="row.invalid">
+                  {{ row.rangeText }}
+                </p>
+              } @else {
+                <span class="switch">
+                  <app-ad-toggle
+                    [checked]="row.value === true"
+                    [label]="row.meta.label"
+                    (toggled)="setBonus($event)"
+                  />
+                  <span>{{ row.value ? 'An' : 'Aus' }}</span>
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </section>
+
+      <aside class="side">
+        <section class="ad-card impact">
+          <header class="ad-card-head">
+            <div>
+              <h2>Was das bedeutet</h2>
+              <p>Mit den Regeln links</p>
+            </div>
+          </header>
+          @if (impact(); as i) {
+            <dl class="facts">
+              <div>
+                <dt>Ein Duell dauert</dt>
+                <dd>{{ i.typical }}</dd>
+                <dd class="sub">typisch, höchstens {{ i.max }}</dd>
+              </div>
+              <div>
+                <dt>Höchstpunktzahl</dt>
+                <dd>{{ i.maxPoints }}</dd>
+                <dd class="sub">pro Person und Duell</dd>
+              </div>
+              <div>
+                <dt>Ohne Wiederholung</dt>
+                <dd>{{ i.duelsWithoutRepeat }} Duelle</dd>
+                <dd class="sub">mit {{ i.active }} aktiven Fragen</dd>
+              </div>
+            </dl>
+            @for (warning of i.warnings; track warning) {
+              <p class="warning">
+                <css-icon icon="priority-warning" size="sm"></css-icon>{{ warning }}
+              </p>
+            }
+          }
+          @if (data.settings.value()?.updatedAt; as updated) {
+            <p class="ad-card-foot">
+              Zuletzt geändert {{ formatRelative(updated) }}
+            </p>
+          }
+        </section>
+      </aside>
+    </div>
+  } @else if (data.settings.error()) {
+    <app-ad-state
+      kind="error"
+      [text]="data.settings.error()"
+      (retry)="data.settings.reload()"
+    />
+  } @else {
+    <div class="ad-card"><app-ad-state kind="loading" [lines]="8" /></div>
+  }
+</main>
+
+@if (dirty()) {
+  <div class="save-bar" role="region" aria-label="Ungespeicherte Änderungen">
+    <div class="save-text">
+      <b>{{
+        changes().length === 1 ? '1 Änderung' : changes().length + ' Änderungen'
+      }}</b>
+      <span class="save-list">
+        @for (change of changes(); track change.label) {
+          <span>{{ change.label }} {{ change.before }} → {{ change.after }}</span>
+        }
+      </span>
+      @if (error(); as text) {
+        <span class="save-error" role="alert">{{ text }}</span>
+      }
+    </div>
+    <div class="save-actions">
+      <button
+        type="button"
+        class="bar-btn"
+        [disabled]="saving()"
+        (click)="discard()"
+      >
+        Verwerfen
+      </button>
+      <button
+        type="button"
+        class="bar-btn primary"
+        [disabled]="saving() || invalid().size > 0"
+        (click)="save()"
+      >
+        {{ saving() ? 'Speichert…' : 'Speichern' }}
+      </button>
+    </div>
+  </div>
+}

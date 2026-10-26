@@ -1,0 +1,653 @@
+// Temporary: Runde 11 of the rules page, popover, changes and saving.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+$green: #2e8540;
+
+// Geändert ------------------------------------------------------------------
+.t-row {
+  position: relative;
+
+  &:not([data-chg='dot']) .r7-label::after {
+    display: none;
+  }
+
+  // Seitenlinie: a short rounded line beside the rule, not the whole row.
+  &[data-chg='accent'].is-changed::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    bottom: 18px;
+    left: 22px;
+    width: 3px;
+    border-radius: 2px;
+    background: $blue;
+  }
+}
+
+.t-tag {
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 10px;
+  background: #e6f1fa;
+  color: #005a8c;
+  font-size: 11.5px;
+  font-weight: t.$bold;
+  line-height: 20px;
+}
+
+.t-ctl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.t-undo {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid rgba(0, 50, 125, 0.14);
+  border-radius: 50%;
+  background: #fff;
+  color: $blue;
+  cursor: pointer;
+  animation: t-pop 0.18s ease-out;
+
+  &:hover {
+    border-color: $blue;
+    background: #f2f8fd;
+  }
+}
+
+@keyframes t-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+// Auslöser ------------------------------------------------------------------
+.t-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  border: 1px solid transparent;
+  background: none;
+  color: t.$text;
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+  @include t.numeric;
+
+  b {
+    font-weight: t.$bold;
+  }
+
+  css-icon,
+  .menu8-chev {
+    color: t.$text-3;
+  }
+
+  &:focus-visible,
+  &.is-open {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.18);
+  }
+
+  &[data-kind='chip'] {
+    padding: 0 12px 0 14px;
+    border-radius: 9px;
+    background: t.$bg-muted;
+
+    &:hover {
+      background: t.$bg-pressed;
+    }
+
+    &.is-open {
+      border-color: $blue;
+      background: #fff;
+    }
+  }
+
+  &[data-kind='select'] {
+    justify-content: space-between;
+    min-width: 128px;
+    padding: 0 12px 0 14px;
+    border-color: rgba(0, 50, 125, 0.18);
+    border-radius: 9px;
+    background: #fff;
+
+    &:hover {
+      border-color: rgba(0, 50, 125, 0.32);
+    }
+
+    &.is-open {
+      border-color: $blue;
+    }
+  }
+
+  &[data-kind='link'] {
+    gap: 14px;
+    padding: 0 4px 0 8px;
+    border-radius: 8px;
+
+    &:hover .t-change {
+      text-decoration: underline;
+    }
+  }
+
+  // «Im Wert»: the old value struck through before the new one.
+  &.is-changed .t-was {
+    color: t.$text-4;
+    font-size: 13px;
+  }
+
+  .t-row[data-chg='inval'] &.is-changed {
+    &[data-kind='chip'] {
+      background: #e6f1fa;
+    }
+
+    b {
+      color: #005a8c;
+    }
+  }
+}
+
+.t-change {
+  color: $blue;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+}
+
+// Popover -------------------------------------------------------------------
+.tp {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  gap: 14px;
+  width: 340px;
+  padding: 16px;
+  border: 1px solid rgba(0, 50, 125, 0.12);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    0 28px 56px -20px rgba(0, 40, 100, 0.45),
+    0 2px 6px rgba(0, 50, 125, 0.06);
+  animation: menu8-in 0.14s ease-out;
+
+  // The little arrow towards the value.
+  &::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 22px;
+    width: 10px;
+    height: 10px;
+    border-top: 1px solid rgba(0, 50, 125, 0.12);
+    border-left: 1px solid rgba(0, 50, 125, 0.12);
+    background: #fff;
+    transform: rotate(45deg);
+  }
+
+  &[data-pop='tiles'] {
+    width: 400px;
+  }
+
+  .range {
+    display: none;
+  }
+
+  @media (max-width: 760px) {
+    right: auto;
+    left: 0;
+    width: min(340px, calc(100vw - 64px));
+
+    &::before {
+      right: auto;
+      left: 22px;
+    }
+
+    &[data-pop='tiles'] {
+      width: min(400px, calc(100vw - 64px));
+    }
+  }
+}
+
+.tp-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+
+  b {
+    font-size: 15px;
+    font-weight: t.$bold;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: 12px;
+    @include t.numeric;
+  }
+}
+
+.tp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+
+  > span {
+    margin-right: 2px;
+    color: t.$text-3;
+    font-size: 12px;
+  }
+}
+
+.tp-effect {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: t.$bg-subtle;
+  color: t.$text-2;
+  font-size: 12.5px;
+  @include t.numeric;
+
+  css-icon {
+    color: t.$text-4;
+  }
+}
+
+.tp-compare {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: t.$bg-subtle;
+  @include t.numeric;
+
+  > div {
+    display: grid;
+    gap: 1px;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: 11.5px;
+  }
+
+  b {
+    font-size: 16px;
+  }
+
+  > div:first-child b {
+    color: t.$text-3;
+    font-weight: t.$medium;
+  }
+
+  css-icon {
+    color: t.$text-4;
+  }
+}
+
+.tp-compare-len {
+  grid-column: 1 / -1;
+  padding-top: 10px;
+  border-top: 1px solid t.$line-soft;
+
+  b {
+    font-size: 14px !important;
+  }
+}
+
+.tp-list {
+  display: grid;
+  gap: 2px;
+  margin: 0 -8px;
+}
+
+.tp-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  color: t.$text;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  @include t.numeric;
+
+  &:hover {
+    background: t.$bg-hover;
+  }
+
+  &.is-active {
+    background: #f2f8fd;
+    font-weight: t.$bold;
+  }
+}
+
+.tp-radio {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid rgba(0, 50, 125, 0.28);
+  border-radius: 50%;
+
+  .is-active & {
+    border: 5px solid t.$text;
+  }
+}
+
+.tp-value {
+  width: 48px;
+}
+
+.tp-note {
+  flex: 1;
+  color: t.$text-3;
+  font-size: 12.5px;
+  font-weight: t.$regular;
+}
+
+.tp-own {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid t.$line-soft;
+  font-size: 13.5px;
+}
+
+.tp-big {
+  display: grid;
+  gap: 2px;
+
+  b {
+    font-size: 26px;
+    font-weight: t.$bold;
+    letter-spacing: -0.02em;
+    @include t.numeric;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: 12.5px;
+  }
+}
+
+.tp .sl8 {
+  gap: 12px;
+}
+
+.tp-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tp-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 -16px -16px;
+  padding: 12px 16px;
+  border-top: 1px solid t.$line-soft;
+  border-radius: 0 0 14px 14px;
+  background: t.$bg-subtle;
+
+  .r7-link:disabled {
+    color: t.$text-4;
+    cursor: default;
+    text-decoration: none;
+  }
+
+  .btn-ghost {
+    margin-left: auto;
+  }
+}
+
+// Speichern: fix unten ------------------------------------------------------
+.ad-page.has-dock {
+  padding-bottom: 120px;
+}
+
+.dock {
+  position: fixed;
+  right: 0;
+  bottom: var(--switcher-h, 0px);
+  left: 0;
+  z-index: 45;
+  border-top: 1px solid rgba(0, 50, 125, 0.12);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -10px 30px -20px rgba(0, 40, 100, 0.35);
+  animation: dock-in 0.22s ease-out;
+
+  &.is-dirty {
+    border-top-color: rgba(0, 120, 187, 0.35);
+    box-shadow: 0 -14px 34px -18px rgba(0, 40, 100, 0.45);
+  }
+}
+
+@keyframes dock-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.dock-in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  max-width: 1328px;
+  margin: 0 auto;
+  padding: 14px 32px;
+
+  @media (max-width: 640px) {
+    padding: 12px 16px;
+  }
+}
+
+.dock-state {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dock-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14.5px;
+  font-weight: t.$bold;
+
+  &.is-ok {
+    font-weight: t.$medium;
+
+    css-icon {
+      color: $green;
+    }
+  }
+}
+
+.dock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $blue;
+  box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.18);
+}
+
+.dock-sub {
+  padding-left: 29px;
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.dock-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-left: 17px;
+}
+
+.dock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 7px;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  font-size: 12.5px;
+  @include t.numeric;
+
+  s {
+    color: t.$text-4;
+  }
+
+  b {
+    color: t.$text;
+  }
+}
+
+.dock-actions {
+  display: flex;
+  gap: 8px;
+
+  @media (max-width: 640px) {
+    width: 100%;
+
+    button {
+      flex: 1;
+    }
+  }
+}
+
+// Speichern: dunkle Leiste ---------------------------------------------------
+.snack {
+  position: fixed;
+  bottom: calc(24px + var(--switcher-h, 0px));
+  left: 50%;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 32px);
+  padding: 8px 8px 8px 18px;
+  border-radius: 12px;
+  background: #0d1f3c;
+  color: #fff;
+  box-shadow: 0 20px 44px -14px rgba(0, 20, 60, 0.6);
+  transform: translateX(-50%);
+  animation: snack-in 0.2s ease-out;
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    width: calc(100vw - 32px);
+
+    .snack-text {
+      width: 100%;
+    }
+
+    button {
+      flex: 1;
+    }
+  }
+}
+
+@keyframes snack-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+}
+
+.snack-text {
+  margin-right: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13.5px;
+  white-space: nowrap;
+
+  b {
+    color: #fff;
+  }
+}
+
+.snack-error {
+  color: #ffb4a8;
+  font-size: 12.5px;
+}
+
+.snack-ghost,
+.snack-primary {
+  height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+  cursor: pointer;
+}
+
+.snack-ghost {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.16);
+  }
+}
+
+.snack-primary {
+  background: #fff;
+  color: #0d1f3c;
+  font-weight: t.$bold;
+
+  &:hover:not(:disabled) {
+    background: #e6f1fa;
+  }
+}
+
+// The popover stays above the bars fixed at the bottom.
+.tp {
+  z-index: 60;
+
+  .sl8-ticks {
+    display: none;
+  }
+
+  .sl8-track {
+    padding-top: 10px;
+  }
+}
+
+.dock-link {
+  gap: 6px;
+}

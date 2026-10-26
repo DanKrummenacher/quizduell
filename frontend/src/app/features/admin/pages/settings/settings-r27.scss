@@ -1,0 +1,120 @@
+// Temporary: Runde 27 of the rules page, the whole page.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+
+// Tempo-Bonus: the switch in a field as wide as the value chips.
+.d-togchip {
+  justify-content: space-between;
+  width: 124px;
+  height: 38px;
+  padding: 0 8px 0 14px;
+  border-radius: 9px;
+  background: t.$bg-muted;
+  color: t.$text-3;
+  font-size: 15px;
+  font-weight: t.$bold;
+
+  &.is-on {
+    color: t.$text;
+  }
+}
+
+.d-row[data-pos='table'][data-thead] .r7-switch.d-togchip {
+  flex: none;
+}
+
+// Kennzahlen in einer Zeile.
+.p-strip {
+  display: grid;
+  grid-template-columns: 1.3fr repeat(3, minmax(0, 1fr));
+  margin-bottom: 28px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.p-strip-item {
+  display: grid;
+  gap: 2px;
+  padding: 14px 20px;
+  border-left: 1px solid t.$line-soft;
+  @include t.numeric;
+
+  &:first-child {
+    border-left: 0;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: 12.5px;
+  }
+
+  b {
+    font-size: 20px;
+    font-weight: t.$bold;
+    letter-spacing: -0.01em;
+  }
+
+  small {
+    color: t.$text-3;
+    font-size: 12px;
+  }
+
+  &.is-lead b {
+    font-size: 24px;
+  }
+
+  @media (max-width: 900px) {
+    &:nth-child(3) {
+      border-left: 0;
+    }
+
+    &:nth-child(n + 3) {
+      border-top: 1px solid t.$line-soft;
+    }
+  }
+}
+
+// Abschnitt-Titel like on the other pages, with a quiet note or action.
+.p-title {
+  margin: 8px 0 16px;
+
+  .p-title-note,
+  .p-title-act {
+    order: 2;
+    color: t.$text-3;
+    font-size: 13px;
+    font-weight: t.$regular;
+    letter-spacing: 0;
+  }
+
+  &::after {
+    order: 1;
+  }
+}
+
+.p-title-act {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $blue !important;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.pre .p-title {
+  margin-top: 0;
+}
+
+.p-strip-item {
+  align-content: start;
+}

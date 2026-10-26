@@ -1,0 +1,219 @@
+// Temporary: Runde 18 of the rules page, «Prüfen».
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+
+// A small tooltip for buttons that only show an icon.
+[data-tip] {
+  position: relative;
+
+  &::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: t.$text;
+    color: #fff;
+    font-size: 12px;
+    font-weight: t.$medium;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 4px);
+    transition:
+      opacity 0.12s ease,
+      transform 0.12s ease;
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+// Knopf mit Zahl: a full second button with icon and count.
+.bv-revcount {
+  height: 38px;
+  gap: 8px;
+
+  css-icon {
+    color: t.$text-3;
+  }
+
+  &.is-open {
+    border-color: $blue;
+    color: $blue;
+
+    css-icon {
+      color: currentColor;
+    }
+  }
+}
+
+.bv-count-in {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-right: -4px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: t.$bg-muted;
+  color: t.$text;
+  font-size: 11.5px;
+  font-weight: t.$bold;
+}
+
+// Symbol ist der Knopf: the pencil opens the review.
+.bv-badge-btn {
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color 0.12s ease,
+    border-color 0.12s ease;
+
+  &:hover {
+    border-color: rgba(0, 120, 187, 0.35);
+    background: #e6f1fa;
+  }
+
+  &.is-open {
+    border-color: $blue;
+    background: #fff;
+    color: $blue;
+  }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.2);
+  }
+}
+
+// Im Titel: the number of changes is the link.
+.bv-titlelink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px dashed rgba(0, 120, 187, 0.5);
+  background: none;
+  color: $blue;
+  font: inherit;
+  font-weight: t.$bold;
+  cursor: pointer;
+
+  &:hover {
+    border-bottom-style: solid;
+  }
+
+  .bv-chev {
+    width: 6px;
+    height: 6px;
+    margin-top: 2px;
+    border-color: currentColor;
+  }
+
+  .bv-chev.is-open {
+    margin-top: -3px;
+  }
+}
+
+// In der Unterzeile.
+.bv-sublink {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $blue;
+  font: inherit;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.bv-main .bv-sub:has(.bv-sublink) {
+  overflow: visible;
+  white-space: normal;
+}
+
+// Symbolknopf: square, bordered, with a tooltip.
+.bv-iconsq {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid rgba(0, 50, 125, 0.16);
+  border-radius: 9px;
+  background: #fff;
+  color: t.$text-2;
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.32);
+    color: t.$text;
+  }
+
+  &.is-open {
+    border-color: $blue;
+    background: #eef5fc;
+    color: $blue;
+  }
+}
+
+// Pfeil am Rand: a quiet chevron after «Speichern», set apart by a line.
+.bv-edge-sep {
+  width: 1px;
+  height: 28px;
+  margin: 0 -4px 0 2px;
+  background: t.$line-soft;
+}
+
+.bv-edge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: none;
+  cursor: pointer;
+
+  &:hover,
+  &.is-open {
+    background: t.$bg-hover;
+  }
+
+  .bv-chev {
+    margin-top: 4px;
+  }
+
+  .bv-chev.is-open {
+    margin-top: -3px;
+  }
+}
+
+@media (max-width: 640px) {
+  .bv-edge-sep {
+    display: none;
+  }
+
+  .bv-edge {
+    position: absolute;
+    top: 10px;
+    right: 8px;
+  }
+}
+
+.bv-titlelink {
+  margin-right: 5px;
+}

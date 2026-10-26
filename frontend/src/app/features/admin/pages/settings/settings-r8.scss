@@ -1,0 +1,527 @@
+// Temporary: Runde 8 of the rules page.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+$green: #2e8540;
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.btn-sm css-icon,
+.btn-secondary css-icon {
+  flex: none;
+}
+
+// Zuletzt geändert as a strip under the head ---------------------------------
+.last8 {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+  padding: 12px 12px 12px 14px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+
+  .btn-secondary {
+    flex: none;
+    gap: 6px;
+  }
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+
+    .btn-secondary {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+.last8-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: t.$brand-50;
+  color: t.$text-2;
+}
+
+.last8-text {
+  display: grid;
+  flex: 1;
+  gap: 1px;
+  min-width: 0;
+
+  > b {
+    font-size: 14px;
+  }
+}
+
+.last8-changes {
+  overflow: hidden;
+  color: t.$text-3;
+  font-size: 12.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  @include t.numeric;
+
+  > span + span::before {
+    content: ' · ';
+  }
+
+  b {
+    color: t.$text;
+    font-weight: t.$medium;
+  }
+
+  @media (max-width: 640px) {
+    white-space: normal;
+  }
+}
+
+// Vorlagen with what they are for -------------------------------------------
+.pre8-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pre8 {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 10px;
+  padding: 18px 20px 14px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.22);
+  }
+
+  &:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.2);
+  }
+
+  &.is-active {
+    border-color: t.$text;
+    box-shadow: inset 0 0 0 1px t.$text;
+
+    .pre8-state {
+      color: $green;
+    }
+  }
+}
+
+.pre8-purpose {
+  color: t.$text-2;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.pre8-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  color: t.$text-3;
+  font-size: 13px;
+  @include t.numeric;
+
+  b {
+    color: t.$text;
+    font-weight: t.$medium;
+  }
+}
+
+.pre8-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid t.$line-soft;
+  color: t.$text-3;
+  font-size: 12.5px;
+  @include t.numeric;
+}
+
+.pre8-state {
+  color: t.$text-2;
+  font-weight: t.$medium;
+}
+
+.pre8-own {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+// Statuskarte ---------------------------------------------------------------
+.st8 {
+  position: sticky;
+  top: 12px;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 28px;
+  margin-bottom: 24px;
+  padding: 20px 22px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  h2 {
+    font-size: 20px;
+    font-weight: t.$bold;
+    letter-spacing: -0.01em;
+  }
+
+  &.is-dirty {
+    border-color: rgba(0, 50, 125, 0.22);
+    box-shadow: 0 16px 34px -22px rgba(0, 50, 125, 0.6);
+  }
+}
+
+.st8-main {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.st8-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: t.$text-3;
+  font-size: 12.5px;
+
+  i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: $green;
+  }
+
+  &.is-dirty i {
+    background: $blue;
+    box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.18);
+  }
+}
+
+.st8-sum {
+  color: t.$text-3;
+  font-size: 13px;
+  @include t.numeric;
+
+  > span + span::before {
+    content: ' · ';
+  }
+
+  b {
+    color: t.$text;
+    font-weight: t.$medium;
+  }
+}
+
+.st8-side,
+.st8-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+
+  @media (max-width: 640px) {
+    width: 100%;
+  }
+}
+
+.st8-actions button {
+  @media (max-width: 640px) {
+    flex: 1;
+  }
+}
+
+.st8-last {
+  display: grid;
+  margin-right: 4px;
+  text-align: right;
+
+  span {
+    color: t.$text-3;
+    font-size: 12px;
+  }
+
+  b {
+    font-size: 13.5px;
+  }
+
+  @media (max-width: 640px) {
+    flex: 1;
+    text-align: left;
+  }
+}
+
+.st8-side .btn-ghost {
+  gap: 5px;
+}
+
+// Menus ---------------------------------------------------------------------
+.menu8-wrap {
+  position: relative;
+}
+
+.menu8-chev {
+  width: 7px;
+  height: 7px;
+  margin: -3px 0 0 8px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.menu8 {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 40;
+  display: grid;
+  gap: 1px;
+  width: 300px;
+  padding: 6px;
+  border: 1px solid rgba(0, 50, 125, 0.1);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 18px 40px -16px rgba(0, 50, 125, 0.4);
+  animation: menu8-in 0.12s ease-out;
+
+  &.is-right {
+    right: 0;
+    left: auto;
+  }
+
+  &.is-wide {
+    width: 340px;
+  }
+
+  @media (max-width: 640px) {
+    &.is-right {
+      right: auto;
+      left: 0;
+    }
+
+    width: min(300px, calc(100vw - 64px));
+  }
+}
+
+@keyframes menu8-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.menu8-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: t.$text;
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  @include t.numeric;
+
+  &:hover {
+    background: t.$bg-hover;
+  }
+
+  &.is-active {
+    font-weight: t.$bold;
+  }
+}
+
+.menu8-text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+
+  span {
+    color: t.$text-3;
+    font-size: 12.5px;
+    font-weight: t.$regular;
+    line-height: 1.45;
+  }
+}
+
+.menu8-value {
+  width: 52px;
+}
+
+.menu8-note {
+  flex: 1;
+  color: t.$text-3;
+  font-size: 12.5px;
+  font-weight: t.$regular;
+}
+
+.menu8-std {
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: t.$brand-50;
+  color: t.$text-2;
+  font-size: 11.5px;
+  font-weight: t.$medium;
+  line-height: 20px;
+}
+
+.menu8-check {
+  display: grid;
+  width: 16px;
+  place-items: center;
+}
+
+.menu8-own {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 10px;
+  margin-top: 5px;
+  padding: 10px 10px 6px;
+  border-top: 1px solid t.$line-soft;
+  font-size: 13.5px;
+}
+
+.menu8-range {
+  grid-column: 1 / -1;
+  color: t.$text-3;
+  font-size: 12px;
+}
+
+.menu8-field,
+.sl8-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(0, 50, 125, 0.18);
+  border-radius: 8px;
+  background: #fff;
+  color: t.$text-3;
+  font-size: 13px;
+
+  input {
+    width: 44px;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background: none;
+    color: t.$text;
+    font: inherit;
+    font-size: 14px;
+    font-weight: t.$bold;
+    text-align: right;
+    -moz-appearance: textfield;
+    @include t.numeric;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+  }
+
+  &:focus-within {
+    border-color: $blue;
+    box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.16);
+  }
+
+  &.is-invalid {
+    border-color: #c0392b;
+  }
+}
+
+// The select of «Menüs + Vorlagen».
+.sel8 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 150px;
+  height: 38px;
+  padding: 0 12px 0 14px;
+  border: 1px solid rgba(0, 50, 125, 0.18);
+  border-radius: 9px;
+  background: #fff;
+  color: t.$text;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  @include t.numeric;
+
+  b {
+    flex: 1;
+    text-align: left;
+  }
+
+  .menu8-chev {
+    color: t.$text-3;
+  }
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.32);
+  }
+
+  &.is-open,
+  &:focus-visible {
+    outline: 0;
+    border-color: $blue;
+    box-shadow: 0 0 0 3px rgba(0, 120, 187, 0.16);
+  }
+
+  &.is-invalid {
+    border-color: #c0392b;
+  }
+
+  @media (max-width: 760px) {
+    width: 100%;
+  }
+}
+
+.sel8-tag {
+  color: t.$text-3;
+  font-size: 12px;
+}

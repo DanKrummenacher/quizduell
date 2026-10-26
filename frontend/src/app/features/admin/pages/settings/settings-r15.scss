@@ -1,0 +1,454 @@
+// Temporary: Runde 15 of the rules page, the review bar.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$green: #2e8540;
+
+// The blue dot breathes while something is unsaved.
+.bv .bv-dot {
+  position: relative;
+  box-shadow: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: $blue;
+    animation: bv-ring 1.8s ease-out infinite;
+  }
+}
+
+@keyframes bv-ring {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bv .bv-dot::after {
+    animation: none;
+  }
+}
+
+.bv[data-bar='sheet'] {
+  width: min(820px, calc(100vw - 32px));
+  gap: 10px 12px;
+}
+
+.bv-split {
+  display: none;
+}
+
+// Zugeklappt.
+.bv-strong {
+  color: t.$text;
+  font-weight: t.$bold;
+}
+
+.bv-mini-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.bv-mini {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  font-size: 12px;
+  @include t.numeric;
+
+  s {
+    color: t.$text-4;
+  }
+
+  b {
+    color: t.$text;
+  }
+}
+
+.bv-num {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: $blue;
+  color: #fff;
+  font-size: 14px;
+  font-weight: t.$bold;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid $blue;
+    animation: bv-ring-soft 2s ease-out infinite;
+  }
+}
+
+@keyframes bv-ring-soft {
+  0% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+// Prüfen.
+.bv-rev {
+  gap: 6px;
+
+  &.is-open {
+    border-color: $blue;
+    color: $blue;
+  }
+}
+
+.bv-revlink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 6px;
+  border: 0;
+  background: none;
+  color: $blue;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  .bv-chev {
+    border-color: currentColor;
+  }
+}
+
+.bv-revicon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid rgba(0, 50, 125, 0.14);
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background-color 0.12s ease;
+
+  &:hover,
+  &.is-open {
+    border-color: $blue;
+    background: #f2f8fd;
+  }
+
+  .bv-chev {
+    margin: 4px 0 0;
+  }
+
+  .bv-chev.is-open {
+    margin: -3px 0 0;
+  }
+}
+
+.bv-area {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin: -6px 0 -6px -8px;
+  padding: 6px 12px 6px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+
+  &:hover {
+    background: t.$bg-subtle;
+
+    .bv-area-hint {
+      color: $blue;
+    }
+  }
+}
+
+.bv-area-hint {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  color: t.$text-3;
+  font-size: 13px;
+  font-weight: t.$medium;
+
+  .bv-chev {
+    border-color: currentColor;
+  }
+}
+
+.bv-countbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 14px 0 12px;
+  border: 1px solid rgba(0, 120, 187, 0.3);
+  border-radius: 99px;
+  background: #eef5fc;
+  color: #004f7c;
+  font: inherit;
+  font-size: 14px;
+  font-weight: t.$bold;
+  cursor: pointer;
+
+  &:hover,
+  &.is-open {
+    border-color: $blue;
+  }
+
+  .bv-chev {
+    border-color: currentColor;
+  }
+}
+
+// Kacheln: changed figures stand out, unchanged ones step back.
+.bv-fig-label {
+  color: t.$text-3;
+  font-size: 12px;
+}
+
+.bv-fig-value {
+  font-size: 18px;
+  font-weight: t.$bold;
+  letter-spacing: -0.01em;
+  @include t.numeric;
+
+  s {
+    margin-right: 6px;
+    color: t.$text-4;
+    font-size: 14px;
+    font-weight: t.$regular;
+  }
+}
+
+.bv-fig-note {
+  color: t.$text-3;
+  font-size: 12px;
+  @include t.numeric;
+}
+
+.bv-sheet .bv-fig {
+  gap: 3px;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  background: t.$bg-subtle;
+
+  &:not(.is-changed) {
+    .bv-fig-value {
+      color: t.$text-3;
+      font-weight: t.$medium;
+    }
+  }
+}
+
+// Geändert hervorgehoben.
+.bv-sheet[data-figs='highlight'] .bv-fig.is-changed {
+  border-color: rgba(0, 120, 187, 0.35);
+  background: #eef5fc;
+
+  .bv-fig-note {
+    color: #005a8c;
+    font-weight: t.$medium;
+  }
+}
+
+.bv-sheet[data-figs='highlight'] .bv-fig:not(.is-changed) {
+  border-color: t.$line-soft;
+  background: #fff;
+}
+
+// Mit Pfeil-Marke.
+.bv-sheet[data-figs='delta'] .bv-fig {
+  border-color: t.$line-soft;
+  background: #fff;
+}
+
+.bv-fig-chip {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: #eef5fc;
+  color: #005a8c;
+  font-size: 12px;
+  font-weight: t.$bold;
+  @include t.numeric;
+}
+
+.bv-arrow {
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+
+  .is-up & {
+    margin-top: 3px;
+    transform: rotate(225deg);
+  }
+}
+
+// Bisher → neu.
+.bv-sheet[data-figs='beforeafter'] .bv-fig {
+  border-color: t.$line-soft;
+  background: #fff;
+
+  &.is-changed {
+    border-color: rgba(0, 50, 125, 0.18);
+    box-shadow: inset 3px 0 0 $blue;
+  }
+}
+
+// Mit Balken.
+.bv-sheet[data-figs='bars'] .bv-fig {
+  border-color: t.$line-soft;
+  background: #fff;
+}
+
+.bv-fig-bars {
+  display: grid;
+  gap: 3px;
+  margin: 4px 0 2px;
+}
+
+.bv-fig-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgba(0, 50, 125, 0.06);
+
+  i {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.25s ease;
+  }
+
+  &.is-before i {
+    background: t.$text-4;
+    opacity: 0.55;
+  }
+
+  &.is-after i {
+    background: t.$text;
+
+    .bv-fig:not(.is-changed) & {
+      background: t.$text-4;
+    }
+  }
+}
+
+// Als Zeilen.
+.bv-ftable {
+  td {
+    width: 110px;
+  }
+
+  td:last-child {
+    width: 120px;
+    text-align: left;
+  }
+
+  tr.is-same {
+    th,
+    td,
+    b {
+      color: t.$text-3;
+      font-weight: t.$regular;
+    }
+  }
+}
+
+.bv-diff {
+  color: #005a8c;
+  font-weight: t.$medium;
+}
+
+// Als Zeilen: both tables share their columns.
+.bv-sheet[data-figs='rows'] .bv-table td {
+  width: 110px;
+
+  &:last-child {
+    width: 120px;
+  }
+}
+
+.bv-sheet {
+  max-height: calc(100vh - 220px - var(--switcher-h, 0px));
+  overflow-y: auto;
+}
+
+@media (max-width: 640px) {
+  .bv-sheet .bv-figs {
+    gap: 6px;
+  }
+
+  .bv-sheet .bv-fig {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 2px 10px;
+    padding: 9px 12px;
+
+    .bv-fig-label {
+      font-size: 12.5px;
+    }
+
+    .bv-fig-value {
+      grid-row: 1;
+      grid-column: 2;
+      font-size: 15px;
+    }
+
+    .bv-fig-note,
+    .bv-fig-chip,
+    .bv-fig-bars {
+      grid-column: 1 / -1;
+    }
+  }
+}

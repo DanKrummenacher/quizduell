@@ -1,0 +1,137 @@
+// Temporary: more facelift drafts of the rules page.
+@use '../../styles/tokens' as t;
+
+// Vorher – nachher: each figure saved and with the new values.
+.cmp {
+  display: grid;
+  margin: 0 0 18px;
+}
+
+.cmp-row {
+  display: grid;
+  gap: 2px;
+  padding: 12px 0;
+  border-bottom: 1px solid t.$line-soft;
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  dt {
+    color: t.$text-2;
+    font-size: 13px;
+    font-weight: t.$medium;
+  }
+
+  dd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 22px;
+    @include t.numeric;
+
+    b {
+      font-weight: t.$bold;
+    }
+
+    css-icon {
+      color: t.$text-3;
+    }
+  }
+}
+
+.cmp-before {
+  color: t.$text-3;
+  font-size: 15px;
+  text-decoration: line-through;
+  text-decoration-color: rgba(0, 50, 125, 0.3);
+}
+
+.cmp-delta {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: t.$brand-50;
+  color: t.$brand;
+  font-size: 12px;
+  font-weight: t.$bold;
+  line-height: 22px;
+}
+
+.compare-timeline {
+  display: grid;
+  gap: 8px;
+}
+
+.compare-label {
+  color: t.$text-2;
+  font-size: 13px;
+  font-weight: t.$medium;
+}
+
+// Schnellwerte: common values as chips beside the stepper.
+.quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+
+  button {
+    height: 28px;
+    padding: 0 10px;
+    border: 1px solid rgba(0, 50, 125, 0.14);
+    border-radius: 99px;
+    background: #fff;
+    color: t.$text-2;
+    font: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+    @include t.numeric;
+
+    &:hover:not(.is-on) {
+      border-color: #0078bb;
+      color: t.$text;
+    }
+
+    &.is-on {
+      border-color: t.$brand;
+      background: t.$brand;
+      color: #fff;
+      font-weight: t.$bold;
+    }
+  }
+}
+
+// Navy-Panel: what the rules mean on the colour of the bar.
+.side.is-navy .impact {
+  border: 0;
+  background: linear-gradient(160deg, #0a3a80, t.$brand 55%, #02265e);
+  color: #fff;
+
+  .ad-card-head p,
+  .impact-big small,
+  .facts dt,
+  .facts .sub,
+  .tl-key,
+  .ad-card-foot {
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .ad-card-head h2,
+  .impact-big,
+  .facts dd:not(.sub) {
+    color: #fff;
+  }
+
+  .impact-timeline,
+  .ad-card-foot {
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+
+  .tl-seg.is-question,
+  .tl-key i.is-question {
+    background: #fff;
+  }
+}

@@ -1,0 +1,211 @@
+// Temporary: Runde 25 of the rules page, Standard / Bisher.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$ink: #00508a;
+$green: #2e8540;
+
+// Tabelle mit Spaltenkopf: «Standard» and «Wert» as real columns.
+.d-thead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px 150px;
+  gap: 16px;
+  padding: 8px 22px 8px 44px;
+  border-top: 1px solid rgba(0, 50, 125, 0.08);
+  background: t.$bg-subtle;
+  color: t.$text-3;
+  font-size: 11.5px;
+  font-weight: t.$medium;
+  letter-spacing: 0.02em;
+
+  @media (max-width: 760px) {
+    display: none;
+  }
+}
+
+.d-thead-std,
+.d-thead-val {
+  text-align: right;
+}
+
+.d-row[data-pos='table'] {
+  grid-template-columns: minmax(0, 1fr) auto;
+
+  .d-ctl {
+    gap: 16px;
+  }
+
+  .d-chipwrap {
+    justify-content: flex-end;
+    min-width: 150px;
+  }
+}
+
+.a7 .d-thead + .d-row {
+  border-top: 1px solid t.$line-soft;
+}
+
+.d-tcell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  width: 120px;
+  color: t.$text-3;
+  font-size: 13.5px;
+  @include t.numeric;
+
+  &.is-off {
+    color: t.$text;
+  }
+
+  .d-act {
+    height: 24px;
+    min-width: 24px;
+    margin: 0;
+  }
+
+  @media (max-width: 760px) {
+    width: auto;
+
+    &::before {
+      content: 'Standard ';
+      color: t.$text-4;
+    }
+  }
+}
+
+.d-tcheck {
+  color: $green;
+}
+
+// Im Kapitelkopf: one note per chapter, the rows stay clean.
+.d-chpill {
+  flex: none;
+  margin-left: auto;
+  height: 22px;
+  padding: 0 9px;
+  border: 1px solid t.$line;
+  border-radius: 11px;
+  color: t.$text-3;
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+
+  &.is-off {
+    border-color: rgba(0, 50, 125, 0.18);
+    color: t.$text;
+  }
+
+  & + .changed-tag {
+    margin-left: 8px;
+  }
+}
+
+.d-chstrip,
+.d-chfoot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 16px;
+  padding: 10px 22px 10px 44px;
+  border-top: 1px solid rgba(0, 50, 125, 0.08);
+  background: t.$bg-subtle;
+  color: t.$text-2;
+  font-size: 12.5px;
+
+  @media (max-width: 760px) {
+    padding-left: 22px;
+  }
+}
+
+.d-chfoot {
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: t.$text-3;
+  }
+
+  css-icon {
+    color: $green;
+  }
+
+  &:not(.is-off) {
+    color: t.$text-3;
+  }
+}
+
+// Häkchen im Wert: the chip says itself whether it is the standard.
+.t-std-check {
+  margin-right: -2px;
+  color: $green;
+}
+
+.t-std-ring {
+  width: 8px;
+  height: 8px;
+  margin-right: -1px;
+  border: 1.5px solid t.$text-3;
+  border-radius: 50%;
+}
+
+// Übersicht + Hervorheben: one line for the whole page, rows marked on demand.
+.d-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  margin-bottom: 16px;
+  padding: 10px 14px 10px 16px;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.d-filter-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+
+  css-icon {
+    color: $green;
+  }
+}
+
+.d-filter-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 12px;
+  background: t.$bg-muted;
+  font-size: 12.5px;
+  font-weight: t.$bold;
+}
+
+.d-filter-switch {
+  height: auto;
+}
+
+.cstack.is-hl .d-row.is-dev {
+  box-shadow: inset 3px 0 0 #c9a23a;
+
+  &:not(.is-changed) {
+    background: #fbf8ef;
+  }
+}
+
+.d-chfoot:last-child {
+  border-radius: 0 0 12px 12px;
+}

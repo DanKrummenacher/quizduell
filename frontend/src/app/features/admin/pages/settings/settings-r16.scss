@@ -1,0 +1,228 @@
+// Temporary: Runde 16 of the rules page, «Prüfen» and the figures.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+
+// The sheet head with its own close button.
+.bv-sheet-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+
+  > div {
+    display: grid;
+    gap: 2px;
+  }
+}
+
+.bv-close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin: -4px -4px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: t.$text-3;
+  cursor: pointer;
+
+  &:hover {
+    background: t.$bg-hover;
+    color: t.$text;
+  }
+}
+
+// Textknopf wie Verwerfen: same height, same weight, a chevron that turns.
+.bv-revghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: t.$text;
+
+  .bv-chev {
+    margin-top: 3px;
+    border-color: t.$text-3;
+  }
+
+  .bv-chev.is-open {
+    margin-top: -3px;
+  }
+
+  &.is-open {
+    background: t.$bg-hover;
+  }
+}
+
+.bv-vsep {
+  width: 1px;
+  height: 22px;
+  margin: 0 -2px;
+  background: t.$line;
+}
+
+.bv[data-bar='sheet']:has(.bv-vsep) .bv-actions {
+  margin-left: 0;
+}
+
+// Knopf in voller Höhe: as tall as «Speichern», clearly a second action.
+.bv-revout {
+  height: 38px;
+  gap: 10px;
+
+  .bv-chev {
+    margin-top: 3px;
+    border-color: currentColor;
+  }
+
+  .bv-chev.is-open {
+    margin-top: -3px;
+  }
+
+  &.is-open {
+    border-color: $blue;
+    color: $blue;
+  }
+}
+
+// Link in der Zeile: «Prüfen» right after the title.
+.bv-main:has(.bv-inline) {
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  column-gap: 12px;
+
+  > :not(b):not(.bv-inline) {
+    grid-column: 1 / -1;
+  }
+}
+
+.bv-inline {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $blue;
+  font: inherit;
+  font-size: 13px;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  .bv-chev {
+    margin-top: 2px;
+    border-color: currentColor;
+  }
+
+  .bv-chev.is-open {
+    margin-top: -4px;
+  }
+}
+
+// Griff oben: a tab on the top edge, like a drawer.
+.bv-handle {
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 14px;
+  border: 1px solid rgba(0, 50, 125, 0.14);
+  border-radius: 99px;
+  background: #fff;
+  color: t.$text-2;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: t.$medium;
+  box-shadow: 0 4px 12px -6px rgba(0, 40, 100, 0.35);
+  transform: translateX(-50%);
+  cursor: pointer;
+  z-index: 1;
+
+  &:hover,
+  &.is-open {
+    border-color: $blue;
+    color: $blue;
+  }
+
+  .bv-chev {
+    margin-top: 3px;
+    border-color: currentColor;
+  }
+
+  .bv-chev.is-open {
+    margin-top: -3px;
+  }
+}
+
+.bv[data-bar='sheet']:has(.bv-handle) .bv-sheet {
+  padding-top: 16px;
+}
+
+// Kacheln: the grey tiles stay, only their edge changes.
+.bv-sheet[data-figs='border'] .bv-fig {
+  border-color: t.$line;
+  background: #fff;
+}
+
+.bv-sheet[data-figs='borderchg'] .bv-fig {
+  border-color: t.$line-soft;
+  background: #fff;
+
+  &.is-changed {
+    border-color: rgba(0, 50, 125, 0.28);
+
+    .bv-fig-note {
+      color: t.$text-2;
+    }
+  }
+}
+
+.bv-sheet[data-figs='soft'] .bv-fig {
+  border-color: t.$line;
+  background: t.$bg-subtle;
+}
+
+.bv-sheet[data-figs='divider'] {
+  .bv-figs {
+    gap: 0;
+    padding: 4px 0;
+    border-top: 1px solid t.$line-soft;
+    border-bottom: 1px solid t.$line-soft;
+  }
+
+  .bv-fig {
+    border-radius: 0;
+    background: none;
+    padding: 10px 16px;
+
+    & + .bv-fig {
+      border-left: 1px solid t.$line-soft;
+    }
+
+    &:first-child {
+      padding-left: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .bv-fig + .bv-fig {
+      border-top: 1px solid t.$line-soft;
+      border-left: 0;
+    }
+
+    .bv-fig {
+      padding-left: 0;
+    }
+  }
+}
