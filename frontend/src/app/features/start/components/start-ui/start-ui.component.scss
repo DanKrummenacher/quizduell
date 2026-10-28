@@ -27,13 +27,13 @@ $turn: cubic-bezier(0.65, 0, 0.35, 1);
   min-height: 100dvh;
 }
 
-// As the lobby: the content sits slightly above the middle.
+// The content sits in the middle of the screen.
 .main {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
   justify-content: center;
-  padding: functions.rem(32) functions.rem(20) functions.rem(80);
+  padding: functions.rem(32) functions.rem(20);
 }
 
 .content {
@@ -243,7 +243,7 @@ $turn: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
   .main {
-    padding-block: functions.rem(20) functions.rem(48);
+    padding-block: functions.rem(20);
   }
 }
 
@@ -257,7 +257,7 @@ $turn: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
   .main {
-    padding-block: functions.rem(12) functions.rem(16);
+    padding-block: functions.rem(12);
   }
 
   .title {

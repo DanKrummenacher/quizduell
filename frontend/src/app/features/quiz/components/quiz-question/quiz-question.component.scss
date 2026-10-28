@@ -52,7 +52,8 @@
   gap: functions.rem(16);
   position: relative;
   width: 100%;
-  height: functions.rem(62);
+  // Grows with a long answer; the letter block keeps the full height.
+  min-height: functions.rem(62);
   // Room on the right for the opponent badge.
   padding: 0 functions.rem(52) 0 0;
   overflow: hidden;
@@ -83,6 +84,14 @@
   &:disabled {
     cursor: default;
   }
+}
+
+.answer-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-block: functions.rem(10);
+  line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 // «Buchstaben-Block»: the letter in a dark block over the full card height.
