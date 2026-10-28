@@ -27,6 +27,10 @@ module.exports = tseslint.config(
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'max-lines': [
+        'error',
+        { max: 500, skipBlankLines: true, skipComments: true },
+      ],
       '@angular-eslint/directive-selector': [
         'error',
         {
@@ -44,6 +48,10 @@ module.exports = tseslint.config(
         },
       ],
     },
+  },
+  {
+    files: ['**/*.spec.ts', 'e2e/**/*.ts'],
+    rules: { 'max-lines': 'off' },
   },
   {
     files: ['**/*.html'],

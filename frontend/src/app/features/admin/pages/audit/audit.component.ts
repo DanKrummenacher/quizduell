@@ -12,14 +12,13 @@ import type {
   AuditAction,
   AuditEntry,
 } from '../../../../core/contracts/admin.contract';
-import { AdminApi } from '../../core/admin-api.service';
+import { AdminApi, messageOf } from '../../core/admin-api.service';
 import { AdminData } from '../../core/admin-data.service';
 import { ConfirmService } from '../../core/confirm.service';
 import { dayKey, formatLongDay, formatTime } from '../../core/format';
 import { NotifyService } from '../../core/notify.service';
 import { formatSetting, SETTINGS_META } from '../../core/settings-meta';
 import { AdStateComponent } from '../../ui/state.component';
-import { messageOf } from '../questions/questions.component';
 import { AdPageHeadComponent } from '../../ui/page-head.component';
 
 type Group = 'all' | 'settings' | 'game' | 'questions' | 'hints' | 'login';

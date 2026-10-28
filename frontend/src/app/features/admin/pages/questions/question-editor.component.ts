@@ -22,7 +22,7 @@ import {
   TRASH_DAYS,
 } from '../../../../core/contracts/admin.contract';
 import { ANSWER_LETTERS } from '../../../../core/game/answer-letters';
-import { AdminApi } from '../../core/admin-api.service';
+import { AdminApi, messageOf } from '../../core/admin-api.service';
 import { AdminData } from '../../core/admin-data.service';
 import { ConfirmService } from '../../core/confirm.service';
 import {
@@ -43,7 +43,6 @@ import { AutofocusDirective } from '../../ui/autofocus.directive';
 import { AdLineChartComponent } from '../../ui/charts';
 import { AdStateComponent } from '../../ui/state.component';
 import { AdToggleComponent } from '../../ui/toggle.component';
-import { messageOf } from './questions.component';
 
 const CHART_KEY = 'playduelio.admin.hint-chart';
 const BARS = 20;

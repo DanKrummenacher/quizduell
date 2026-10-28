@@ -18,51 +18,39 @@ import '@css-ch/components/icon';
 import {
   type AdminQuestion,
   type BulkAction,
-  type Hint,
   TRASH_DAYS,
 } from '../../../../core/contracts/admin.contract';
-import { AdminApi, AdminApiError } from '../../core/admin-api.service';
+import { AdminApi, messageOf } from '../../core/admin-api.service';
 import { AdminData } from '../../core/admin-data.service';
 import { ConfirmService } from '../../core/confirm.service';
 import { download, questionsToCsv } from '../../core/csv';
-import {
-  formatInt,
-  formatPercent,
-  formatSeconds,
-  plural,
-  share,
-} from '../../core/format';
-import {
-  type Difficulty,
-  difficultyOf,
-  DIFFICULTY_LABELS,
-  HINT_TYPE_LABELS,
-} from '../../core/hint-texts';
+import { formatInt, formatPercent, formatSeconds, plural } from '../../core/format';
+import { DIFFICULTY_LABELS } from '../../core/hint-texts';
 import { NotifyService } from '../../core/notify.service';
 import { AdStateComponent } from '../../ui/state.component';
 import { AdToggleComponent } from '../../ui/toggle.component';
+import { AdPageHeadComponent } from '../../ui/page-head.component';
 import { QuestionEditorComponent } from './question-editor.component';
 import { QuestionImportComponent } from './question-import.component';
+import {
+  filterQuestions,
+  type HealthFilter,
+  hintsByQuestion,
+  NO_CATEGORY,
+  type QuickId,
+  quickFiguresOf,
+  rowOf,
+  type Sort,
+  SORTS,
+  type StatusFilter,
+  toggled,
+  trendText,
+} from './question-list';
 import { QuestionTrashComponent } from './question-trash.component';
-import { AdPageHeadComponent } from '../../ui/page-head.component';
-
-type StatusFilter = 'all' | 'active' | 'paused';
-type HealthFilter = 'all' | 'hints' | Difficulty;
-type Sort = 'newest' | 'oldest' | 'rate-asc' | 'rate-desc' | 'answers' | 'text';
 
 const PAGE_SIZE = 50;
-const NO_CATEGORY = '__none__';
 /** A category shows its first questions until opened in full. */
 const SHORT_LIST = 3;
-
-const SORTS: { id: Sort; label: string }[] = [
-  { id: 'newest', label: 'Neueste zuerst' },
-  { id: 'oldest', label: 'Älteste zuerst' },
-  { id: 'rate-asc', label: 'Trefferquote aufsteigend' },
-  { id: 'rate-desc', label: 'Trefferquote absteigend' },
-  { id: 'answers', label: 'Am meisten gestellt' },
-  { id: 'text', label: 'Frage A–Z' },
-];
 
 /** The question catalogue: find, judge and change questions, one or many. */
 @Component({
@@ -134,45 +122,11 @@ export class QuestionsComponent {
   private readonly destroyRef = inject(DestroyRef);
 
   /** Quick filters as figures: each sets the filters it stands for. */
-  protected readonly quick = computed(() => {
-    const all = this.data.questions.value() ?? [];
-    const hints = this.hintsByQuestion();
-    const count = (test: (q: AdminQuestion) => boolean) => all.filter(test).length;
-    return [
-      {
-        id: 'active',
-        label: 'Im Spiel',
-        value: count((q) => q.active),
-        note: `von ${formatInt(all.length)} Fragen`,
-      },
-      {
-        id: 'paused',
-        label: 'Pausiert',
-        value: count((q) => !q.active),
-        note: 'kommen in keinem Duell vor',
-      },
-      {
-        id: 'hints',
-        label: 'Mit Hinweis',
-        value: count((q) => hints.has(q.id)),
-        note: 'auffällig im Spiel',
-      },
-      {
-        id: 'hard',
-        label: DIFFICULTY_LABELS.hard,
-        value: count((q) => difficultyOf(q) === 'hard'),
-        note: 'unter 45 % richtig',
-      },
-      {
-        id: 'new',
-        label: DIFFICULTY_LABELS.new,
-        value: count((q) => difficultyOf(q) === 'new'),
-        note: 'noch ohne verlässliche Quote',
-      },
-    ] as const;
-  });
+  protected readonly quick = computed(() =>
+    quickFiguresOf(this.data.questions.value() ?? [], this.hintsByQuestion()),
+  );
 
-  protected readonly quickPicked = computed(() => {
+  protected readonly quickPicked = computed((): QuickId | null => {
     if (this.health() === 'hints') {
       return 'hints';
     }
@@ -191,7 +145,7 @@ export class QuestionsComponent {
     return null;
   });
 
-  protected pickQuick(id: string): void {
+  protected pickQuick(id: QuickId): void {
     const same = this.quickPicked() === id;
     this.status.set('all');
     this.health.set('all');
@@ -201,7 +155,7 @@ export class QuestionsComponent {
     if (id === 'active' || id === 'paused') {
       this.status.set(id);
     } else {
-      this.health.set(id as HealthFilter);
+      this.health.set(id);
     }
   }
 
@@ -312,15 +266,9 @@ export class QuestionsComponent {
     }
   }
 
-  private readonly hintsByQuestion = computed(() => {
-    const map = new Map<number, Hint[]>();
-    for (const hint of this.data.openHints() ?? []) {
-      if (hint.questionId !== null) {
-        map.set(hint.questionId, [...(map.get(hint.questionId) ?? []), hint]);
-      }
-    }
-    return map;
-  });
+  private readonly hintsByQuestion = computed(() =>
+    hintsByQuestion(this.data.openHints() ?? []),
+  );
 
   protected readonly counts = computed(() => {
     const all = this.data.questions.value() ?? [];
@@ -328,49 +276,19 @@ export class QuestionsComponent {
     return { all: all.length, active, paused: all.length - active };
   });
 
-  protected readonly filtered = computed(() => {
-    const all = this.data.questions.value() ?? [];
-    const words = this.search()
-      .toLocaleLowerCase('de-CH')
-      .split(/\s+/)
-      .filter(Boolean);
-    const status = this.status();
-    const category = this.category();
-    const health = this.health();
-    const hints = this.hintsByQuestion();
-    const result = all.filter((q) => {
-      if ((status === 'active' && !q.active) || (status === 'paused' && q.active)) {
-        return false;
-      }
-      if (
-        category === NO_CATEGORY
-          ? q.category !== null
-          : category && q.category !== category
-      ) {
-        return false;
-      }
-      if (health === 'hints' && !hints.has(q.id)) {
-        return false;
-      }
-      if (health !== 'all' && health !== 'hints' && difficultyOf(q) !== health) {
-        return false;
-      }
-      if (words.length) {
-        const haystack = [
-          q.text,
-          ...q.options,
-          q.category ?? '',
-          `f-${q.id}`,
-          String(q.id),
-        ]
-          .join(' ')
-          .toLocaleLowerCase('de-CH');
-        return words.every((word) => haystack.includes(word));
-      }
-      return true;
-    });
-    return sortQuestions(result, this.sort());
-  });
+  protected readonly filtered = computed(() =>
+    filterQuestions(
+      this.data.questions.value() ?? [],
+      {
+        search: this.search(),
+        status: this.status(),
+        category: this.category(),
+        health: this.health(),
+      },
+      this.hintsByQuestion(),
+      this.sort(),
+    ),
+  );
 
   protected readonly pageCount = computed(() =>
     Math.max(1, Math.ceil(this.filtered().length / PAGE_SIZE)),
@@ -381,28 +299,7 @@ export class QuestionsComponent {
     const start = this.page() * PAGE_SIZE;
     return this.filtered()
       .slice(start, start + PAGE_SIZE)
-      .map((question) => {
-        const { answers, correct, recent, previous } = question.stats;
-        const rate = share(correct, answers);
-        const recentRate = share(recent.correct, recent.answers);
-        const previousRate = share(previous.correct, previous.answers);
-        const trend =
-          recentRate !== null &&
-          previousRate !== null &&
-          recent.answers >= 10 &&
-          previous.answers >= 10
-            ? recentRate - previousRate
-            : null;
-        return {
-          question,
-          rate,
-          trend,
-          difficulty: difficultyOf(question),
-          hints: (hints.get(question.id) ?? []).map(
-            (hint) => HINT_TYPE_LABELS[hint.type],
-          ),
-        };
-      });
+      .map((question) => rowOf(question, hints.get(question.id) ?? []));
   });
 
   protected readonly range = computed(() => {
@@ -432,11 +329,7 @@ export class QuestionsComponent {
   // Filters and selection
   // ---------------------------------------------------------------------------
 
-  /** Change in percentage points: «+5 Pkt.» */
-  protected trendText(trend: number): string {
-    const points = Math.round(trend * 100);
-    return `${points > 0 ? '+' : points < 0 ? '−' : '±'}${Math.abs(points)} Pkt.`;
-  }
+  protected readonly trendText = trendText;
 
   protected onSearch(event: Event): void {
     this.search.set((event.target as HTMLInputElement).value);
@@ -639,48 +532,4 @@ export class QuestionsComponent {
       this.busy.set(false);
     }
   }
-}
-
-/** The set with the name added, or removed when it was in it. */
-function toggled(current: ReadonlySet<string>, name: string): ReadonlySet<string> {
-  const next = new Set(current);
-  if (next.has(name)) {
-    next.delete(name);
-  } else {
-    next.add(name);
-  }
-  return next;
-}
-
-function sortQuestions(questions: AdminQuestion[], sort: Sort): AdminQuestion[] {
-  const rate = (q: AdminQuestion) =>
-    q.stats.answers > 0 ? q.stats.correct / q.stats.answers : null;
-  const byRate = (direction: 1 | -1) => (a: AdminQuestion, b: AdminQuestion) => {
-    const ra = rate(a);
-    const rb = rate(b);
-    // Questions without answers always go last.
-    if (ra === null || rb === null) {
-      return ra === null ? (rb === null ? 0 : 1) : -1;
-    }
-    return (ra - rb) * direction;
-  };
-  const sorted = [...questions];
-  switch (sort) {
-    case 'newest':
-      return sorted.sort((a, b) => b.id - a.id);
-    case 'oldest':
-      return sorted.sort((a, b) => a.id - b.id);
-    case 'rate-asc':
-      return sorted.sort(byRate(1));
-    case 'rate-desc':
-      return sorted.sort(byRate(-1));
-    case 'answers':
-      return sorted.sort((a, b) => b.stats.answers - a.stats.answers);
-    case 'text':
-      return sorted.sort((a, b) => a.text.localeCompare(b.text, 'de-CH'));
-  }
-}
-
-export function messageOf(error: unknown): string {
-  return error instanceof AdminApiError ? error.message : 'Das hat nicht geklappt.';
 }

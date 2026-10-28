@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import '@css-ch/components/icon';
 import { ADMIN_LIMITS } from '../../../../core/contracts/admin.contract';
-import { AdminApi } from '../../core/admin-api.service';
+import { AdminApi, messageOf } from '../../core/admin-api.service';
 import { AdminData } from '../../core/admin-data.service';
 import { ConfirmService } from '../../core/confirm.service';
 import {
@@ -21,7 +21,6 @@ import {
 import { formatInt, plural } from '../../core/format';
 import { NotifyService } from '../../core/notify.service';
 import { AutofocusDirective } from '../../ui/autofocus.directive';
-import { messageOf } from './questions.component';
 
 const PREVIEW_ROWS = 200;
 

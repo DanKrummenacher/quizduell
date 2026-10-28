@@ -33,6 +33,11 @@ export class AdminApiError extends Error {
   }
 }
 
+/** What to tell the admin when a request failed. */
+export function messageOf(error: unknown): string {
+  return error instanceof AdminApiError ? error.message : 'Das hat nicht geklappt.';
+}
+
 const BASE = `${environment.apiUrl}/api/admin`;
 
 /** All calls of the admin to the server. Errors arrive as `AdminApiError`. */

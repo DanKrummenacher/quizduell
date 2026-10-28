@@ -17,18 +17,12 @@ import type {
   AuditEntry,
   NumericSettingKey,
 } from '../../../../core/contracts/admin.contract';
-import { AdminApi } from '../../core/admin-api.service';
+import { AdminApi, messageOf } from '../../core/admin-api.service';
 import { AdminData } from '../../core/admin-data.service';
 import { ConfirmService } from '../../core/confirm.service';
-import {
-  formatDuration,
-  formatInt,
-  formatRelative,
-  formatSeconds,
-} from '../../core/format';
+import { formatInt, formatRelative } from '../../core/format';
 import { NotifyService } from '../../core/notify.service';
 import {
-  duelLength,
   formatSetting,
   SETTINGS_META,
   type SettingMeta,
@@ -36,8 +30,14 @@ import {
 import { AdStateComponent } from '../../ui/state.component';
 import { AdToggleComponent } from '../../ui/toggle.component';
 import { AutofocusDirective } from '../../ui/autofocus.directive';
-import { messageOf } from '../questions/questions.component';
 import { AdPageHeadComponent } from '../../ui/page-head.component';
+import {
+  effectsOf,
+  impactOf,
+  lastChangeOf,
+  optionNoteOf,
+  presetsOf,
+} from './settings-figures';
 
 /** Pages that can hold unsaved changes when the admin navigates away. */
 export interface UnsavedChanges {
@@ -295,130 +295,25 @@ export class SettingsComponent implements UnsavedChanges {
   /** What the rules mean for players, with the measured answer time. */
   protected readonly impact = computed(() => {
     const draft = this.draft();
-    if (!draft) {
-      return null;
-    }
-    const active = this.activeQuestions();
-    const avgAnswerMs = this.avgAnswerMs();
-    const length = duelLength(draft, avgAnswerMs ?? undefined);
-    const maxPoints = draft.questionsPerGame * (draft.speedBonusEnabled ? 200 : 100);
-    const warnings: string[] = [];
-    if (active < draft.questionsPerGame) {
-      warnings.push(
-        `Nur ${formatInt(active)} aktive Fragen – mit ${draft.questionsPerGame} Fragen pro Duell kann niemand spielen.`,
-      );
-    }
-    if (
-      avgAnswerMs !== null &&
-      draft.questionDurationSec * 1000 < avgAnswerMs * 1.4
-    ) {
-      warnings.push(
-        `Im Schnitt brauchen Spielende ${formatSeconds(avgAnswerMs)} pro Antwort. Mit ${draft.questionDurationSec} s läuft die Zeit oft ab.`,
-      );
-    }
-    return {
-      typical: formatDuration(length.typical),
-      max: formatDuration(length.max),
-      maxPoints: formatInt(maxPoints),
-      active: formatInt(active),
-      duelsWithoutRepeat: draft.questionsPerGame
-        ? Math.max(0, Math.floor(active / draft.questionsPerGame))
-        : 0,
-      warnings,
-    };
+    return draft
+      ? impactOf(draft, this.activeQuestions(), this.avgAnswerMs())
+      : null;
   });
 
   /** The same three figures saved and now, with the difference in words. */
   protected readonly effects = computed(() => {
     const draft = this.draft();
     const saved = this.saved();
-    if (!draft || !saved) {
-      return [];
-    }
-    const avg = this.avgAnswerMs() ?? undefined;
-    const active = this.activeQuestions();
-    const of = (s: AdminSettings) => [
-      duelLength(s, avg).typical,
-      s.questionsPerGame * (s.speedBonusEnabled ? 200 : 100),
-      s.questionsPerGame ? Math.floor(active / s.questionsPerGame) : 0,
-    ];
-    const before = of(saved);
-    const after = of(draft);
-    const figures = [
-      {
-        label: 'Ein Duell dauert',
-        show: (n: number) => formatDuration(n),
-        words: (d: number) =>
-          `${Math.round(Math.abs(d) / 1000)} s ${d < 0 ? 'kürzer' : 'länger'}`,
-      },
-      {
-        label: 'Höchstpunktzahl',
-        show: (n: number) => formatInt(n),
-        words: (d: number) =>
-          `${formatInt(Math.abs(d))} ${d < 0 ? 'weniger' : 'mehr'}`,
-      },
-      {
-        label: 'Ohne Wiederholung',
-        show: (n: number) => `${n} Duelle`,
-        words: (d: number) => `${Math.abs(d)} ${d < 0 ? 'weniger' : 'mehr'}`,
-      },
-    ];
-    return figures.map((figure, i) => {
-      const b = before[i]!;
-      const a = after[i]!;
-      return {
-        label: figure.label,
-        before: figure.show(b),
-        after: figure.show(a),
-        changed: a !== b,
-        words: figure.words(a - b),
-      };
-    });
+    return draft && saved
+      ? effectsOf(draft, saved, this.activeQuestions(), this.avgAnswerMs())
+      : [];
   });
 
   /** Three presets for the flow of a duel; «Eigene» is any other mix. */
   protected readonly presets = computed(() => {
     const defaults = this.defaults();
     const draft = this.draft();
-    if (!defaults || !draft) {
-      return [];
-    }
-    const list = [
-      {
-        id: 'short',
-        label: 'Kurz',
-        values: {
-          questionsPerGame: 5,
-          questionDurationSec: 15,
-          revealDurationSec: 3,
-        },
-      },
-      {
-        id: 'default',
-        label: 'Standard',
-        values: {
-          questionsPerGame: defaults.questionsPerGame,
-          questionDurationSec: defaults.questionDurationSec,
-          revealDurationSec: defaults.revealDurationSec,
-        },
-      },
-      {
-        id: 'long',
-        label: 'Ausführlich',
-        values: {
-          questionsPerGame: 10,
-          questionDurationSec: 25,
-          revealDurationSec: 5,
-        },
-      },
-    ];
-    const avg = this.avgAnswerMs() ?? undefined;
-    return list.map((preset) => ({
-      ...preset,
-      length: formatDuration(
-        duelLength({ ...draft, ...preset.values }, avg).typical,
-      ),
-    }));
+    return defaults && draft ? presetsOf(defaults, draft, this.avgAnswerMs()) : [];
   });
 
   protected readonly activePreset = computed(() => {
@@ -445,46 +340,13 @@ export class SettingsComponent implements UnsavedChanges {
   });
 
   /** The last save of the rules as a short figure and a line below it. */
-  protected readonly lastChange = computed(() => {
-    const entry = this.history()?.[0];
-    const at = entry?.at ?? this.data.settings.value()?.updatedAt ?? null;
-    if (!at) {
-      return { value: 'Noch nie', note: 'Es gelten die Standardregeln' };
-    }
-    const date = new Date(at);
-    const now = new Date(this.now());
-    const minutes = Math.round((now.getTime() - date.getTime()) / 60_000);
-    const time = date.toLocaleTimeString('de-CH', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-    const yesterday = new Date(now.getTime() - 86_400_000);
-    const value =
-      minutes < 1
-        ? 'Gerade eben'
-        : minutes < 60
-          ? `vor ${minutes} Min.`
-          : date.toDateString() === now.toDateString()
-            ? 'Heute'
-            : date.toDateString() === yesterday.toDateString()
-              ? 'Gestern'
-              : date.toLocaleDateString('de-CH', { day: 'numeric', month: 'short' });
-    const count =
-      entry?.before && entry.after
-        ? SETTINGS_META.filter(
-            (meta) => entry.before![meta.key] !== entry.after![meta.key],
-          ).length
-        : 0;
-    const what =
-      entry?.action === 'settings.restore'
-        ? 'wiederhergestellt'
-        : count === 1
-          ? '1 Regel'
-          : count > 1
-            ? `${count} Regeln`
-            : null;
-    return { value, note: what ? `um ${time} · ${what}` : `um ${time}` };
-  });
+  protected readonly lastChange = computed(() =>
+    lastChangeOf(
+      this.history()?.[0],
+      this.data.settings.value()?.updatedAt ?? null,
+      this.now(),
+    ),
+  );
 
   protected readonly sinceText = computed(() => {
     const since = this.dirtySince();
@@ -533,27 +395,7 @@ export class SettingsComponent implements UnsavedChanges {
   /** What a value would mean, beside it in the menu. */
   protected optionNote(meta: SettingMeta, value: number): string {
     const draft = this.draft();
-    if (!draft) {
-      return '';
-    }
-    if (meta.key === 'questionDurationSec') {
-      const avg = this.avgAnswerMs();
-      if (avg !== null && value * 1000 < avg * 1.4) {
-        return 'Zeit läuft oft ab';
-      }
-      return `Duell bis ${formatDuration(duelLength({ ...draft, [meta.key]: value }).max)}`;
-    }
-    if (meta.key === 'questionsPerGame' || meta.key === 'revealDurationSec') {
-      const length = duelLength(
-        { ...draft, [meta.key]: value },
-        this.avgAnswerMs() ?? undefined,
-      );
-      return `Duell ≈ ${formatDuration(length.typical)}`;
-    }
-    if (meta.key === 'idleResetSec') {
-      return value === 0 ? 'Geräte bleiben stehen' : 'nach Ruhe zur Startseite';
-    }
-    return 'zum Einigen';
+    return draft ? optionNoteOf(meta, value, draft, this.avgAnswerMs()) : '';
   }
 
   protected toggleChapter(index: number): void {

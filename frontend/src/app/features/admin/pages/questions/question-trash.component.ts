@@ -12,14 +12,13 @@ import {
   TRASH_DAYS,
   type TrashedQuestion,
 } from '../../../../core/contracts/admin.contract';
-import { AdminApi } from '../../core/admin-api.service';
+import { AdminApi, messageOf } from '../../core/admin-api.service';
 import { AdminData } from '../../core/admin-data.service';
 import { ConfirmService } from '../../core/confirm.service';
 import { formatInt, formatRelative, plural, questionCode } from '../../core/format';
 import { NotifyService } from '../../core/notify.service';
 import { AutofocusDirective } from '../../ui/autofocus.directive';
 import { AdStateComponent } from '../../ui/state.component';
-import { messageOf } from './questions.component';
 
 const DAY_MS = 86_400_000;
 
