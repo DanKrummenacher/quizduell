@@ -10,7 +10,9 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
-      exclude: ['src/main.ts', 'src/**/*.spec.ts'],
+      // The demo data only serve the local admin; main.ts is the bootstrap.
+      exclude: ['src/main.ts', 'src/**/*.spec.ts', 'src/testing/demo-data.ts'],
+      thresholds: { lines: 85, functions: 85, branches: 70, statements: 85 },
     },
   },
 });
