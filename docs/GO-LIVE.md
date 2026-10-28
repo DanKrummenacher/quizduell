@@ -115,7 +115,8 @@ Aufbau in einem neuen Workspace (Render → New → Blueprint).
 
 ## 6. Inhalt und Probe (5 Min.)
 
-1. **Fragen**: erfassen oder per CSV importieren (Vorlage: **Exportieren**).
+1. **Fragen**: erfassen oder per CSV importieren. Zum Start liegt `docs/beispielfragen.csv`
+   bereit (32 Fragen in vier Kategorien); eine leere Vorlage liefert **Exportieren**.
 2. **Spielregeln** prüfen (Fragen pro Duell, Zeit pro Frage, automatischer Neustart).
 3. Mit zwei Geräten (Handy und Laptop) ein Duell spielen, dann unter **Live** und
    **Auswertung** nachsehen, dass es ankommt.
