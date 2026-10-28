@@ -72,11 +72,11 @@ Umsetzung:
 
 | Modul        | Aufgabe                                                                |
 | ------------ | ---------------------------------------------------------------------- |
-| `game/`      | Spiel-Engine (`GameService`), Socket-Gateway, Namensfilter, Rate-Limit |
+| `game/`      | Spiel-Engine: `GameService` (Ablauf), `SessionRegistry` (Sitzungen und Spieler), `LiveMonitor` (Live-Stand für das Admin), `scoring` (Punkte und Statistik einer Runde), `game-view` (Spielstand pro Spieler), Socket-Gateway, Namensfilter, Rate-Limit |
 | `questions/` | Fragen in der Datenbank, Zufallsauswahl, Trefferstatistik, Beispielfragen |
 | `settings/`  | Spieleinstellungen (im Speicher gecacht, gelten ab dem nächsten Duell) |
 | `stats/`     | Gespielte und abgebrochene Duelle mit Dauer, Punkten und Revanche      |
-| `admin/`     | Admin-API: Anmeldung, Live-Stand, Auswertung, Fragen, Regeln, Hinweise, Verlauf |
+| `admin/`     | Admin-API: Anmeldung und Passwort, Live-Stand, Auswertung, Fragen, Regeln, Hinweise, Verlauf |
 | `testing/`   | Teststeuerung `/api/test/*` für die E2E-Tests (nur mit `TEST_CONTROL=true`) |
 | `database/`  | Drizzle-Schema, Verbindung, Migrationen beim Start                     |
 | `config/`    | Validierte Konfiguration aus Umgebungsvariablen                        |
@@ -123,7 +123,9 @@ gesperrt: Die Konfiguration verweigert dort `TEST_CONTROL=true`.
 - ESLint mit typgeprüften Regeln in Backend, Frontend und E2E-Tests, Prettier
 - Tests: Unit- und Integrationstests (Vitest, Backend mit In-Memory-Postgres),
   End-to-End-Tests (Playwright, Chromium und WebKit, 14 Geräte)
-- Jeder Push läuft durch die CI: Vertrag, Format, Lint, Typen, Tests, Build, E2E
+- ESLint begrenzt jede Datei auf 500 Zeilen Code (`max-lines`)
+- Jeder Push läuft durch die CI: Vertrag, Format, Lint, Typen, Tests mit Abdeckung
+  (Backend mindestens 85 % Zeilen), Audit der Produktionspakete, Build, E2E
 
 ## Admin
 
@@ -139,7 +141,9 @@ Admin-API (`/api/admin/*`, Vertrag in `contracts/admin.contract.ts`).
   Warteschlange, Ereignisse, Höchststand pro Minute der letzten Stunde) und wird alle
   zwei Sekunden abgefragt.
 - **Hinweise** berechnet das Backend aus den Zahlen (ab 20 Antworten pro Frage);
-  ignorierte Hinweise stehen in `dismissed_hints`.
+  ignorierte Hinweise stehen in `dismissed_hints`. Das Frontend zeigt sie im Editor
+  jeder Frage (mit der Einordnung unter allen bewerteten Fragen) und als Filter auf
+  der Fragen-Seite; die eigene Hinweise-Seite ist als «Bald verfügbar» angelegt.
 - **Verlauf:** Jede Änderung landet in `audit_log`; Änderungen der Spielregeln speichern
   die Werte davor und danach, damit sie sich wiederherstellen lassen.
 - Tage und Stunden der Auswertung gelten in der Zeitzone Europe/Zurich.
@@ -153,7 +157,7 @@ Millisekundenbereich. Lasttest lokal (`npm --prefix backend run load-test -- <ur
 | --------------- | ------ | --------------------------- |
 | 500 Duelle (1000 Spielende) | 0 | 1 ms / 4 ms        |
 
-Das ist ein Vielfaches dessen, was an einem Messestand passiert. Für mehrere Instanzen
+Das ist ein Vielfaches dessen, was im vorgesehenen Betrieb anfällt. Für mehrere Instanzen
 bräuchte es einen gemeinsamen Spielstand (z. B. Redis mit dem Socket.IO-Redis-Adapter);
 für diesen Einsatz ist das bewusst nicht nötig.
 
@@ -164,8 +168,11 @@ für diesen Einsatz ist das bewusst nicht nötig.
 - Helmet-Security-Header, CORS nur für die konfigurierte Frontend-Domain
 - Schreibzugriffe nur über die Admin-API mit gültiger Anmeldung (die Teststeuerung ist in
   der Produktion gesperrt)
-- Admin-Anmeldung: ein gemeinsames Passwort (`ADMIN_PASSWORD`, in der Produktion Pflicht,
-  mindestens 12 Zeichen), Vergleich in konstanter Zeit, höchstens 10 Versuche pro Minute
-  und IP. Die Sitzung ist ein mit HMAC-SHA256 signiertes Token (12 Stunden), dessen
-  Schlüssel aus dem Passwort abgeleitet ist: Ein neues Passwort beendet alle Sitzungen.
+- Admin-Anmeldung: ein gemeinsames Passwort, als scrypt-Hash in `admin_credentials`
+  gespeichert. `ADMIN_PASSWORD` (in der Produktion Pflicht, mindestens 12 Zeichen) gilt
+  nur für den ersten Start; danach ändert das Admin es auf der Seite **Passwort**, und
+  `ADMIN_PASSWORD_RESET=true` setzt es beim nächsten Start zurück. Vergleich in
+  konstanter Zeit, höchstens 10 Anmeldeversuche pro Minute und IP. Die Sitzung ist ein
+  mit HMAC-SHA256 signiertes Token (12 Stunden), dessen Schlüssel aus dem gespeicherten
+  Hash abgeleitet ist: Ein neues Passwort beendet alle Sitzungen.
 - Keine Personendaten in der Datenbank

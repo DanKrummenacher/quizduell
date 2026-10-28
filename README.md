@@ -1,11 +1,11 @@
 # playduelio
 
-**Quizduell Challenge – das Quiz-Duell im Browser.** Zwei Personen treten in
-Echtzeit gegeneinander an – wer schneller richtig antwortet, holt mehr Punkte. Ohne App, ohne Konto, auf jedem
-Gerät vom iPhone bis zum grossen Monitor.
+**Das Quiz-Duell im Browser.** Zwei Personen treten in Echtzeit gegeneinander an;
+wer schneller richtig antwortet, holt mehr Punkte. Ohne App, ohne Konto, auf jedem
+Gerät vom Handy bis zum grossen Bildschirm. Fragen, Spielregeln und Auswertung
+pflegt man im eingebauten Admin.
 
-Ursprünglich als IPA-Projekt entstanden, weiterentwickelt für den Einsatz an der
-Zentralschweizer Bildungsmesse (ZEBI).
+[![CI](https://github.com/DanKrummenacher/quizduell/actions/workflows/ci.yml/badge.svg)](https://github.com/DanKrummenacher/quizduell/actions/workflows/ci.yml)
 
 ## Funktionen
 
@@ -16,39 +16,39 @@ Zentralschweizer Bildungsmesse (ZEBI).
 - Echtzeit-Duell mit Timer, Tempo-Bonus, Auflösung und Revanche gegen denselben Gegner
 - Läuft weiter nach Verbindungsabbrüchen oder einem Neuladen der Seite; wer das Spiel
   verlässt, beendet es sofort für beide
-- Stand-Modus: Geräte am Messestand springen nach Inaktivität zur Startseite zurück
+- Stand-Modus: geteilte Geräte springen nach Inaktivität zur Startseite zurück
 - Optimiert für Handy (hoch/quer), Tablet und Desktop bis Ultrawide
 
-**Admin** (unter `/admin`, Anmeldung mit einem gemeinsamen Admin-Passwort)
+**Admin** (unter `/admin`, Anmeldung mit dem Admin-Passwort)
 
 - **Übersicht:** Kennzahlen im Vergleich zur Vorperiode, Duelle pro Tag, Live-Stand,
-  Hinweise, Fragenbestand, Spielregeln und die letzten Änderungen
+  Fragenbestand, Spielregeln und die letzten Änderungen
 - **Live:** laufende Duelle in Echtzeit, jedes Duell Frage für Frage, Gegnersuche,
   offene Spiele mit Code und ein Ereignisprotokoll
 - **Fragen:** Suche, Filter, Sortierung, Erfassen und Bearbeiten mit Prüfung,
-  Massenaktionen, CSV-Import mit Prüfung jeder Zeile und CSV-Export; pro Frage die
-  Verteilung auf die Antworten, Trefferquote, Antwortzeit und Verlauf
-- **Hinweise:** Das Admin findet selbst Fragen, die locken, zu schwer oder zu leicht sind
-  oder bei denen oft die Zeit abläuft, und warnt bei zu wenigen Fragen
+  Massenaktionen, CSV-Import mit Prüfung jeder Zeile und CSV-Export, Papierkorb; pro
+  Frage die Verteilung auf die Antworten, Trefferquote, Antwortzeit und Verlauf
+- **Hinweise im Editor:** Das Admin erkennt Fragen, bei denen eine falsche Antwort
+  lockt, die zu schwer oder zu leicht sind oder bei denen oft die Zeit abläuft, und
+  zeigt sie beim Bearbeiten mit Einordnung und Vorschlag. Die Übersichtsseite aller
+  Hinweise ist als «Bald verfügbar» angelegt.
 - **Auswertung:** 7, 30 oder 90 Tage – Duelle, Abbrüche, Revanchen, Spielzeiten
   (Wochentag × Stunde), Trefferquote, Kategorien, schwerste und leichteste Fragen
-- **Spielregeln:** mit Auswirkung (Dauer eines Duells, Wiederholungen) vor dem Speichern
+- **Spielregeln:** Vorlagen, jede Regel einzeln, Auswirkung vor dem Speichern
 - **Verlauf:** jede Änderung im Admin; frühere Spielregeln lassen sich wiederherstellen
+- **Passwort:** das Admin-Passwort im Admin ändern
 
 ## Technik
 
-| Bereich      | Technologie                                                       |
-| ------------ | ----------------------------------------------------------------- |
-| Frontend     | Angular 22 (Standalone, Signals, zoneless), Shared Library `@css-ch` |
-| Backend      | NestJS 12, Socket.IO, Drizzle ORM                                 |
-| Datenbank    | PostgreSQL (lokal via Docker, Tests mit In-Memory-PGlite)         |
-| Tests        | Vitest (Unit/Integration), Playwright (End-to-End, 14 Geräte)     |
-| Hosting      | Render (Static Site + Web Service + Postgres)                     |
+| Bereich   | Technologie                                                                |
+| --------- | -------------------------------------------------------------------------- |
+| Frontend  | Angular 22 (Standalone, Signals, zoneless), Shared Library `@css-ch`        |
+| Backend   | NestJS 12, Socket.IO, Drizzle ORM                                          |
+| Datenbank | PostgreSQL (lokal via Docker, Tests mit In-Memory-PGlite)                  |
+| Tests     | Vitest (Unit/Integration mit Abdeckung), Playwright (End-to-End, 14 Geräte) |
+| Hosting   | Render (Static Site + Web Service + Postgres, als Blueprint `render.yaml`) |
 
-Das Design stammt aus der IPA-Version und nutzt die aktuellen Komponenten der
-Shared Library (`@css-ch/components`, `@css-ch/calc-ui-text`, Design-Tokens).
-
-Mehr Details: [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md)
+Mehr dazu in [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md).
 
 ## Lokal starten
 
@@ -86,13 +86,9 @@ npm run e2e             # End-to-End-Tests (startet Backend und Frontend selbst)
 npm run build           # Produktions-Builds
 ```
 
-Lasttest gegen ein laufendes Backend (Duelle gleichzeitig):
-
-```bash
-npm --prefix backend run load-test -- http://localhost:3000 500
-```
-
-Jeder Push auf `main` läuft durch die GitHub-Actions-CI (Lint, Tests, Build, E2E).
+Jeder Push auf `main` und jeder Pull Request läuft durch die CI: Vertrag, Format,
+Lint, Typen, Tests mit Abdeckung, Audit der Produktionspakete, Build und E2E. Render
+deployt `main` erst, wenn die CI grün ist.
 
 Die Dateien in `backend/src/contracts` und `frontend/src/app/core/contracts`
 beschreiben die Schnittstelle zwischen Frontend und Backend und müssen identisch
@@ -101,5 +97,7 @@ sein – `npm run check:contracts` prüft das.
 ## Dokumentation
 
 - [Deployment auf Render](docs/DEPLOYMENT.md)
-- [Betrieb an der Messe](docs/MESSE-BETRIEB.md)
+- [Betrieb](docs/BETRIEB.md) – Checklisten, Notfallplan, Datenbank zurücksetzen
+- [Übergabe](docs/UEBERGABE.md) – Konten, Geheimnisse, Kosten, wer was weiss
 - [Architektur](docs/ARCHITEKTUR.md)
+- [Mitarbeiten](CONTRIBUTING.md) · [Sicherheit](SECURITY.md) · [Changelog](CHANGELOG.md)

@@ -1,120 +1,111 @@
 # Deployment auf Render
 
-playduelio besteht auf Render aus drei Diensten, alle in der Region **Frankfurt**:
+playduelio besteht auf Render aus drei Diensten, alle in der Region **Frankfurt**.
+Sie sind als Blueprint in [`render.yaml`](../render.yaml) beschrieben.
 
-| Dienst              | Render-Typ   | Name (Vorschlag)  | URL                                  | Kosten (ca.)   |
-| ------------------- | ------------ | ----------------- | ------------------------------------ | -------------- |
-| Frontend (Spiel)    | Static Site  | `playduelio`      | `https://playduelio.onrender.com`    | gratis         |
-| Backend (API)       | Web Service  | `playduelio-api`  | `https://playduelio-api.onrender.com`| Starter ~7 $/Mt|
-| Datenbank           | PostgreSQL   | `playduelio-db`   | nur intern                           | Basic ~6 $/Mt  |
+| Dienst           | Render-Typ  | Name             | URL                                   | Kosten (ca.)     |
+| ---------------- | ----------- | ---------------- | ------------------------------------- | ---------------- |
+| Frontend (Spiel) | Static Site | `playduelio`     | `https://playduelio.onrender.com`     | gratis           |
+| Backend (API)    | Web Service | `playduelio-api` | `https://playduelio-api.onrender.com` | Starter ~7 $/Mt. |
+| Datenbank        | PostgreSQL  | `playduelio-db`  | nur intern                            | Basic ~6 $/Mt.   |
 
-> **Die URL des Frontends ist die URL für den QR-Code.** Die Static Site darf nie
-> gelöscht oder neu erstellt werden. Repo, Branch, Build-Befehle und Plan können
-> jederzeit in den Einstellungen geändert werden, ohne dass sich die URL ändert.
+> **Die URL des Frontends ist die URL auf den QR-Codes.** Die Static Site darf nie
+> gelöscht oder neu erstellt werden. Einstellungen lassen sich jederzeit ändern, ohne
+> dass sich die URL ändert.
 
-## 1. Datenbank erstellen
+## 1. Zum ersten Mal: Blueprint anwenden
 
-1. Render → **New → Postgres**
-2. Name `playduelio-db`, Region **Frankfurt (EU Central)**, PostgreSQL 17
-3. Plan **Basic-256mb** (der Gratis-Plan wird nach 30 Tagen gelöscht!)
-4. Nach dem Erstellen die **Internal Database URL** kopieren
+1. Render → **New → Blueprint** → Repository `quizduell` verbinden → `render.yaml`
+   wird erkannt.
+2. Render fragt die geheimen Werte ab (`sync: false`):
+   - `ADMIN_PASSWORD` für `playduelio-api`: das Passwort des **ersten** Starts,
+     mindestens 12 Zeichen, aus dem Passwort-Manager. Danach wird es im Admin unter
+     **Passwort** geändert; die Variable zählt dann nicht mehr (siehe unten).
+   - `GITHUB_TOKEN` für `playduelio`: ein GitHub-Token mit `read:packages` für die
+     privaten `@css-ch`-Pakete.
+3. **Apply.** Render legt Datenbank, Backend und Static Site an, verbindet
+   `DATABASE_URL` automatisch und deployt `main`.
+4. Prüfen: `https://playduelio-api.onrender.com/health` liefert `{"status":"ok"}`,
+   `https://playduelio.onrender.com` zeigt das Spiel, `/admin` die Anmeldung.
 
-Die Tabellen legt das Backend beim Start automatisch an (Migrationen).
+Bekommt ein Dienst eine andere URL als in der Tabelle (Render hängt bei Namens-
+kollisionen ein Suffix an): `CORS_ORIGINS` in `render.yaml` und die Backend-Adresse in
+`frontend/src/environments/environment.ts` anpassen und pushen.
 
-## 2. Backend erstellen
+Wenn die Dienste schon existieren (z. B. die Static Site mit der QR-URL), den Blueprint
+trotzdem anwenden: Render übernimmt bestehende Dienste gleichen Namens und gleicht nur
+die Einstellungen ab.
 
-Render → **New → Web Service** → Repository `quizduell` verbinden.
+## 2. Was die Dienste tun
 
-| Feld              | Wert                                         |
-| ----------------- | -------------------------------------------- |
-| Name              | `playduelio-api`                             |
-| Region            | Frankfurt (EU Central) – *nicht änderbar*    |
-| Branch            | `main`                                       |
-| Root Directory    | `backend`                                    |
-| Runtime           | Node                                         |
-| Build Command     | `npm ci --include=dev && npm run build`      |
-| Start Command     | `npm run start:prod`                         |
-| Instance Type     | **Starter** (kein Einschlafen)               |
-| Health Check Path | `/health` (unter *Advanced*)                 |
+**Backend** (`rootDir: backend`): `npm ci --include=dev && npm run build`, dann
+`npm run start:prod`. Beim Start legt es fehlende Tabellen per Migration an, liest
+die Spielregeln und das Admin-Passwort aus der Datenbank. Health-Check auf `/health`.
+Es startet nur mit gültiger Konfiguration, sonst steht im Log genau, was fehlt.
 
-**Environment Variables:**
+| Variable               | Bedeutung                                                                |
+| ---------------------- | ------------------------------------------------------------------------ |
+| `NODE_ENV`             | `production`: erzwingt Datenbank, CORS und Passwort                      |
+| `DATABASE_URL`         | interne URL der Render-Datenbank (automatisch)                           |
+| `CORS_ORIGINS`         | exakte Frontend-URL ohne `/`, mehrere mit Komma                          |
+| `ADMIN_PASSWORD`       | Passwort des ersten Starts; später nur mit `ADMIN_PASSWORD_RESET` wirksam |
+| `ADMIN_PASSWORD_RESET` | `true`: setzt beim nächsten Start das gespeicherte Passwort auf `ADMIN_PASSWORD` zurück, danach wieder entfernen |
 
-| Variable         | Wert                                                                 |
-| ---------------- | -------------------------------------------------------------------- |
-| `NODE_VERSION`   | `24`                                                                 |
-| `NODE_ENV`       | `production`                                                         |
-| `DATABASE_URL`   | Internal Database URL aus Schritt 1                                  |
-| `CORS_ORIGINS`   | `https://playduelio.onrender.com` (exakte Frontend-URL, ohne `/`)    |
-| `ADMIN_PASSWORD` | Passwort für das Admin, mindestens 12 Zeichen (Passwort-Manager)     |
+**Frontend** (`rootDir: frontend`): `npm ci && npm run build`, veröffentlicht
+`dist/frontend/browser`. Jede Adresse wird auf `index.html` umgeschrieben (Angular
+Router), dazu die Security-Header aus dem Blueprint.
 
-Das Backend startet nur, wenn alle Werte gültig sind – sonst steht im Log genau,
-was fehlt. Test: `https://playduelio-api.onrender.com/health` liefert `{"status":"ok"}`.
+**Datenbank:** PostgreSQL 17, Plan Basic-256mb (der Gratis-Plan wird nach 30 Tagen
+gelöscht). Render sichert sie täglich; Wiederherstellung unter *Backups* im
+Dashboard der Datenbank.
 
-## 3. Frontend (bestehende Static Site) prüfen
+## 3. Automatische Deploys
 
-| Feld                | Wert                                                    |
-| ------------------- | ------------------------------------------------------- |
-| Root Directory      | `frontend`                                              |
-| Build Command       | `npm ci && npm run build`                               |
-| Publish Directory   | `dist/frontend/browser`                                 |
-| `GITHUB_TOKEN`      | GitHub-Token mit `read:packages` (für `@css-ch`-Pakete) |
-| `NODE_VERSION`      | `24`                                                    |
-| Redirects/Rewrites  | `/*` → `/index.html`, Action **Rewrite**                |
+Beide Dienste deployen `main` mit **Auto-Deploy: After CI Checks Pass**
+(`autoDeployTrigger: checksPass` im Blueprint). Nur was die GitHub-Actions-CI
+bestanden hat, geht live.
 
-Die Backend-Adresse steht in `frontend/src/environments/environment.ts`. Bekommt das
-Backend auf Render eine andere URL als `https://playduelio-api.onrender.com`
-(z. B. mit Zufallssuffix), dort anpassen und pushen.
+Auf GitHub (einmalig, von Hand):
 
-Unter **Settings → Headers** für den Pfad `/*` diese Security-Header ergänzen
-(das Backend setzt sie über Helmet bereits selbst):
+- *Settings → Secrets and variables → Actions*: Secret **`CSS_PACKAGES_TOKEN`**
+  (GitHub-Token mit `read:packages`), damit die CI die `@css-ch`-Pakete installieren kann.
+  Dasselbe Token unter *Dependabot secrets* als **`CSS_PACKAGES_TOKEN`**, damit
+  Dependabot die Frontend-Updates prüfen kann.
+- *Settings → Branches → Branch protection rule* für `main`: «Require status checks to
+  pass» mit den Checks *Shared contracts*, *Backend*, *Frontend* und *End-to-end*;
+  «Do not allow force pushes»; optional «Require a pull request before merging».
 
-| Header                   | Wert                                       |
-| ------------------------ | ------------------------------------------ |
-| `X-Frame-Options`        | `DENY`                                     |
-| `X-Content-Type-Options` | `nosniff`                                  |
-| `Referrer-Policy`        | `strict-origin-when-cross-origin`          |
-| `Permissions-Policy`     | `camera=(), microphone=(), geolocation=()` |
+## 4. Nach dem ersten Deploy
 
-## 4. Automatische Deploys absichern
+- Im Admin anmelden und unter **Passwort** ein eigenes Passwort setzen.
+- Fragen erfassen oder per CSV importieren (**Fragen → Importieren**; eine Vorlage
+  liefert **Exportieren**).
+- Spielregeln prüfen; sie gelten ab dem nächsten Duell.
+- Mit zwei Geräten ein Duell spielen, dann unter **Auswertung** die Zahlen sehen.
 
-- In beiden Diensten unter *Settings → Build & Deploy*: **Auto-Deploy: After CI Checks Pass**.
-  So wird nur deployt, was die GitHub-Actions-CI bestanden hat.
-- Damit die CI die privaten `@css-ch`-Pakete installieren kann, im GitHub-Repo unter
-  *Settings → Secrets and variables → Actions* das Secret **`CSS_PACKAGES_TOKEN`**
-  anlegen (GitHub-Token mit `read:packages`).
+Alles Weitere zum laufenden Betrieb steht in [BETRIEB.md](BETRIEB.md).
 
-## 5. Fragen und Spielregeln pflegen
+## 5. Direkt an die Datenbank
 
-Fragen, Spielregeln und Zahlen pflegt man im **Admin**: `https://playduelio.onrender.com/admin`,
-Anmeldung mit dem `ADMIN_PASSWORD`. Eine Anmeldung gilt 12 Stunden. Wird das Passwort in
-Render geändert, sind danach alle bestehenden Anmeldungen ungültig.
-
-- **Fragen:** erfassen, bearbeiten, pausieren, löschen, als CSV importieren oder
-  exportieren. Änderungen gelten sofort für neue Duelle.
-- **Spielregeln:** gelten ab dem nächsten Duell, ohne Neustart.
-- **Verlauf:** jede Änderung im Admin; frühere Spielregeln lassen sich wiederherstellen.
-
-Für Notfälle bleibt der direkte Weg in die Datenbank mit Drizzle Studio: In Render bei
-der Datenbank die **External Database URL** kopieren und lokal starten:
+Für Notfälle gibt es Drizzle Studio: in Render bei der Datenbank die **External
+Database URL** kopieren und lokal starten:
 
 ```bash
 DATABASE_URL='<External Database URL>' npm --prefix backend run db:studio
 ```
 
-- Tabelle `questions`: Fragen erfassen, ändern oder mit `active` aus dem Spiel nehmen.
-  Änderungen gelten sofort für neue Duelle. `options` sind genau vier Antworten,
-  `correct_index` ist die Position der richtigen (0–3).
-- Tabelle `settings` (eine Zeile): Fragen pro Duell, Zeit pro Frage usw. Direkt in der
-  Datenbank geänderte Spielregeln liest das Backend erst beim nächsten Start.
+- Tabelle `questions`: Fragen; `active` nimmt sie aus dem Spiel. `options` sind genau
+  vier Antworten, `correct_index` die Position der richtigen (0–3).
+- Tabelle `settings` (eine Zeile): Spielregeln. Direkt geänderte Werte liest das
+  Backend erst beim nächsten Start.
+- Tabelle `admin_credentials` (eine Zeile): das gehashte Admin-Passwort. Nicht von Hand
+  ändern; zum Zurücksetzen `ADMIN_PASSWORD_RESET` benutzen.
 
-Solange zu wenige aktive Fragen vorhanden sind, zeigt die Startseite einen freundlichen
-Hinweis. Danach mit zwei Geräten ein Duell spielen.
+Die Datenbank ganz leeren (Übergabe, Neustart): siehe
+[BETRIEB.md, «Datenbank zurücksetzen»](BETRIEB.md#datenbank-zurücksetzen).
 
-Die frühere Variable `JWT_SECRET` wird nicht mehr gebraucht und kann in Render gelöscht
-werden.
+## Kosten sparen
 
-## Kosten sparen nach der Messe
-
-- Backend auf **Free** zurückstellen (schläft dann nach 15 Min. ein, erster Aufruf
-  dauert ~1 Min.). Die URLs bleiben gleich.
-- Die Datenbank behalten, damit Fragen und Statistik erhalten bleiben.
+Wenn länger nicht gespielt wird: Backend auf **Free** zurückstellen (schläft nach
+15 Min. ein, der erste Aufruf dauert dann ~1 Min.). Die URLs bleiben gleich. Die
+Datenbank behalten, damit Fragen und Statistik erhalten bleiben.
