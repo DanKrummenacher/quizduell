@@ -131,6 +131,18 @@ Aufbau in einem neuen Workspace (Render → New → Blueprint).
 3. Zugang zum GitHub-Repository und zum Render-Team an die Betreiberin oder den
    Betreiber geben.
 
+## Pläne umstellen, sobald die Firmenkarte hinterlegt ist
+
+Bis zur Übergabe dürfen Datenbank und Backend auf **Free** laufen. Danach, mit der
+Firmenkarte im Workspace (**Billing**):
+
+1. `playduelio-db` → **Settings** → **Instance Type** → **Basic-256mb**. Die Daten bleiben.
+   Wichtig: Der Free-Plan wird nach 30 Tagen gelöscht, also nicht verschieben.
+2. `playduelio-api` → **Settings** → **Instance Type** → **Starter**, damit das Backend
+   nicht mehr einschläft (Free: nach 15 Min. Ruhe, erster Aufruf dauert ~1 Min.).
+
+Alle Einstellungen bleiben beim Planwechsel erhalten.
+
 ## Fertig
 
 Ab jetzt deployt jeder Push auf `main` automatisch, sobald die CI grün ist. Dependabot
