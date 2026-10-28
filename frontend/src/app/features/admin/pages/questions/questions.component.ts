@@ -65,7 +65,11 @@ const SHORT_LIST = 3;
     QuestionTrashComponent,
   ],
   templateUrl: './questions.component.html',
-  styleUrls: ['./questions.component.scss', './questions-bulk.scss'],
+  styleUrls: [
+    './questions.component.scss',
+    './questions-chapters.scss',
+    './questions-bulk.scss',
+  ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class QuestionsComponent {

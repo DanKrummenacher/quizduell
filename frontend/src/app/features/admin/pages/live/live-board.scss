@@ -1,0 +1,210 @@
+// The live page, part two: the figures of the moment, the players of a row,
+// the view switch and the board that holds the cards.
+@use '../../styles/tokens' as t;
+@use '../../styles/controls' as c;
+// The four figures of the moment, as on the other pages.
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+.pair {
+  display: flex;
+
+  .initial {
+    width: 26px;
+    height: 26px;
+    background: t.$brand;
+    box-shadow: 0 0 0 2px #fff;
+
+    & + .initial {
+      margin-left: -4px;
+      background: t.$cyan;
+    }
+  }
+}
+
+.wait-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 18px;
+
+  div {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: t.$bg-subtle;
+  }
+
+  dt {
+    overflow: hidden;
+    color: t.$text-3;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: t.$text-lg;
+    font-weight: t.$bold;
+    @include t.numeric;
+
+    &.warn {
+      color: t.$warning-text;
+    }
+  }
+}
+
+.more-wait {
+  margin: 14px 0 0;
+}
+
+// The two players at the start of a row.
+.c-pair {
+  width: 52px;
+  padding-right: 0 !important;
+}
+
+.duels,
+.raster {
+  th.c-pair + th,
+  td.c-pair + td {
+    padding-left: 8px;
+  }
+}
+
+// Table or grid, as two icons beside the mode.
+.view-icons {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: t.$bg-muted;
+
+  button {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: t.$text-3;
+    cursor: pointer;
+
+    &:hover {
+      color: t.$text;
+    }
+
+    &.is-active {
+      background: #fff;
+      color: t.$brand;
+      box-shadow: 0 1px 2px rgba(0, 50, 125, 0.16);
+    }
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+}
+
+.head-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.log-more {
+  padding: 10px 22px 16px;
+  border-top: 1px solid rgba(0, 50, 125, 0.08);
+}
+
+// The board under the figures: the duels over the full width, below them the
+// curve and the log in the wide column and the queue beside them, each card
+// as high as what it holds.
+.board {
+  display: grid;
+  gap: 20px;
+
+  @media (max-width: 1024px) {
+    gap: 16px;
+  }
+}
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+
+.split > .wait-card {
+  @media (max-width: 1200px) {
+    order: -1;
+  }
+}
+
+.split-main {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+
+  @media (max-width: 1200px) {
+    gap: 16px;
+  }
+}
+
+// On the narrowest phones the phase takes its own line under the progress.
+@media (max-width: 380px) {
+  .duels tbody tr {
+    grid-template-areas:
+      'pair duel score'
+      'pair players age'
+      'pair progress progress'
+      'pair phase phase';
+
+    .c-phase {
+      justify-self: start;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .duels {
+    .players {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .c-duel {
+      min-width: 0;
+    }
+
+    td.c-pair + td {
+      padding-left: 0;
+    }
+
+    .duel-open {
+      flex-wrap: wrap;
+      row-gap: 4px;
+      text-align: left;
+    }
+  }
+}

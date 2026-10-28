@@ -56,7 +56,11 @@ const SEEN_CHANGE = 'playduelio.admin.seen.change';
     </div>
     <app-ad-command-palette [areas]="items()" />
   `,
-  styleUrls: ['./admin-shell.component.scss', './admin-shell-surfaces.scss'],
+  styleUrls: [
+    './admin-shell.component.scss',
+    './admin-shell-surfaces.scss',
+    './admin-shell-paused.scss',
+  ],
   encapsulation: ViewEncapsulation.None,
 })
 export class AdminShellComponent {

@@ -75,7 +75,7 @@ const EVENT_GROUPS: Record<EventFilter, LiveEvent['kind'][] | null> = {
     AdStateComponent,
   ],
   templateUrl: './live.component.html',
-  styleUrls: ['./live.component.scss', './live-duel.scss'],
+  styleUrls: ['./live.component.scss', './live-board.scss', './live-duel.scss'],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class LiveComponent {

@@ -1,0 +1,71 @@
+// The shell while the admin paused the game.
+@use '../../styles/tokens' as t;
+// The game is paused: a calm strip under the bar, on every page.
+app-admin-shell .ad-paused {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px max(32px, calc((100vw - 1360px) / 2 + 32px));
+  border-bottom: 1px solid #f1d58a;
+  background: t.$warning-bg;
+  color: t.$warning-text;
+  font-size: 14px;
+
+  p {
+    flex: 1;
+    min-width: 0;
+  }
+
+  strong {
+    font-weight: t.$bold;
+  }
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+
+    // The sentence takes the row beside the dot, the button goes below.
+    p {
+      flex-basis: calc(100% - 20px);
+    }
+  }
+}
+
+app-admin-shell .ad-paused-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: t.$warning;
+  box-shadow: 0 0 0 4px rgba(224, 161, 0, 0.2);
+}
+
+app-admin-shell .ad-paused-btn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid rgba(107, 71, 0, 0.25);
+  border-radius: 9px;
+  background: #fff;
+  color: #6b4700;
+  font: inherit;
+  font-size: 13px;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover {
+    background: #fff3cf;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  @media (max-width: 640px) {
+    margin-left: 20px;
+  }
+}

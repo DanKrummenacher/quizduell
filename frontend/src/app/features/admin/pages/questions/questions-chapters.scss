@@ -1,0 +1,218 @@
+// The questions page, part two: the categories as flat cards and the pager.
+@use '../../styles/tokens' as t;
+@use '../../styles/controls' as c;
+// The arrow of a category heading and of «show all».
+.group-chev {
+  width: 7px;
+  height: 7px;
+  margin: -3px 4px 0 2px;
+  border-right: 1.5px solid t.$text-3;
+  border-bottom: 1.5px solid t.$text-3;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+
+  &.is-closed {
+    margin-top: 0;
+    transform: rotate(-45deg);
+  }
+
+  &.is-up {
+    margin-top: 3px;
+    transform: rotate(225deg);
+  }
+}
+
+// The categories as flat cards: a tinted heading while open, white when
+// closed, zebra rows and the first questions until all are shown.
+.chapters {
+  display: grid;
+  gap: 16px;
+
+  .questions-table tbody tr {
+    transition: background-color 0.12s ease;
+
+    &:nth-child(even) {
+      background: #f9fbfd;
+    }
+
+    // One clear hover over both tones, the chosen ones stay blue.
+    &:hover {
+      background: #eef3f9;
+    }
+
+    &.is-selected,
+    &.is-selected:hover {
+      background: t.$brand-50;
+    }
+  }
+
+  // The rate's track stays visible on every tone.
+  .questions-table .meter {
+    background: rgba(0, 50, 125, 0.08);
+  }
+
+  // The category stands in the heading; the columns line up in every card.
+  .questions-table {
+    table-layout: fixed;
+  }
+
+  .col-category {
+    display: none;
+  }
+
+  .col-text {
+    width: auto;
+    max-width: none;
+  }
+
+  @media (max-width: 640px) {
+    .col-rate {
+      width: 64px;
+    }
+
+    .col-active {
+      width: 62px;
+    }
+  }
+}
+
+.chapter {
+  overflow: hidden;
+  border: 1px solid rgba(0, 50, 125, 0.08);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.chapter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  width: 100%;
+  padding: 16px 20px;
+  border: 0;
+  border-bottom: 1px solid rgba(0, 50, 125, 0.08);
+  background: #f7f9fc;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: #f1f5fa;
+  }
+
+  &[aria-expanded='false'] {
+    border-bottom: 0;
+    background: #fff;
+
+    &:hover {
+      background: #fafbfd;
+    }
+  }
+
+  @media (max-width: 640px) {
+    padding: 14px 16px;
+  }
+}
+
+.chapter-name {
+  margin-right: 4px;
+  font-size: 17px;
+  font-weight: t.$bold;
+  letter-spacing: -0.01em;
+}
+
+.cchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid rgba(0, 50, 125, 0.12);
+  border-radius: 99px;
+  background: #fff;
+  color: t.$text-2;
+  font-size: 12.5px;
+
+  b {
+    color: t.$text;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+}
+
+.chapter-meta {
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.chapter-rate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+
+  .meter {
+    width: 110px;
+
+    > span {
+      background: t.$brand;
+    }
+  }
+}
+
+.chapter-rate-label {
+  color: t.$text-2;
+  font-size: 13px;
+  font-weight: t.$medium;
+  @include t.numeric;
+}
+
+.chapter-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 44px;
+  border: 0;
+  border-top: 1px solid rgba(0, 50, 125, 0.08);
+  background: #fafbfd;
+  color: t.$text;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover {
+    background: #f3f6fa;
+  }
+}
+
+// The count of what is shown sits in the search field.
+.search-count {
+  flex: none;
+  margin-right: 8px;
+  color: t.$text-3;
+  font-size: 13px;
+  white-space: nowrap;
+  @include t.numeric;
+}
+
+@media (max-width: 640px) {
+  .search-count {
+    display: none;
+  }
+}
+
+.summary-gap {
+  height: 20px;
+}
+
+// The pager under the categories.
+.ad-card.pager {
+  margin-top: 16px;
+  border-top: 0;
+}
