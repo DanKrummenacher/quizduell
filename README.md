@@ -96,6 +96,7 @@ sein – `npm run check:contracts` prüft das.
 
 ## Dokumentation
 
+- [Go-live, Schritt für Schritt](docs/GO-LIVE.md)
 - [Deployment auf Render](docs/DEPLOYMENT.md)
 - [Betrieb](docs/BETRIEB.md) – Checklisten, Notfallplan, Datenbank zurücksetzen
 - [Übergabe](docs/UEBERGABE.md) – Konten, Geheimnisse, Kosten, wer was weiss
