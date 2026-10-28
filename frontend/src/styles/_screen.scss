@@ -1,6 +1,6 @@
 // Shared building blocks of the game screens, so they look the same
 // everywhere. Values follow the quiz and result pages.
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-helpers/styles' as functions;
 
 $muted: #4d70a4;
@@ -14,8 +14,8 @@ $border: #8098be;
   height: $size;
   margin-inline: auto;
   border-radius: 50%;
-  background-color: colors.$dt-color-darkblue-100;
-  color: colors.$dt-color-white-100;
+  background-color: palette.$darkblue-100;
+  color: palette.$white-100;
 
   css-icon {
     display: block;

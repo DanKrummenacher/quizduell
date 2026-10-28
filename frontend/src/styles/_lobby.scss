@@ -1,6 +1,6 @@
 // Building blocks of the lobby, in the design system of the quiz and result
 // pages. Spacing on the 4px grid.
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'interaction';
@@ -15,7 +15,7 @@ $border: screen.$border;
   font-size: functions.rem(24);
   font-weight: miscs.$css-ui-font-weight-bold;
   line-height: 1.25;
-  color: colors.$dt-color-darkblue-100;
+  color: palette.$darkblue-100;
   text-align: center;
 }
 
@@ -43,8 +43,8 @@ $border: screen.$border;
   padding: 0 functions.rem(16) 0 0;
   border: functions.rem(1) solid $border;
   border-radius: functions.rem(4);
-  background-color: colors.$dt-color-white-100;
-  color: colors.$dt-color-darkblue-100;
+  background-color: palette.$white-100;
+  color: palette.$darkblue-100;
   font: inherit;
   text-align: left;
   overflow: hidden;
@@ -56,8 +56,8 @@ $border: screen.$border;
     align-self: stretch;
     flex: none;
     width: functions.rem(72);
-    background-color: colors.$dt-color-darkblue-100;
-    color: colors.$dt-color-white-100;
+    background-color: palette.$darkblue-100;
+    color: palette.$white-100;
 
     css-icon {
       display: block;
@@ -76,7 +76,7 @@ $border: screen.$border;
   font-size: functions.rem(16);
   font-weight: miscs.$css-ui-font-weight-bold;
   line-height: 1.3;
-  color: colors.$dt-color-darkblue-100;
+  color: palette.$darkblue-100;
 }
 
 @mixin choice-description {

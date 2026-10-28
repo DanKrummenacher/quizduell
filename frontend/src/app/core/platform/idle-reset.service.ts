@@ -13,7 +13,7 @@ const ACTIVITY_EVENTS = [
 ] as const;
 
 /**
- * Stand mode: devices at the fair return to the start screen after a period
+ * Stand mode: shared devices on site return to the start screen after a period
  * without interaction, so the next visitor starts fresh. Pages opt in while
  * nothing important is happening (never during a running duel).
  */

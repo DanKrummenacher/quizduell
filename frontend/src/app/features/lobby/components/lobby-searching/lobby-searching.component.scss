@@ -1,4 +1,4 @@
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'lobby';
@@ -46,7 +46,7 @@ $track: #dfe3ea;
   transition: stroke 0.3s ease;
 
   &.is-filled {
-    stroke: colors.$dt-color-darkblue-100;
+    stroke: palette.$darkblue-100;
   }
 }
 
@@ -64,7 +64,7 @@ $track: #dfe3ea;
   font-weight: miscs.$css-ui-font-weight-bold;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
-  color: colors.$dt-color-darkblue-100;
+  color: palette.$darkblue-100;
 }
 
 .dial-label {

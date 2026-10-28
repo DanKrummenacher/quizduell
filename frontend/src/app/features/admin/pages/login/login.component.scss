@@ -2,12 +2,12 @@
 // symbol with a fine frame, the large title with the light blue marker, the
 // muted description and the library's field and button. Spacing on the 4/8
 // grid as on the start page: symbol → title 24, title → text 16, → form 40.
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use 'screen';
 
-$blue: colors.$dt-color-darkblue-100;
-$white: colors.$dt-color-white-100;
+$blue: palette.$darkblue-100;
+$white: palette.$white-100;
 $light: #00a4e0;
 $ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 

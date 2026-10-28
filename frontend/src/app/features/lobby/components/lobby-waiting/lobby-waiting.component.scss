@@ -1,14 +1,14 @@
 // Title → text 8, text → code 32, code → copy 16, copy → waiting 40,
 // text → bar 12. The bar is exactly as wide as the code.
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'lobby';
 
 $track: #dfe3ea;
 $bold: miscs.$css-ui-font-weight-bold;
-$blue: colors.$dt-color-darkblue-100;
-$white: colors.$dt-color-white-100;
+$blue: palette.$darkblue-100;
+$white: palette.$white-100;
 $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 
 :host {

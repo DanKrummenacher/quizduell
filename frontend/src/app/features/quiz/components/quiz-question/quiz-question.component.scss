@@ -1,4 +1,4 @@
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'interaction';
@@ -10,7 +10,7 @@
 .question-text {
   font-size: functions.rem(24);
   font-weight: miscs.$css-ui-font-weight-regular;
-  color: colors.$dt-color-darkblue-100;
+  color: palette.$darkblue-100;
   line-height: 1.2;
   margin: functions.rem(28) 0 0;
   text-align: left;
@@ -30,7 +30,7 @@
 }
 
 .feedback-default {
-  color: colors.$dt-color-darkblue-100;
+  color: palette.$darkblue-100;
 }
 .feedback-success {
   color: #00875e;
@@ -58,14 +58,14 @@
   overflow: hidden;
   border: functions.rem(1) solid #8098be;
   border-radius: functions.rem(4);
-  background-color: colors.$dt-color-white-100;
+  background-color: palette.$white-100;
   font-weight: miscs.$css-ui-font-weight-bold;
   text-align: left;
   @include interaction.card;
 
   // Only the fill changes; the card border always stays the same.
   &.state-selected {
-    background-color: colors.$dt-color-darkblue-100;
+    background-color: palette.$darkblue-100;
   }
 
   &.state-correct {
@@ -93,7 +93,7 @@
   flex-shrink: 0;
   align-self: stretch;
   width: functions.rem(56);
-  background-color: colors.$dt-color-darkblue-100;
+  background-color: palette.$darkblue-100;
   transition: background-color 0.2s ease;
 
   calc-text {
@@ -116,7 +116,7 @@
   border: functions.rem(2) solid #00a4e0;
 
   .answer-card:is(.state-selected, .state-correct, .state-wrong) & {
-    border-color: colors.$dt-color-white-100;
+    border-color: palette.$white-100;
   }
   border-radius: 50%;
   display: flex;

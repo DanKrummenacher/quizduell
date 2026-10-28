@@ -1,13 +1,13 @@
 // The start page in the design system of the lobby: the large description,
 // white symbols with a frame and generous spacing on the 4/8 grid: title →
 // text 16, text → facts 48, symbol → label 16, facts → form 56, form 16.
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'lobby';
 
-$blue: colors.$dt-color-darkblue-100;
-$white: colors.$dt-color-white-100;
+$blue: palette.$darkblue-100;
+$white: palette.$white-100;
 $mid: #0078bb;
 $opponent: #00a4e0;
 $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);

@@ -5,7 +5,7 @@
 // - cards with a 4px radius, navy blocks, round uppercase buttons
 // - the game's hover fill, hover shadow and focus ring
 // Sizes are in px: the admin is used on desktops and keeps a fixed 16px root.
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 
 // Typeface (Museo Sans has 300, 500 and 700).
 $font: 'Museo Sans', helvetica, arial, sans-serif;
@@ -24,7 +24,7 @@ $text-2xl: 24px;
 $text-3xl: 28px;
 
 // Text: the game's navy and its muted blue
-$text: colors.$dt-color-darkblue-100;
+$text: palette.$darkblue-100;
 $text-2: #4d70a4;
 $text-3: #6c86ae;
 $text-4: #8098be;
@@ -36,30 +36,30 @@ $line-soft: #e9edf3;
 $line-strong: #8098be;
 
 // Surfaces
-$bg: colors.$dt-color-white-100;
+$bg: palette.$white-100;
 $bg-subtle: #fafbfc;
 $bg-muted: #eff2f6;
 $bg-hover: #eef3f9;
 $bg-pressed: #dfe8f3;
-$canvas: colors.$dt-color-pepper-bright;
+$canvas: palette.$pepper-bright;
 
 // Brand (design system)
-$brand: colors.$dt-color-darkblue-100;
-$brand-hover: colors.$dt-color-darkblue-active;
+$brand: palette.$darkblue-100;
+$brand-hover: palette.$darkblue-active;
 $brand-50: #eef3f9;
 $brand-100: #dfe8f3;
 $brand-200: #c3d3ec;
-$accent: colors.$dt-color-cyan-dark;
-$cyan: colors.$dt-color-cyan-100;
+$accent: palette.$cyan-dark;
+$cyan: palette.$cyan-100;
 
 // Status, as in the game (correct answer #00875e, wrong #d53419)
 $success: #00875e;
 $success-bg: #e6f4ef;
 $success-text: #006b4b;
-$danger: colors.$dt-color-red;
+$danger: palette.$red;
 $danger-bg: #fcefec;
 $danger-text: #a8290f;
-$warning: colors.$dt-color-yellow;
+$warning: palette.$yellow;
 $warning-bg: #fff6dc;
 $warning-text: #7f5600;
 $info-bg: #e8f3fa;

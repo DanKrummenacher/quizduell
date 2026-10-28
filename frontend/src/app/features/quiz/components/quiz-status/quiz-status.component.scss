@@ -1,4 +1,4 @@
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 
@@ -57,13 +57,13 @@ $clock: functions.rem(48);
   &.me {
     left: 0;
     padding: 0 $inner 0 $outer;
-    background-color: colors.$dt-color-darkblue-100;
-    color: colors.$dt-color-white-100;
+    background-color: palette.$darkblue-100;
+    color: palette.$white-100;
     clip-path: polygon(0 0, 100% 0, calc(100% - #{$slant}) 100%, 0 100%);
 
     .avatar {
-      background-color: colors.$dt-color-white-100;
-      color: colors.$dt-color-darkblue-100;
+      background-color: palette.$white-100;
+      color: palette.$darkblue-100;
     }
 
     .name {
@@ -79,7 +79,7 @@ $clock: functions.rem(48);
     right: 0;
     padding: 0 $outer 0 $inner;
     background-color: $opponent-surface;
-    color: colors.$dt-color-darkblue-100;
+    color: palette.$darkblue-100;
     text-align: right;
     clip-path: polygon(#{$slant} 0, 100% 0, 100% 100%, 0 100%);
 
@@ -90,7 +90,7 @@ $clock: functions.rem(48);
 
     .avatar {
       background-color: $opponent;
-      color: colors.$dt-color-white-100;
+      color: palette.$white-100;
     }
 
     .points {
@@ -168,7 +168,7 @@ $clock: functions.rem(48);
   width: $clock;
   height: $clock;
   transform: translate(-50%, -50%) rotate(45deg);
-  border: functions.rem(3) solid colors.$dt-color-pepper-bright;
+  border: functions.rem(3) solid palette.$pepper-bright;
   background-color: $opponent;
 }
 
@@ -177,7 +177,7 @@ $clock: functions.rem(48);
   font-size: functions.rem(14);
   font-weight: miscs.$css-ui-font-weight-bold;
   font-variant-numeric: tabular-nums;
-  color: colors.$dt-color-white-100;
+  color: palette.$white-100;
   white-space: nowrap;
 }
 
@@ -193,7 +193,7 @@ $clock: functions.rem(48);
 .time {
   font-weight: miscs.$css-ui-font-weight-bold;
   font-variant-numeric: tabular-nums;
-  color: colors.$dt-color-darkblue-100;
+  color: palette.$darkblue-100;
   transition: color 0.3s ease;
 }
 
@@ -208,7 +208,7 @@ $clock: functions.rem(48);
 .progress {
   height: 100%;
   border-radius: functions.rem(3);
-  background-color: colors.$dt-color-darkblue-100;
+  background-color: palette.$darkblue-100;
 }
 
 // The last seconds of a question.

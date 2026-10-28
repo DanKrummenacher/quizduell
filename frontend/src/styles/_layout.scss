@@ -1,5 +1,5 @@
 // Shared page layout for all screens.
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 
 // From this width the page background shows the brand surface (styles.scss)
 // and every page draws its content column on top of it.
@@ -9,7 +9,7 @@ $large-screen: 1024px;
 /// the page colour and fades softly into the decorated background.
 @mixin page-column {
   @media (min-width: $large-screen) {
-    background-color: colors.$dt-color-pepper-bright;
-    box-shadow: 0 0 3rem 2rem colors.$dt-color-pepper-bright;
+    background-color: palette.$pepper-bright;
+    box-shadow: 0 0 3rem 2rem palette.$pepper-bright;
   }
 }

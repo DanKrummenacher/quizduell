@@ -1,6 +1,6 @@
 // Spacing on the 4/8 grid of the app: card → «oder» 24, «oder» → title 24,
 // title → text 4, text → code 16, code → status 12.
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'lobby';
@@ -10,8 +10,8 @@ $green: #00875e;
 $red: #d53419;
 $track: #dfe3ea;
 $bold: miscs.$css-ui-font-weight-bold;
-$blue: colors.$dt-color-darkblue-100;
-$white: colors.$dt-color-white-100;
+$blue: palette.$darkblue-100;
+$white: palette.$white-100;
 $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 
 :host {

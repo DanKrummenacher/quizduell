@@ -1,4 +1,4 @@
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'screen';
@@ -51,7 +51,7 @@ $actions-inset: functions.rem(24);
 .result-icon-glyph {
   // As a block the icon sits exactly in the middle (no text baseline).
   display: block;
-  color: colors.$dt-color-white-100;
+  color: palette.$white-100;
 }
 
 .result-title {
@@ -59,7 +59,7 @@ $actions-inset: functions.rem(24);
   font-size: functions.rem(28);
   font-weight: miscs.$css-ui-font-weight-bold;
   line-height: 1.2;
-  color: colors.$dt-color-darkblue-100;
+  color: palette.$darkblue-100;
 }
 
 .result-subtitle {
@@ -94,7 +94,7 @@ app-result-players {
 }
 
 .rematch-status {
-  color: colors.$dt-color-darkblue-100;
+  color: palette.$darkblue-100;
 }
 
 // Without a countdown the message is centred under the buttons.
@@ -116,8 +116,8 @@ app-result-players {
   flex: none;
   padding: 0 functions.rem(8);
   border-radius: functions.rem(999);
-  background-color: colors.$dt-color-darkblue-100;
-  color: colors.$dt-color-white-100;
+  background-color: palette.$darkblue-100;
+  color: palette.$white-100;
   font-size: functions.rem(13);
   font-weight: miscs.$css-ui-font-weight-bold;
   font-variant-numeric: tabular-nums;
@@ -143,7 +143,7 @@ app-result-players {
 .progress {
   height: 100%;
   border-radius: functions.rem(3);
-  background-color: colors.$dt-color-darkblue-100;
+  background-color: palette.$darkblue-100;
   // The countdown ticks once per second; this keeps the bar moving smoothly.
   transition: width 1s linear;
 }

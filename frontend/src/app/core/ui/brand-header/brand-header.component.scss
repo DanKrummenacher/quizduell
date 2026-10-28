@@ -1,4 +1,4 @@
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 
@@ -62,7 +62,7 @@ $light: #00a4e0;
   font-weight: miscs.$css-ui-font-weight-bold;
   letter-spacing: -0.01em;
   line-height: 1;
-  color: colors.$dt-color-white-100;
+  color: palette.$white-100;
   white-space: nowrap;
 
   .light {

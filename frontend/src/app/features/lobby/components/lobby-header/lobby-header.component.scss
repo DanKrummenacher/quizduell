@@ -1,5 +1,5 @@
 // The type scale of the quiz and result pages.
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'screen';
@@ -35,7 +35,7 @@
   line-height: 1.2;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: colors.$dt-color-darkblue-100;
+  color: palette.$darkblue-100;
 }
 
 .greeting-subtitle {

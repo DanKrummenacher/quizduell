@@ -4,7 +4,7 @@
 // - a short pressed state
 // - the global keyboard focus ring (styles.scss), never removed
 // Borders never change, only the fill and the shadow.
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 
 $hover-fill: #eef3f9;
 $pressed-fill: #dfe8f3;
@@ -49,7 +49,7 @@ $duration: 0.15s;
 
 /// Text links.
 @mixin link {
-  color: colors.$dt-color-darkblue-70;
+  color: palette.$darkblue-70;
   text-decoration: underline;
   text-decoration-color: transparent;
   text-underline-offset: 0.2em;
@@ -59,7 +59,7 @@ $duration: 0.15s;
 
   @media (hover: hover) {
     &:hover {
-      color: colors.$dt-color-darkblue-100;
+      color: palette.$darkblue-100;
       text-decoration-color: currentColor;
     }
   }

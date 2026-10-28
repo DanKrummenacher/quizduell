@@ -1,0 +1,12 @@
+// The brand colours of the design system, as Sass variables for the few places
+// that mix them into gradients or shadows. Everything else uses the CSS custom
+// properties of @css-ch/design-tokens. Values match the design system.
+$darkblue-100: #00327d;
+$darkblue-70: #4d70a4;
+$darkblue-active: #0d358c;
+$cyan-100: #00a4e0;
+$cyan-dark: #0078bb;
+$pepper-bright: #f7f7f4;
+$white-100: #fff;
+$yellow: #ffc015;
+$red: #d53419;

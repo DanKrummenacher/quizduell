@@ -1,13 +1,13 @@
 // Same structure as the search screen: visual, title, text, then the
 // countdown where the search had its button.
-@use '@css-ch/web-design-tokens/colors';
+@use 'palette';
 @use '@css-ch/calc-design-tokens/miscs';
 @use '@css-ch/calc-helpers/styles' as functions;
 @use 'lobby';
 
 $opponent: #00a4e0;
 $green: #00875e;
-$page: colors.$dt-color-pepper-bright;
+$page: palette.$pepper-bright;
 $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 
 :host {
@@ -36,7 +36,7 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
 }
 
 .opponent-name {
-  color: colors.$dt-color-darkblue-100;
+  color: palette.$darkblue-100;
 }
 
 // ---------------------------------------------------------------------------
@@ -56,8 +56,8 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   box-sizing: border-box;
   border: functions.rem(4) solid $page;
   border-radius: 50%;
-  background-color: colors.$dt-color-darkblue-100;
-  color: colors.$dt-color-white-100;
+  background-color: palette.$darkblue-100;
+  color: palette.$white-100;
   font-size: functions.rem(40);
   font-weight: miscs.$css-ui-font-weight-bold;
 
@@ -99,7 +99,7 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   border: functions.rem(3) solid $page;
   border-radius: 50%;
   background-color: $green;
-  color: colors.$dt-color-white-100;
+  color: palette.$white-100;
   animation: pop 0.35s 0.6s $spring both;
 
   css-icon {
@@ -124,7 +124,7 @@ $spring: cubic-bezier(0.2, 0.9, 0.3, 1.15);
   font-weight: miscs.$css-ui-font-weight-bold;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-  color: colors.$dt-color-darkblue-100;
+  color: palette.$darkblue-100;
   animation: roll-in 0.4s $spring both;
 
   &.is-go {
