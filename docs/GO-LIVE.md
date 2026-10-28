@@ -67,7 +67,7 @@ Umgebung wie die Static Site anlegen.
    | `NODE_VERSION`   | `24`                                                      |
    | `NODE_ENV`       | `production`                                              |
    | `CORS_ORIGINS`   | `https://playduelio.onrender.com`                         |
-   | `ADMIN_PASSWORD` | neues Passwort, mindestens 12 Zeichen, in den Passwort-Manager |
+   | `ADMIN_PASSWORD` | das Admin-Passwort, mindestens 12 Zeichen, in den Passwort-Manager |
    | `DATABASE_URL`   | *Add from Database* → `playduelio-db` → **Internal Database URL** |
 
 4. **Advanced** aufklappen: **Health Check Path** `/health`.
@@ -106,12 +106,10 @@ Prüfen: `https://playduelio.onrender.com` zeigt das Spiel, `/admin` die Anmeldu
 `render.yaml` im Repo beschreibt dieselben drei Dienste; es dient als Referenz und zum
 Aufbau in einem neuen Workspace (Render → New → Blueprint).
 
-## 5. Erste Anmeldung und eigenes Passwort (3 Min.)
+## 5. Erste Anmeldung (1 Min.)
 
-1. `/admin` öffnen, mit `ADMIN_PASSWORD` anmelden.
-2. Oben rechts auf das Schloss-Symbol → **Passwort ändern**: bisheriges = `ADMIN_PASSWORD`,
-   neues Passwort aus dem Passwort-Manager, speichern.
-3. Ab jetzt zählt nur das neue Passwort. Vergessen? → `docs/BETRIEB.md`, «Admin-Passwort».
+`/admin` öffnen und mit `ADMIN_PASSWORD` anmelden. Ändern oder vergessen? →
+`docs/BETRIEB.md`, «Admin-Passwort».
 
 ## 6. Inhalt und Probe (5 Min.)
 

@@ -140,14 +140,6 @@ export const deletedQuestions = pgTable(
   (table) => [index('deleted_questions_deleted_at_idx').on(table.deletedAt)],
 );
 
-/** The one admin password, hashed; a single row (id = 1). */
-export const adminCredentials = pgTable('admin_credentials', {
-  id: smallint('id').primaryKey(),
-  /** `scrypt$<salt>$<hash>`, both base64url. */
-  passwordHash: text('password_hash').notNull(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
-});
-
 /** Hints the admin decided to ignore. */
 export const dismissedHints = pgTable('dismissed_hints', {
   key: varchar('key', { length: 80 }).primaryKey(),
