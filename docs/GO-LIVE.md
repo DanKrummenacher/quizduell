@@ -40,7 +40,7 @@ Umgebung wie die Static Site anlegen.
 
 1. Render → **New** → **Postgres**.
 2. Name `playduelio-db`, Project/Environment wie die Static Site, Region **Frankfurt (EU Central)**,
-   PostgreSQL **17**, Plan **Basic-256mb** (der Gratis-Plan wird nach 30 Tagen gelöscht).
+   PostgreSQL **18**, Plan **Basic-256mb** (der Gratis-Plan wird nach 30 Tagen gelöscht).
 3. **Create Database** und warten, bis der Status *Available* ist.
 
 **4b. Backend**
