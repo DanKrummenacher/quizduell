@@ -55,7 +55,7 @@ Es startet nur mit gültiger Konfiguration, sonst steht im Log genau, was fehlt.
 `dist/frontend/browser`. Jede Adresse wird auf `index.html` umgeschrieben (Angular
 Router), dazu die Security-Header aus dem Blueprint.
 
-**Datenbank:** PostgreSQL 17, Plan Basic-256mb (der Gratis-Plan wird nach 30 Tagen
+**Datenbank:** PostgreSQL 18, Plan Basic-256mb (der Gratis-Plan wird nach 30 Tagen
 gelöscht). Render sichert sie täglich; Wiederherstellung unter *Backups* im
 Dashboard der Datenbank.
 
