@@ -36,7 +36,6 @@ pflegt man im eingebauten Admin.
   (Wochentag × Stunde), Trefferquote, Kategorien, schwerste und leichteste Fragen
 - **Spielregeln:** Vorlagen, jede Regel einzeln, Auswirkung vor dem Speichern
 - **Verlauf:** jede Änderung im Admin; frühere Spielregeln lassen sich wiederherstellen
-- **Passwort:** das Admin-Passwort im Admin ändern
 
 ## Technik
 

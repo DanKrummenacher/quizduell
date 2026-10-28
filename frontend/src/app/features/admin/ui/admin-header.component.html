@@ -71,15 +71,6 @@
       >
         <css-icon icon="play-circle" size="sm"></css-icon>
       </a>
-      <a
-        class="icon-btn"
-        routerLink="/admin/passwort"
-        routerLinkActive="is-active"
-        aria-label="Passwort ändern"
-        title="Passwort ändern"
-      >
-        <css-icon icon="lock" size="sm"></css-icon>
-      </a>
       <button
         type="button"
         class="icon-btn"
@@ -159,9 +150,6 @@
     <div class="sheet-foot">
       <a href="/" target="_blank" rel="noopener"
         ><css-icon icon="play-circle" size="xs"></css-icon>Zum Spiel</a
-      >
-      <a routerLink="/admin/passwort" (click)="sheetOpen.set(false)"
-        ><css-icon icon="lock" size="xs"></css-icon>Passwort</a
       >
       <button type="button" (click)="sheetOpen.set(false); signOut.emit()">
         <css-icon icon="logout" size="xs"></css-icon>Abmelden
