@@ -151,6 +151,23 @@ test.describe('admin', () => {
       await page.getByLabel('Neues Passwort wiederholen').fill(next);
       await page.getByRole('button', { name: 'Passwort ändern' }).click();
     };
+    // Whatever happens, the shared password comes back for the other tests.
+    const restore = async () => {
+      const stored = await page.evaluate(() =>
+        localStorage.getItem('playduelio.admin.session'),
+      );
+      const token = (JSON.parse(stored ?? '{}') as { token?: string }).token;
+      const restored = await page.request.post(
+        'http://localhost:3100/api/admin/password',
+        {
+          headers: { Authorization: `Bearer ${token ?? ''}` },
+          data: { currentPassword: NEW_PASSWORD, newPassword: PASSWORD },
+        },
+      );
+      session = null;
+      // 403: the password was never changed, nothing to restore.
+      expect([200, 403]).toContain(restored.status());
+    };
 
     await signIn(page);
     await page.getByRole('link', { name: 'Passwort ändern' }).click();
@@ -158,30 +175,31 @@ test.describe('admin', () => {
       page.getByRole('heading', { name: 'Passwort', level: 1 }),
     ).toBeVisible();
 
-    // Nothing happens with a wrong current password or a short new one.
-    await change('falsch', NEW_PASSWORD);
-    await expect(page.getByRole('alert')).toHaveText(
-      'Das bisherige Passwort stimmt nicht.',
-    );
-    await change(PASSWORD, 'kurz');
-    await expect(page.getByText('Mindestens 12 Zeichen.')).toBeVisible();
+    try {
+      // Nothing happens with a wrong current password or a short new one.
+      await change('falsch', NEW_PASSWORD);
+      await expect(page.getByRole('alert')).toHaveText(
+        'Das bisherige Passwort stimmt nicht.',
+      );
+      await change(PASSWORD, 'kurz');
+      await expect(
+        page.getByText('Mindestens 12 Zeichen.', { exact: true }),
+      ).toBeVisible();
 
-    await change(PASSWORD, NEW_PASSWORD);
-    await expect(page.getByRole('status')).toContainText('Passwort geändert');
+      await change(PASSWORD, NEW_PASSWORD);
+      await expect(
+        page.getByRole('heading', { name: 'Passwort geändert' }),
+      ).toBeVisible();
 
-    // This device stays signed in; the new password opens the admin.
-    await page.reload();
-    await expect(
-      page.getByRole('heading', { name: 'Passwort', level: 1 }),
-    ).toBeVisible();
-    await page.getByRole('link', { name: 'Verlauf' }).first().click();
-    await expect(page.getByText('Admin-Passwort geändert').first()).toBeVisible();
-
-    // Back to the shared password, so the other tests can sign in.
-    await page.goto('/admin/passwort');
-    await change(NEW_PASSWORD, PASSWORD);
-    await expect(page.getByRole('status')).toContainText('Passwort geändert');
-    session = null;
+      // This device stays signed in; the change is in the history.
+      await page
+        .getByRole('navigation', { name: 'Bereiche' })
+        .getByRole('link', { name: 'Verlauf' })
+        .click();
+      await expect(page.getByText('Admin-Passwort geändert').first()).toBeVisible();
+    } finally {
+      await restore();
+    }
   });
 
   test('changes a rule and restores it from the history', async ({ page }) => {

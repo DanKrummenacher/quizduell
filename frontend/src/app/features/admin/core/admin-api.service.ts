@@ -209,14 +209,15 @@ export class AdminApi {
   }
 
   private async call<T>(request: Observable<T>, timeoutMs = 20_000): Promise<T> {
+    const sentWith = this.session.token();
     try {
       return await firstValueFrom(request.pipe(timeout(timeoutMs)));
     } catch (error) {
-      throw this.toError(error);
+      throw this.toError(error, sentWith);
     }
   }
 
-  private toError(error: unknown): AdminApiError {
+  private toError(error: unknown, sentWith: string | null): AdminApiError {
     if (!(error instanceof HttpErrorResponse)) {
       return new AdminApiError(
         'Der Server antwortet nicht. Bitte später erneut versuchen.',
@@ -224,7 +225,11 @@ export class AdminApi {
       );
     }
     if (error.status === 401) {
-      this.session.logout('expired');
+      // A request still carrying the token from before a password change
+      // is stale, not a sign that the current session ended.
+      if (sentWith === this.session.token()) {
+        this.session.logout('expired');
+      }
       return new AdminApiError('Die Anmeldung ist abgelaufen.', 401);
     }
     if (error.status === 0) {
@@ -247,13 +252,14 @@ export class AdminApi {
       ? (body.message as unknown[])[0]
       : body?.message;
     if (
-      error.status === 400 &&
+      (error.status === 400 || error.status === 403) &&
       typeof message === 'string' &&
       /^[A-ZÄÖÜ].*\.$/.test(message)
     ) {
-      // The server's own German sentences («Zwei Antworten sind gleich.»);
-      // validator messages start with a lowercase property name.
-      return new AdminApiError(message, 400);
+      // The server's own German sentences («Zwei Antworten sind gleich.»,
+      // «Das bisherige Passwort stimmt nicht.»); validator messages start
+      // with a lowercase property name.
+      return new AdminApiError(message, error.status);
     }
     if (error.status === 400) {
       return new AdminApiError('Die Eingabe ist ungültig.', 400);
