@@ -460,10 +460,9 @@ function toAdminQuestion(
       correct: row.timesCorrect,
       timeouts: row.timeouts,
       picks: row.options.map((_, index) => row.picks[index] ?? 0),
+      // An answer within the same millisecond counts as 0 ms, not as none.
       avgAnswerMs:
-        row.timesAsked > 0 && row.answerMsTotal > 0
-          ? Math.round(row.answerMsTotal / row.timesAsked)
-          : null,
+        row.timesAsked > 0 ? Math.round(row.answerMsTotal / row.timesAsked) : null,
       recent: trend?.recent ?? { ...EMPTY },
       previous: trend?.previous ?? { ...EMPTY },
     },
