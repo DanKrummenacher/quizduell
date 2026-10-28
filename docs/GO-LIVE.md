@@ -30,22 +30,81 @@ Die privaten `@css-ch`-Pakete brauchen ein Token zum Lesen.
    **Block force pushes**. Optional: **Require a pull request before merging**.
 4. Speichern.
 
-## 4. Render: Dienste per Blueprint anlegen (10 Min.)
+## 4. Render: Datenbank und Backend anlegen, Static Site einstellen (15 Min.)
 
-1. Render → **New** → **Blueprint** → Repository `quizduell` verbinden (GitHub-Zugriff erlauben).
-2. Render liest `render.yaml` und zeigt drei Dienste: `playduelio-api`, `playduelio`, `playduelio-db`.
-3. Es fragt zwei Werte:
-   - `ADMIN_PASSWORD` bei `playduelio-api`: ein neues Passwort, mindestens 12 Zeichen,
-     im Passwort-Manager speichern. Es gilt nur für die erste Anmeldung.
-   - `GITHUB_TOKEN` bei `playduelio`: das Token aus Schritt 1.
-4. **Apply**. Render baut und deployt; das dauert ein paar Minuten.
-5. Prüfen:
-   - `https://playduelio-api.onrender.com/health` zeigt `{"status":"ok"}`.
-   - `https://playduelio.onrender.com` zeigt das Spiel.
-   - `https://playduelio.onrender.com/admin` zeigt die Anmeldung.
+Die Static Site `playduelio` existiert schon (ihre URL steht auf den QR-Codes, nie
+löschen). Datenbank und Backend kommen neu dazu. Alles im selben Projekt und derselben
+Umgebung wie die Static Site anlegen.
 
-Wenn ein Dienst eine andere URL bekommt (Render hängt bei belegten Namen ein Suffix an):
-die neue URL mir geben, dann passe ich `render.yaml` und `environment.ts` an.
+**4a. Datenbank**
+
+1. Render → **New** → **Postgres**.
+2. Name `playduelio-db`, Project/Environment wie die Static Site, Region **Frankfurt (EU Central)**,
+   PostgreSQL **18**, Plan **Basic-256mb** (der Gratis-Plan wird nach 30 Tagen gelöscht).
+3. **Create Database** und warten, bis der Status *Available* ist.
+
+**4b. Backend**
+
+1. Render → **New** → **Web Service** → *Build and deploy from a Git repository* →
+   Repository `DanKrummenacher/quizduell`.
+2. Einstellungen:
+
+   | Feld           | Wert                                      |
+   | -------------- | ----------------------------------------- |
+   | Name           | `playduelio-api`                          |
+   | Region         | Frankfurt (EU Central)                    |
+   | Branch         | `main`                                    |
+   | Root Directory | `backend`                                 |
+   | Language       | Node                                      |
+   | Build Command  | `npm ci --include=dev && npm run build`   |
+   | Start Command  | `npm run start:prod`                      |
+   | Instance Type  | **Starter**                               |
+
+3. **Environment Variables** (Add Environment Variable):
+
+   | Key              | Value                                                     |
+   | ---------------- | --------------------------------------------------------- |
+   | `NODE_VERSION`   | `24`                                                      |
+   | `NODE_ENV`       | `production`                                              |
+   | `CORS_ORIGINS`   | `https://playduelio.onrender.com`                         |
+   | `ADMIN_PASSWORD` | neues Passwort, mindestens 12 Zeichen, in den Passwort-Manager |
+   | `DATABASE_URL`   | *Add from Database* → `playduelio-db` → **Internal Database URL** |
+
+4. **Advanced** aufklappen: **Health Check Path** `/health`.
+5. **Deploy Web Service**. Der erste Build dauert ein paar Minuten. Im Log steht am Ende
+   `playduelio backend listening on port …`.
+6. Danach bei `playduelio-api` → **Settings** → **Build & Deploy** → **Auto-Deploy**:
+   **After CI Checks Pass**.
+7. Prüfen: `https://playduelio-api.onrender.com/health` zeigt `{"status":"ok"}`.
+   Hat der Dienst eine andere URL bekommen, diese mir geben.
+
+**4c. Static Site `playduelio` prüfen**
+
+Bei `playduelio` → **Settings**:
+
+- **Build & Deploy:** Root Directory `frontend`, Build Command `npm ci && npm run build`,
+  Publish Directory `dist/frontend/browser`, **Auto-Deploy: After CI Checks Pass**.
+- **Environment:** `GITHUB_TOKEN` (ist gesetzt) und `NODE_VERSION` = `24`.
+- **Redirects/Rewrites:** eine Regel: Source `/*`, Destination `/index.html`, Action **Rewrite**.
+- **Headers**, je für Path `/*`:
+
+  | Name                        | Value                                        |
+  | --------------------------- | -------------------------------------------- |
+  | `X-Frame-Options`           | `DENY`                                       |
+  | `X-Content-Type-Options`    | `nosniff`                                    |
+  | `Referrer-Policy`           | `strict-origin-when-cross-origin`            |
+  | `Permissions-Policy`        | `camera=(), microphone=(), geolocation=()`   |
+  | `Strict-Transport-Security` | `max-age=31536000; includeSubDomains`        |
+
+- Zum Schluss **Manual Deploy → Deploy latest commit**, damit der aktuelle Stand live ist.
+
+Prüfen: `https://playduelio.onrender.com` zeigt das Spiel, `/admin` die Anmeldung.
+
+**4d. Aufräumen:** Static Sites, die nicht gebraucht werden (alte Versuche), unter
+*Settings → Delete* löschen. `playduelio` bleibt.
+
+`render.yaml` im Repo beschreibt dieselben drei Dienste; es dient als Referenz und zum
+Aufbau in einem neuen Workspace (Render → New → Blueprint).
 
 ## 5. Erste Anmeldung und eigenes Passwort (3 Min.)
 
@@ -71,6 +130,18 @@ die neue URL mir geben, dann passe ich `render.yaml` und `environment.ts` an.
    Passwörter gehören nicht in die Datei, nur in den Passwort-Manager.
 3. Zugang zum GitHub-Repository und zum Render-Team an die Betreiberin oder den
    Betreiber geben.
+
+## Pläne umstellen, sobald die Firmenkarte hinterlegt ist
+
+Bis zur Übergabe dürfen Datenbank und Backend auf **Free** laufen. Danach, mit der
+Firmenkarte im Workspace (**Billing**):
+
+1. `playduelio-db` → **Settings** → **Instance Type** → **Basic-256mb**. Die Daten bleiben.
+   Wichtig: Der Free-Plan wird nach 30 Tagen gelöscht, also nicht verschieben.
+2. `playduelio-api` → **Settings** → **Instance Type** → **Starter**, damit das Backend
+   nicht mehr einschläft (Free: nach 15 Min. Ruhe, erster Aufruf dauert ~1 Min.).
+
+Alle Einstellungen bleiben beim Planwechsel erhalten.
 
 ## Fertig
 
