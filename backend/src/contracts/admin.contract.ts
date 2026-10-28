@@ -24,6 +24,11 @@ export interface AdminLoginRequest {
   password: string;
 }
 
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface AdminSession {
   token: string;
   /** Epoch ms when the token expires. */
@@ -324,6 +329,7 @@ export interface Hint {
 
 export type AuditAction =
   | 'login'
+  | 'password.change'
   | 'game.pause'
   | 'game.resume'
   | 'settings.update'

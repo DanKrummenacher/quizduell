@@ -11,8 +11,13 @@ export interface AppConfig {
   seedSampleQuestions: boolean;
   /** Enables `/api/test/*` so end-to-end tests can reset questions and settings. */
   testControl: boolean;
-  /** The one password that opens the admin. */
+  /**
+   * The admin password at the first start; afterwards the admin changes it
+   * in the app and the stored one counts.
+   */
   adminPassword: string;
+  /** Replaces the stored password with `adminPassword` at the next start. */
+  adminPasswordReset: boolean;
 }
 
 /** Used outside production when no ADMIN_PASSWORD is set. */
@@ -67,5 +72,6 @@ export function loadAppConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     seedSampleQuestions: !databaseUrl,
     testControl,
     adminPassword: adminPassword || DEV_ADMIN_PASSWORD,
+    adminPasswordReset: env['ADMIN_PASSWORD_RESET'] === 'true',
   };
 }

@@ -68,6 +68,13 @@ export class AdminSessionService {
     }
   }
 
+  /** Takes over a session the server issued, e.g. after a password change. */
+  replace(session: AdminSession): void {
+    this.session.set(session);
+    localStore.set(STORAGE_KEY, JSON.stringify(session));
+    this.scheduleExpiry();
+  }
+
   /** Ends the session; `expired` when the server no longer accepts it. */
   logout(reason: 'expired' | 'signed-out' = 'signed-out'): void {
     if (!this.session()) {

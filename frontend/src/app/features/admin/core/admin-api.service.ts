@@ -4,6 +4,7 @@ import { firstValueFrom, type Observable, timeout } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import type {
   AdminQuestion,
+  AdminSession,
   AdminSettings,
   AdminSettingsView,
   Analytics,
@@ -11,15 +12,16 @@ import type {
   AuditPage,
   BulkRequest,
   BulkResult,
+  ChangePasswordRequest,
   Hint,
   ImportRequest,
   ImportResult,
   LiveSnapshot,
-  QuestionDay,
   PauseRequest,
+  QuestionDay,
   QuestionInput,
-  TrashedQuestion,
   QuestionUpdate,
+  TrashedQuestion,
 } from '../../../core/contracts/admin.contract';
 import { AdminSessionService } from './admin-session.service';
 
@@ -45,6 +47,13 @@ const BASE = `${environment.apiUrl}/api/admin`;
 export class AdminApi {
   private readonly http = inject(HttpClient);
   private readonly session = inject(AdminSessionService);
+
+  /** Sets a new admin password; the session that comes back replaces the old one. */
+  changePassword(request: ChangePasswordRequest): Promise<AdminSession> {
+    return this.call(
+      this.http.post<AdminSession>(`${BASE}/password`, request, this.options()),
+    );
+  }
 
   live(): Promise<LiveSnapshot> {
     return this.call(this.http.get<LiveSnapshot>(`${BASE}/live`, this.options()));

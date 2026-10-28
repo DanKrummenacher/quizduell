@@ -406,6 +406,58 @@ describe('admin API (e2e)', () => {
     });
   });
 
+  describe('password', () => {
+    const NEW_PASSWORD = 'a-new-admin-password';
+
+    it('refuses a wrong current password and a weak new one', async () => {
+      await post('/password', {
+        currentPassword: 'wrong',
+        newPassword: NEW_PASSWORD,
+      }).expect(403);
+      await post('/password', {
+        currentPassword: PASSWORD,
+        newPassword: 'short',
+      }).expect(400);
+      await post('/password', {
+        currentPassword: PASSWORD,
+        newPassword: PASSWORD,
+      }).expect(400);
+      await request(http)
+        .post('/api/admin/password')
+        .send({ currentPassword: PASSWORD, newPassword: NEW_PASSWORD })
+        .expect(401);
+    });
+
+    it('changes the password, ends the old sessions and records it', async () => {
+      const oldToken = token;
+      const response = await post('/password', {
+        currentPassword: PASSWORD,
+        newPassword: NEW_PASSWORD,
+      }).expect(200);
+      const session = response.body as AdminSession;
+      expect(session.token).not.toBe(oldToken);
+
+      await request(http)
+        .get('/api/admin/session')
+        .set('Authorization', `Bearer ${oldToken}`)
+        .expect(401);
+      token = session.token;
+      await get('/session').expect(200, { ok: true });
+
+      await request(http)
+        .post('/api/admin/login')
+        .send({ password: PASSWORD })
+        .expect(401);
+      await request(http)
+        .post('/api/admin/login')
+        .send({ password: NEW_PASSWORD })
+        .expect(200);
+
+      const page = (await get('/audit?limit=5')).body as AuditPage;
+      expect(page.entries.map((entry) => entry.action)).toContain('password.change');
+    });
+  });
+
   it('throttles sign-in attempts', async () => {
     const attempts = await Promise.all(
       Array.from({ length: 12 }, () =>

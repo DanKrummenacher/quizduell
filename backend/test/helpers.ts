@@ -27,6 +27,7 @@ export async function startTestApp(
     seedSampleQuestions: false,
     testControl: true,
     adminPassword: 'test-admin-password',
+    adminPasswordReset: false,
     ...overrides,
   };
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })

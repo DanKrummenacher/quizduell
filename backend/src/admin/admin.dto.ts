@@ -11,6 +11,7 @@ import {
   Max,
   MaxLength,
   Min,
+  MinLength,
   ValidateIf,
   ValidateNested,
 } from 'class-validator';
@@ -18,12 +19,14 @@ import {
   ADMIN_LIMITS,
   type BulkAction,
   type BulkRequest,
+  type ChangePasswordRequest,
   type ImportRequest,
   type PauseRequest,
   type QuestionInput,
   type QuestionUpdate,
 } from '../contracts/admin.contract.js';
 import { ANSWER_OPTION_COUNT } from '../contracts/game.contract.js';
+import { ADMIN_PASSWORD_MIN_LENGTH } from '../config/app-config.js';
 
 export class PauseDto implements PauseRequest {
   @IsBoolean()
@@ -34,6 +37,19 @@ export class LoginDto {
   @IsString()
   @MaxLength(200)
   password: string;
+}
+
+export class ChangePasswordDto implements ChangePasswordRequest {
+  @IsString()
+  @MaxLength(200)
+  currentPassword: string;
+
+  @IsString()
+  @MinLength(ADMIN_PASSWORD_MIN_LENGTH, {
+    message: `Das neue Passwort braucht mindestens ${ADMIN_PASSWORD_MIN_LENGTH} Zeichen.`,
+  })
+  @MaxLength(200)
+  newPassword: string;
 }
 
 /** Shape and rough limits; the service trims and checks the details. */
