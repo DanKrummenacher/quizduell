@@ -143,65 +143,6 @@ test.describe('admin', () => {
     await expect(row).toHaveCount(1);
   });
 
-  test('changes the admin password and back', async ({ page }) => {
-    const NEW_PASSWORD = 'e2e-admin-password-new';
-    const change = async (current: string, next: string) => {
-      await page.getByLabel('Bisheriges Passwort').fill(current);
-      await page.getByLabel('Neues Passwort', { exact: true }).fill(next);
-      await page.getByLabel('Neues Passwort wiederholen').fill(next);
-      await page.getByRole('button', { name: 'Passwort ändern' }).click();
-    };
-    // Whatever happens, the shared password comes back for the other tests.
-    const restore = async () => {
-      const stored = await page.evaluate(() =>
-        localStorage.getItem('playduelio.admin.session'),
-      );
-      const token = (JSON.parse(stored ?? '{}') as { token?: string }).token;
-      const restored = await page.request.post(
-        'http://localhost:3100/api/admin/password',
-        {
-          headers: { Authorization: `Bearer ${token ?? ''}` },
-          data: { currentPassword: NEW_PASSWORD, newPassword: PASSWORD },
-        },
-      );
-      session = null;
-      // 403: the password was never changed, nothing to restore.
-      expect([200, 403]).toContain(restored.status());
-    };
-
-    await signIn(page);
-    await page.getByRole('link', { name: 'Passwort ändern' }).click();
-    await expect(
-      page.getByRole('heading', { name: 'Passwort', level: 1 }),
-    ).toBeVisible();
-
-    try {
-      // Nothing happens with a wrong current password or a short new one.
-      await change('falsch', NEW_PASSWORD);
-      await expect(page.getByRole('alert')).toHaveText(
-        'Das bisherige Passwort stimmt nicht.',
-      );
-      await change(PASSWORD, 'kurz');
-      await expect(
-        page.getByText('Mindestens 12 Zeichen.', { exact: true }),
-      ).toBeVisible();
-
-      await change(PASSWORD, NEW_PASSWORD);
-      await expect(
-        page.getByRole('heading', { name: 'Passwort geändert' }),
-      ).toBeVisible();
-
-      // This device stays signed in; the change is in the history.
-      await page
-        .getByRole('navigation', { name: 'Bereiche' })
-        .getByRole('link', { name: 'Verlauf' })
-        .click();
-      await expect(page.getByText('Admin-Passwort geändert').first()).toBeVisible();
-    } finally {
-      await restore();
-    }
-  });
-
   test('changes a rule and restores it from the history', async ({ page }) => {
     await signIn(page, '/admin/regeln');
     await page.getByRole('button', { name: /^Fragen pro Duell ändern/ }).click();
@@ -247,7 +188,6 @@ test.describe('admin', () => {
       '/auswertung',
       '/regeln',
       '/verlauf',
-      '/passwort',
     ]) {
       await page.goto(`/admin${path}`);
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

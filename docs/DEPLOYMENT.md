@@ -18,9 +18,8 @@ Sie sind als Blueprint in [`render.yaml`](../render.yaml) beschrieben.
 1. Render → **New → Blueprint** → Repository `quizduell` verbinden → `render.yaml`
    wird erkannt.
 2. Render fragt die geheimen Werte ab (`sync: false`):
-   - `ADMIN_PASSWORD` für `playduelio-api`: das Passwort des **ersten** Starts,
-     mindestens 12 Zeichen, aus dem Passwort-Manager. Danach wird es im Admin unter
-     **Passwort** geändert; die Variable zählt dann nicht mehr (siehe unten).
+   - `ADMIN_PASSWORD` für `playduelio-api`: das Admin-Passwort, mindestens 12 Zeichen,
+     aus dem Passwort-Manager.
    - `GITHUB_TOKEN` für `playduelio`: ein GitHub-Token mit `read:packages` für die
      privaten `@css-ch`-Pakete.
 3. **Apply.** Render legt Datenbank, Backend und Static Site an, verbindet
@@ -40,7 +39,7 @@ die Einstellungen ab.
 
 **Backend** (`rootDir: backend`): `npm ci --include=dev && npm run build`, dann
 `npm run start:prod`. Beim Start legt es fehlende Tabellen per Migration an, liest
-die Spielregeln und das Admin-Passwort aus der Datenbank. Health-Check auf `/health`.
+die Spielregeln aus der Datenbank. Health-Check auf `/health`.
 Es startet nur mit gültiger Konfiguration, sonst steht im Log genau, was fehlt.
 
 | Variable               | Bedeutung                                                                |
@@ -48,8 +47,7 @@ Es startet nur mit gültiger Konfiguration, sonst steht im Log genau, was fehlt.
 | `NODE_ENV`             | `production`: erzwingt Datenbank, CORS und Passwort                      |
 | `DATABASE_URL`         | interne URL der Render-Datenbank (automatisch)                           |
 | `CORS_ORIGINS`         | exakte Frontend-URL ohne `/`, mehrere mit Komma                          |
-| `ADMIN_PASSWORD`       | Passwort des ersten Starts; später nur mit `ADMIN_PASSWORD_RESET` wirksam |
-| `ADMIN_PASSWORD_RESET` | `true`: setzt beim nächsten Start das gespeicherte Passwort auf `ADMIN_PASSWORD` zurück, danach wieder entfernen |
+| `ADMIN_PASSWORD`       | das Admin-Passwort, mindestens 12 Zeichen; ändern = Variable ändern, der Dienst startet neu und alle Anmeldungen enden |
 
 **Frontend** (`rootDir: frontend`): `npm ci && npm run build`, veröffentlicht
 `dist/frontend/browser`. Jede Adresse wird auf `index.html` umgeschrieben (Angular
@@ -77,7 +75,6 @@ Auf GitHub (einmalig, von Hand):
 
 ## 4. Nach dem ersten Deploy
 
-- Im Admin anmelden und unter **Passwort** ein eigenes Passwort setzen.
 - Fragen erfassen oder per CSV importieren (**Fragen → Importieren**; eine Vorlage
   liefert **Exportieren**).
 - Spielregeln prüfen; sie gelten ab dem nächsten Duell.
@@ -98,8 +95,6 @@ DATABASE_URL='<External Database URL>' npm --prefix backend run db:studio
   vier Antworten, `correct_index` die Position der richtigen (0–3).
 - Tabelle `settings` (eine Zeile): Spielregeln. Direkt geänderte Werte liest das
   Backend erst beim nächsten Start.
-- Tabelle `admin_credentials` (eine Zeile): das gehashte Admin-Passwort. Nicht von Hand
-  ändern; zum Zurücksetzen `ADMIN_PASSWORD_RESET` benutzen.
 
 Die Datenbank ganz leeren (Übergabe, Neustart): siehe
 [BETRIEB.md, «Datenbank zurücksetzen»](BETRIEB.md#datenbank-zurücksetzen).

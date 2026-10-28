@@ -4,7 +4,6 @@ import { firstValueFrom, type Observable, timeout } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import type {
   AdminQuestion,
-  AdminSession,
   AdminSettings,
   AdminSettingsView,
   Analytics,
@@ -12,7 +11,6 @@ import type {
   AuditPage,
   BulkRequest,
   BulkResult,
-  ChangePasswordRequest,
   Hint,
   ImportRequest,
   ImportResult,
@@ -47,13 +45,6 @@ const BASE = `${environment.apiUrl}/api/admin`;
 export class AdminApi {
   private readonly http = inject(HttpClient);
   private readonly session = inject(AdminSessionService);
-
-  /** Sets a new admin password; the session that comes back replaces the old one. */
-  changePassword(request: ChangePasswordRequest): Promise<AdminSession> {
-    return this.call(
-      this.http.post<AdminSession>(`${BASE}/password`, request, this.options()),
-    );
-  }
 
   live(): Promise<LiveSnapshot> {
     return this.call(this.http.get<LiveSnapshot>(`${BASE}/live`, this.options()));
@@ -209,15 +200,14 @@ export class AdminApi {
   }
 
   private async call<T>(request: Observable<T>, timeoutMs = 20_000): Promise<T> {
-    const sentWith = this.session.token();
     try {
       return await firstValueFrom(request.pipe(timeout(timeoutMs)));
     } catch (error) {
-      throw this.toError(error, sentWith);
+      throw this.toError(error);
     }
   }
 
-  private toError(error: unknown, sentWith: string | null): AdminApiError {
+  private toError(error: unknown): AdminApiError {
     if (!(error instanceof HttpErrorResponse)) {
       return new AdminApiError(
         'Der Server antwortet nicht. Bitte später erneut versuchen.',
@@ -225,11 +215,7 @@ export class AdminApi {
       );
     }
     if (error.status === 401) {
-      // A request still carrying the token from before a password change
-      // is stale, not a sign that the current session ended.
-      if (sentWith === this.session.token()) {
-        this.session.logout('expired');
-      }
+      this.session.logout('expired');
       return new AdminApiError('Die Anmeldung ist abgelaufen.', 401);
     }
     if (error.status === 0) {
@@ -252,14 +238,13 @@ export class AdminApi {
       ? (body.message as unknown[])[0]
       : body?.message;
     if (
-      (error.status === 400 || error.status === 403) &&
+      error.status === 400 &&
       typeof message === 'string' &&
       /^[A-ZÄÖÜ].*\.$/.test(message)
     ) {
-      // The server's own German sentences («Zwei Antworten sind gleich.»,
-      // «Das bisherige Passwort stimmt nicht.»); validator messages start
-      // with a lowercase property name.
-      return new AdminApiError(message, error.status);
+      // The server's own German sentences («Zwei Antworten sind gleich.»);
+      // validator messages start with a lowercase property name.
+      return new AdminApiError(message, 400);
     }
     if (error.status === 400) {
       return new AdminApiError('Die Eingabe ist ungültig.', 400);

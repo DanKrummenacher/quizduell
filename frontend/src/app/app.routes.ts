@@ -4,7 +4,7 @@ import { GAME_SCREEN_DATA } from './core/game/game-screen';
 import { PlayerNameStore } from './core/player/player-name.store';
 import { StartContainerComponent } from './features/start/container/start-container/start-container.component';
 
-const TITLE = 'Quizduell Challenge';
+const TITLE = 'playduelio – das Quiz-Duell';
 
 /** The lobby needs a player name; without one, start on the name screen. */
 const requireName: CanActivateFn = () =>
