@@ -1,11 +1,21 @@
 @use '../../styles/tokens' as t;
 
-// The page until the hints launch: an empty state on the page.
+// The page until the hints launch: an empty state in the middle of the space
+// under the bar (64px), the head of the page above it.
+:host .ad-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 64px);
+  padding-bottom: 32px;
+}
+
 .open {
   display: grid;
   justify-items: center;
+  width: 100%;
   max-width: 620px;
-  margin: 24px auto 0;
+  margin: auto;
+  padding-bottom: 48px;
   text-align: center;
 
   h2 {
@@ -20,7 +30,7 @@
   }
 
   @media (max-width: 640px) {
-    margin-top: 8px;
+    padding-bottom: 24px;
 
     h2 {
       font-size: t.$text-2xl;
