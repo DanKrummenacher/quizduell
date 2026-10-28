@@ -18,7 +18,7 @@ function random(seed: number): () => number {
   };
 }
 
-/** Typical load per hour of the day, a fair or office pattern. */
+/** Typical load per hour of the day, an event or office pattern. */
 const HOUR_WEIGHTS = [
   0, 0, 0, 0, 0, 0, 0, 0.2, 0.6, 1, 1.2, 1.3, 1.1, 1, 1.2, 1.4, 1.3, 1, 0.6, 0.3,
   0.15, 0.05, 0, 0,

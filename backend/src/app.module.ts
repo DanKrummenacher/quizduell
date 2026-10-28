@@ -16,7 +16,7 @@ import { TestControlController } from './testing/test-control.controller.js';
   imports: [
     ConfigModule,
     DatabaseModule,
-    // Generous per-IP limit: at the fair many devices share one public IP.
+    // Generous per-IP limit: many devices on site may share one public IP.
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 2_000 }]),
     QuestionsModule,
     SettingsModule,
