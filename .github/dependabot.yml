@@ -1,0 +1,34 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Zurich
+    groups:
+      backend:
+        patterns: ['*']
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Zurich
+    groups:
+      frontend:
+        patterns: ['*']
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+    # The private @css-ch packages need the token from the repository secrets
+    # (Settings → Secrets → Dependabot), see docs/DEPLOYMENT.md.
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
