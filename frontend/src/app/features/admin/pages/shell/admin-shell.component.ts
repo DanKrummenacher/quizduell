@@ -86,7 +86,7 @@ export class AdminShellComponent {
             live: true,
           };
         case '/admin/hinweise':
-          return { ...area, count: hints?.length ?? null };
+          return area.soon ? { ...area } : { ...area, count: hints?.length ?? null };
         case '/admin/fragen':
           return { ...area, warn: this.data.playable() === false };
         case '/admin/verlauf':

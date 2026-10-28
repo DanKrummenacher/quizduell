@@ -61,8 +61,11 @@ export const ADMIN_ROUTES: Routes = [
           },
           {
             path: 'hinweise',
+            // Until the hints launch: a page that says what comes.
             loadComponent: () =>
-              import('./pages/hints/hints.component').then((m) => m.HintsComponent),
+              import('./pages/hints/hints-soon.component').then(
+                (m) => m.HintsSoonComponent,
+              ),
             title: `Hinweise · ${TITLE}`,
           },
           {

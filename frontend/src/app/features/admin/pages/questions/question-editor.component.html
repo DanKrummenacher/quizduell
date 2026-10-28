@@ -178,20 +178,137 @@
         <section class="stats" aria-labelledby="stats-title">
           <h3 id="stats-title">So wird sie beantwortet</h3>
 
-          @for (item of hints(); track item.hint.key) {
-            <a
-              class="hint"
-              routerLink="/admin/hinweise"
-              [queryParams]="{ hinweis: item.hint.key }"
-            >
-              <span class="sev" [attr.data-severity]="item.hint.severity">{{
-                severityLabels[item.hint.severity]
-              }}</span>
-              <span>
-                <b>{{ item.text.title }}</b>
-                <span class="ad-muted">{{ item.text.finding }}</span>
-              </span>
-            </a>
+          @if (hints().length) {
+            <section class="hints" aria-labelledby="hints-title">
+              <header class="hints-head">
+                <css-icon icon="priority-warning" size="xs"></css-icon>
+                <b id="hints-title">{{
+                  hints().length === 1 ? '1 Hinweis' : hints().length + ' Hinweise'
+                }}</b>
+                <span>aus {{ formatInt(q.stats.answers) }} Antworten</span>
+              </header>
+              @for (item of hints(); track item.hint.key) {
+                <details class="hint" [attr.data-tone]="item.tone">
+                  <summary>
+                    <span class="hint-icon" aria-hidden="true">
+                      <css-icon
+                        [attr.icon]="hintIcons[item.hint.type] ?? 'priority-warning'"
+                        size="xs"
+                      ></css-icon>
+                    </span>
+                    <span class="hint-text">
+                      <span class="hint-title"
+                        >{{ item.text.title }}
+                        <span class="sev">{{
+                          severityLabels[item.hint.severity]
+                        }}</span></span
+                      >
+                      <span class="hint-finding">{{ item.text.finding }}</span>
+                    </span>
+                    <css-icon
+                      class="hint-chev"
+                      icon="angle-right"
+                      size="xs"
+                    ></css-icon>
+                  </summary>
+                  <div class="hint-more">
+                    @if (item.place; as p) {
+                      <div class="place">
+                        <div class="place-head">
+                          <span>Im Vergleich</span>
+                          <span
+                            class="place-switch"
+                            role="group"
+                            aria-label="Darstellung"
+                          >
+                            <button
+                              type="button"
+                              title="Als Linie"
+                              aria-label="Als Linie"
+                              [attr.aria-pressed]="chartMode() === 'line'"
+                              (click)="setChart('line')"
+                            >
+                              <svg viewBox="0 0 16 16" aria-hidden="true">
+                                <line x1="2" y1="8" x2="14" y2="8" />
+                                <circle cx="6" cy="8" r="2.2" />
+                              </svg>
+                            </button>
+                            <button
+                              type="button"
+                              title="Als Verteilung"
+                              aria-label="Als Verteilung"
+                              [attr.aria-pressed]="chartMode() === 'bars'"
+                              (click)="setChart('bars')"
+                            >
+                              <svg viewBox="0 0 16 16" aria-hidden="true">
+                                <rect x="2" y="8" width="3" height="6" rx="0.5" />
+                                <rect x="6.5" y="4" width="3" height="10" rx="0.5" />
+                                <rect x="11" y="6" width="3" height="8" rx="0.5" />
+                              </svg>
+                            </button>
+                          </span>
+                        </div>
+                        @if (chartMode() === 'line') {
+                          <div class="place-line" aria-hidden="true">
+                            <i
+                              class="place-zone"
+                              [style.left.%]="p.zone.left"
+                              [style.width.%]="p.zone.width"
+                            ></i>
+                            @if (p.gap; as g) {
+                              <i
+                                class="place-gap"
+                                [style.left.%]="g.left"
+                                [style.width.%]="g.width"
+                              ></i>
+                            }
+                            <span
+                              class="place-own"
+                              [style.left.%]="p.own"
+                              [attr.data-edge]="
+                                p.own < 8 ? 'start' : p.own > 92 ? 'end' : null
+                              "
+                              ><b>{{ p.ownLabel }}</b></span
+                            >
+                          </div>
+                        } @else {
+                          <div class="place-bars" aria-hidden="true">
+                            @for (bar of p.bars; track $index) {
+                              <span
+                                [class.is-zone]="bar.zone"
+                                [class.is-own]="bar.own"
+                              >
+                                @if (bar.own) {
+                                  <b>{{ p.ownLabel }}</b>
+                                }
+                                <i [style.height.%]="bar.height"></i>
+                              </span>
+                            }
+                          </div>
+                        }
+                        <div class="place-axis" aria-hidden="true">
+                          <span>0 %</span><span>{{ p.max }}</span>
+                        </div>
+                        <div class="place-keys">
+                          <span class="place-key"><i></i>{{ p.zoneLabel }}</span>
+                          @if (p.gap; as g) {
+                            <span class="place-key is-gap"><i></i>{{ g.text }}</span>
+                          }
+                        </div>
+                      </div>
+                    }
+                    <dl class="hint-facts">
+                      <dt>Vorschlag</dt>
+                      <dd>{{ item.text.advice }}</dd>
+                      @if (item.place; as p) {
+                        <dt>Einordnung</dt>
+                        <dd>{{ p.place }}</dd>
+                      }
+                    </dl>
+                  </div>
+                </details>
+              }
+            </section>
           }
 
           @if (stats(); as s) {

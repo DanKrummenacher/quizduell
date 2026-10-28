@@ -235,6 +235,22 @@ css-icon {
       animation: pulse 2s ease-in-out infinite;
     }
   }
+
+  // Comes later: a quiet outline, no dot.
+  &[data-tone='soon'] {
+    --c: rgba(255, 255, 255, 0.5);
+
+    padding: 0 7px;
+    background: transparent;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+    color: rgba(255, 255, 255, 0.72);
+    font-weight: t.$medium;
+    letter-spacing: 0.04em;
+
+    i {
+      display: none;
+    }
+  }
 }
 
 @keyframes pulse {

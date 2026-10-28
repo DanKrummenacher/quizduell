@@ -201,39 +201,354 @@
   }
 }
 
-.hint {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 14px;
-  border: 1px solid #f0d9a8;
-  border-radius: 10px;
-  background: t.$warning-bg;
-  color: t.$text;
-  font-size: t.$text-base;
-  line-height: 1.5;
-  text-decoration: none;
+// Hints: a yellow head, white rows to open, the opened part in grey.
+$hint-line: #f0d9a8;
+$hint-open: #f6f8fb;
+$hint-track: #e4e9f0;
 
-  &:hover {
-    border-color: t.$warning;
-  }
+.hints {
+  overflow: hidden;
+  border: 1px solid t.$line;
+  border-radius: t.$radius;
+  background: #fff;
+}
+.hints-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-bottom: 1px solid $hint-line;
+  background: t.$warning-bg;
+  color: t.$warning-text;
+  font-size: t.$text-base;
 
   b {
-    display: block;
+    font-weight: t.$bold;
+  }
+  span {
+    margin-left: auto;
+    color: t.$text-3;
+    font-size: t.$text-sm;
+  }
+}
+.hint + .hint {
+  border-top: 1px solid t.$line;
+}
+.hint summary {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  list-style: none;
+  cursor: pointer;
+  transition: background-color 0.12s ease;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+  &:hover {
+    background: $hint-open;
+  }
+  &:focus-visible {
+    outline: 2px solid t.$brand;
+    outline-offset: -2px;
+  }
+}
+.hint[open] > summary {
+  border-bottom: 1px solid t.$line-soft;
+}
+.hint-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: t.$warning-bg;
+  color: t.$warning-text;
+
+  [data-tone='danger'] & {
+    background: t.$danger-bg;
+    color: t.$danger-text;
+  }
+}
+.hint-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.hint-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  color: t.$text;
+  font-size: t.$text-base;
+  font-weight: t.$bold;
+  line-height: 1.45;
+}
+.hint-finding {
+  color: t.$text-2;
+  font-size: t.$text-sm;
+  line-height: 1.5;
+}
+.hint-chev {
+  color: t.$text-3;
+  transition: transform 0.15s ease;
+
+  [open] > summary > & {
+    transform: rotate(90deg);
+  }
+}
+.sev {
+  @include c.badge(warning);
+
+  height: 20px;
+  padding: 0 8px;
+  font-size: t.$text-xs;
+  font-weight: t.$medium;
+
+  [data-tone='danger'] & {
+    @include c.badge-tone(danger);
+  }
+}
+.hint-more {
+  display: grid;
+  padding: 16px 16px 14px 62px;
+  background: $hint-open;
+
+  @media (max-width: 480px) {
+    padding-left: 16px;
   }
 }
 
-.sev {
-  @include c.badge(warning);
-  flex: none;
-  height: 20px;
-  padding: 0 8px;
-  background: #fff;
+// The question among all judged questions: a line or the distribution.
+.place {
+  display: grid;
+  padding-bottom: 14px;
+}
+.place-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 26px;
+  color: t.$text-3;
   font-size: t.$text-xs;
+  font-weight: t.$medium;
+}
+.place-switch {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 6px;
+  background: $hint-track;
 
-  &[data-severity='high'],
-  &[data-severity='critical'] {
+  button {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: none;
+    color: t.$text-3;
+    cursor: pointer;
+
+    &:hover {
+      color: t.$text;
+    }
+    &[aria-pressed='true'] {
+      background: #fff;
+      box-shadow: t.$shadow-xs;
+      color: t.$text;
+    }
+    &:focus-visible {
+      outline: 2px solid t.$brand;
+      outline-offset: 1px;
+    }
+  }
+  svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+  rect,
+  circle {
+    stroke: none;
+  }
+}
+.place-line {
+  position: relative;
+  height: 6px;
+  margin-bottom: 8px;
+  border-radius: 3px;
+  background: $hint-track;
+}
+.place-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
+  background: t.$success;
+  opacity: 0.35;
+}
+.place-gap {
+  position: absolute;
+  top: 50%;
+  border-top: 2px dashed t.$warning;
+  transform: translateY(-50%);
+
+  [data-tone='danger'] & {
+    border-top-color: t.$danger;
+  }
+}
+.place-own {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: t.$warning;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.15);
+  transform: translateY(-50%);
+
+  [data-tone='danger'] & {
+    background: t.$danger;
+  }
+  &[data-edge='start'] b {
+    left: -4px;
+    transform: none;
+  }
+  &[data-edge='end'] b {
+    right: -4px;
+    left: auto;
+    transform: none;
+  }
+}
+.place-own b,
+.place-bars b {
+  @include t.numeric;
+
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  color: t.$warning-text;
+  font-size: t.$text-sm;
+  font-weight: t.$bold;
+  white-space: nowrap;
+  transform: translateX(-50%);
+
+  [data-tone='danger'] & {
     color: t.$danger-text;
+  }
+}
+.place-bars {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 2px;
+  align-items: end;
+  height: 40px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid t.$line;
+
+  > span {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    height: 100%;
+  }
+  i {
+    display: block;
+    width: 100%;
+    min-height: 2px;
+    border-radius: 2px 2px 0 0;
+    background: t.$line;
+  }
+  .is-zone i {
+    background: rgba(0, 150, 90, 0.4);
+  }
+  .is-own i {
+    background: t.$warning;
+
+    [data-tone='danger'] & {
+      background: t.$danger;
+    }
+  }
+}
+.place-axis {
+  @include t.numeric;
+
+  display: flex;
+  justify-content: space-between;
+  color: t.$text-4;
+  font-size: t.$text-xs;
+}
+.place-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  margin-top: 8px;
+  color: t.$text-3;
+  font-size: t.$text-xs;
+}
+.place-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  i {
+    width: 12px;
+    height: 6px;
+    border-radius: 3px;
+    background: t.$success;
+    opacity: 0.35;
+  }
+  &.is-gap {
+    color: t.$warning-text;
+    font-weight: t.$medium;
+
+    i {
+      height: 0;
+      border-top: 2px dashed t.$warning;
+      border-radius: 0;
+      background: none;
+      opacity: 1;
+    }
+    [data-tone='danger'] & {
+      color: t.$danger-text;
+
+      i {
+        border-top-color: t.$danger;
+      }
+    }
+  }
+}
+.hint-facts {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 0;
+  font-size: t.$text-sm;
+  line-height: 1.5;
+
+  .place + & {
+    padding-top: 12px;
+    border-top: 1px solid t.$line;
+  }
+  dt {
+    color: t.$text-3;
+  }
+  dd {
+    margin: 0;
+    color: t.$text-2;
   }
 }
 

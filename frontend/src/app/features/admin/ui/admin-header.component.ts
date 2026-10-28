@@ -41,7 +41,7 @@ export interface NavItem extends AdminArea {
 
 /** A mark next to an area: what is going on there, in a word or a number. */
 export interface NavMark {
-  tone: 'alert' | 'warn' | 'live' | 'new';
+  tone: 'alert' | 'warn' | 'live' | 'new' | 'soon';
   text: string;
   label: string;
 }
@@ -126,6 +126,9 @@ export class AdminHeaderComponent {
    */
   protected markOf(item: NavItem): NavMark | null {
     const count = item.count ?? 0;
+    if (item.soon) {
+      return { tone: 'soon', text: 'Bald', label: 'Bald verfügbar' };
+    }
     if (item.warn) {
       return { tone: 'warn', text: '!', label: 'Zu wenige Fragen im Spiel' };
     }

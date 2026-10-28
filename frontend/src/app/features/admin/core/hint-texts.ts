@@ -58,13 +58,16 @@ export function hintText(hint: Hint, question: AdminQuestion | null): HintText {
           'Prüfen, ob die Frage eindeutig ist und die richtige Antwort stimmt. Oft hilft eine genauere Formulierung.',
       };
     }
-    case 'hard':
+    case 'hard': {
+      // Blind guessing hits one answer in as many as there are.
+      const chance = 1 / Math.max(1, question?.options.length ?? 4);
       return {
         title: 'Kaum jemand weiss die Antwort',
-        finding: `Nur ${value} antworten richtig (${sample} Antworten). Zufällig wären es 25 %.`,
+        finding: `Nur ${value} antworten richtig (${sample} Antworten), ${hint.value < chance ? 'weniger als' : 'kaum mehr als'} durch blosses Raten (${formatPercent(chance)}).`,
         advice:
           'Frage vereinfachen, einen Hinweis in die Frage nehmen oder pausieren.',
       };
+    }
     case 'easy':
       return {
         title: 'Fast alle wissen die Antwort',

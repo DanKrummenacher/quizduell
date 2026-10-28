@@ -1,0 +1,96 @@
+@use '../../styles/tokens' as t;
+
+// The page until the hints launch: an empty state on the page.
+.open {
+  display: grid;
+  justify-items: center;
+  max-width: 620px;
+  margin: 24px auto 0;
+  text-align: center;
+
+  h2 {
+    margin: 12px 0 0;
+    font-size: t.$text-3xl;
+    font-weight: t.$bold;
+    line-height: 1.2;
+  }
+
+  .soon-lead {
+    max-width: 520px;
+  }
+
+  @media (max-width: 640px) {
+    margin-top: 8px;
+
+    h2 {
+      font-size: t.$text-2xl;
+    }
+  }
+}
+
+.open-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 18px;
+  border-radius: 50%;
+  background: t.$bg;
+  box-shadow:
+    0 0 0 8px rgba(0, 120, 187, 0.06),
+    t.$shadow-sm;
+  color: t.$brand;
+}
+
+.soon-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: t.$radius-pill;
+  background: t.$info-bg;
+  color: t.$info-text;
+  font-size: t.$text-xs;
+  font-weight: t.$bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.soon-lead {
+  max-width: 440px;
+  margin: 10px 0 0;
+  color: t.$text-2;
+  font-size: t.$text-md;
+  line-height: 1.55;
+}
+
+.soon-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.open-checks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 22px;
+  margin: 40px 0 0;
+  padding: 20px 0 0;
+  border-top: 1px solid t.$line;
+  list-style: none;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: t.$text-2;
+    font-size: t.$text-sm;
+  }
+
+  css-icon {
+    color: t.$text-3;
+  }
+}

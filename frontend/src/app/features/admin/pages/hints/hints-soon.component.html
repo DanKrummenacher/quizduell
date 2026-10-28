@@ -1,0 +1,26 @@
+<main class="ad-page">
+  <app-ad-page-head title="Hinweise">
+    <p headDesc>Was bei den Fragen Aufmerksamkeit braucht.</p>
+  </app-ad-page-head>
+
+  <section class="open" aria-labelledby="soon-title">
+    <span class="open-icon"><css-icon icon="bulb" size="md"></css-icon></span>
+    <span class="soon-tag">Bald verfügbar</span>
+    <h2 id="soon-title">Hinweise zu jeder Frage</h2>
+    <p class="soon-lead">
+      Das Admin wird jede Frage laufend prüfen und hier zeigen, welche verwirrt, zu
+      schwer oder zu leicht ist – mit einem Vorschlag, was hilft.
+    </p>
+    <div class="soon-actions">
+      <a class="btn-primary" routerLink="/admin/fragen">Zu den Fragen</a>
+      <a class="btn-secondary" routerLink="/admin/auswertung">Zur Auswertung</a>
+    </div>
+    <ul class="open-checks" aria-label="Was geprüft wird">
+      @for (check of checks; track check.title) {
+        <li>
+          <css-icon [attr.icon]="check.icon" size="xs"></css-icon>{{ check.title }}
+        </li>
+      }
+    </ul>
+  </section>
+</main>

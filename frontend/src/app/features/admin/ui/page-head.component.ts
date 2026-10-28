@@ -135,6 +135,9 @@ export class AdPageHeadComponent {
         return running > 0 ? { tone: 'live', text: `${running} live` } : null;
       }
       case '/admin/hinweise':
+        if (area.soon) {
+          return { tone: 'soon', text: 'Bald' };
+        }
         return open?.length ? { tone: 'alert', text: String(open.length) } : null;
       case '/admin/fragen':
         return this.data.playable() === false ? { tone: 'warn', text: '!' } : null;

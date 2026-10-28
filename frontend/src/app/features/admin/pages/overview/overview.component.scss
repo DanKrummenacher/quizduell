@@ -119,75 +119,6 @@
   }
 }
 
-.hints {
-  display: grid;
-  margin: 0 -10px;
-  padding: 0;
-  list-style: none;
-}
-
-.hint {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  min-height: 52px;
-  padding: 8px 10px;
-  border-radius: t.$radius;
-  color: t.$text;
-  text-decoration: none;
-
-  &:hover {
-    background: t.$bg-hover;
-  }
-}
-
-// The severity as a dot: red for important, amber for the rest.
-.hint-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: t.$warning;
-  box-shadow: 0 0 0 3px rgba(255, 183, 0, 0.18);
-
-  &[data-severity='critical'],
-  &[data-severity='high'] {
-    background: t.$danger;
-    box-shadow: 0 0 0 3px rgba(213, 52, 25, 0.14);
-  }
-}
-
-.hint-text {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
-.hint-title,
-.hint-question {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.hint-title {
-  font-size: t.$text-md;
-  font-weight: t.$medium;
-}
-
-.hint-question {
-  color: t.$text-3;
-  font-size: t.$text-sm;
-}
-
-.hint-go {
-  color: t.$text-4;
-}
-
-.hint:hover .hint-go {
-  color: t.$text-2;
-}
-
 .bars-title {
   color: t.$text-2;
   font-size: t.$text-base;
@@ -437,30 +368,68 @@
   }
 }
 
-// The open hints by kind.
-.kinds {
+// Until the hints launch: the checks that will run.
+.soon-card h2 {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 0 0 12px;
+  align-items: center;
+  gap: 8px;
+}
+
+.soon-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: t.$radius-pill;
+  background: t.$info-bg;
+  color: t.$info-text;
+  font-size: t.$text-xs;
+  font-weight: t.$bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.soon-checks {
+  display: grid;
+  gap: 2px;
+  margin: 0;
   padding: 0;
   list-style: none;
 
   li {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 6px;
-    height: 26px;
-    padding: 0 10px;
-    border-radius: t.$radius-pill;
-    background: t.$bg-muted;
-    color: t.$text-2;
-    font-size: t.$text-sm;
-    white-space: nowrap;
+    gap: 12px;
+    padding: 7px 0;
+
+    & + li {
+      border-top: 1px solid t.$line-soft;
+    }
   }
+}
+
+.soon-check-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: t.$bg-muted;
+  color: t.$text-2;
+}
+
+.soon-check-text {
+  display: grid;
+  min-width: 0;
 
   b {
-    color: t.$text;
-    @include t.numeric;
+    font-size: t.$text-base;
+    font-weight: t.$medium;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: t.$text-sm;
   }
 }

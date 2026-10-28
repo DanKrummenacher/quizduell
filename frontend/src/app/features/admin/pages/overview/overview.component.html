@@ -241,70 +241,29 @@
 </ng-template>
 
 <ng-template #hintsCard>
-  <section class="ad-card">
+  <section class="ad-card soon-card">
     <header class="ad-card-head">
       <div>
-        <h2>Hinweise</h2>
-        <p>Was Aufmerksamkeit braucht</p>
+        <h2>Hinweise <span class="soon-chip">Bald</span></h2>
+        <p>Was bei den Fragen Aufmerksamkeit braucht</p>
       </div>
       <a class="ad-more" routerLink="/admin/hinweise"
-        >Alle<css-icon icon="arrow-right" size="xs"></css-icon
+        >Mehr<css-icon icon="arrow-right" size="xs"></css-icon
       ></a>
     </header>
-    @if (data.hints.value()) {
-      @if (hintKinds().length) {
-        <ul class="kinds" aria-label="Offene Hinweise nach Art">
-          @for (kind of hintKinds(); track kind.label) {
-            <li>
-              {{ kind.label }} <b>{{ kind.count }}</b>
-            </li>
-          }
-        </ul>
+    <ul class="soon-checks" aria-label="Was geprüft wird">
+      @for (check of soonChecks; track check.title) {
+        <li>
+          <span class="soon-check-icon"
+            ><css-icon [attr.icon]="check.icon" size="xs"></css-icon
+          ></span>
+          <span class="soon-check-text"
+            ><b>{{ check.title }}</b
+            ><span>{{ check.limit }}</span></span
+          >
+        </li>
       }
-      <ul class="hints">
-        @for (item of hints(); track item.hint.key) {
-          <li>
-            <a
-              class="hint"
-              routerLink="/admin/hinweise"
-              [queryParams]="{ hinweis: item.hint.key }"
-            >
-              <span
-                class="hint-dot"
-                [attr.data-severity]="item.hint.severity"
-                [attr.aria-label]="severityLabels[item.hint.severity]"
-              ></span>
-              <span class="hint-text">
-                <span class="hint-title">{{ item.text.title }}</span>
-                @if (item.question; as q) {
-                  <span class="hint-question"
-                    ><span class="ad-num">F-{{ q.id }}</span> · {{ q.text }}</span
-                  >
-                }
-              </span>
-              <css-icon class="hint-go" icon="angle-right" size="xs"></css-icon>
-            </a>
-          </li>
-        } @empty {
-          <li>
-            <app-ad-state
-              kind="empty"
-              icon="checkmark-circle"
-              title="Alles in Ordnung"
-              text="Keine Frage fällt gerade auf."
-            />
-          </li>
-        }
-      </ul>
-    } @else if (data.hints.error()) {
-      <app-ad-state
-        kind="error"
-        [text]="data.hints.error()"
-        (retry)="data.hints.reload()"
-      />
-    } @else {
-      <app-ad-state kind="loading" [lines]="4" />
-    }
+    </ul>
   </section>
 </ng-template>
 

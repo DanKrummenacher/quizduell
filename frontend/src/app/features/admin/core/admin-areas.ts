@@ -6,6 +6,8 @@ export interface AdminArea {
   group: 'Betrieb' | 'Inhalte' | 'Analyse';
   /** One line on what the area is for. */
   description: string;
+  /** Comes later: listed with «Bald». */
+  soon?: boolean;
 }
 
 export const ADMIN_AREAS: readonly AdminArea[] = [
@@ -29,6 +31,7 @@ export const ADMIN_AREAS: readonly AdminArea[] = [
     icon: 'bulb',
     group: 'Betrieb',
     description: 'Was Aufmerksamkeit braucht',
+    soon: true,
   },
   {
     path: '/admin/fragen',

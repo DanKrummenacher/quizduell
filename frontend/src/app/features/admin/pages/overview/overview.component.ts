@@ -30,7 +30,6 @@ import {
   labelStep,
   share,
 } from '../../core/format';
-import { HINT_TYPE_LABELS, hintText, SEVERITY_LABELS } from '../../core/hint-texts';
 import { every, remote } from '../../core/remote';
 import { duelLength, formatSetting, SETTINGS_META } from '../../core/settings-meta';
 import { AdLineChartComponent, AdSparklineComponent } from '../../ui/charts';
@@ -115,16 +114,6 @@ export class OverviewComponent {
       });
   });
 
-  /** The open hints by kind. */
-  protected readonly hintKinds = computed(() => {
-    const counts = new Map<string, number>();
-    for (const hint of this.data.openHints() ?? []) {
-      const label = HINT_TYPE_LABELS[hint.type];
-      counts.set(label, (counts.get(label) ?? 0) + 1);
-    }
-    return [...counts].map(([label, count]) => ({ label, count }));
-  });
-
   /** An icon for each kind of change. */
   protected readonly auditIcons: Record<AuditAction, string> = {
     login: 'unlock',
@@ -188,7 +177,7 @@ export class OverviewComponent {
     const height: Record<Card, number> = {
       chart: 336,
       live: 336,
-      hints: 110 + Math.max(this.hints().length * 56, 90),
+      hints: 300,
       questions: 150 + (this.catalog()?.categories.length ?? 4) * 42,
       rules: 370,
       audit: 110 + Math.max(this.audit.value()?.entries.length ?? 1, 1) * 46,
@@ -233,7 +222,6 @@ export class OverviewComponent {
 
   protected readonly formatInt = formatInt;
   protected readonly formatRelative = formatRelative;
-  protected readonly severityLabels = SEVERITY_LABELS;
 
   protected setRange(range: AnalyticsRange): void {
     if (range !== this.range()) {
@@ -366,12 +354,17 @@ export class OverviewComponent {
     };
   });
 
-  protected readonly hints = computed(() =>
-    (this.data.openHints() ?? []).slice(0, 4).map((hint) => {
-      const question = this.data.questionById(hint.questionId);
-      return { hint, question, text: hintText(hint, question) };
-    }),
-  );
+  /** Until the hints launch, the card names the checks that will run. */
+  protected readonly soonChecks = [
+    {
+      icon: 'bulb',
+      title: 'Verständlichkeit',
+      limit: 'keine falsche Antwort vor der richtigen',
+    },
+    { icon: 'statistic', title: 'Schwierigkeit', limit: '30 bis 95 % richtig' },
+    { icon: 'time', title: 'Zeit zum Antworten', limit: 'unter 20 % ohne Antwort' },
+    { icon: 'items-list', title: 'Fragenbestand', limit: 'genug aktive Fragen' },
+  ];
 
   protected readonly critical = computed(
     () => this.data.openHints()?.find((hint) => hint.type === 'pool-empty') ?? null,
