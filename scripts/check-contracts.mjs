@@ -4,7 +4,8 @@ import { join } from 'node:path';
 
 const backendDir = 'backend/src/contracts';
 const frontendDir = 'frontend/src/app/core/contracts';
-const files = new Set([...readdirSync(backendDir), ...readdirSync(frontendDir)]);
+const contracts = (dir) => readdirSync(dir).filter((file) => file.endsWith('.ts'));
+const files = new Set([...contracts(backendDir), ...contracts(frontendDir)]);
 let failed = false;
 
 for (const file of files) {
