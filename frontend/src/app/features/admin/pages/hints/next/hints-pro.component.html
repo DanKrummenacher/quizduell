@@ -1,0 +1,347 @@
+@switch (variant()) {
+  @case ('p1') {
+    <section class="sum">
+      <div class="sum-cell is-lead">
+        <span class="sum-label">Fragenqualität</span>
+        <span class="sum-value">{{
+          quality() === null ? '–' : percent(quality())
+        }}</span>
+        <span class="sum-meter"
+          ><span [style.width.%]="(quality() ?? 0) * 100"></span
+        ></span>
+      </div>
+      <div class="sum-cell">
+        <span class="sum-label">Auffällige Fragen</span>
+        <span class="sum-value"
+          >{{ flagged() }}<small> von {{ judged() }}</small></span
+        >
+        <span class="sum-note">mit mindestens 20 Antworten</span>
+      </div>
+      <div class="sum-cell">
+        <span class="sum-label">Bald angehen</span>
+        <span class="sum-value" [class.is-warm]="urgent()">{{ urgent() }}</span>
+        <span class="sum-note">kritisch oder wichtig</span>
+      </div>
+      <div class="sum-cell">
+        <span class="sum-label">Prüfungen bestanden</span>
+        <span class="sum-value"
+          >{{ passed() }}<small> von {{ checks().length }}</small></span
+        >
+        <span class="sum-dots">
+          @for (c of checks(); track c.id) {
+            <i [class.is-bad]="c.items.length" [attr.title]="c.title"></i>
+          }
+        </span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <header class="panel-head">
+        <div class="seg" role="tablist" aria-label="Prüfung">
+          <button
+            type="button"
+            role="tab"
+            [class.is-on]="!check()"
+            (click)="check.set(null)"
+          >
+            Alle <span>{{ (showIgnored() ? ignored() : open()).length }}</span>
+          </button>
+          @for (c of checks(); track c.id) {
+            <button
+              type="button"
+              role="tab"
+              [class.is-on]="check() === c.id"
+              [disabled]="!c.items.length && !showIgnored()"
+              (click)="check.set(c.id)"
+            >
+              {{ c.title }} <span>{{ c.items.length }}</span>
+            </button>
+          }
+        </div>
+        @if (ignored().length || showIgnored()) {
+          <button type="button" class="quiet" (click)="toggleIgnored()">
+            {{
+              showIgnored()
+                ? 'Offene zeigen'
+                : 'Ignoriert (' + ignored().length + ')'
+            }}
+          </button>
+        }
+      </header>
+      @if (!shown().length) {
+        <ng-container *ngTemplateOutlet="calm" />
+      } @else {
+        <div class="tbl" role="table">
+          <div class="tbl-head" role="row">
+            <span role="columnheader">Frage</span>
+            <span role="columnheader">Befund</span>
+            <span role="columnheader">Messwert im Verhältnis zur Grenze</span>
+            <span role="columnheader"><span class="sr-only">Aktion</span></span>
+          </div>
+          @for (item of shown(); track item.hint.key) {
+            @let b = bullet(item);
+            <div class="tbl-row" role="row" [attr.data-sev]="item.hint.severity">
+              <span class="tbl-q" role="cell">
+                <span class="qid">{{
+                  item.question ? 'F-' + item.question.id : 'Bestand'
+                }}</span>
+                <b>{{ item.question?.text ?? 'Ganzer Fragenbestand' }}</b>
+              </span>
+              <span class="tbl-kind" role="cell">
+                <i class="sev-dot"></i>
+                <span
+                  ><b>{{ kind(item) }}</b
+                  ><small>{{ severity(item) }}</small></span
+                >
+              </span>
+              <span class="tbl-bullet" role="cell">
+                <ng-container
+                  *ngTemplateOutlet="bulletTpl; context: { $implicit: b }"
+                />
+              </span>
+              <span class="tbl-act" role="cell">
+                @if (item.hint.ignored) {
+                  <button
+                    type="button"
+                    class="act-btn"
+                    (click)="ignoreOne.emit({ item, ignored: false })"
+                  >
+                    Wieder öffnen
+                  </button>
+                } @else {
+                  <button type="button" class="act-btn" (click)="act.emit(item)">
+                    {{ actionOf(item)
+                    }}<css-icon icon="arrow-right" size="xs"></css-icon>
+                  </button>
+                }
+              </span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  @case ('p2') {
+    @if (!items().length || (!shown().length && !showIgnored())) {
+      <section class="panel"><ng-container *ngTemplateOutlet="calm" /></section>
+    } @else {
+      <div class="case">
+        <aside class="case-nav">
+          <header class="case-nav-head">
+            <b>{{ showIgnored() ? 'Ignoriert' : 'Offen' }}</b>
+            <span>{{ shown().length }}</span>
+            @if (ignored().length || showIgnored()) {
+              <button type="button" class="quiet" (click)="toggleIgnored()">
+                {{ showIgnored() ? 'Offene' : 'Ignorierte' }}
+              </button>
+            }
+          </header>
+          @for (item of shown(); track item.hint.key) {
+            <button
+              type="button"
+              class="case-item"
+              [attr.data-sev]="item.hint.severity"
+              [class.is-on]="picked()?.hint?.key === item.hint.key"
+              (click)="pickKey.set(item.hint.key)"
+            >
+              <i class="sev-dot"></i>
+              <span class="case-item-text">
+                <b>{{ item.question?.text ?? 'Ganzer Fragenbestand' }}</b>
+                <small>{{ kind(item) }} · {{ bullet(item).label }}</small>
+              </span>
+            </button>
+          }
+        </aside>
+        @if (picked(); as item) {
+          @let b = bullet(item);
+          <article class="case-main" [attr.data-sev]="item.hint.severity">
+            <header class="case-head">
+              <span class="pill"
+                ><i class="sev-dot"></i>{{ severity(item) }} · {{ kind(item) }}</span
+              >
+              <span class="case-ref">{{
+                item.question
+                  ? 'F-' + item.question.id + ' · ' + item.question.category
+                  : 'Fragenbestand'
+              }}</span>
+            </header>
+            <h2 class="case-title">{{ item.question?.text ?? item.text.title }}</h2>
+            <div class="case-metric">
+              <span class="case-big">{{ b.label }}</span>
+              <span class="case-cap">{{ b.caption }}</span>
+              <div class="case-bullet">
+                <ng-container
+                  *ngTemplateOutlet="bulletTpl; context: { $implicit: b }"
+                />
+              </div>
+            </div>
+            @if (item.question) {
+              <section class="ans">
+                <h3>So antworten die Spielenden</h3>
+                @for (a of answers(item); track a.letter) {
+                  <div class="ans-row" [attr.data-kind]="a.kind">
+                    <span class="ans-letter">{{ a.letter }}</span>
+                    <span class="ans-text">
+                      {{ a.text }}
+                      @if (a.kind === 'ok') {
+                        <em>richtig</em>
+                      } @else if (a.kind === 'lure') {
+                        <em>lockt</em>
+                      }
+                    </span>
+                    <span class="ans-bar"
+                      ><span [style.width.%]="a.share * 100"></span
+                    ></span>
+                    <span class="ans-val">{{ percent(a.share) }}</span>
+                  </div>
+                }
+              </section>
+            }
+            <section class="rec">
+              <h3>Empfehlung</h3>
+              <p>{{ item.text.advice }}</p>
+            </section>
+            <footer class="case-foot">
+              <button
+                type="button"
+                class="quiet"
+                (click)="ignoreOne.emit({ item, ignored: !item.hint.ignored })"
+              >
+                {{ item.hint.ignored ? 'Wieder öffnen' : 'Ignorieren' }}
+              </button>
+              @if (!item.hint.ignored) {
+                @if (item.question?.active) {
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    (click)="pauseOne.emit(item)"
+                  >
+                    Pausieren
+                  </button>
+                }
+                <button type="button" class="btn-primary" (click)="act.emit(item)">
+                  {{ actionOf(item) }}
+                </button>
+              }
+            </footer>
+          </article>
+        }
+      </div>
+    }
+  }
+
+  @case ('p3') {
+    <article class="report">
+      <header class="report-head">
+        <div>
+          <p class="report-kicker">Prüfbericht · Stand heute</p>
+          <h2>
+            @if (!judged()) {
+              Noch keine Frage beurteilt
+            } @else if (!open().length) {
+              Alle Prüfungen bestanden
+            } @else {
+              {{ checks().length - passed() }} von {{ checks().length }} Prüfungen
+              mit Befund
+            }
+          </h2>
+          <p>
+            {{ judged() }} aktive Fragen mit mindestens 20 Antworten geprüft ·
+            Fragenqualität {{ quality() === null ? '–' : percent(quality()) }}
+          </p>
+        </div>
+        <span class="stamp" [class.is-ok]="!open().length">
+          <css-icon
+            [attr.icon]="open().length ? 'priority-warning' : 'checkmark'"
+            size="sm"
+          ></css-icon>
+          {{
+            open().length
+              ? open().length + ' Befunde'
+              : judged()
+                ? 'In Ordnung'
+                : 'Wartet auf Antworten'
+          }}
+        </span>
+      </header>
+      @for (c of checks(); track c.id; let n = $index) {
+        <section class="report-sec">
+          <header class="report-sec-head">
+            <span class="report-no">{{ n + 1 }}</span>
+            <div>
+              <h3>{{ c.title }}</h3>
+              <p>{{ c.limit }}</p>
+            </div>
+            <span class="verdict" [class.is-bad]="c.items.length">
+              {{
+                c.items.length
+                  ? c.items.length + ' Befund' + (c.items.length === 1 ? '' : 'e')
+                  : judged()
+                    ? 'Bestanden'
+                    : 'Noch nicht beurteilt'
+              }}
+            </span>
+          </header>
+          @for (item of c.items; track item.hint.key) {
+            @let b = bullet(item);
+            <div class="report-row" [attr.data-sev]="item.hint.severity">
+              <span class="report-q">
+                <span class="qid">{{
+                  item.question ? 'F-' + item.question.id : 'Bestand'
+                }}</span>
+                {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+              </span>
+              <span class="report-bullet"
+                ><ng-container
+                  *ngTemplateOutlet="bulletTpl; context: { $implicit: b }"
+              /></span>
+              <button type="button" class="act-btn" (click)="act.emit(item)">
+                {{ actionOf(item)
+                }}<css-icon icon="arrow-right" size="xs"></css-icon>
+              </button>
+            </div>
+          }
+        </section>
+      }
+      @if (ignored().length) {
+        <footer class="report-foot">
+          {{ ignored().length }} Hinweis{{ ignored().length === 1 ? '' : 'e' }}
+          bewusst ignoriert.
+        </footer>
+      }
+    </article>
+  }
+}
+
+<ng-template #bulletTpl let-b>
+  <span class="bullet">
+    <span class="bullet-track">
+      @if (b.band; as band) {
+        <span
+          class="bullet-band"
+          [style.left.%]="band[0] * 100"
+          [style.width.%]="(band[1] - band[0]) * 100"
+        ></span>
+      }
+      @if (b.compare; as c) {
+        <span class="bullet-mark is-ok" [style.left.%]="c.value * 100"></span>
+      }
+      <span class="bullet-fill" [style.width.%]="b.value * 100"></span>
+      <span class="bullet-mark" [style.left.%]="b.value * 100"></span>
+    </span>
+    <b class="bullet-val">{{ b.label }}</b>
+  </span>
+</ng-template>
+
+<ng-template #calm>
+  <div class="calm">
+    <span class="calm-icon"><css-icon icon="checkmark" size="sm"></css-icon></span>
+    <div>
+      <b>{{ showIgnored() ? 'Nichts ignoriert' : 'Nichts zu tun' }}</b>
+      <p>
+        Keine Frage fällt auf. Hinweise erscheinen hier, sobald eine Frage auffällt.
+      </p>
+    </div>
+  </div>
+</ng-template>

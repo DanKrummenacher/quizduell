@@ -1,0 +1,1226 @@
+// Temporary: second round of drafts of the hints page.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+$crit: #b42318;
+$high: #b54708;
+$med: #8a6a00;
+
+@mixin sev-colors {
+  &[data-severity='critical'] {
+    --sev: #{$crit};
+    --sev-bg: #fdf0ee;
+  }
+
+  &[data-severity='high'] {
+    --sev: #{$high};
+    --sev-bg: #fdf4ea;
+  }
+
+  &[data-severity='medium'] {
+    --sev: #{$med};
+    --sev-bg: #fbf6e6;
+  }
+}
+
+.dot {
+  @include sev-colors;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: t.$text;
+  font-size: 15px;
+  font-weight: t.$bold;
+
+  * + & {
+    margin-top: 32px;
+  }
+}
+
+.eyebrow-count {
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px t.$line;
+  color: t.$text-2;
+  font-size: 12px;
+  font-weight: t.$bold;
+  line-height: 20px;
+  @include t.numeric;
+}
+
+// Rows that open the drawer.
+.rows .row {
+  @include sev-colors;
+  border-top: 1px solid t.$line-soft;
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  .sev {
+    flex: none;
+  }
+
+  @media (max-width: 760px) {
+    flex-wrap: wrap;
+
+    .row-text {
+      flex-basis: calc(100% - 80px);
+    }
+
+    .sev {
+      margin-left: 52px;
+    }
+  }
+}
+
+.row-metric {
+  flex: none;
+  width: 120px;
+  color: t.$text-2;
+  font-size: 13px;
+  text-align: right;
+  @include t.numeric;
+
+  @media (max-width: 760px) {
+    width: auto;
+    margin-left: auto;
+  }
+}
+
+// h6: the state in one sentence.
+.lage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px 24px;
+  margin-bottom: 36px;
+  padding: 24px 28px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+
+  &[data-tone='critical'] {
+    --tone: #{$crit};
+    --tone-bg: #fdf0ee;
+    border-color: rgba(180, 35, 24, 0.25);
+  }
+
+  &[data-tone='high'] {
+    --tone: #{$high};
+    --tone-bg: #fdf4ea;
+  }
+
+  &[data-tone='medium'] {
+    --tone: #{$med};
+    --tone-bg: #fbf6e6;
+  }
+
+  &[data-tone='ok'] {
+    --tone: #2e8540;
+    --tone-bg: #e8f4ec;
+  }
+
+  @media (max-width: 640px) {
+    padding: 18px;
+  }
+}
+
+.lage-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--tone-bg);
+  color: var(--tone);
+}
+
+.lage-text {
+  flex: 1 1 280px;
+  min-width: 0;
+
+  h2 {
+    font-size: 22px;
+    font-weight: t.$bold;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin-top: 4px;
+    color: t.$text-2;
+    font-size: 14px;
+  }
+}
+
+.lage-meter {
+  display: grid;
+  flex: 0 1 380px;
+  gap: 10px;
+  min-width: 240px;
+
+  @media (max-width: 640px) {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+}
+
+.meter {
+  display: flex;
+  gap: 2px;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.meter-part {
+  @include sev-colors;
+  flex-basis: 0;
+  background: var(--sev);
+}
+
+.meter-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+
+.legend-item {
+  @include sev-colors;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: t.$text;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  @include t.numeric;
+
+  &:hover {
+    background: t.$bg-hover;
+  }
+
+  &.is-active {
+    border-color: t.$text;
+  }
+}
+
+.next {
+  @include sev-colors;
+  display: grid;
+  gap: 16px;
+  padding: 24px 28px;
+  border-left: 3px solid var(--sev);
+
+  @media (max-width: 640px) {
+    padding: 18px 16px;
+  }
+}
+
+.next-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  .detail-top {
+    margin-bottom: 4px;
+  }
+}
+
+.next-body {
+  display: grid;
+  gap: 16px;
+  max-width: 860px;
+  padding-left: 52px;
+
+  @media (max-width: 640px) {
+    padding-left: 0;
+  }
+}
+
+// h7: three panes like a mail app.
+.inbox {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 340px) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 200px minmax(0, 1fr);
+
+    .inbox-detail {
+      grid-column: 2;
+    }
+  }
+
+  @media (max-width: 760px) {
+    grid-template-columns: minmax(0, 1fr);
+
+    .inbox-detail {
+      grid-column: auto;
+    }
+  }
+}
+
+.inbox-nav {
+  position: sticky;
+  top: 90px;
+  display: grid;
+  gap: 2px;
+
+  @media (max-width: 760px) {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    .nav-title {
+      display: none;
+    }
+
+    .nav-btn {
+      width: auto;
+      border: 1px solid $hair;
+      background: #fff;
+    }
+  }
+}
+
+.nav-title {
+  margin: 16px 0 6px 10px;
+  color: t.$text-3;
+  font-size: 12px;
+  font-weight: t.$medium;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.nav-btn {
+  @include sev-colors;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: t.$text;
+  font: inherit;
+  font-size: 13.5px;
+  text-align: left;
+  cursor: pointer;
+
+  css-icon {
+    color: t.$text-3;
+  }
+
+  &:hover:not(:disabled) {
+    background: rgba(0, 50, 125, 0.05);
+  }
+
+  &.is-active {
+    background: #fff;
+    box-shadow: inset 0 0 0 1px t.$line;
+    font-weight: t.$medium;
+  }
+
+  &:disabled {
+    color: t.$text-4;
+    cursor: default;
+  }
+}
+
+.nav-count {
+  margin-left: auto;
+  color: t.$text-3;
+  font-size: 12.5px;
+  @include t.numeric;
+}
+
+.inbox-list {
+  display: grid;
+  gap: 6px;
+}
+
+.inbox-list-head {
+  margin: 0 0 4px 2px;
+  font-size: 13.5px;
+  font-weight: t.$bold;
+  @include t.numeric;
+
+  span {
+    margin-left: 4px;
+    color: t.$text-3;
+    font-weight: t.$regular;
+  }
+}
+
+.mail {
+  @include sev-colors;
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.22);
+  }
+
+  &.is-selected {
+    border-color: t.$text;
+    box-shadow: inset 0 0 0 1px t.$text;
+  }
+
+  b {
+    font-size: 14px;
+  }
+}
+
+.mail-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mail-id {
+  margin-left: auto;
+  color: t.$text-3;
+  font-size: 12px;
+  @include t.numeric;
+}
+
+.mail-q {
+  overflow: hidden;
+  color: t.$text-2;
+  font-size: 12.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inbox-empty {
+  grid-column: 2 / -1;
+
+  @media (max-width: 760px) {
+    grid-column: auto;
+  }
+}
+
+// h8: one line of figures, then question by question.
+.strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 36px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+
+  @media (max-width: 760px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.strip-item {
+  display: grid;
+  gap: 2px;
+  padding: 18px 22px;
+  border-left: 1px solid t.$line-soft;
+
+  &:first-child {
+    border-left: 0;
+  }
+
+  &.is-lead .strip-value {
+    color: $blue;
+  }
+
+  @media (max-width: 760px) {
+    &:nth-child(3) {
+      border-left: 0;
+    }
+
+    &:nth-child(n + 3) {
+      border-top: 1px solid t.$line-soft;
+    }
+  }
+}
+
+.strip-value {
+  font-size: 32px;
+  font-weight: t.$bold;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  @include t.numeric;
+
+  @media (max-width: 480px) {
+    font-size: 24px;
+  }
+}
+
+.strip-label {
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.pool {
+  @include sev-colors;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 18px;
+  padding: 20px 24px;
+
+  h3 {
+    margin: 4px 0 2px;
+    font-size: 16px;
+    font-weight: t.$bold;
+  }
+}
+
+.pool-text {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.pool-actions {
+  display: flex;
+  gap: 8px;
+
+  a,
+  button {
+    gap: 6px;
+  }
+}
+
+.qcards {
+  display: grid;
+  gap: 16px;
+}
+
+.qcard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  padding: 0;
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.qcard-q {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 22px 24px;
+  border-right: 1px solid t.$line-soft;
+
+  .question-text {
+    margin-bottom: 6px;
+  }
+
+  @media (max-width: 900px) {
+    border-right: 0;
+    border-bottom: 1px solid t.$line-soft;
+  }
+
+  @media (max-width: 640px) {
+    padding: 18px 16px;
+  }
+}
+
+.qcard-hints {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 22px 24px;
+
+  @media (max-width: 640px) {
+    padding: 18px 16px;
+  }
+}
+
+.qhint {
+  display: grid;
+  gap: 8px;
+}
+
+.qhint-title {
+  font-size: 17px;
+}
+
+// h9: three columns, their heads are the figures.
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.col {
+  @include sev-colors;
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(0, 50, 125, 0.035);
+}
+
+.col-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 0 10px;
+  padding: 8px 10px 6px;
+}
+
+.col-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: t.$bold;
+
+  .dot {
+    background: var(--sev);
+  }
+}
+
+.col-value {
+  grid-row: span 2;
+  align-self: center;
+  font-size: 32px;
+  font-weight: t.$bold;
+  letter-spacing: -0.025em;
+  @include t.numeric;
+}
+
+.col-note {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.col-empty {
+  padding: 18px 10px 22px;
+  color: t.$text-3;
+  font-size: 13px;
+  text-align: center;
+}
+
+.tile {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.22);
+    box-shadow: 0 10px 24px -18px rgba(0, 40, 100, 0.5);
+  }
+
+  b {
+    font-size: 14.5px;
+  }
+
+  .hint-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+}
+
+.tile-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+
+.tile-kind {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.tile-q {
+  display: -webkit-box;
+  overflow: hidden;
+  color: t.$text-2;
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tile-metric {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid t.$line-soft;
+  color: t.$text;
+  font-size: 12.5px;
+  font-weight: t.$medium;
+  @include t.numeric;
+}
+
+// h10: big tabs as the figures, a task list below.
+.bigtabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  border-bottom: 1px solid t.$line;
+  scrollbar-width: none;
+}
+
+.bigtab {
+  @include sev-colors;
+  display: grid;
+  flex: none;
+  gap: 2px;
+  min-width: 128px;
+  padding: 10px 18px 14px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  background: none;
+  color: t.$text-3;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: t.$text;
+  }
+
+  &.is-active {
+    border-bottom-color: t.$text;
+    color: t.$text;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  &.is-end {
+    margin-left: auto;
+  }
+
+  .dot {
+    background: var(--sev);
+  }
+
+  @media (max-width: 640px) {
+    min-width: 0;
+    padding: 8px 12px 12px;
+
+    &.is-end {
+      margin-left: 0;
+    }
+  }
+}
+
+.bigtab-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+  white-space: nowrap;
+}
+
+.bigtab-value {
+  color: t.$text;
+  font-size: 28px;
+  font-weight: t.$bold;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  @include t.numeric;
+
+  @media (max-width: 640px) {
+    font-size: 22px;
+  }
+}
+
+.task {
+  @include sev-colors;
+  border-top: 1px solid t.$line-soft;
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  &.is-open {
+    background: t.$bg-subtle;
+  }
+
+  .chev {
+    transform: rotate(45deg);
+  }
+
+  &.is-open .chev {
+    transform: rotate(-135deg);
+  }
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 22px;
+  box-shadow: inset 3px 0 0 var(--sev);
+
+  @media (max-width: 900px) {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+  }
+}
+
+.task-text {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  b {
+    font-size: 15px;
+  }
+
+  > span {
+    color: t.$text-2;
+    font-size: 13px;
+  }
+
+  @media (max-width: 900px) {
+    flex-basis: calc(100% - 60px);
+  }
+}
+
+.task-q {
+  overflow: hidden;
+  color: t.$text-3 !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+
+  a,
+  button {
+    gap: 6px;
+  }
+
+  @media (max-width: 900px) {
+    width: 100%;
+    padding-left: 54px;
+  }
+}
+
+.task-detail {
+  display: grid;
+  gap: 14px;
+  max-width: 720px;
+  padding: 0 22px 22px 76px;
+
+  @media (max-width: 900px) {
+    padding: 0 16px 18px;
+  }
+}
+
+// h11: a short written report, then the hints by kind.
+.brief {
+  margin-bottom: 36px;
+  padding: 26px 30px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background:
+    radial-gradient(60% 120% at 100% 0%, rgba(0, 164, 224, 0.1), transparent 70%),
+    #fff;
+
+  @media (max-width: 640px) {
+    padding: 20px 18px;
+  }
+}
+
+.brief-kicker {
+  color: $blue;
+  font-size: 12.5px;
+  font-weight: t.$bold;
+}
+
+.brief-title {
+  margin: 4px 0 14px;
+  font-size: 24px;
+  font-weight: t.$bold;
+  letter-spacing: -0.015em;
+}
+
+.brief-points {
+  display: grid;
+  gap: 10px;
+  max-width: 880px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    color: t.$text-2;
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+
+  .dot {
+    position: relative;
+    top: -2px;
+    background: var(--sev);
+  }
+}
+
+.brief-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: t.$text;
+  font: inherit;
+  font-weight: t.$bold;
+  text-decoration: underline;
+  text-decoration-color: rgba(0, 50, 125, 0.25);
+  text-underline-offset: 3px;
+  cursor: pointer;
+
+  &:hover {
+    color: $blue;
+    text-decoration-color: currentColor;
+  }
+}
+
+.brief-more,
+.brief-text {
+  margin-top: 10px;
+  color: t.$text-2;
+  font-size: 14px;
+}
+
+.brief-foot {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid t.$line-soft;
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.kinds {
+  display: grid;
+  gap: 32px;
+}
+
+.kind-head {
+  margin-bottom: 12px;
+
+  h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: t.$bold;
+  }
+
+  p {
+    margin-top: 2px;
+    color: t.$text-3;
+    font-size: 13.5px;
+  }
+}
+
+// h12: where the questions stand.
+.spread {
+  margin-bottom: 36px;
+  padding: 24px 28px 20px;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+
+  @media (max-width: 640px) {
+    padding: 18px 16px;
+  }
+}
+
+.spread-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 24px;
+  margin-bottom: 22px;
+
+  h2 {
+    font-size: 17px;
+    font-weight: t.$bold;
+  }
+
+  p {
+    margin-top: 2px;
+    color: t.$text-3;
+    font-size: 13.5px;
+  }
+}
+
+.spread-sum {
+  margin: 0 !important;
+  color: t.$text-2 !important;
+  font-size: 13.5px;
+
+  b {
+    color: t.$text;
+    font-size: 15px;
+    @include t.numeric;
+  }
+}
+
+.plot {
+  position: relative;
+  height: 108px;
+  margin: 0 6px;
+  border-bottom: 1px solid t.$line;
+}
+
+.zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(0, 50, 125, 0.035) 0 6px,
+    transparent 6px 12px
+  );
+
+  span {
+    position: absolute;
+    top: 6px;
+    color: t.$text-3;
+    font-size: 11.5px;
+    white-space: nowrap;
+  }
+
+  &.is-hard {
+    left: 0;
+    width: 30%;
+    border-right: 1px dashed rgba(0, 50, 125, 0.2);
+
+    span {
+      left: 8px;
+    }
+  }
+
+  &.is-easy {
+    left: 95%;
+    right: 0;
+    border-left: 1px dashed rgba(0, 50, 125, 0.2);
+
+    span {
+      right: 8px;
+    }
+  }
+}
+
+.pt {
+  @include sev-colors;
+  position: absolute;
+  bottom: calc(10px + var(--lane) * 17px);
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #a9bdd6;
+
+  &.is-flagged {
+    z-index: 1;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    background: var(--sev);
+    cursor: pointer;
+
+    &:hover {
+      transform: scale(1.2);
+    }
+  }
+}
+
+.axis {
+  position: relative;
+  height: 22px;
+  margin: 0 6px;
+
+  span {
+    position: absolute;
+    top: 6px;
+    color: t.$text-3;
+    font-size: 11.5px;
+    transform: translateX(-50%);
+    @include t.numeric;
+
+    &:first-child {
+      transform: none;
+    }
+  }
+}
+
+.spread-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-top: 10px;
+  color: t.$text-2;
+  font-size: 12.5px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.pt-key {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #a9bdd6;
+
+  &.is-high {
+    background: $high;
+  }
+
+  &.is-medium {
+    background: $med;
+  }
+}
+
+.spread-empty {
+  padding: 24px 0 12px;
+  color: t.$text-3;
+  font-size: 13.5px;
+}
+
+// A small tooltip, as on the other pages.
+[data-tip] {
+  &::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    z-index: 5;
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: t.$text;
+    color: #fff;
+    font-size: 12px;
+    font-weight: t.$medium;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 4px);
+    transition:
+      opacity 0.12s ease,
+      transform 0.12s ease;
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.icon-btn[data-tip] {
+  position: relative;
+}
+
+// The checks inside the state on top, without their own box.
+.lage-checks,
+.brief-checks {
+  flex-basis: 100%;
+
+  .checks {
+    width: auto;
+    margin: 0;
+    padding: 16px 0 0;
+    border: 0;
+    border-top: 1px solid t.$line-soft;
+    border-radius: 0;
+    background: none;
+
+    ul {
+      grid-template-columns: repeat(4, auto);
+      justify-content: start;
+      gap: 8px 28px;
+
+      @media (max-width: 1024px) {
+        grid-template-columns: repeat(2, auto);
+      }
+
+      @media (max-width: 560px) {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  }
+}
+
+.brief-checks {
+  margin-top: 16px;
+}
+
+.axis span {
+  white-space: nowrap;
+}

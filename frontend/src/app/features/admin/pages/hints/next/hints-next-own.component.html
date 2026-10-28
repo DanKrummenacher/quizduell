@@ -1,0 +1,394 @@
+@switch (variant()) {
+  @case ('w1') {
+    <section class="strip" aria-label="Laufend geprüft">
+      <header class="strip-head">
+        <div>
+          <h2>Laufend geprüft</h2>
+          <p>
+            {{ passed() }} von {{ checks().length }} Prüfungen ohne Befund ·
+            {{ judged() }} Fragen beurteilt
+          </p>
+        </div>
+        <span class="strip-quality">
+          Fragenqualität <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+        </span>
+      </header>
+      <ol class="strip-steps">
+        @for (c of checks(); track c.id) {
+          <li>
+            <button
+              type="button"
+              class="strip-step"
+              [class.is-bad]="c.count"
+              [class.is-active]="check() === c.id"
+              [disabled]="!c.count"
+              [attr.aria-pressed]="check() === c.id"
+              (click)="pickCheck(c.id)"
+            >
+              <span class="strip-node" aria-hidden="true">
+                <css-icon
+                  [attr.icon]="c.count ? 'priority-warning' : 'checkmark'"
+                  size="xs"
+                ></css-icon>
+              </span>
+              <span class="strip-text">
+                <b>{{ c.title }}</b>
+                <span>{{ c.limit }}</span>
+              </span>
+              <span class="strip-state">{{
+                c.count ? c.count + ' auffällig' : 'Bestanden'
+              }}</span>
+            </button>
+          </li>
+        }
+      </ol>
+    </section>
+
+    <section class="card">
+      <header class="card-head">
+        <div>
+          <h2>{{ showIgnored() ? 'Ignorierte Hinweise' : 'Befunde' }}</h2>
+          <p>So verteilen sich die Antworten der Spielenden</p>
+        </div>
+        <div class="legend" aria-hidden="true">
+          <span><i class="is-ok"></i>Richtig</span>
+          <span><i class="is-lure"></i>Lockt</span>
+          <span><i></i>Falsch</span>
+          <span><i class="is-time"></i>Ohne Antwort</span>
+        </div>
+      </header>
+      @for (item of shown(); track item.hint.key) {
+        <div class="finding" [attr.data-severity]="item.hint.severity">
+          <div class="finding-q">
+            <span class="sev"
+              ><i></i>{{ severityOf(item) }} · {{ kindOf(item) }}</span
+            >
+            <b>
+              @if (item.question) {
+                <span class="qid">F-{{ item.question.id }}</span>
+              }
+              {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+            </b>
+          </div>
+          @if (item.question) {
+            <span class="split" role="img" [attr.aria-label]="item.text.finding">
+              @for (seg of segments(item); track $index) {
+                <span
+                  class="split-part"
+                  [attr.data-kind]="seg.kind"
+                  [style.flex-grow]="seg.share"
+                >
+                  @if (seg.share >= 0.12) {
+                    <em>{{ seg.letter }} {{ percent(seg.share) }}</em>
+                  }
+                </span>
+              }
+            </span>
+          } @else {
+            <span class="split is-pool">
+              <span
+                class="split-part"
+                data-kind="pool"
+                [style.flex-grow]="item.hint.value"
+                ><em>{{ item.hint.value }} aktiv</em></span
+              >
+              <span
+                class="split-part"
+                data-kind="empty"
+                [style.flex-grow]="item.hint.sample - item.hint.value"
+                ><em>Ziel {{ item.hint.sample }}</em></span
+              >
+            </span>
+          }
+          <button
+            type="button"
+            class="btn-secondary btn-sm finding-do"
+            (click)="act.emit(item)"
+          >
+            {{ actionOf(item) }}
+          </button>
+        </div>
+      } @empty {
+        <ng-container *ngTemplateOutlet="calm" />
+      }
+      @if (ignoredCount() || showIgnored()) {
+        <button type="button" class="card-foot" (click)="toggleIgnored()">
+          {{
+            showIgnored()
+              ? 'Zurück zu den offenen Befunden'
+              : ignoredCount() + ' ignoriert anzeigen'
+          }}
+        </button>
+      }
+    </section>
+  }
+
+  @case ('w2') {
+    @if (!items().length) {
+      <section class="card"><ng-container *ngTemplateOutlet="calm" /></section>
+    } @else {
+      <div class="case">
+        <aside class="card case-list">
+          <header class="case-list-head">
+            <b
+              >{{ showIgnored() ? 'Ignoriert' : 'Offen' }}
+              <span>{{ shown().length }}</span></b
+            >
+            <button type="button" class="link" (click)="toggleIgnored()">
+              {{ showIgnored() ? 'Offene' : 'Ignorierte (' + ignoredCount() + ')' }}
+            </button>
+          </header>
+          @for (item of shown(); track item.hint.key) {
+            <button
+              type="button"
+              class="case-item"
+              [attr.data-severity]="item.hint.severity"
+              [class.is-active]="selected()?.hint?.key === item.hint.key"
+              (click)="selectedKey.set(item.hint.key)"
+            >
+              <span class="case-item-top">
+                <span class="sev"><i></i>{{ severityOf(item) }}</span>
+                <span class="case-item-val">{{ measured(item) }}</span>
+              </span>
+              <b>{{ item.question?.text ?? 'Ganzer Fragenbestand' }}</b>
+              <small>{{ kindOf(item) }}</small>
+            </button>
+          } @empty {
+            <p class="case-none">
+              Nichts {{ showIgnored() ? 'ignoriert' : 'offen' }}.
+            </p>
+          }
+        </aside>
+        @if (selected(); as item) {
+          <article class="card case-file" [attr.data-severity]="item.hint.severity">
+            <header class="case-head">
+              <span class="sev"
+                ><i></i>{{ severityOf(item) }} · {{ kindOf(item) }}</span
+              >
+              <span class="case-ref">{{
+                item.question
+                  ? 'F-' + item.question.id + ' · ' + item.question.category
+                  : 'Fragenbestand'
+              }}</span>
+            </header>
+            <div class="case-body">
+              <h2>{{ item.question?.text ?? item.text.title }}</h2>
+              @if (item.question; as q) {
+                <div class="case-split">
+                  <span class="split is-big">
+                    @for (seg of segments(item); track $index) {
+                      <span
+                        class="split-part"
+                        [attr.data-kind]="seg.kind"
+                        [style.flex-grow]="seg.share"
+                      >
+                        @if (seg.share >= 0.1) {
+                          <em>{{ seg.letter }} {{ percent(seg.share) }}</em>
+                        }
+                      </span>
+                    }
+                  </span>
+                  <ol class="case-answers">
+                    @for (seg of segments(item); track $index) {
+                      <li [attr.data-kind]="seg.kind">
+                        <i></i
+                        ><span>{{
+                          seg.letter ? seg.letter + ' · ' + seg.text : seg.text
+                        }}</span
+                        ><b>{{ percent(seg.share) }}</b>
+                      </li>
+                    }
+                  </ol>
+                </div>
+                @let f = facts(q);
+                <dl class="case-facts">
+                  <div
+                    [class.is-bad]="
+                      item.hint.type === 'hard' || item.hint.type === 'easy'
+                    "
+                  >
+                    <dt>Richtig</dt>
+                    <dd>{{ percent(f.rate) }}</dd>
+                    @if (averageRate() !== null) {
+                      <small>Schnitt {{ percent(averageRate()) }}</small>
+                    }
+                  </div>
+                  <div [class.is-bad]="item.hint.type === 'timeouts'">
+                    <dt>Ohne Antwort</dt>
+                    <dd>{{ percent(f.timeouts) }}</dd>
+                    <small>Grenze 20 %</small>
+                  </div>
+                  <div>
+                    <dt>Ø Zeit</dt>
+                    <dd>{{ f.seconds }} s</dd>
+                    <small>{{ f.answers }} Antworten</small>
+                  </div>
+                </dl>
+              } @else {
+                <dl class="case-facts">
+                  <div class="is-bad">
+                    <dt>Aktive Fragen</dt>
+                    <dd>{{ item.hint.value }}</dd>
+                    <small>empfohlen {{ item.hint.sample }}</small>
+                  </div>
+                </dl>
+              }
+              <div class="case-advice">
+                <b>Empfehlung</b>
+                <p>{{ item.text.advice }}</p>
+              </div>
+            </div>
+            <footer class="case-foot">
+              <button
+                type="button"
+                class="link is-quiet"
+                (click)="ignoreOne.emit({ item, ignored: !item.hint.ignored })"
+              >
+                {{ item.hint.ignored ? 'Wieder öffnen' : 'Ignorieren' }}
+              </button>
+              @if (item.question?.active) {
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="pauseOne.emit(item)"
+                >
+                  Pausieren
+                </button>
+              }
+              <button type="button" class="btn-primary" (click)="act.emit(item)">
+                {{ actionOf(item) }}
+              </button>
+            </footer>
+          </article>
+        } @else {
+          <section class="card case-file">
+            <ng-container *ngTemplateOutlet="calm" />
+          </section>
+        }
+      </div>
+    }
+  }
+
+  @case ('w3') {
+    <section class="card spectrum">
+      <header class="card-head">
+        <div>
+          <h2>Wie schwer die Fragen sind</h2>
+          <p>Jeder Punkt eine aktive Frage mit mindestens 20 Antworten</p>
+        </div>
+        <span class="strip-quality">
+          Im guten Bereich <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+        </span>
+      </header>
+      @if (dots().length) {
+        <div class="spec">
+          <div class="spec-plot">
+            <span class="spec-zone is-low"><em>Zu schwer</em></span>
+            <span class="spec-zone is-good"><em>Gut spielbar</em></span>
+            <span class="spec-zone is-high"><em>Zu leicht</em></span>
+            @for (dot of dots(); track dot.id) {
+              <span
+                class="spec-dot"
+                [class.is-flagged]="dot.flagged"
+                [style.left.%]="dot.rate * 100"
+                [style.--lane]="dot.lane"
+              >
+                @if (dot.flagged) {
+                  <em>F-{{ dot.id }}</em>
+                }
+              </span>
+            }
+          </div>
+          <div class="spec-axis" aria-hidden="true">
+            <span style="left: 0">0 %</span>
+            <span style="left: 30%">30 %</span>
+            <span style="left: 95%">95 %</span>
+          </div>
+        </div>
+      } @else {
+        <p class="note">Erscheint, sobald Fragen 20 Antworten haben.</p>
+      }
+    </section>
+    <div class="tiles">
+      @for (item of shown(); track item.hint.key) {
+        <article class="card tile" [attr.data-severity]="item.hint.severity">
+          <header class="tile-head">
+            <span class="sev"
+              ><i></i>{{ severityOf(item) }} · {{ kindOf(item) }}</span
+            >
+            <span class="tile-val">{{ measured(item) }}</span>
+          </header>
+          <h3>{{ item.question?.text ?? 'Der ganze Fragenbestand' }}</h3>
+          @if (item.question) {
+            <span class="split">
+              @for (seg of segments(item); track $index) {
+                <span
+                  class="split-part"
+                  [attr.data-kind]="seg.kind"
+                  [style.flex-grow]="seg.share"
+                ></span>
+              }
+            </span>
+          } @else {
+            <span class="split is-pool">
+              <span
+                class="split-part"
+                data-kind="pool"
+                [style.flex-grow]="item.hint.value"
+              ></span>
+              <span
+                class="split-part"
+                data-kind="empty"
+                [style.flex-grow]="item.hint.sample - item.hint.value"
+              ></span>
+            </span>
+          }
+          <p class="tile-advice">{{ item.text.advice }}</p>
+          <footer class="tile-foot">
+            <button
+              type="button"
+              class="link is-quiet"
+              (click)="ignoreOne.emit({ item, ignored: !item.hint.ignored })"
+            >
+              {{ item.hint.ignored ? 'Wieder öffnen' : 'Ignorieren' }}
+            </button>
+            <button
+              type="button"
+              class="btn-secondary btn-sm"
+              (click)="act.emit(item)"
+            >
+              {{ actionOf(item) }}
+            </button>
+          </footer>
+        </article>
+      } @empty {
+        <section class="card"><ng-container *ngTemplateOutlet="calm" /></section>
+      }
+    </div>
+    @if (ignoredCount() || showIgnored()) {
+      <button type="button" class="link tiles-more" (click)="toggleIgnored()">
+        {{
+          showIgnored()
+            ? 'Zurück zu den offenen Hinweisen'
+            : ignoredCount() + ' ignoriert anzeigen'
+        }}
+      </button>
+    }
+  }
+}
+
+<ng-template #calm>
+  <div class="calm">
+    <span class="calm-icon"><css-icon icon="checkmark" size="sm"></css-icon></span>
+    <div>
+      <b>{{ showIgnored() ? 'Nichts ignoriert' : 'Nichts zu tun' }}</b>
+      <p>
+        {{
+          showIgnored()
+            ? 'Ignorierte Hinweise erscheinen hier und lassen sich wieder öffnen.'
+            : 'Keine Frage fällt auf. Hinweise erscheinen hier, sobald eine Frage auffällt.'
+        }}
+      </p>
+    </div>
+  </div>
+</ng-template>

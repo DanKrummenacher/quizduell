@@ -1,0 +1,753 @@
+@switch (variant()) {
+  @case ('t1') {
+    <div class="ws">
+      <section class="card ws-map" aria-labelledby="ws-map-title">
+        <header class="card-head">
+          <div>
+            <h2 id="ws-map-title">Fragenkarte</h2>
+            <p>
+              Jede Frage mit mindestens 20 Antworten. Im Feld liegt, was besteht.
+            </p>
+          </div>
+          <div class="figure-inline">
+            <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+            <span>Fragenqualität</span>
+          </div>
+        </header>
+        <div class="map">
+          <div class="map-y" aria-hidden="true">
+            <span style="bottom: 100%">40 %</span>
+            <span style="bottom: 50%">20 %</span>
+            <span style="bottom: 0">0 %</span>
+          </div>
+          <div class="map-plot">
+            <span class="map-name is-y" aria-hidden="true">ohne Antwort</span>
+            <div class="map-field" aria-hidden="true"><span>Besteht</span></div>
+            @for (p of mapPoints(); track p.id) {
+              @if (p.n && p.item) {
+                <button
+                  type="button"
+                  class="pt is-mark"
+                  [attr.data-tone]="tone(p.item.hint.severity)"
+                  [class.is-on]="picked()?.hint.questionId === p.id"
+                  [class.is-hover]="hoverId() === p.id"
+                  [class.is-end]="p.x > 70"
+                  [class.is-low]="p.y > 70"
+                  [style.left.%]="p.x"
+                  [style.bottom.%]="p.y"
+                  [attr.aria-label]="p.n + ': ' + (p.text ?? '')"
+                  (click)="pickPoint(p.item)"
+                  (mouseenter)="hoverId.set(p.id)"
+                  (mouseleave)="hoverId.set(null)"
+                  (focus)="hoverId.set(p.id)"
+                  (blur)="hoverId.set(null)"
+                >
+                  {{ p.n }}
+                  <span class="tip"
+                    ><b
+                      >{{ percent(p.rate) }} richtig ·
+                      {{ percent(p.time ?? 0) }} ohne Antwort</b
+                    >{{ p.text }}</span
+                  >
+                </button>
+              } @else {
+                <span
+                  class="pt"
+                  tabindex="0"
+                  [class.is-end]="p.x > 70"
+                  [class.is-low]="p.y > 70"
+                  [style.left.%]="p.x"
+                  [style.bottom.%]="p.y"
+                  [attr.aria-label]="
+                    (p.text ?? '') + ', ' + percent(p.rate) + ' richtig'
+                  "
+                  ><span class="tip"
+                    ><b
+                      >{{ percent(p.rate) }} richtig ·
+                      {{ percent(p.time ?? 0) }} ohne Antwort</b
+                    >{{ p.text }}</span
+                  ></span
+                >
+              }
+            }
+            @if (!spread().length) {
+              <p class="plot-empty">
+                <span>Jede Frage erscheint hier, sobald sie 20 Antworten hat.</span>
+              </p>
+            }
+          </div>
+          <div class="map-x" aria-hidden="true">
+            <span style="left: 0">0 %</span>
+            <span style="left: 30%">30 %</span>
+            <span style="left: 95%">95 %</span>
+            <span class="map-name is-x">richtig beantwortet</span>
+          </div>
+        </div>
+        <footer class="legend">
+          <span><i class="key is-ok"></i>Besteht</span>
+          <span><i class="key is-danger"></i>Bald ansehen</span>
+          <span><i class="key is-warning"></i>Hat Zeit</span>
+        </footer>
+      </section>
+
+      <section class="card ws-list" aria-label="Hinweise">
+        <header class="ws-list-head">
+          <div class="seg" role="group" aria-label="Filter">
+            <button
+              type="button"
+              [class.is-active]="filter() === 'all'"
+              [attr.aria-pressed]="filter() === 'all'"
+              (click)="filter.set('all')"
+            >
+              Alle <span class="seg-n">{{ count('all') }}</span>
+            </button>
+            <button
+              type="button"
+              [class.is-active]="filter() === 'urgent'"
+              [attr.aria-pressed]="filter() === 'urgent'"
+              (click)="filter.set('urgent')"
+            >
+              Bald ansehen <span class="seg-n">{{ count('urgent') }}</span>
+            </button>
+            <button
+              type="button"
+              [class.is-active]="filter() === 'later'"
+              [attr.aria-pressed]="filter() === 'later'"
+              (click)="filter.set('later')"
+            >
+              Hat Zeit <span class="seg-n">{{ count('later') }}</span>
+            </button>
+          </div>
+          @if (ignoredItems().length || showIgnored()) {
+            <button
+              type="button"
+              class="link"
+              (click)="showIgnored.set(!showIgnored())"
+            >
+              {{
+                showIgnored()
+                  ? 'Offene zeigen'
+                  : ignoredItems().length + ' ignoriert'
+              }}
+            </button>
+          }
+        </header>
+        @if (!listed().length) {
+          <div class="empty">
+            <span class="empty-icon"
+              ><css-icon icon="checkmark" size="sm"></css-icon
+            ></span>
+            <b>{{ showIgnored() ? 'Nichts ignoriert' : 'Nichts anzugehen' }}</b>
+            <p>
+              {{
+                judged()
+                  ? 'Jede beurteilte Frage besteht alle Prüfungen.'
+                  : 'Eine Frage wird geprüft, sobald sie 20 Antworten hat.'
+              }}
+            </p>
+          </div>
+        }
+        <ul class="ws-rows">
+          @for (item of listed(); track item.hint.key) {
+            @let on = picked()?.hint.key === item.hint.key;
+            <li
+              class="ws-row"
+              [class.is-on]="on"
+              [class.is-hover]="
+                item.hint.questionId !== null && hoverId() === item.hint.questionId
+              "
+            >
+              <button
+                type="button"
+                class="ws-row-head"
+                [attr.aria-expanded]="on"
+                (click)="pick(item)"
+                (mouseenter)="hoverId.set(item.hint.questionId)"
+                (mouseleave)="hoverId.set(null)"
+                (focus)="hoverId.set(item.hint.questionId)"
+                (blur)="hoverId.set(null)"
+              >
+                <span class="no" [attr.data-tone]="tone(item.hint.severity)">{{
+                  markOf(item.hint.questionId) ?? '!'
+                }}</span>
+                <span class="ws-row-text">
+                  <b>{{ kinds[item.hint.type] }}</b>
+                  <span>{{ item.question?.text ?? 'Ganzer Fragenbestand' }}</span>
+                </span>
+                <span class="badge" [attr.data-tone]="tone(item.hint.severity)">{{
+                  measured(item)
+                }}</span>
+              </button>
+              @if (on) {
+                <div class="ws-detail">
+                  <p class="why">{{ item.text.finding }} {{ item.text.advice }}</p>
+                  @if (item.question) {
+                    <app-ad-answer-distribution [question]="item.question" />
+                  }
+                  <div class="actions">
+                    <button
+                      type="button"
+                      class="btn-primary"
+                      (click)="act.emit(item)"
+                    >
+                      {{ actionOf(item) }}
+                    </button>
+                    @if (item.question?.active) {
+                      <button
+                        type="button"
+                        class="btn-secondary"
+                        (click)="pauseHint.emit(item)"
+                      >
+                        Pausieren
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="btn-ghost"
+                      (click)="ignore.emit({ item, ignored: !item.hint.ignored })"
+                    >
+                      {{ item.hint.ignored ? 'Wieder öffnen' : 'Ignorieren' }}
+                    </button>
+                  </div>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    </div>
+  }
+
+  @case ('t2') {
+    <article class="card report">
+      <header class="report-head">
+        <div class="report-intro">
+          <span class="overline">Qualitätsbericht · Stand {{ checkedAt }}</span>
+          <h2>
+            @if (!judged()) {
+              Noch keine Frage beurteilt
+            } @else if (!open().length) {
+              Alle {{ judged() }} Fragen bestehen jede Prüfung
+            } @else {
+              {{ judged() - flagged() }} von {{ judged() }} Fragen bestehen jede
+              Prüfung
+            }
+          </h2>
+          <p>
+            @if (!judged()) {
+              Eine Frage wird geprüft, sobald sie 20 Antworten hat.
+            } @else {
+              @if (passed()) {
+                {{ passed() }} von {{ sections().length }} Prüfungen ohne Befund.
+              } @else {
+                Jede der {{ sections().length }} Prüfungen hat mindestens einen
+                Befund.
+              }
+              @if (urgent().length) {
+                {{ urgent().length }}
+                {{
+                  urgent().length === 1 ? 'Hinweis solltest' : 'Hinweise solltest'
+                }}
+                du bald ansehen.
+              }
+            }
+          </p>
+        </div>
+        <div class="score">
+          <div class="score-top">
+            <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+            <span>Fragenqualität</span>
+          </div>
+          <div class="score-meter">
+            <span [style.width.%]="(quality() ?? 0) * 100"></span>
+            <i class="score-goal" title="Ziel 95 %"></i>
+          </div>
+          <div class="score-scale"><span>0 %</span><span>Ziel 95 %</span></div>
+        </div>
+      </header>
+
+      @for (s of sections(); track s.id) {
+        <section class="report-sec" [attr.aria-labelledby]="'sec-' + s.id">
+          <div class="report-sec-head">
+            <h3 [id]="'sec-' + s.id">{{ s.title }}</h3>
+            <span
+              class="badge"
+              [attr.data-tone]="s.items.length ? 'danger' : judged() ? 'ok' : null"
+            >
+              @if (s.items.length) {
+                {{ s.items.length }}
+                {{ s.items.length === 1 ? 'Befund' : 'Befunde' }}
+              } @else if (judged()) {
+                <css-icon icon="checkmark" size="xs"></css-icon>Bestanden
+              } @else {
+                Noch nicht geprüft
+              }
+            </span>
+          </div>
+          <p class="report-limit">Grenze: {{ s.limit }}</p>
+
+          @if (s.row) {
+            <div class="strip">
+              <div class="strip-line">
+                <span
+                  class="strip-zone"
+                  [style.left.%]="s.row.zone.from"
+                  [style.width.%]="s.row.zone.to - s.row.zone.from"
+                ></span>
+                @for (d of s.dots; track d.id) {
+                  <span
+                    class="pt is-strip"
+                    tabindex="0"
+                    [class.is-mark]="d.n"
+                    [attr.data-tone]="d.bad ? 'danger' : null"
+                    [class.is-end]="d.x > 70"
+                    [style.left.%]="d.x"
+                    [style.top.px]="32 + d.lane * 9"
+                    [attr.aria-label]="d.label + ', ' + d.text"
+                    >{{ d.n ?? ''
+                    }}<span class="tip"
+                      ><b>{{ d.label }}</b
+                      >{{ d.text }}</span
+                    ></span
+                  >
+                }
+              </div>
+              <div class="strip-ticks" aria-hidden="true">
+                @for (t of s.row.ticks; track t.at) {
+                  <span [style.left.%]="t.at">{{ t.text }}</span>
+                }
+              </div>
+              <p class="strip-axis">{{ s.row.axis }}</p>
+            </div>
+          } @else {
+            @let pool = poolItem();
+            <div class="pool">
+              @if (pool) {
+                <div class="pool-meter">
+                  <span
+                    [style.width.%]="(pool.hint.value / pool.hint.sample) * 100"
+                  ></span>
+                </div>
+                <div class="strip-ticks is-static">
+                  <span>{{ pool.hint.value }} aktive Fragen</span>
+                  <span>empfohlen mind. {{ pool.hint.sample }}</span>
+                </div>
+              } @else {
+                <p class="report-limit">Genug aktive Fragen für jedes Duell.</p>
+              }
+            </div>
+          }
+
+          @if (s.items.length) {
+            <ol class="findings">
+              @for (item of s.items; track item.hint.key) {
+                <li class="finding">
+                  <span class="no" [attr.data-tone]="tone(item.hint.severity)">{{
+                    markOf(item.hint.questionId) ?? '!'
+                  }}</span>
+                  <div class="finding-text">
+                    <b>{{ item.question?.text ?? 'Ganzer Fragenbestand' }}</b>
+                    <span>{{ item.text.finding }}</span>
+                  </div>
+                  <span class="badge" [attr.data-tone]="tone(item.hint.severity)">{{
+                    measured(item)
+                  }}</span>
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    (click)="act.emit(item)"
+                  >
+                    {{ actionOf(item) }}
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    aria-label="Details"
+                    (click)="details.emit(item)"
+                  >
+                    <css-icon icon="angle-right" size="xs"></css-icon>
+                  </button>
+                </li>
+              }
+            </ol>
+          }
+        </section>
+      }
+      @if (ignoredItems().length || showIgnored()) {
+        <footer class="report-foot">
+          <button
+            type="button"
+            class="link"
+            (click)="showIgnored.set(!showIgnored())"
+          >
+            {{
+              showIgnored()
+                ? 'Offene Hinweise zeigen'
+                : ignoredItems().length +
+                  (ignoredItems().length === 1
+                    ? ' ignorierter Hinweis'
+                    : ' ignorierte Hinweise')
+            }}
+          </button>
+        </footer>
+      }
+    </article>
+  }
+
+  @case ('t3') {
+    @let cur = current();
+    @let at = Math.min(index(), Math.max(0, queue().length - 1));
+    <section class="card queue-head">
+      <div class="qh-top">
+        <div>
+          <span class="overline">Durchgehen</span>
+          <h2>
+            @if (cur) {
+              Hinweis {{ at + 1 }} von {{ queue().length }}
+            } @else {
+              Nichts durchzugehen
+            }
+          </h2>
+        </div>
+        <div class="qh-side">
+          @if (ignoredItems().length || showIgnored()) {
+            <button
+              type="button"
+              class="link"
+              (click)="showIgnored.set(!showIgnored()); index.set(0)"
+            >
+              {{
+                showIgnored()
+                  ? 'Offene durchgehen'
+                  : ignoredItems().length + ' ignoriert'
+              }}
+            </button>
+          }
+          <span class="qh-keys"><kbd>←</kbd><kbd>→</kbd> blättern</span>
+        </div>
+      </div>
+      @if (queue().length) {
+        <ol class="qh-steps">
+          @for (item of queue(); track item.hint.key; let i = $index) {
+            <li>
+              <button
+                type="button"
+                [attr.data-tone]="tone(item.hint.severity)"
+                [class.is-on]="i === at"
+                [class.is-done]="done().has(item.hint.key)"
+                [attr.aria-current]="i === at ? 'step' : null"
+                [attr.aria-label]="
+                  'Hinweis ' + (i + 1) + ': ' + kinds[item.hint.type]
+                "
+                (click)="index.set(i)"
+              >
+                <span class="qh-step-label">{{ kinds[item.hint.type] }}</span>
+              </button>
+            </li>
+          }
+        </ol>
+      }
+    </section>
+
+    @if (cur) {
+      <section class="card queue-card" [class.has-side]="cur.question">
+        <div class="qc-main">
+          <div class="qc-tags">
+            <span class="badge" [attr.data-tone]="tone(cur.hint.severity)">{{
+              severities[cur.hint.severity]
+            }}</span>
+            <span class="qc-kind">{{ kinds[cur.hint.type] }}</span>
+            @if (cur.question) {
+              <span class="qc-id"
+                >F-{{ cur.question.id }} · {{ cur.question.category }}</span
+              >
+            }
+          </div>
+          <p class="qc-question">
+            {{ cur.question?.text ?? 'Der ganze Fragenbestand' }}
+          </p>
+          <p class="qc-why">{{ cur.text.finding }}</p>
+          <div class="qc-advice">
+            <css-icon icon="bulb" size="xs"></css-icon>
+            <span>{{ cur.text.advice }}</span>
+          </div>
+          <dl class="qc-facts">
+            <div>
+              <dt>Gemessen</dt>
+              <dd class="is-bad">{{ measured(cur) }}</dd>
+            </div>
+            <div>
+              <dt>Grenze</dt>
+              <dd>{{ limitOf(cur) }}</dd>
+            </div>
+            <div>
+              <dt>Gewertet</dt>
+              <dd>
+                {{ cur.hint.sample }} {{ cur.question ? 'Antworten' : 'nötig' }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+        @if (cur.question) {
+          <div class="qc-side">
+            <span class="overline">So wurde geantwortet</span>
+            <app-ad-answer-distribution [question]="cur.question" />
+          </div>
+        }
+        <footer class="qc-actions">
+          <button type="button" class="btn-primary" (click)="decide('act', cur)">
+            {{ actionOf(cur) }}
+          </button>
+          @if (cur.question?.active) {
+            <button
+              type="button"
+              class="btn-secondary"
+              (click)="decide('pause', cur)"
+            >
+              Pausieren
+            </button>
+          }
+          <button type="button" class="btn-ghost" (click)="decide('ignore', cur)">
+            {{ cur.hint.ignored ? 'Wieder öffnen' : 'Ignorieren' }}
+          </button>
+          <span class="qc-spacer"></span>
+          <button
+            type="button"
+            class="icon-btn is-framed"
+            aria-label="Vorheriger Hinweis"
+            [disabled]="at === 0"
+            (click)="go(-1)"
+          >
+            <css-icon icon="angle-left" size="xs"></css-icon>
+          </button>
+          <button
+            type="button"
+            class="btn-secondary"
+            [disabled]="at >= queue().length - 1"
+            (click)="go(1)"
+          >
+            Überspringen<css-icon icon="angle-right" size="xs"></css-icon>
+          </button>
+        </footer>
+      </section>
+    } @else {
+      <section class="card empty is-card">
+        <span class="empty-icon"
+          ><css-icon icon="checkmark" size="sm"></css-icon
+        ></span>
+        <b>{{ showIgnored() ? 'Nichts ignoriert' : 'Alles durchgesehen' }}</b>
+        <p>
+          {{
+            judged()
+              ? 'Jede beurteilte Frage besteht alle Prüfungen.'
+              : 'Eine Frage wird geprüft, sobald sie 20 Antworten hat.'
+          }}
+        </p>
+      </section>
+    }
+  }
+
+  @case ('t4') {
+    <section class="card tb-summary">
+      <div class="tb-fig">
+        <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+        <span>Fragenqualität</span>
+      </div>
+      <div class="tb-fig">
+        <b>{{ judged() }}</b>
+        <span>Fragen beurteilt</span>
+      </div>
+      <div class="tb-fig">
+        <b [class.is-bad]="flagged()">{{ flagged() }}</b>
+        <span>mit Befund</span>
+      </div>
+      <div class="tb-strip">
+        <span class="tb-strip-label"
+          >Anteil richtiger Antworten, je Frage ein Punkt</span
+        >
+        <div class="tb-line">
+          <span class="strip-zone" style="left: 30%; width: 65%"></span>
+          @for (d of strip(); track d.id) {
+            <i
+              class="tb-dot"
+              [class.is-bad]="d.bad"
+              [style.left.%]="d.x"
+              [style.top.px]="14 + d.lane * 6"
+            ></i>
+          }
+        </div>
+        <div class="strip-ticks" aria-hidden="true">
+          <span style="left: 0">0 %</span>
+          <span style="left: 30%">30 %</span>
+          <span style="left: 95%">95 %</span>
+        </div>
+      </div>
+    </section>
+
+    @let pool = poolItem();
+    @if (pool) {
+      <div class="notice" [attr.data-tone]="tone(pool.hint.severity)">
+        <css-icon icon="priority-warning" size="sm"></css-icon>
+        <div>
+          <b>{{ kinds[pool.hint.type] }}</b>
+          <span>{{ pool.text.finding }}</span>
+        </div>
+        <button type="button" class="btn-secondary" (click)="act.emit(pool)">
+          {{ actionOf(pool) }}
+        </button>
+      </div>
+    }
+
+    <section class="card tb-card">
+      <header class="tb-toolbar">
+        <div class="seg" role="group" aria-label="Fragen">
+          <button
+            type="button"
+            [class.is-active]="!showAll()"
+            [attr.aria-pressed]="!showAll()"
+            (click)="showAll.set(false)"
+          >
+            Mit Befund <span class="seg-n">{{ marks().size }}</span>
+          </button>
+          <button
+            type="button"
+            [class.is-active]="showAll()"
+            [attr.aria-pressed]="showAll()"
+            (click)="showAll.set(true)"
+          >
+            Alle Fragen <span class="seg-n">{{ spread().length }}</span>
+          </button>
+        </div>
+        <span class="tb-note">Grün hinterlegt: die Grenze jeder Prüfung</span>
+      </header>
+      <div class="tb-scroll">
+        <table class="tb">
+          <thead>
+            <tr>
+              <th class="is-no" [attr.aria-sort]="sortState('severity')">
+                <button type="button" (click)="sortBy('severity')">#</button>
+              </th>
+              <th [attr.aria-sort]="sortState('text')">
+                <button type="button" (click)="sortBy('text')">Frage</button>
+              </th>
+              <th class="is-bullet" [attr.aria-sort]="sortState('rate')">
+                <button type="button" (click)="sortBy('rate')">Richtig</button>
+              </th>
+              <th class="is-bullet" [attr.aria-sort]="sortState('lead')">
+                <button type="button" (click)="sortBy('lead')">Vorsprung</button>
+              </th>
+              <th class="is-bullet" [attr.aria-sort]="sortState('time')">
+                <button type="button" (click)="sortBy('time')">Ohne Antwort</button>
+              </th>
+              <th>Befund</th>
+              <th class="is-go"><span class="sr">Details</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.id) {
+              <tr [class.is-flagged]="row.item">
+                <td class="is-no">
+                  @if (row.n && row.item) {
+                    <span
+                      class="no"
+                      [attr.data-tone]="tone(row.item.hint.severity)"
+                      >{{ row.n }}</span
+                    >
+                  }
+                </td>
+                <td class="is-text">
+                  <b>{{ row.text }}</b>
+                  <span>F-{{ row.id }} · {{ row.category }}</span>
+                </td>
+                <td class="is-bullet">
+                  <span class="bullet"
+                    ><i class="bullet-zone" style="left: 30%; width: 65%"></i
+                    ><i
+                      class="bullet-mark"
+                      [class.is-bad]="row.hard || row.easy"
+                      [style.left.%]="Math.min(100, row.rate * 100)"
+                    ></i></span
+                  ><span class="num" [class.is-bad]="row.hard || row.easy">{{
+                    percent(row.rate)
+                  }}</span>
+                </td>
+                <td class="is-bullet">
+                  <span class="bullet"
+                    ><i class="bullet-zone" style="left: 33.33%; width: 66.67%"></i
+                    ><i
+                      class="bullet-mark"
+                      [class.is-bad]="row.lure"
+                      [style.left.%]="
+                        Math.max(
+                          0,
+                          Math.min(100, (((row.lead ?? 0) + 0.5) / 1.5) * 100)
+                        )
+                      "
+                    ></i></span
+                  ><span class="num" [class.is-bad]="row.lure"
+                    >{{ (row.lead ?? 0) > 0 ? '+' : ''
+                    }}{{ Math.round((row.lead ?? 0) * 100) }}</span
+                  >
+                </td>
+                <td class="is-bullet">
+                  <span class="bullet"
+                    ><i class="bullet-zone" style="left: 0; width: 50%"></i
+                    ><i
+                      class="bullet-mark"
+                      [class.is-bad]="row.slow"
+                      [style.left.%]="Math.min(100, ((row.time ?? 0) / 0.4) * 100)"
+                    ></i></span
+                  ><span class="num" [class.is-bad]="row.slow">{{
+                    percent(row.time ?? 0)
+                  }}</span>
+                </td>
+                <td>
+                  @if (row.item) {
+                    <span
+                      class="badge"
+                      [attr.data-tone]="tone(row.item.hint.severity)"
+                      >{{ kinds[row.item.hint.type] }}</span
+                    >
+                  } @else {
+                    <span class="ok-text">Besteht</span>
+                  }
+                </td>
+                <td class="is-go">
+                  @if (row.item) {
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      [attr.aria-label]="'Details zu F-' + row.id"
+                      (click)="details.emit(row.item)"
+                    >
+                      <css-icon icon="angle-right" size="xs"></css-icon>
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (!rows().length) {
+          <div class="empty">
+            <span class="empty-icon"
+              ><css-icon icon="checkmark" size="sm"></css-icon
+            ></span>
+            <b>{{
+              spread().length
+                ? 'Keine Frage mit Befund'
+                : 'Noch keine Frage beurteilt'
+            }}</b>
+            <p>
+              {{
+                spread().length
+                  ? 'Unter «Alle Fragen» stehen alle beurteilten Fragen mit ihren Werten.'
+                  : 'Eine Frage wird geprüft, sobald sie 20 Antworten hat.'
+              }}
+            </p>
+          </div>
+        }
+      </div>
+    </section>
+  }
+}

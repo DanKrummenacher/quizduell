@@ -1,0 +1,990 @@
+// Temporary: the new start of the hints page drafts.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+$line: rgba(0, 50, 125, 0.06);
+$ok: #2e8540;
+$orange: #c2410c;
+
+// Two tones only: orange for soon, slate for when there is time.
+@mixin tone {
+  --tone: #{t.$text-2};
+  --tone-bg: rgba(0, 50, 125, 0.06);
+
+  &[data-severity='critical'] {
+    --tone: #b42318;
+    --tone-bg: #fdecea;
+  }
+
+  &[data-severity='high'] {
+    --tone: #{$orange};
+    --tone-bg: #fdf0e8;
+  }
+}
+
+.nv-card {
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.nv-card + .nv-card {
+  margin-top: 20px;
+}
+
+.nv-muted {
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.nv-label {
+  color: t.$text-3;
+  font-size: 12.5px;
+  font-weight: t.$medium;
+}
+
+.nv-title {
+  font-size: 17px;
+  font-weight: t.$bold;
+  letter-spacing: -0.01em;
+}
+
+.nv-sev {
+  @include tone;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: var(--tone-bg);
+  color: var(--tone);
+  font-size: 12px;
+  font-weight: t.$bold;
+}
+
+.nv-quiet {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: t.$text-3;
+  font: inherit;
+  font-size: 13.5px;
+  cursor: pointer;
+
+  &:hover {
+    color: t.$text;
+  }
+}
+
+.nv-link {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  color: $blue;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+}
+
+.nv-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid $hair;
+  border-radius: 8px;
+  background: #fff;
+  color: t.$text-2;
+  cursor: pointer;
+
+  &:hover {
+    border-color: rgba(0, 50, 125, 0.2);
+    color: t.$text;
+  }
+}
+
+// The head of a card: tabs left, one figure right.
+.nv-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  min-height: 60px;
+  padding: 12px 20px;
+  border-bottom: 1px solid $hair;
+}
+
+.nv-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: t.$text-2;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+
+    span {
+      color: t.$text-3;
+      font-size: 13px;
+      @include t.numeric;
+    }
+
+    &:hover {
+      background: t.$bg-subtle;
+    }
+
+    &.is-active {
+      background: t.$text;
+      color: #fff;
+      font-weight: t.$medium;
+
+      span {
+        color: rgba(255, 255, 255, 0.7);
+      }
+    }
+  }
+}
+
+.nv-quality {
+  color: t.$text-3;
+  font-size: 13px;
+
+  b {
+    margin-left: 6px;
+    color: t.$text;
+    font-size: 16px;
+    @include t.numeric;
+  }
+}
+
+// n1: a work list.
+.nv-cols,
+.nv-row-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) 140px;
+  align-items: center;
+  gap: 24px;
+}
+
+.nv-cols {
+  padding: 10px 196px 10px 20px;
+  border-bottom: 1px solid $line;
+  color: t.$text-3;
+  font-size: 12.5px;
+  font-weight: t.$medium;
+
+  span:last-child {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+}
+
+.nv-row {
+  @include tone;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-right: 20px;
+  border-top: 1px solid $line;
+
+  &:first-of-type,
+  .nv-cols + & {
+    border-top: 0;
+  }
+
+  &:hover {
+    background: #f8fafc;
+  }
+
+  @media (max-width: 900px) {
+    flex-wrap: wrap;
+    padding: 0 16px 14px;
+  }
+}
+
+.nv-row-main {
+  flex: 1;
+  min-width: 0;
+  padding: 16px 0 16px 20px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 14px 0 0;
+  }
+}
+
+.nv-q {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
+}
+
+.nv-id {
+  flex: none;
+  width: 40px;
+  padding-top: 1px;
+  color: t.$text-3;
+  font-size: 12.5px;
+  @include t.numeric;
+}
+
+.nv-q-text {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+
+  b {
+    overflow: hidden;
+    font-size: 14.5px;
+    font-weight: t.$medium;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    color: t.$text-3;
+    font-size: 12.5px;
+  }
+}
+
+.nv-issue {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 13.5px;
+
+  > span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.nv-val {
+  color: var(--tone);
+  font-size: 13.5px;
+  font-weight: t.$bold;
+  text-align: right;
+  @include t.numeric;
+
+  @media (max-width: 900px) {
+    text-align: left;
+  }
+}
+
+.nv-action {
+  flex: none;
+  width: 176px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 50, 125, 0.16);
+  border-radius: 8px;
+  background: #fff;
+  color: t.$text;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $blue;
+    color: $blue;
+  }
+
+  @media (max-width: 900px) {
+    width: auto;
+  }
+}
+
+// n2: one at a time, the queue beside.
+.nv-focus {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
+  gap: 20px;
+
+  .nv-card + .nv-card {
+    margin-top: 0;
+  }
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.nv-stage {
+  @include tone;
+}
+
+.nv-stage-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid $hair;
+
+  @media (max-width: 640px) {
+    padding: 12px 16px;
+  }
+}
+
+.nv-stage-pos {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  color: t.$text-3;
+  font-size: 13px;
+  @include t.numeric;
+}
+
+.nv-stage-body {
+  display: grid;
+  gap: 18px;
+  padding: 28px 32px 30px;
+
+  @media (max-width: 640px) {
+    padding: 20px 16px;
+  }
+}
+
+.nv-eyebrow {
+  color: t.$text-3;
+  font-size: 13px;
+  @include t.numeric;
+}
+
+.nv-stage-q {
+  margin-top: -10px;
+  font-size: 24px;
+  font-weight: t.$bold;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+
+  @media (max-width: 640px) {
+    font-size: 19px;
+  }
+}
+
+.nv-diagnosis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  padding-top: 20px;
+  border-top: 1px solid $line;
+
+  p:not(.nv-label) {
+    margin-top: 4px;
+    color: t.$text;
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+
+  b {
+    color: var(--tone);
+    @include t.numeric;
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+}
+
+.nv-stage-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px 14px;
+  padding: 14px 24px;
+  border-top: 1px solid $hair;
+  background: #fafbfd;
+  border-radius: 0 0 12px 12px;
+
+  .nv-quiet {
+    margin-right: auto;
+  }
+
+  @media (max-width: 640px) {
+    padding: 12px 16px;
+  }
+}
+
+.nv-queue {
+  position: sticky;
+  top: 90px;
+  padding-bottom: 8px;
+
+  @media (max-width: 1024px) {
+    position: static;
+  }
+}
+
+.nv-queue-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 10px;
+
+  b {
+    font-size: 15px;
+  }
+
+  .nv-quiet {
+    font-size: 12.5px;
+  }
+}
+
+.nv-q-item {
+  @include tone;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: calc(100% - 16px);
+  margin: 0 8px;
+  padding: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  > span {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  b {
+    font-size: 13.5px;
+    font-weight: t.$medium;
+  }
+
+  small {
+    color: t.$text-3;
+    font-size: 12px;
+    @include t.numeric;
+  }
+
+  &:hover {
+    background: t.$bg-subtle;
+  }
+
+  &.is-active {
+    background: #eaf2fb;
+  }
+}
+
+.nv-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--tone);
+}
+
+// Answers, light and quiet.
+.nv-answers {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 0.9fr) minmax(0, 1.4fr) 44px;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+  }
+}
+
+.nv-a-letter {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  font-size: 12px;
+  font-weight: t.$bold;
+
+  .is-correct & {
+    background: $ok;
+    color: #fff;
+  }
+
+  .is-lure & {
+    background: $orange;
+    color: #fff;
+  }
+}
+
+.nv-a-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  .is-correct &,
+  .is-lure & {
+    font-weight: t.$medium;
+  }
+}
+
+.nv-a-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: rgba(0, 50, 125, 0.07);
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: #b8c6d8;
+
+    .is-correct & {
+      background: $ok;
+    }
+
+    .is-lure & {
+      background: $orange;
+    }
+  }
+}
+
+.nv-a-val {
+  color: t.$text-2;
+  font-size: 13px;
+  font-weight: t.$medium;
+  text-align: right;
+  @include t.numeric;
+}
+
+// n3: health first.
+.nv-health {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.nv-health-score {
+  display: grid;
+  align-content: center;
+  gap: 4px;
+  padding: 28px 30px;
+  border-right: 1px solid $hair;
+
+  @media (max-width: 900px) {
+    border-right: 0;
+    border-bottom: 1px solid $hair;
+    padding: 20px 18px;
+  }
+}
+
+.nv-big {
+  font-size: 48px;
+  font-weight: t.$bold;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  @include t.numeric;
+}
+
+.nv-health-rows {
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  margin: 0;
+  padding: 26px 30px;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr) 120px;
+    align-items: center;
+    gap: 16px;
+    font-size: 14px;
+  }
+
+  @media (max-width: 640px) {
+    padding: 18px;
+
+    li {
+      grid-template-columns: minmax(0, 1fr) auto;
+
+      .nv-hr-bar {
+        grid-column: 1 / -1;
+        grid-row: 2;
+      }
+    }
+  }
+}
+
+.nv-hr-bar {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #fbe3d6;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 4px;
+    background: $ok;
+  }
+}
+
+.nv-hr-val {
+  color: $ok;
+  font-size: 13px;
+  font-weight: t.$medium;
+  text-align: right;
+
+  .is-bad & {
+    color: $orange;
+  }
+}
+
+.nv-finding {
+  @include tone;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 20px;
+  border: 0;
+  border-top: 1px solid $line;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:first-of-type {
+    border-top: 0;
+  }
+
+  &:hover {
+    background: #f8fafc;
+  }
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+  }
+}
+
+.nv-finding-text {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+
+  b {
+    font-size: 14.5px;
+    font-weight: t.$medium;
+  }
+
+  small {
+    overflow: hidden;
+    color: t.$text-3;
+    font-size: 12.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    flex-basis: 100%;
+  }
+}
+
+// n4 and n5: a summary bar.
+.nv-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 18px;
+}
+
+.nv-summary {
+  font-size: 18px;
+  font-weight: t.$bold;
+  letter-spacing: -0.01em;
+
+  span {
+    color: t.$text-3;
+    font-weight: t.$medium;
+  }
+}
+
+// n4: question cards.
+.nv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+
+  .nv-card + .nv-card {
+    margin-top: 0;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.nv-qcard {
+  @include tone;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto auto;
+  gap: 16px;
+  padding: 22px 24px 0;
+
+  @media (max-width: 640px) {
+    padding: 18px 16px 0;
+  }
+}
+
+.nv-qcard-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nv-qcard-q {
+  font-size: 18px;
+  font-weight: t.$bold;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
+}
+
+.nv-qcard-fact {
+  color: t.$text-2;
+  font-size: 13.5px;
+  line-height: 1.55;
+
+  b {
+    color: var(--tone);
+  }
+}
+
+.nv-qcard-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 -24px;
+  padding: 14px 24px;
+  border-top: 1px solid $line;
+
+  @media (max-width: 640px) {
+    margin: 0 -16px;
+    padding: 12px 16px;
+  }
+}
+
+.nv-pool {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: rgba(0, 50, 125, 0.07);
+
+  span {
+    display: block;
+    height: 100%;
+    background: var(--tone);
+  }
+}
+
+// n5: by category.
+.nv-cats {
+  display: grid;
+  gap: 20px;
+
+  .nv-card + .nv-card {
+    margin-top: 0;
+  }
+}
+
+.nv-cat-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+  padding: 18px 20px 12px;
+  border-bottom: 1px solid $hair;
+}
+
+.nv-row.is-cat .nv-row-main {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.nv-calm-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: t.$text-3;
+  font-size: 13.5px;
+
+  css-icon {
+    color: $ok;
+  }
+}
+
+// The quiet empty state.
+.nv-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 48px 24px 52px;
+  text-align: center;
+
+  h2 {
+    font-size: 18px;
+    font-weight: t.$bold;
+  }
+
+  p {
+    max-width: 440px;
+    color: t.$text-2;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+}
+
+.nv-empty-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: #e8f4ec;
+  color: $ok;
+}
+
+.nv-empty-checks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 20px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: t.$text-2;
+    font-size: 13px;
+
+    css-icon {
+      color: $ok;
+    }
+  }
+}
+
+.nv-cols span:nth-child(3) {
+  text-align: right;
+}
+
+.nv-qcard {
+  grid-template-rows: auto auto auto 1fr auto;
+}
+
+.nv-pool-box {
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  padding: 22px 20px;
+  border-radius: 10px;
+  background: #f7f9fc;
+
+  p {
+    color: t.$text-2;
+    font-size: 14px;
+  }
+
+  b {
+    margin-right: 4px;
+    color: t.$text;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    @include t.numeric;
+  }
+}
+
+@media (max-width: 900px) {
+  .nv-row {
+    display: grid;
+    gap: 12px;
+    padding: 0 16px 16px;
+  }
+
+  .nv-action {
+    justify-self: start;
+    width: auto;
+    margin-left: 54px;
+  }
+
+  .nv-q-text b {
+    white-space: normal;
+  }
+
+  .nv-issue {
+    margin-left: 54px;
+
+    > span:last-child {
+      white-space: normal;
+    }
+  }
+
+  .nv-val {
+    margin-left: 54px;
+  }
+
+  .nv-head {
+    padding: 12px 14px;
+  }
+
+  .nv-stage-head {
+    flex-wrap: wrap;
+  }
+}

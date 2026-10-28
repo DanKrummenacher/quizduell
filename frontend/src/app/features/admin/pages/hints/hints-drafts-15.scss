@@ -1,0 +1,607 @@
+// Temporary: fifteenth round of drafts of the hints page.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+$ok: #2e8540;
+
+@mixin sev-colors {
+  &[data-severity='critical'] {
+    --sev: #b42318;
+    --sev-bg: #fdf0ee;
+  }
+
+  &[data-severity='high'] {
+    --sev: #c2410c;
+    --sev-bg: #fdf1ea;
+  }
+
+  &[data-severity='medium'] {
+    --sev: #8a6a00;
+    --sev-bg: #fbf6e6;
+  }
+}
+
+// h64: from finding to fix.
+.flow-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) 28px minmax(0, 1fr) 28px minmax(0, 1fr);
+  margin-bottom: 10px;
+  color: t.$text-3;
+  font-size: 12.5px;
+  font-weight: t.$bold;
+
+  span:nth-child(2) {
+    grid-column: 3;
+  }
+
+  span:nth-child(3) {
+    grid-column: 5;
+  }
+
+  @media (max-width: 960px) {
+    display: none;
+  }
+}
+
+.flows {
+  display: grid;
+  gap: 12px;
+}
+
+.flow {
+  @include sev-colors;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) 28px minmax(0, 1fr) 28px minmax(0, 1fr);
+  align-items: stretch;
+
+  @media (max-width: 960px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}
+
+.flow-step {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 8px;
+  padding: 18px 20px;
+  border: 1px solid $hair;
+  border-radius: 14px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+
+  p {
+    color: t.$text-2;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  small {
+    overflow: hidden;
+    max-width: 100%;
+    color: t.$text-3;
+    font-size: 12.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &.is-fact {
+    box-shadow: inset 3px 0 0 var(--sev);
+    cursor: pointer;
+
+    &:hover {
+      border-color: rgba(0, 50, 125, 0.2);
+    }
+  }
+
+  &.is-cause {
+    background: #f7f9fc;
+  }
+
+  &.is-fix {
+    border-color: rgba(0, 120, 187, 0.2);
+    background: #f2f8fe;
+
+    p {
+      color: #00508a;
+    }
+  }
+}
+
+.flow-fact {
+  font-size: 15.5px;
+  font-weight: t.$medium;
+  line-height: 1.4;
+
+  b {
+    margin-right: 2px;
+    color: var(--sev);
+    font-size: 20px;
+    @include t.numeric;
+  }
+}
+
+.flow-arrow {
+  position: relative;
+  align-self: center;
+  justify-self: center;
+  width: 12px;
+  height: 12px;
+  border-top: 2px solid rgba(0, 50, 125, 0.25);
+  border-right: 2px solid rgba(0, 50, 125, 0.25);
+  transform: rotate(45deg);
+
+  @media (max-width: 960px) {
+    margin: 6px 0;
+    transform: rotate(135deg);
+  }
+}
+
+// h65: questions against checks.
+.pm {
+  table-layout: fixed;
+
+  tbody tr {
+    cursor: pointer;
+
+    &:hover {
+      background: #f6f9fc;
+    }
+  }
+
+  td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    vertical-align: middle;
+  }
+
+  .pm-q {
+    width: auto;
+
+    b {
+      display: block;
+      overflow: hidden;
+      font-size: 14px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    small {
+      color: t.$text-3;
+      font-size: 12.5px;
+    }
+  }
+
+  .pm-c {
+    width: 150px;
+  }
+
+  .pm-go {
+    width: 40px;
+    text-align: right;
+
+    .chev {
+      display: inline-block;
+    }
+  }
+
+  @media (max-width: 900px) {
+    min-width: 860px;
+  }
+}
+
+.pm-cell {
+  @include sev-colors;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: #eef7f1;
+  color: $ok;
+  font-size: 13px;
+  font-weight: t.$medium;
+  @include t.numeric;
+
+  &.is-bad {
+    background: var(--sev-bg);
+    color: var(--sev);
+    font-weight: t.$bold;
+  }
+}
+
+.matrix-pool.is-flat {
+  width: auto;
+  margin: 0 20px 20px;
+}
+
+// h66: stacked answer bars.
+.stk-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  padding: 14px 22px;
+  border-bottom: 1px solid t.$line-soft;
+  color: t.$text-3;
+  font-size: 12.5px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  i {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: #c9d5e3;
+
+    &.is-ok {
+      background: #2e9d5e;
+    }
+
+    &.is-lure {
+      background: #d6402e;
+    }
+
+    &.is-time {
+      background: repeating-linear-gradient(135deg, #b5c3d3 0 3px, #e4eaf1 3px 6px);
+    }
+  }
+}
+
+.stk {
+  @include sev-colors;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr);
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  padding: 18px 22px;
+  border: 0;
+  border-top: 1px solid t.$line-soft;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:first-of-type {
+    border-top: 0;
+  }
+
+  &:hover {
+    background: #f6f9fc;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+}
+
+.stk-text {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+
+  b {
+    overflow: hidden;
+    font-size: 14.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.stk-bar {
+  display: flex;
+  gap: 2px;
+  height: 34px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.stk-seg {
+  position: relative;
+  display: flex;
+  flex-basis: 0;
+  align-items: center;
+  min-width: 4px;
+  padding: 0 8px;
+  background: #c9d5e3;
+  color: t.$text;
+
+  em {
+    overflow: hidden;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: t.$bold;
+    white-space: nowrap;
+    @include t.numeric;
+  }
+
+  &.is-ok {
+    background: #2e9d5e;
+    color: #fff;
+  }
+
+  &.is-lure {
+    background: #d6402e;
+    color: #fff;
+  }
+
+  &.is-time {
+    background: repeating-linear-gradient(135deg, #b5c3d3 0 4px, #e4eaf1 4px 8px);
+  }
+
+  &.is-empty {
+    background: rgba(0, 50, 125, 0.06);
+    color: t.$text-3;
+  }
+}
+
+.stk-bar.is-pool .is-lure {
+  background: var(--sev);
+}
+
+// h67: a school report.
+.report {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  margin-bottom: 20px;
+  overflow: hidden;
+  border: 1px solid $hair;
+  border-radius: 16px;
+  background: #fff;
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.report-main {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 8px;
+  padding: 30px 32px;
+  background:
+    radial-gradient(70% 90% at 0% 0%, rgba(0, 164, 224, 0.12), transparent 70%),
+    linear-gradient(160deg, #f4f9fd, #e8f1f9);
+}
+
+.report-kicker {
+  color: $blue;
+  font-size: 13px;
+  font-weight: t.$bold;
+}
+
+.report-grade {
+  font-size: 88px;
+  font-weight: t.$bold;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  @include t.numeric;
+
+  &[data-tone='good'] {
+    color: $ok;
+  }
+
+  &[data-tone='fair'] {
+    color: #8a6a00;
+  }
+
+  &[data-tone='poor'] {
+    color: #c2410c;
+  }
+}
+
+.report-text {
+  max-width: 340px;
+  color: t.$text-2;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.report-subjects {
+  display: grid;
+  margin: 0;
+  padding: 18px 28px;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 56px;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-top: 1px dashed t.$line;
+
+    &:first-child {
+      border-top: 0;
+    }
+  }
+}
+
+.report-name {
+  font-size: 15px;
+  font-weight: t.$medium;
+}
+
+.report-note {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.report-g {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 36px;
+  border-radius: 10px;
+  background: #e8f4ec;
+  color: $ok;
+  font-size: 17px;
+  font-weight: t.$bold;
+  @include t.numeric;
+
+  &[data-tone='fair'] {
+    background: #fbf6e6;
+    color: #8a6a00;
+  }
+
+  &[data-tone='poor'] {
+    background: #fdf1ea;
+    color: #c2410c;
+  }
+}
+
+.report-none {
+  display: block !important;
+  color: t.$text-3;
+  font-size: 13.5px;
+}
+
+// h68: a checklist.
+.cl-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 24px;
+  margin-bottom: 18px;
+
+  > div:first-child {
+    display: grid;
+    flex: 1 1 360px;
+    gap: 12px;
+  }
+}
+
+.cl-track {
+  display: block;
+  max-width: 420px;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgba(0, 50, 125, 0.08);
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 4px;
+    background: $ok;
+    transition: width 0.3s ease;
+  }
+}
+
+.cl-item {
+  @include sev-colors;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px;
+  border-top: 1px solid t.$line-soft;
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  &.is-done {
+    .cl-text b {
+      color: t.$text-3;
+      text-decoration: line-through;
+    }
+
+    .cl-text small {
+      color: t.$text-4;
+    }
+  }
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+
+    .fr-sev {
+      margin-left: 42px;
+    }
+  }
+}
+
+.cl-box {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 2px solid rgba(0, 50, 125, 0.25);
+  border-radius: 8px;
+  background: #fff;
+  color: #fff;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    border-color: $ok;
+  }
+
+  .is-done & {
+    border-color: $ok;
+    background: $ok;
+  }
+}
+
+.cl-text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  b {
+    font-size: 15px;
+  }
+
+  small {
+    overflow: hidden;
+    color: t.$text-2;
+    font-size: 12.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    flex-basis: calc(100% - 44px);
+  }
+}
+
+.cl-sep {
+  padding: 18px 22px 8px;
+  border-top: 1px solid t.$line-soft;
+  color: t.$text-3;
+  font-size: 12.5px;
+  font-weight: t.$bold;
+}
+
+.report-grade[data-tone='none'] {
+  color: t.$text-4;
+}
+
+.report-subjects:has(.report-none) {
+  align-content: center;
+}

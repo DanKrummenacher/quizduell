@@ -1,0 +1,145 @@
+// Temporary: what the hints add to the parts of the questions page.
+@use '../../../styles/tokens' as t;
+
+$hair: rgba(0, 50, 125, 0.08);
+$green: #2e8540;
+
+:host {
+  display: block;
+}
+
+.quick-tile.is-lead {
+  cursor: default;
+}
+
+.quick-tile:disabled {
+  cursor: default;
+
+  .quick-value {
+    color: t.$text-4;
+  }
+}
+
+.chapter-head {
+  .chapter-name::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin: 0 10px 2px 0;
+    border-radius: 50%;
+    background: #8a6a00;
+  }
+}
+
+.chapter[data-severity='high'] .chapter-name::before {
+  background: #b54708;
+}
+
+.chapter[data-severity='critical'] .chapter-name::before {
+  background: #b42318;
+}
+
+.hints-table {
+  .text-button {
+    cursor: pointer;
+  }
+
+  .col-kind {
+    width: 190px;
+    color: t.$text-2;
+    font-size: 13.5px;
+  }
+
+  .col-measure {
+    width: 190px;
+
+    b {
+      display: block;
+      color: #b54708;
+      font-size: 14px;
+      @include t.numeric;
+    }
+
+    small {
+      color: t.$text-3;
+      font-size: 12px;
+    }
+  }
+
+  .col-do {
+    width: 200px;
+    text-align: right;
+  }
+
+  @media (max-width: 900px) {
+    .col-kind,
+    .col-do {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .col-measure {
+      width: 110px;
+    }
+  }
+}
+
+.calm-chapter {
+  padding: 0;
+}
+
+.calm {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+
+  b {
+    font-size: 15px;
+  }
+
+  p {
+    margin-top: 2px;
+    color: t.$text-2;
+    font-size: 13.5px;
+  }
+}
+
+.calm-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e8f4ec;
+  color: $green;
+}
+
+.sb {
+  bottom: calc(24px + var(--switcher-h, 0px));
+}
+
+.chapter.is-cat .chapter-name::before {
+  display: none;
+}
+
+.sev-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: #8a6a00;
+  vertical-align: 1px;
+
+  &[data-severity='high'] {
+    background: #b54708;
+  }
+
+  &[data-severity='critical'] {
+    background: #b42318;
+  }
+}

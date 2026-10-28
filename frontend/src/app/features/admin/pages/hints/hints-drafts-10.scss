@@ -1,0 +1,581 @@
+// Temporary: tenth round, new elements in the card grammar.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+$ok: #2e8540;
+
+@mixin sev-colors {
+  &[data-severity='critical'] {
+    --sev: #b42318;
+    --sev-bg: #fdf0ee;
+  }
+
+  &[data-severity='high'] {
+    --sev: #b54708;
+    --sev-bg: #fdf4ea;
+  }
+
+  &[data-severity='medium'] {
+    --sev: #8a6a00;
+    --sev-bg: #fbf6e6;
+  }
+}
+
+@mixin tones {
+  &[data-tone='critical'] {
+    --tone: #b42318;
+    --tone-bg: #fdf0ee;
+  }
+
+  &[data-tone='high'] {
+    --tone: #b54708;
+    --tone-bg: #fdf4ea;
+  }
+
+  &[data-tone='medium'] {
+    --tone: #8a6a00;
+    --tone-bg: #fbf6e6;
+  }
+
+  &[data-tone='ok'] {
+    --tone: #{$ok};
+    --tone-bg: #e8f4ec;
+  }
+}
+
+// h47: a status card with the five checks as its foot.
+.status-card {
+  @include tones;
+  margin-bottom: 20px;
+}
+
+.status-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 22px;
+  padding: 24px 26px;
+
+  @media (max-width: 640px) {
+    padding: 18px 16px;
+  }
+}
+
+.status-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--tone-bg);
+  color: var(--tone);
+}
+
+.status-text {
+  flex: 1 1 320px;
+  min-width: 0;
+
+  h2 {
+    font-size: 21px;
+    font-weight: t.$bold;
+    letter-spacing: -0.01em;
+  }
+
+  p {
+    margin-top: 3px;
+    color: t.$text-2;
+    font-size: 14px;
+  }
+}
+
+.status-score {
+  display: grid;
+  justify-items: end;
+  padding-left: 24px;
+  border-left: 1px solid t.$line-soft;
+
+  b {
+    font-size: 32px;
+    font-weight: t.$bold;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    @include t.numeric;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: 12.5px;
+  }
+
+  @media (max-width: 640px) {
+    justify-items: start;
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+.status-checks {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 1px solid $hair;
+  background: #fafcfe;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.status-check {
+  @include sev-colors;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 18px;
+  border: 0;
+  border-left: 1px solid $hair;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:first-child {
+    border-left: 0;
+  }
+
+  &:hover:not(:disabled) {
+    background: #fff;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  &.is-active {
+    background: #fff;
+    box-shadow: inset 0 -2px 0 var(--sev);
+  }
+
+  @media (max-width: 640px) {
+    border-top: 1px solid $hair;
+    border-left: 0;
+
+    &:first-child {
+      border-top: 0;
+    }
+  }
+}
+
+.status-check-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--sev-bg);
+  color: var(--sev);
+
+  .is-ok & {
+    background: #e8f4ec;
+    color: $ok;
+  }
+}
+
+.status-check-text {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+
+  b {
+    overflow: hidden;
+    font-size: 13.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    color: var(--sev);
+    font-size: 12px;
+    font-weight: t.$medium;
+
+    .is-ok & {
+      color: $ok;
+    }
+  }
+}
+
+// h48: every question as one stroke, in a card.
+.band-card {
+  margin-bottom: 20px;
+}
+
+.band-strand {
+  display: flex;
+  gap: 3px;
+  height: 36px;
+  margin-top: 20px;
+
+  &.is-empty i {
+    flex: 1;
+    border: 1px dashed t.$line;
+    border-radius: 8px;
+  }
+}
+
+.band-seg {
+  @include sev-colors;
+  position: relative;
+  flex: 1;
+  border-radius: 3px;
+  background: var(--sev);
+  transition: transform 0.12s ease;
+
+  &.is-ok {
+    background: #c7e5d0;
+  }
+
+  &:hover {
+    transform: scaleY(1.12);
+  }
+
+  &:first-child {
+    border-radius: 8px 3px 3px 8px;
+  }
+
+  &:last-child {
+    border-radius: 3px 8px 8px 3px;
+  }
+}
+
+.band-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 20px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid t.$line-soft;
+
+  > div {
+    padding: 0 18px;
+    border-left: 1px solid t.$line-soft;
+
+    &:first-child {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+
+  dt {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: t.$text-3;
+    font-size: 13px;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: 24px;
+    font-weight: t.$bold;
+    letter-spacing: -0.02em;
+    @include t.numeric;
+  }
+
+  @media (max-width: 760px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 0;
+
+    > div:nth-child(3) {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+}
+
+.band-key {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: #b54708;
+
+  &.is-ok {
+    background: #c7e5d0;
+  }
+}
+
+// h49: the next one in front, all below.
+.next-card {
+  @include sev-colors;
+  margin-bottom: 20px;
+
+  .ad-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+}
+
+.next-pos {
+  color: t.$text-2;
+  font-size: 13.5px;
+  @include t.numeric;
+}
+
+.next-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  padding: 26px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    padding: 18px 16px;
+  }
+}
+
+.next-fact {
+  display: grid;
+  align-content: center;
+  gap: 16px;
+}
+
+.next-big {
+  color: t.$text;
+  font-size: 22px;
+  font-weight: t.$bold;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+
+  b {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--sev);
+    font-size: 52px;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    @include t.numeric;
+  }
+}
+
+.next-q {
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.next-visual .game.is-compact {
+  padding: 22px;
+}
+
+.next-list .r9-row.is-current {
+  background: #eef5fc;
+  box-shadow: inset 3px 0 0 t.$text;
+}
+
+// h50: tabs in the head of one card.
+.tabbed-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 4px;
+  padding: 0 14px;
+  border-bottom: 1px solid $hair;
+
+  > button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 58px;
+    padding: 0 12px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    background: none;
+    color: t.$text-3;
+    font: inherit;
+    font-size: 15px;
+    font-weight: t.$medium;
+    cursor: pointer;
+
+    span {
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 11px;
+      background: t.$bg-muted;
+      color: t.$text-2;
+      font-size: 12px;
+      line-height: 22px;
+      @include t.numeric;
+    }
+
+    &:hover {
+      color: t.$text;
+    }
+
+    &.is-active {
+      border-bottom-color: t.$text;
+      color: t.$text;
+
+      span {
+        background: t.$text;
+        color: #fff;
+      }
+    }
+  }
+
+  @media (max-width: 640px) {
+    padding: 0 6px;
+
+    > button {
+      height: 50px;
+      padding: 0 8px;
+      font-size: 14px;
+    }
+  }
+}
+
+.tabbed-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  color: t.$text-3;
+  font-size: 13px;
+
+  b {
+    color: t.$text;
+    font-size: 18px;
+    @include t.numeric;
+  }
+
+  @media (max-width: 760px) {
+    display: none;
+  }
+}
+
+.tabbed-group th {
+  @include sev-colors;
+  padding-top: 14px !important;
+  padding-bottom: 10px !important;
+  background: #f7f9fc;
+  font-size: 14px;
+  font-weight: t.$bold;
+  text-align: left;
+
+  .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 8px;
+    background: var(--sev);
+    vertical-align: 1px;
+  }
+
+  .cchip {
+    height: 20px;
+    margin: 0 8px;
+    padding: 0 8px;
+  }
+}
+
+.tabbed-group {
+  @include sev-colors;
+}
+
+.r9-table tbody tr.tabbed-group {
+  cursor: default;
+
+  &:hover {
+    background: none;
+  }
+}
+
+.tabbed-checks {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    @include sev-colors;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 24px;
+    border-top: 1px solid t.$line-soft;
+
+    &:first-child {
+      border-top: 0;
+    }
+  }
+
+  .r9-check-text b {
+    font-size: 14.5px;
+  }
+
+  .r9-check-text small {
+    font-size: 13px;
+  }
+}
+
+.tabbed-ok {
+  color: $ok;
+  font-size: 13px;
+  font-weight: t.$medium;
+}
+
+.tabbed-foot {
+  padding: 14px 24px 18px;
+  border-top: 1px solid t.$line-soft;
+  color: t.$text-3;
+  font-size: 13px;
+
+  a {
+    margin-left: 6px;
+    color: $blue;
+  }
+}
+
+.tabbed-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-bottom: 1px solid t.$line-soft;
+  background: #f2f8fe;
+  color: t.$text-2;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .r9-table .c-hint {
+    width: 60%;
+  }
+}
+
+@media (max-width: 640px) {
+  .r9-table .c-hint {
+    width: 100%;
+  }
+
+  .tabbed-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    > button {
+      flex: none;
+    }
+  }
+}

@@ -1,0 +1,515 @@
+// Temporary: the little the hints add to the shared admin parts.
+@use '../../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+$line: rgba(0, 50, 125, 0.06);
+$green: #2e8540;
+
+:host {
+  display: block;
+}
+
+[data-severity] {
+  --sev: #8a6a00;
+  --sev-bg: #f8f2de;
+}
+
+[data-severity='high'] {
+  --sev: #b54708;
+  --sev-bg: #fdf1e7;
+}
+
+[data-severity='critical'] {
+  --sev: #b42318;
+  --sev-bg: #fdecea;
+}
+
+.head-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+
+  .ad-select {
+    min-width: 200px;
+  }
+}
+
+.seg-n {
+  margin-left: 4px;
+  color: t.$text-3;
+  font-weight: t.$regular;
+  @include t.numeric;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: var(--sev-bg);
+  color: var(--sev);
+  font-size: 12px;
+  font-weight: t.$bold;
+  white-space: nowrap;
+}
+
+.qid {
+  margin-right: 6px;
+  color: t.$text-3;
+  font-size: 12.5px;
+  font-weight: t.$medium;
+  @include t.numeric;
+}
+
+.chev {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid t.$text-3;
+  border-bottom: 1.5px solid t.$text-3;
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+}
+
+.x-label {
+  color: t.$text-3;
+  font-size: 12px;
+  font-weight: t.$medium;
+}
+
+.link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: $blue;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+// x1: the table that opens in place.
+.x-table {
+  .c-sev {
+    width: 130px;
+  }
+
+  .c-q {
+    font-size: 14px;
+    font-weight: t.$medium;
+  }
+
+  .c-kind {
+    width: 200px;
+    color: t.$text-2;
+    font-size: 13.5px;
+  }
+
+  .c-val {
+    width: 180px;
+
+    b {
+      display: block;
+      color: var(--sev);
+      font-size: 14px;
+      @include t.numeric;
+    }
+
+    small {
+      color: t.$text-3;
+      font-size: 12px;
+    }
+  }
+
+  .c-go {
+    width: 44px;
+    text-align: right;
+  }
+
+  td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    vertical-align: middle;
+  }
+
+  @media (max-width: 900px) {
+    .c-kind {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .c-sev,
+    .c-go {
+      display: none;
+    }
+  }
+}
+
+.x-row {
+  cursor: pointer;
+
+  &:hover td {
+    background: #f6f9fc;
+  }
+
+  &.is-open td {
+    background: #f2f8fe;
+  }
+
+  &.is-open .chev {
+    transform: rotate(45deg);
+  }
+}
+
+.x-detail td {
+  padding: 0 !important;
+  background: #f7fafd;
+}
+
+.x-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  padding: 18px 22px 24px 22px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+}
+
+.x-answers,
+.x-side {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.x-side p:not(.x-label) {
+  margin-bottom: 8px;
+  color: t.$text;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.x-big {
+  font-size: 32px;
+  font-weight: t.$bold;
+  @include t.numeric;
+
+  span {
+    color: t.$text-3;
+    font-size: 14px;
+    font-weight: t.$regular;
+  }
+}
+
+// x2: a board of three columns.
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 20px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.count {
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: t.$bg-muted;
+  color: t.$text-2;
+  font-size: 12px;
+  line-height: 20px;
+  @include t.numeric;
+}
+
+.col-body {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  background: #f7f9fc;
+  border-radius: 0 0 12px 12px;
+}
+
+.task {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px 12px;
+  border: 1px solid $hair;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.task-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.task-val {
+  color: var(--sev);
+  font-size: 13px;
+  @include t.numeric;
+}
+
+.task-q {
+  font-size: 14px;
+  font-weight: t.$medium;
+  line-height: 1.45;
+}
+
+.task-kind {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.task-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid $line;
+}
+
+.col-empty {
+  padding: 18px 8px;
+  color: t.$text-3;
+  font-size: 13px;
+  text-align: center;
+}
+
+// x3: the next one, the overview beside.
+.day {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  gap: 20px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.day-focus {
+  display: grid;
+  gap: 16px;
+  padding: 22px 24px 24px;
+
+  h3 {
+    font-size: 20px;
+    font-weight: t.$bold;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+
+  @media (max-width: 640px) {
+    padding: 18px 16px;
+  }
+}
+
+.day-finding {
+  margin-top: -8px;
+  color: t.$text-2;
+  font-size: 14px;
+}
+
+.day-advice {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #eef5fc;
+  color: #00508a;
+  font-size: 14px;
+  line-height: 1.5;
+
+  css-icon {
+    flex: none;
+    margin-top: 2px;
+  }
+}
+
+.day-rest {
+  display: grid;
+  gap: 4px;
+  padding: 16px 16px 14px;
+  border-top: 1px solid $hair;
+
+  .x-label {
+    padding: 0 8px 6px;
+  }
+}
+
+.day-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: t.$bg-subtle;
+  }
+
+  b {
+    color: var(--sev);
+    font-size: 13px;
+    white-space: nowrap;
+    @include t.numeric;
+  }
+}
+
+.day-row-q {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.day-side {
+  display: grid;
+  gap: 20px;
+}
+
+.side-big {
+  margin: 14px 0 4px;
+  font-size: 32px;
+  font-weight: t.$bold;
+  letter-spacing: -0.025em;
+  @include t.numeric;
+}
+
+.side-checks {
+  display: grid;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-top: 1px solid $line;
+    font-size: 13.5px;
+
+    css-icon {
+      color: $green;
+    }
+
+    span {
+      flex: 1;
+    }
+
+    b {
+      color: $green;
+      font-size: 12.5px;
+      font-weight: t.$medium;
+    }
+
+    &.is-bad {
+      css-icon,
+      b {
+        color: #b54708;
+      }
+    }
+  }
+}
+
+.side-ign {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid $line;
+  font-size: 13.5px;
+
+  &:first-of-type {
+    margin-top: 10px;
+  }
+}
+
+.side-none {
+  margin-top: 12px;
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.calm {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px;
+
+  b {
+    font-size: 15px;
+  }
+
+  p {
+    margin-top: 2px;
+    color: t.$text-2;
+    font-size: 13.5px;
+  }
+}
+
+.calm-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e8f4ec;
+  color: $green;
+}
+
+.day > *,
+.day-rest,
+.day-row {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.day-row {
+  max-width: 100%;
+}

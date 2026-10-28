@@ -1,0 +1,283 @@
+<section class="quick" aria-label="Schnellfilter">
+  <div class="quick-tile is-lead">
+    <span class="quick-label">Fragenqualität</span>
+    <span class="quick-value">{{ quality() }}</span>
+    <span class="quick-note">{{
+      judged()
+        ? judged() - flagged() + ' von ' + judged() + ' unauffällig'
+        : 'noch keine Frage beurteilt'
+    }}</span>
+  </div>
+  @for (tile of tiles(); track tile.id) {
+    <button
+      type="button"
+      class="quick-tile"
+      [class.is-picked]="
+        quick() === tile.id || (tile.id === 'ignored' && status() === 'ignored')
+      "
+      [attr.aria-pressed]="quick() === tile.id"
+      [disabled]="!tile.value"
+      (click)="pickQuick(tile.id)"
+    >
+      <span class="quick-label">{{ tile.label }}</span>
+      <span class="quick-value">{{ tile.value }}</span>
+      <span class="quick-note">{{ tile.note }}</span>
+    </button>
+  }
+</section>
+
+<div class="toolbar" role="search">
+  <label class="ad-input search">
+    <css-icon icon="search" size="xs"></css-icon>
+    <span class="ad-sr">Hinweise durchsuchen</span>
+    <input
+      type="search"
+      placeholder="Hinweis, Frage oder F-12 suchen"
+      [value]="search()"
+      (input)="onSearch($event)"
+    />
+    <span class="search-count"
+      >{{ rows().length }} {{ rows().length === 1 ? 'Hinweis' : 'Hinweise' }}</span
+    >
+  </label>
+  <div class="ad-segmented status" role="group" aria-label="Status">
+    <button
+      type="button"
+      [class.is-active]="status() === 'open'"
+      [attr.aria-pressed]="status() === 'open'"
+      (click)="setStatus('open')"
+    >
+      Offen
+    </button>
+    <button
+      type="button"
+      [class.is-active]="status() === 'ignored'"
+      [attr.aria-pressed]="status() === 'ignored'"
+      (click)="setStatus('ignored')"
+    >
+      Ignoriert
+    </button>
+  </div>
+</div>
+@if (quick() || search()) {
+  <div class="summary">
+    <button
+      type="button"
+      class="btn-ghost btn-sm"
+      (click)="quick.set(null); search.set('')"
+    >
+      Filter zurücksetzen
+    </button>
+  </div>
+} @else {
+  <div class="summary-gap"></div>
+}
+
+@if (groups().length) {
+  <div class="chapters">
+    @for (group of groups(); track group.name) {
+      <section
+        class="chapter"
+        [attr.data-severity]="variant() === 'v7' ? null : group.name"
+        [class.is-cat]="variant() === 'v7'"
+      >
+        <button
+          type="button"
+          class="chapter-head"
+          [attr.aria-expanded]="!collapsed().has(group.name)"
+          (click)="toggleGroup(group.name)"
+        >
+          <span
+            class="group-chev"
+            [class.is-closed]="collapsed().has(group.name)"
+            aria-hidden="true"
+          ></span>
+          <span class="chapter-name">{{ group.label }}</span>
+          <span class="cchip"
+            ><b>{{ group.rows.length }}</b>
+            {{ group.rows.length === 1 ? 'Hinweis' : 'Hinweise' }}</span
+          >
+          @if (variant() === 'v7') {
+            @if (group.average !== null) {
+              <span class="chapter-rate">
+                <span class="chapter-rate-label"
+                  >Ø {{ percent(group.average) }} richtig</span
+                >
+                <span class="meter"
+                  ><span [style.width.%]="group.average * 100"></span
+                ></span>
+              </span>
+            }
+          } @else {
+            <span class="chapter-meta">{{
+              group.name === 'medium' ? 'bei Gelegenheit ansehen' : 'bald angehen'
+            }}</span>
+          }
+        </button>
+        @if (!collapsed().has(group.name)) {
+          <div class="ad-table-wrap">
+            <table class="ad-table questions-table hints-table">
+              <thead>
+                <tr>
+                  <th scope="col" class="col-check">
+                    <input
+                      type="checkbox"
+                      [attr.aria-label]="'Alle ' + group.label + ' auswählen'"
+                      [checked]="groupState(group.rows) === 'all'"
+                      [indeterminate]="groupState(group.rows) === 'some'"
+                      (change)="toggleGroupRows(group.rows)"
+                    />
+                  </th>
+                  <th scope="col" class="col-id">ID</th>
+                  <th scope="col">Frage</th>
+                  <th scope="col" class="col-kind">
+                    {{ variant() === 'v7' ? 'Wichtigkeit · Befund' : 'Befund' }}
+                  </th>
+                  <th scope="col" class="col-measure">Gemessen</th>
+                  <th scope="col" class="col-do">
+                    <span class="ad-sr">Aktion</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of group.rows; track item.hint.key) {
+                  <tr
+                    [class.is-selected]="selected().has(item.hint.key)"
+                    (click)="details.emit(item)"
+                  >
+                    <td class="col-check" (click)="$event.stopPropagation()">
+                      <input
+                        type="checkbox"
+                        [attr.aria-label]="item.text.title + ' auswählen'"
+                        [checked]="selected().has(item.hint.key)"
+                        (change)="toggleRow(item.hint.key)"
+                      />
+                    </td>
+                    <td class="col-id ad-num">
+                      {{ item.question ? 'F-' + item.question.id : '–' }}
+                    </td>
+                    <td class="col-text">
+                      <span class="text-button">{{
+                        item.question?.text ?? 'Ganzer Fragenbestand'
+                      }}</span>
+                      @if (variant() !== 'v7') {
+                        <span class="answer">
+                          <span class="answer-main">{{
+                            item.question?.category ?? 'Alle Kategorien'
+                          }}</span>
+                        </span>
+                      }
+                    </td>
+                    <td class="col-kind">
+                      @if (variant() === 'v7') {
+                        <span
+                          class="sev-dot"
+                          [attr.data-severity]="item.hint.severity"
+                        ></span>
+                      }
+                      {{ kinds[item.hint.type] }}
+                    </td>
+                    <td class="col-measure">
+                      <b>{{ measured(item) }}</b>
+                      <small>Grenze {{ limitOf(item) }}</small>
+                    </td>
+                    <td class="col-do" (click)="$event.stopPropagation()">
+                      <button
+                        type="button"
+                        class="btn-secondary btn-sm"
+                        (click)="act.emit(item)"
+                      >
+                        {{ actionOf(item) }}
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    }
+  </div>
+} @else {
+  <section class="chapter calm-chapter">
+    <div class="calm">
+      <span class="calm-icon"><css-icon icon="checkmark" size="sm"></css-icon></span>
+      <div>
+        <b>{{
+          status() === 'ignored'
+            ? 'Nichts ignoriert'
+            : quick() || search()
+              ? 'Keine Hinweise mit diesem Filter'
+              : 'Nichts zu tun'
+        }}</b>
+        <p>
+          {{
+            status() === 'ignored'
+              ? 'Ignorierte Hinweise erscheinen hier und lassen sich wieder öffnen.'
+              : 'Keine Frage fällt auf. Hinweise erscheinen hier, sobald eine Frage auffällt.'
+          }}
+        </p>
+      </div>
+    </div>
+  </section>
+}
+
+@if (count() > 0) {
+  <div class="sb" role="region" aria-label="Ausgewählte Hinweise">
+    <span class="sb-badge" aria-hidden="true"
+      ><css-icon icon="checkmark" size="sm"></css-icon><i>{{ count() }}</i></span
+    >
+    <span class="sb-main">
+      <b>{{
+        count() === 1 ? '1 Hinweis ausgewählt' : count() + ' Hinweise ausgewählt'
+      }}</b>
+      <span class="sb-sub">
+        @if (count() < rows().length) {
+          <button type="button" class="sb-link" (click)="selectAll()">
+            Alle {{ rows().length }} auswählen
+          </button>
+          ·
+        }
+        <button type="button" class="sb-link" (click)="clear()">
+          Auswahl aufheben
+        </button>
+      </span>
+    </span>
+    <div class="sb-actions">
+      <button
+        type="button"
+        class="sb-icon"
+        [attr.data-tip]="
+          pausable() ? 'Fragen pausieren' : 'Keine aktive Frage ausgewählt'
+        "
+        aria-label="Fragen pausieren"
+        [disabled]="!pausable()"
+        (click)="bulkPause()"
+      >
+        <css-icon icon="pause-circle" size="sm"></css-icon>
+      </button>
+      <span class="sb-sep" aria-hidden="true"></span>
+      <button
+        type="button"
+        class="sb-icon"
+        [attr.data-tip]="status() === 'open' ? 'Ignorieren' : 'Wieder öffnen'"
+        [attr.aria-label]="status() === 'open' ? 'Ignorieren' : 'Wieder öffnen'"
+        (click)="bulkIgnore()"
+      >
+        <css-icon
+          [attr.icon]="status() === 'open' ? 'hide' : 'undo'"
+          size="sm"
+        ></css-icon>
+      </button>
+    </div>
+    <button
+      type="button"
+      class="sb-close"
+      aria-label="Auswahl aufheben"
+      (click)="clear()"
+    >
+      <css-icon icon="close" size="xs"></css-icon>
+    </button>
+  </div>
+}

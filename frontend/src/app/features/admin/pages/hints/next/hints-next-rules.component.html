@@ -1,0 +1,3767 @@
+@if (top() === 'figures') {
+  <section class="figures" aria-label="Überblick">
+    <div class="figure is-lead">
+      <span class="figure-label">Fragenqualität</span>
+      <span class="figure-value">{{
+        quality() === null ? '–' : percent(quality())
+      }}</span>
+      <span class="figure-note">{{
+        judged()
+          ? judged() - flagged() + ' von ' + judged() + ' Fragen unauffällig'
+          : 'noch keine Frage beurteilt'
+      }}</span>
+    </div>
+    <div class="figure">
+      <span class="figure-label">Offene Hinweise</span>
+      <span class="figure-value">{{ open().length }}</span>
+      <span class="figure-note">{{
+        urgent().length ? urgent().length + ' davon bald angehen' : 'nichts eilt'
+      }}</span>
+    </div>
+    <div class="figure">
+      <span class="figure-label">Beurteilte Fragen</span>
+      <span class="figure-value">{{ judged() }}</span>
+      <span class="figure-note">ab 20 Antworten geprüft</span>
+    </div>
+    <button
+      type="button"
+      class="figure is-link"
+      [attr.aria-pressed]="showIgnored()"
+      (click)="showIgnored.set(!showIgnored())"
+    >
+      <span class="figure-label">{{
+        showIgnored() ? 'Zurück zu' : 'Ignoriert'
+      }}</span>
+      <span class="figure-value">{{
+        showIgnored() ? 'Offen' : ignored().length
+      }}</span>
+      <span class="figure-note figure-row"
+        >{{
+          showIgnored() ? open().length + ' offene Hinweise' : 'bewusst so gelassen'
+        }}
+        <span class="figure-go" aria-hidden="true"
+          ><css-icon icon="angle-right" size="xs"></css-icon></span
+      ></span>
+    </button>
+  </section>
+} @else {
+  <ng-container *ngTemplateOutlet="head" />
+}
+
+@if (
+  variant() === 'v1' ||
+  variant().startsWith('z') ||
+  variant().startsWith('y') ||
+  variant().startsWith('q') ||
+  variant().startsWith('r') ||
+  variant().startsWith('s')
+) {
+  @if (!showIgnored() && stepOne().length) {
+    <section class="block" aria-labelledby="first-title">
+      <div class="step">
+        <span class="step-no" aria-hidden="true">1</span>
+        <div class="step-text">
+          <h2 id="first-title">Zuerst angehen</h2>
+          <p>Diese Fragen verwirren Spielende oder entscheiden Duelle unfair.</p>
+        </div>
+      </div>
+      <div class="presets">
+        @for (item of stepOne(); track item.hint.key) {
+          <button type="button" class="preset is-hint" (click)="details.emit(item)">
+            <span class="preset-top">
+              @if (variant().startsWith('s') && markOf(item.hint.questionId); as n) {
+                <span class="s-mark is-inline">{{ n }}</span>
+              }
+              <b>{{ kinds[item.hint.type] }}</b>
+              <span class="preset-tag is-warm">{{
+                severities[item.hint.severity]
+              }}</span>
+            </span>
+            <span class="preset-facts">
+              <span class="hint-q">{{
+                item.question?.text ?? 'Ganzer Fragenbestand'
+              }}</span>
+              <span
+                ><b>{{ measured(item) }}</b> · Grenze {{ limitOf(item) }}</span
+              >
+            </span>
+            <span class="preset-length is-go"
+              >{{ actionOf(item) }}<css-icon icon="arrow-right" size="xs"></css-icon
+            ></span>
+          </button>
+        }
+      </div>
+    </section>
+  }
+
+  <section class="block" aria-labelledby="checks-title">
+    <div class="step">
+      <span class="step-no" aria-hidden="true">{{
+        !showIgnored() && stepOne().length ? 2 : 1
+      }}</span>
+      <div class="step-text">
+        <h2 id="checks-title">
+          {{ showIgnored() ? 'Ignorierte Hinweise' : 'Alle Prüfungen' }}
+        </h2>
+        <p>
+          {{
+            showIgnored()
+              ? 'Bleiben aussen vor, bis du sie wieder öffnest.'
+              : 'Jede aktive Frage mit mindestens 20 Antworten, laufend geprüft.'
+          }}
+        </p>
+      </div>
+    </div>
+    <ng-container *ngTemplateOutlet="checkChapters" />
+  </section>
+}
+
+@if (
+  variant() === 'v2' ||
+  variant() === 'v10' ||
+  variant() === 'v15' ||
+  variant() === 'v21' ||
+  variant() === 'b3'
+) {
+  <section class="block" aria-labelledby="sev-title">
+    <div class="step">
+      <span class="step-no" aria-hidden="true">1</span>
+      <div class="step-text">
+        <h2 id="sev-title">
+          {{ showIgnored() ? 'Ignorierte Hinweise' : 'Hinweise prüfen' }}
+        </h2>
+        <p>Einen Wert öffnen für den nächsten Schritt.</p>
+      </div>
+    </div>
+    @if (!bySeverity().length) {
+      <ng-container *ngTemplateOutlet="calm" />
+    } @else {
+      <div class="chapters">
+        @for (group of bySeverity(); track group.severity) {
+          <section class="chapter" [class.is-open]="isOpen(group.severity, true)">
+            <button
+              type="button"
+              class="chapter-head"
+              [attr.aria-expanded]="isOpen(group.severity, true)"
+              (click)="toggleGroup(group.severity, true)"
+            >
+              <span class="chev" aria-hidden="true"></span>
+              <span class="chapter-title">
+                <b>{{ group.title }}</b>
+                <span>{{ group.note }}</span>
+              </span>
+              <span
+                class="changed-tag is-count"
+                [attr.data-severity]="group.severity"
+                >{{ group.items.length }}
+                {{ group.items.length === 1 ? 'Hinweis' : 'Hinweise' }}</span
+              >
+            </button>
+            @if (isOpen(group.severity, true)) {
+              <div class="rules-head" aria-hidden="true">
+                <span>Frage</span>
+                <span>Grenze</span>
+                <span>Gemessen</span>
+              </div>
+              @for (item of group.items; track item.hint.key) {
+                <ng-container
+                  *ngTemplateOutlet="
+                    hintRow;
+                    context: { $implicit: item, withKind: true }
+                  "
+                />
+              }
+            }
+          </section>
+        }
+      </div>
+    }
+  </section>
+
+  @if (!showIgnored() && variant() === 'v2') {
+    <section class="block" aria-labelledby="run-title">
+      <div class="step">
+        <span class="step-no" aria-hidden="true">2</span>
+        <div class="step-text">
+          <h2 id="run-title">Laufend geprüft</h2>
+          <p>Diese Grenzen gelten für jede Frage mit mindestens 20 Antworten.</p>
+        </div>
+      </div>
+      <div class="presets">
+        @for (group of groups(); track group.id) {
+          <div class="preset is-check" [class.is-bad]="group.items.length">
+            <span class="preset-top">
+              <b>{{ group.title }}</b>
+              <span class="check-state" aria-hidden="true">
+                <css-icon
+                  [attr.icon]="group.items.length ? 'priority-warning' : 'checkmark'"
+                  size="xs"
+                ></css-icon>
+              </span>
+            </span>
+            <span class="preset-facts"
+              ><span>{{ group.limit }}</span></span
+            >
+            <span class="preset-length">{{
+              group.items.length
+                ? group.items.length +
+                  (group.items.length === 1 ? ' Hinweis' : ' Hinweise')
+                : 'Bestanden'
+            }}</span>
+          </div>
+        }
+      </div>
+    </section>
+  }
+}
+
+@if (variant() === 'v4') {
+  <section class="block" aria-labelledby="pick-title">
+    <div class="step">
+      <span class="step-no" aria-hidden="true">1</span>
+      <div class="step-text">
+        <h2 id="pick-title">Prüfung wählen</h2>
+        <p>Jede Prüfung hat eine Grenze. Gewählt wird, was angesehen werden soll.</p>
+      </div>
+    </div>
+    <div class="presets" role="radiogroup" aria-labelledby="pick-title">
+      @for (group of groups(); track group.id) {
+        <button
+          type="button"
+          role="radio"
+          class="preset"
+          [class.is-active]="activeCheck() === group.id"
+          [attr.aria-checked]="activeCheck() === group.id"
+          (click)="pickedCheck.set(group.id)"
+        >
+          <span class="preset-top">
+            <b>{{ group.title }}</b>
+            @if (!group.items.length) {
+              <span class="preset-tag is-ok">Bestanden</span>
+            }
+            <span class="radio" aria-hidden="true"></span>
+          </span>
+          <span class="preset-facts"
+            ><span>{{ group.limit }}</span></span
+          >
+          <span class="preset-length" [class.is-warm-text]="group.items.length">{{
+            group.items.length
+              ? group.items.length +
+                (group.items.length === 1 ? ' Frage auffällig' : ' Fragen auffällig')
+              : 'Alle Fragen in Ordnung'
+          }}</span>
+        </button>
+      }
+    </div>
+  </section>
+  <section class="block" aria-labelledby="list-title">
+    <div class="step">
+      <span class="step-no" aria-hidden="true">2</span>
+      <div class="step-text">
+        <h2 id="list-title">{{ checkTitle() }}</h2>
+        <p>
+          {{
+            checkItems().length
+              ? 'Einen Wert öffnen für den nächsten Schritt.'
+              : 'Hier gibt es nichts zu tun.'
+          }}
+        </p>
+      </div>
+    </div>
+    @if (checkItems().length) {
+      <section class="chapter is-open is-flat">
+        <div class="rules-head" aria-hidden="true">
+          <span>Frage</span>
+          <span>Grenze</span>
+          <span>Gemessen</span>
+        </div>
+        @for (item of checkItems(); track item.hint.key) {
+          <ng-container
+            *ngTemplateOutlet="
+              hintRow;
+              context: { $implicit: item, withKind: false }
+            "
+          />
+        }
+      </section>
+    } @else {
+      <ng-container *ngTemplateOutlet="calm" />
+    }
+  </section>
+}
+
+@if (variant() === 'v5' || variant() === 'v11') {
+  <section class="block" aria-labelledby="sheet-title">
+    <div class="step">
+      <span class="step-no" aria-hidden="true">1</span>
+      <div class="step-text">
+        <h2 id="sheet-title">Auffällige Fragen</h2>
+        <p>
+          Pro Frage alle Prüfungen auf einen Blick – was in Ordnung ist und was
+          nicht.
+        </p>
+      </div>
+    </div>
+    @if (!byQuestion().length && !poolShown().length) {
+      <ng-container *ngTemplateOutlet="calm" />
+    } @else {
+      <div class="chapters">
+        @for (entry of byQuestion(); track entry.id) {
+          <section class="chapter" [class.is-open]="isOpen('q' + entry.id, true)">
+            <button
+              type="button"
+              class="chapter-head"
+              [attr.aria-expanded]="isOpen('q' + entry.id, true)"
+              (click)="toggleGroup('q' + entry.id, true)"
+            >
+              <span class="chev" aria-hidden="true"></span>
+              <span class="chapter-title">
+                <b
+                  ><span class="rule-id">F-{{ entry.id }}</span
+                  >{{ entry.question.text }}</b
+                >
+                <span
+                  >{{ entry.question.category }} ·
+                  {{ entry.question.stats.answers }} Antworten</span
+                >
+              </span>
+              <span class="changed-tag is-count" [attr.data-severity]="entry.worst"
+                >{{ entry.items.length }} von 3 auffällig</span
+              >
+            </button>
+            @if (isOpen('q' + entry.id, true)) {
+              <div class="rules-head" aria-hidden="true">
+                <span>Prüfung</span>
+                <span>Grenze</span>
+                <span>Gemessen</span>
+              </div>
+              @for (check of entry.checks; track check.title) {
+                @if (check.item; as item) {
+                  <div class="rule is-hint">
+                    <div class="rule-text">
+                      <span class="rule-label">{{ check.title }}</span>
+                      <p class="rule-description">{{ item.text.finding }}</p>
+                    </div>
+                    <div class="rule-control">
+                      <span class="rule-standard">{{ check.limit }}</span>
+                      <ng-container
+                        *ngTemplateOutlet="valueChip; context: { $implicit: item }"
+                      />
+                    </div>
+                  </div>
+                } @else {
+                  <div class="rule is-hint is-fine">
+                    <div class="rule-text">
+                      <span class="rule-label">{{ check.title }}</span>
+                    </div>
+                    <div class="rule-control">
+                      <span class="rule-standard">{{ check.limit }}</span>
+                      <span class="value is-ok"
+                        ><b>{{ check.value }}</b
+                        ><css-icon icon="checkmark" size="xs"></css-icon
+                      ></span>
+                    </div>
+                  </div>
+                }
+              }
+            }
+          </section>
+        }
+        @for (item of poolShown(); track item.hint.key) {
+          <section class="chapter is-open">
+            <div class="chapter-head is-static">
+              <span class="chev is-hidden" aria-hidden="true"></span>
+              <span class="chapter-title">
+                <b>Fragenbestand</b>
+                <span>{{ item.text.finding }}</span>
+              </span>
+              <ng-container
+                *ngTemplateOutlet="valueChip; context: { $implicit: item }"
+              />
+            </div>
+          </section>
+        }
+      </div>
+    }
+  </section>
+}
+
+@if (
+  variant() === 'v6' ||
+  variant() === 'v14' ||
+  variant() === 'v17' ||
+  variant() === 'b2'
+) {
+  <section class="block" aria-labelledby="decide-title">
+    <div class="step">
+      <span class="step-no" aria-hidden="true">1</span>
+      <div class="step-text">
+        <h2 id="decide-title">Entscheiden</h2>
+        <p>
+          Pro Hinweis festlegen, was passiert. Ausgeführt wird erst unten in der
+          Leiste.
+        </p>
+      </div>
+    </div>
+    @if (!shown().length) {
+      <ng-container *ngTemplateOutlet="calm" />
+    } @else {
+      <section class="chapter is-open is-flat">
+        <div class="rules-head is-decide" aria-hidden="true">
+          <span>Frage</span>
+          <span>Gemessen</span>
+          <span>Entscheidung</span>
+        </div>
+        @for (item of shown(); track item.hint.key) {
+          <div class="rule is-hint" [class.is-changed]="staged().has(item.hint.key)">
+            <div class="rule-text">
+              <span class="rule-label">
+                @if (item.question) {
+                  <span class="rule-id">F-{{ item.question.id }}</span>
+                }
+                {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+              </span>
+              <p class="rule-description">
+                <b>{{ kindOf(item) }}.</b> {{ item.text.advice }}
+              </p>
+            </div>
+            <div class="rule-control">
+              <span
+                class="rule-standard is-measured"
+                [attr.data-severity]="item.hint.severity"
+                >{{ measured(item) }}</span
+              >
+              <div
+                class="decide"
+                role="radiogroup"
+                [attr.aria-label]="'Entscheidung für ' + item.text.title"
+              >
+                @for (what of decisionsFor(item); track what) {
+                  <button
+                    type="button"
+                    role="radio"
+                    class="decide-btn"
+                    [class.is-active]="staged().get(item.hint.key) === what"
+                    [attr.aria-checked]="staged().get(item.hint.key) === what"
+                    (click)="stage(item, what)"
+                  >
+                    {{ decisionLabels[what] }}
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </section>
+    }
+  </section>
+  @if (stagedRows().length) {
+    <div class="bar" role="region" aria-label="Entscheidungen">
+      @if (reviewOpen()) {
+        <div class="review">
+          <div class="review-head">
+            <div>
+              <b>Entscheidungen prüfen</b>
+              <span
+                >Überarbeiten öffnet die Frage, Pausieren nimmt sie aus dem
+                Spiel.</span
+              >
+            </div>
+            <button
+              type="button"
+              class="review-btn is-close"
+              aria-label="Prüfung schliessen"
+              (click)="reviewOpen.set(false)"
+            >
+              <css-icon icon="close" size="xs"></css-icon>
+            </button>
+          </div>
+          <table class="review-table">
+            <thead>
+              <tr>
+                <th scope="col">Frage</th>
+                <th scope="col">Befund</th>
+                <th scope="col">Entscheidung</th>
+                <th scope="col"><span class="sr-only">Zurücknehmen</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of stagedRows(); track row.item.hint.key) {
+                <tr>
+                  <th scope="row">
+                    {{ row.item.question ? 'F-' + row.item.question.id : 'Bestand' }}
+                  </th>
+                  <td class="was">{{ kindOf(row.item) }}</td>
+                  <td>
+                    <b>{{ decisionLabels[row.what] }}</b>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="review-btn"
+                      title="Zurücknehmen"
+                      aria-label="Zurücknehmen"
+                      (click)="unstage(row.item.hint.key)"
+                    >
+                      <css-icon icon="undo" size="xs"></css-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      <span class="bar-badge" aria-hidden="true"
+        ><css-icon icon="checkmark" size="sm"></css-icon
+        ><i>{{ stagedRows().length }}</i></span
+      >
+      <span class="bar-main">
+        <b>{{
+          stagedRows().length === 1
+            ? 'Eine Entscheidung bereit'
+            : stagedRows().length + ' Entscheidungen bereit'
+        }}</b>
+        <span class="bar-sub">Noch nichts ausgeführt</span>
+      </span>
+      <div class="bar-actions">
+        <button type="button" class="bar-ghost" (click)="discardStaged()">
+          Verwerfen
+        </button>
+        @if (!reviewOpen()) {
+          <button
+            type="button"
+            class="btn-primary bar-save"
+            (click)="reviewOpen.set(true)"
+          >
+            Prüfen und ausführen
+          </button>
+        } @else {
+          <button type="button" class="btn-primary bar-save" (click)="carryOut()">
+            Jetzt ausführen
+          </button>
+        }
+      </div>
+    </div>
+  }
+}
+
+@if (variant() === 'v8') {
+  @if (categories().length) {
+    <section class="block" aria-labelledby="cat-title">
+      <div class="step">
+        <span class="step-no" aria-hidden="true">1</span>
+        <div class="step-text">
+          <h2 id="cat-title">Kategorie wählen</h2>
+          <p>Der Anteil unauffälliger Fragen je Kategorie.</p>
+        </div>
+        @if (pickedCategory()) {
+          <button type="button" class="link-btn" (click)="pickedCategory.set(null)">
+            Alle Kategorien
+          </button>
+        }
+      </div>
+      <div class="presets is-cats" role="radiogroup" aria-labelledby="cat-title">
+        @for (cat of categories(); track cat.name) {
+          <button
+            type="button"
+            role="radio"
+            class="preset"
+            [class.is-active]="pickedCategory() === cat.name"
+            [attr.aria-checked]="pickedCategory() === cat.name"
+            (click)="
+              pickedCategory.set(pickedCategory() === cat.name ? null : cat.name)
+            "
+          >
+            <span class="preset-top">
+              <b>{{ cat.name }}</b>
+              <span class="radio" aria-hidden="true"></span>
+            </span>
+            <span class="cat-score">{{ percent(cat.score) }}</span>
+            <span class="cat-meter"
+              ><span [style.width.%]="cat.score * 100"></span
+            ></span>
+            <span class="preset-length" [class.is-warm-text]="cat.bad">{{
+              cat.bad
+                ? cat.bad + ' von ' + cat.total + ' auffällig'
+                : 'alle ' + cat.total + ' in Ordnung'
+            }}</span>
+          </button>
+        }
+      </div>
+    </section>
+  }
+  <section class="block" aria-labelledby="cat-list-title">
+    <div class="step">
+      <span class="step-no" aria-hidden="true">{{
+        categories().length ? 2 : 1
+      }}</span>
+      <div class="step-text">
+        <h2 id="cat-list-title">
+          {{
+            categories().length
+              ? (pickedCategory() ?? 'Alle Kategorien')
+              : 'Hinweise'
+          }}
+        </h2>
+        <p>
+          {{ categoryItems().length }}
+          {{ categoryItems().length === 1 ? 'Hinweis' : 'Hinweise' }}
+        </p>
+      </div>
+    </div>
+    @if (!categoryGroups().length) {
+      <ng-container *ngTemplateOutlet="calm" />
+    } @else {
+      <div class="chapters">
+        @for (group of categoryGroups(); track group.id) {
+          <section class="chapter is-open">
+            <div class="chapter-head is-static">
+              <span class="chev is-hidden" aria-hidden="true"></span>
+              <span class="chapter-title">
+                <b>{{ group.title }}</b>
+                <span>{{ group.limit }}</span>
+              </span>
+              <span
+                class="changed-tag is-count"
+                [attr.data-severity]="group.items[0]?.hint?.severity"
+                >{{ group.items.length }} auffällig</span
+              >
+            </div>
+            <div class="rules-head" aria-hidden="true">
+              <span>Frage</span>
+              <span>Grenze</span>
+              <span>Gemessen</span>
+            </div>
+            @for (item of group.items; track item.hint.key) {
+              <ng-container
+                *ngTemplateOutlet="
+                  hintRow;
+                  context: { $implicit: item, withKind: false }
+                "
+              />
+            }
+          </section>
+        }
+      </div>
+    }
+  </section>
+}
+
+@if (
+  variant() === 'v9' ||
+  variant() === 'v16' ||
+  variant() === 'v18' ||
+  variant() === 'v24' ||
+  variant() === 'b1'
+) {
+  @if (variant() !== 'b1' || shown().length) {
+    <ng-container *ngTemplateOutlet="checkChapters" />
+  }
+}
+
+@if (variant() === 'v12') {
+  @if (!cellItems().length) {
+    <ng-container *ngTemplateOutlet="calm" />
+  } @else {
+    <section class="chapter is-open is-flat">
+      <div class="rules-head" aria-hidden="true">
+        <span>Frage</span>
+        <span>Grenze</span>
+        <span>Gemessen</span>
+      </div>
+      @for (item of cellItems(); track item.hint.key) {
+        <ng-container
+          *ngTemplateOutlet="hintRow; context: { $implicit: item, withKind: true }"
+        />
+      }
+    </section>
+  }
+}
+
+@if (variant() === 'v13') {
+  <div class="with-side">
+    <div class="with-side-main">
+      <ng-container *ngTemplateOutlet="checkChapters" />
+    </div>
+    <aside class="side-card">
+      <p class="side-label">Fragenqualität</p>
+      <p class="side-big">{{ quality() === null ? '–' : percent(quality()) }}</p>
+      <p class="side-note">
+        {{ judged() - flagged() }} von {{ judged() }} Fragen unauffällig
+      </p>
+      <div class="side-meter">
+        <span [style.width.%]="(quality() ?? 0) * 100"></span>
+      </div>
+      <dl class="side-facts">
+        <div>
+          <dt>Offen</dt>
+          <dd>{{ open().length }}</dd>
+        </div>
+        <div>
+          <dt>Bald angehen</dt>
+          <dd>{{ urgent().length }}</dd>
+        </div>
+        <div>
+          <dt>Ignoriert</dt>
+          <dd>{{ ignored().length }}</dd>
+        </div>
+      </dl>
+      <button
+        type="button"
+        class="side-link"
+        (click)="showIgnored.set(!showIgnored())"
+      >
+        {{ showIgnored() ? 'Zurück zu den offenen' : 'Ignorierte anzeigen' }}
+        <css-icon icon="angle-right" size="xs"></css-icon>
+      </button>
+    </aside>
+  </div>
+}
+
+@if (variant() === 'v19') {
+  <div class="vrail">
+    <nav class="vrail-nav" aria-label="Prüfungen">
+      <p class="vrail-title">Laufend geprüft</p>
+      @for (group of groups(); track group.id; let last = $last) {
+        <button
+          type="button"
+          class="vrail-step"
+          [class.is-active]="railActive() === group.id"
+          [class.is-bad]="group.items.length"
+          [class.is-last]="last"
+          [attr.aria-current]="railActive() === group.id"
+          (click)="railCheck.set(group.id)"
+        >
+          <span class="vrail-node" aria-hidden="true">
+            <css-icon
+              [attr.icon]="group.items.length ? 'priority-warning' : 'checkmark'"
+              size="xs"
+            ></css-icon>
+          </span>
+          <span class="vrail-text">
+            <b>{{ group.title }}</b>
+            <span>{{
+              group.items.length ? group.items.length + ' auffällig' : 'Bestanden'
+            }}</span>
+          </span>
+        </button>
+      }
+      <p class="vrail-quality">
+        Fragenqualität <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+      </p>
+    </nav>
+    <div class="vrail-main">
+      @if (railGroup(); as group) {
+        <div class="step">
+          <div class="step-text">
+            <h2>{{ group.title }}</h2>
+            <p>{{ group.limit }}</p>
+          </div>
+        </div>
+        @if (group.items.length) {
+          <section class="chapter is-open is-flat">
+            <div class="rules-head" aria-hidden="true">
+              <span>Frage</span>
+              <span>Grenze</span>
+              <span>Gemessen</span>
+            </div>
+            @for (item of group.items; track item.hint.key) {
+              <ng-container
+                *ngTemplateOutlet="
+                  hintRow;
+                  context: { $implicit: item, withKind: false }
+                "
+              />
+            }
+          </section>
+        } @else {
+          <ng-container *ngTemplateOutlet="calm" />
+        }
+      }
+    </div>
+  </div>
+}
+
+@if (variant() === 'v20') {
+  @if (!found().length) {
+    <ng-container *ngTemplateOutlet="calm" />
+  } @else {
+    <section class="chapter is-open is-flat">
+      <div class="rules-head" aria-hidden="true">
+        <span>Frage</span>
+        <span>Grenze</span>
+        <span>Gemessen</span>
+      </div>
+      @for (item of found(); track item.hint.key) {
+        <ng-container
+          *ngTemplateOutlet="hintRow; context: { $implicit: item, withKind: true }"
+        />
+      }
+    </section>
+  }
+}
+
+@if (variant() === 'v22') {
+  <section class="hd-card is-flush">
+    <header class="hd-head">
+      <div>
+        <h2>So antworten die Spielenden</h2>
+        <p>Je dunkler ein Feld, desto mehr wählen diese Antwort</p>
+      </div>
+      <ul class="band-key is-inline">
+        <li><i class="is-ok"></i>richtig</li>
+        <li><i data-check="clear"></i>lockt</li>
+        <li><i data-check="time"></i>andere</li>
+      </ul>
+    </header>
+    @if (!heat().length) {
+      <ng-container *ngTemplateOutlet="calm" />
+    } @else {
+      <div class="heat">
+        @for (row of heat(); track row.item.hint.key) {
+          <div class="heat-row">
+            <div class="heat-q">
+              <b>
+                <span class="rule-id">F-{{ row.item.question!.id }}</span
+                >{{ row.item.question!.text }}
+              </b>
+              <span
+                class="heat-kind"
+                [attr.data-severity]="row.item.hint.severity"
+                >{{ kindOf(row.item) }}</span
+              >
+            </div>
+            <div class="heat-cells">
+              @for (c of row.cells; track $index) {
+                <span
+                  class="heat-cell"
+                  [attr.data-kind]="c.kind"
+                  [class.is-light]="c.share < 0.22"
+                  [style.--a]="0.12 + c.share * 0.88"
+                  [attr.title]="c.text"
+                >
+                  <small>{{ c.text }}</small>
+                  <b>{{ percent(c.share) }}</b>
+                </span>
+              }
+            </div>
+            <ng-container
+              *ngTemplateOutlet="valueChip; context: { $implicit: row.item }"
+            />
+          </div>
+        }
+      </div>
+    }
+  </section>
+}
+
+@if (variant() === 'v23') {
+  <section class="block" aria-labelledby="fix-title">
+    <div class="step">
+      <span class="step-no" aria-hidden="true">1</span>
+      <div class="step-text">
+        <h2 id="fix-title">Was du beheben willst</h2>
+        <p>
+          Antippen, was du überarbeitest – oben siehst du, wie sich die Qualität
+          verändert.
+        </p>
+      </div>
+    </div>
+    @if (!open().length) {
+      <ng-container *ngTemplateOutlet="calm" />
+    } @else {
+      <section class="chapter is-open is-flat">
+        @for (item of open(); track item.hint.key) {
+          <label
+            class="rule is-hint is-pick"
+            [class.is-changed]="fixed().has(item.hint.key)"
+          >
+            <span class="pick-box" aria-hidden="true">
+              @if (fixed().has(item.hint.key)) {
+                <css-icon icon="checkmark" size="xs"></css-icon>
+              }
+            </span>
+            <input
+              type="checkbox"
+              class="sr-only"
+              [checked]="fixed().has(item.hint.key)"
+              (change)="toggleFixed(item.hint.key)"
+            />
+            <span class="rule-text">
+              <span class="rule-label">
+                @if (item.question) {
+                  <span class="rule-id">F-{{ item.question.id }}</span>
+                }
+                {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+              </span>
+              <span class="rule-description"
+                ><b>{{ kindOf(item) }}.</b> {{ item.text.advice }}</span
+              >
+            </span>
+            <span
+              class="rule-standard is-measured"
+              [attr.data-severity]="item.hint.severity"
+              >{{ measured(item) }}</span
+            >
+          </label>
+        }
+      </section>
+    }
+  </section>
+}
+
+@if (variant() === 'v25') {
+  <div class="cols">
+    @for (group of groups(); track group.id) {
+      <section class="col-card" [class.is-ok]="!group.items.length">
+        <header class="col-head">
+          <span
+            class="vrail-node"
+            [class.is-bad]="group.items.length"
+            aria-hidden="true"
+          >
+            <css-icon
+              [attr.icon]="group.items.length ? 'priority-warning' : 'checkmark'"
+              size="xs"
+            ></css-icon>
+          </span>
+          <div>
+            <b>{{ group.title }}</b>
+            <span>{{ group.limit }}</span>
+          </div>
+        </header>
+        @for (item of group.items; track item.hint.key) {
+          <button type="button" class="col-item" (click)="details.emit(item)">
+            <span class="col-item-q">
+              @if (item.question) {
+                <span class="rule-id">F-{{ item.question.id }}</span>
+              }
+              {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+            </span>
+            <span class="col-item-foot">
+              <b [attr.data-severity]="item.hint.severity">{{ measured(item) }}</b>
+              <span
+                >{{ actionOf(item)
+                }}<css-icon icon="angle-right" size="xs"></css-icon
+              ></span>
+            </span>
+          </button>
+        } @empty {
+          <p class="col-ok">
+            <css-icon icon="checkmark" size="xs"></css-icon>Bestanden
+          </p>
+        }
+      </section>
+    }
+  </div>
+}
+
+@if (variant() === 'v26') {
+  @if (tabGroup(); as group) {
+    <section class="chapter is-open is-flat">
+      @if (group.items.length) {
+        <div class="rules-head" aria-hidden="true">
+          <span>Frage</span>
+          <span>Grenze</span>
+          <span>Gemessen</span>
+        </div>
+        @for (item of group.items; track item.hint.key) {
+          <ng-container
+            *ngTemplateOutlet="
+              hintRow;
+              context: { $implicit: item, withKind: false }
+            "
+          />
+        }
+      } @else {
+        <ng-container *ngTemplateOutlet="calm" />
+      }
+    </section>
+  }
+}
+
+@if (variant() === 'b4') {
+  <div class="ws">
+    <nav class="vrail-nav" aria-label="Prüfungen">
+      <p class="vrail-title">Laufend geprüft</p>
+      @for (group of groups(); track group.id; let last = $last) {
+        <button
+          type="button"
+          class="vrail-step"
+          [class.is-active]="railActive() === group.id"
+          [class.is-bad]="group.items.length"
+          [class.is-last]="last"
+          (click)="pickRail(group.id)"
+        >
+          <span
+            class="vrail-node"
+            [class.is-bad]="group.items.length"
+            aria-hidden="true"
+          >
+            <css-icon
+              [attr.icon]="group.items.length ? 'priority-warning' : 'checkmark'"
+              size="xs"
+            ></css-icon>
+          </span>
+          <span class="vrail-text">
+            <b>{{ group.title }}</b>
+            <span>{{
+              group.items.length ? group.items.length + ' auffällig' : 'Bestanden'
+            }}</span>
+          </span>
+        </button>
+      }
+      <p class="vrail-quality">
+        Fragenqualität <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+      </p>
+      @if (ignored().length || showIgnored()) {
+        <button
+          type="button"
+          class="side-link"
+          (click)="showIgnored.set(!showIgnored())"
+        >
+          {{
+            showIgnored()
+              ? 'Zurück zu den offenen'
+              : ignored().length + ' ignoriert anzeigen'
+          }}
+          <css-icon icon="angle-right" size="xs"></css-icon>
+        </button>
+      }
+    </nav>
+    <div class="ws-main">
+      @if (railGroup(); as group) {
+        <header class="ws-head">
+          <h2>{{ group.title }}</h2>
+          <p>{{ group.limit }}</p>
+        </header>
+        @if (!group.items.length) {
+          <ng-container *ngTemplateOutlet="calm" />
+        } @else {
+          @if (group.items.length > 1) {
+            <div class="ws-picks" role="tablist">
+              @for (item of group.items; track item.hint.key) {
+                <button
+                  type="button"
+                  role="tab"
+                  class="ws-pick"
+                  [class.is-active]="focusItem()?.hint?.key === item.hint.key"
+                  (click)="focusKey.set(item.hint.key)"
+                >
+                  <span>{{
+                    item.question ? 'F-' + item.question.id : 'Bestand'
+                  }}</span>
+                  <b [attr.data-severity]="item.hint.severity">{{
+                    measured(item)
+                  }}</b>
+                </button>
+              }
+            </div>
+          }
+          @if (focusItem(); as item) {
+            <article class="ws-card">
+              <div class="ws-card-head">
+                <span
+                  class="changed-tag is-count"
+                  [attr.data-severity]="item.hint.severity"
+                  >{{ severityText(item) }}</span
+                >
+                <span class="ws-ref">{{
+                  item.question
+                    ? 'F-' + item.question.id + ' · ' + item.question.category
+                    : 'Fragenbestand'
+                }}</span>
+              </div>
+              <h3>{{ item.question?.text ?? item.text.title }}</h3>
+              <p class="ws-finding">{{ item.text.finding }}</p>
+              @if (item.question) {
+                <div class="heat-cells is-big">
+                  @for (c of heatOf(item); track $index) {
+                    <span
+                      class="heat-cell"
+                      [attr.data-kind]="c.kind"
+                      [class.is-light]="c.share < 0.22"
+                      [style.--a]="0.12 + c.share * 0.88"
+                    >
+                      <small>{{ c.text }}</small>
+                      <b>{{ percent(c.share) }}</b>
+                    </span>
+                  }
+                </div>
+              }
+              <div class="ws-advice">
+                <b>Empfehlung</b>
+                <p>{{ item.text.advice }}</p>
+              </div>
+              <footer class="ws-foot">
+                <button
+                  type="button"
+                  class="link-btn is-quiet-btn"
+                  (click)="run('ignore', item)"
+                >
+                  {{ item.hint.ignored ? 'Wieder öffnen' : 'Ignorieren' }}
+                </button>
+                @if (item.question?.active && !item.hint.ignored) {
+                  <button
+                    type="button"
+                    class="btn-secondary"
+                    (click)="run('pause', item)"
+                  >
+                    Pausieren
+                  </button>
+                }
+                @if (!item.hint.ignored) {
+                  <button
+                    type="button"
+                    class="btn-primary"
+                    (click)="run('act', item)"
+                  >
+                    {{ actionOf(item) }}
+                  </button>
+                }
+              </footer>
+            </article>
+          }
+        }
+      }
+    </div>
+  </div>
+}
+
+@if (variant() === 'c1') {
+  @if (!catChapters().length) {
+    <ng-container *ngTemplateOutlet="calm" />
+  } @else {
+    <div class="chapters">
+      @for (entry of catChapters(); track entry.name) {
+        <section class="chapter is-open">
+          <div class="chapter-head is-static is-cat">
+            <span class="chapter-title">
+              <b>{{ entry.name }}</b>
+              <span>
+                @if (entry.cat; as cat) {
+                  {{ cat.total }} Fragen · {{ cat.bad }} auffällig
+                } @else {
+                  Alle Kategorien
+                }
+              </span>
+            </span>
+            @if (entry.cat; as cat) {
+              <span class="cat-head-meter">
+                <b>{{ percent(cat.score) }}</b>
+                <span class="catbars-track"
+                  ><span
+                    class="catbars-fill"
+                    [style.width.%]="cat.score * 100"
+                  ></span
+                ></span>
+              </span>
+            }
+          </div>
+          <div class="rules-head" aria-hidden="true">
+            <span>Frage</span>
+            <span>Grenze</span>
+            <span>Gemessen</span>
+          </div>
+          @for (item of entry.items; track item.hint.key) {
+            <ng-container
+              *ngTemplateOutlet="
+                hintRow;
+                context: { $implicit: item, withKind: true }
+              "
+            />
+          }
+        </section>
+      }
+    </div>
+  }
+}
+
+@if (variant() === 'c2') {
+  @if (!shown().length) {
+    <ng-container *ngTemplateOutlet="calm" />
+  } @else {
+    <div class="ld">
+      <section class="ld-list">
+        @for (item of shown(); track item.hint.key) {
+          <button
+            type="button"
+            class="ld-row"
+            [class.is-active]="picked()?.hint?.key === item.hint.key"
+            (click)="pickKey.set(item.hint.key)"
+          >
+            <span class="ld-row-top">
+              <span
+                class="changed-tag is-count"
+                [attr.data-severity]="item.hint.severity"
+                >{{ severityText(item) }}</span
+              >
+              <b [attr.data-severity]="item.hint.severity">{{ measured(item) }}</b>
+            </span>
+            <span class="ld-row-q">
+              @if (item.question) {
+                <span class="rule-id">F-{{ item.question.id }}</span>
+              }
+              {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+            </span>
+            <small>{{ kindOf(item) }}</small>
+          </button>
+        }
+      </section>
+      @if (picked(); as item) {
+        <ng-container *ngTemplateOutlet="bigCard; context: { $implicit: item }" />
+      }
+    </div>
+  }
+}
+
+@if (variant() === 'c3') {
+  @if (!byTrend().length) {
+    <ng-container *ngTemplateOutlet="calm" />
+  } @else {
+    <section class="chapter is-open is-flat">
+      <div class="rules-head is-trend" aria-hidden="true">
+        <span>Frage</span>
+        <span>Entwicklung</span>
+        <span>Gemessen</span>
+      </div>
+      @for (item of byTrend(); track item.hint.key) {
+        <div class="rule is-hint">
+          <div class="rule-text">
+            <span class="rule-label">
+              @if (item.question) {
+                <span class="rule-id">F-{{ item.question.id }}</span>
+              }
+              {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+            </span>
+            <p class="rule-description">
+              <b>{{ kindOf(item) }}.</b> {{ item.text.finding }}
+            </p>
+          </div>
+          <div class="rule-control">
+            <span class="verdict" [attr.data-verdict]="verdictOf(item)">
+              {{
+                verdictOf(item) === 'worse'
+                  ? 'wird schlechter'
+                  : verdictOf(item) === 'better'
+                    ? 'bessert sich'
+                    : verdictOf(item) === 'same'
+                      ? 'gleich'
+                      : '–'
+              }}
+            </span>
+            <ng-container
+              *ngTemplateOutlet="valueChip; context: { $implicit: item }"
+            />
+          </div>
+        </div>
+      }
+    </section>
+  }
+}
+
+@if (variant() === 'c4') {
+  @if (tabGroup(); as group) {
+    @if (!group.items.length) {
+      <ng-container *ngTemplateOutlet="calm" />
+    } @else {
+      <div class="stack">
+        @for (item of group.items; track item.hint.key) {
+          <ng-container *ngTemplateOutlet="bigCard; context: { $implicit: item }" />
+        }
+      </div>
+    }
+  }
+}
+
+@if (variant() === 'd1') {
+  @if (!measures().length && !poolShown().length) {
+    <ng-container *ngTemplateOutlet="calm" />
+  } @else {
+    <section class="mt-card">
+      <div class="mt-scroll">
+        <table class="mt">
+          <thead>
+            <tr>
+              <th scope="col" class="mt-q">Frage</th>
+              @for (h of measureHeads; track h; let i = $index) {
+                <th scope="col">
+                  {{ h }}
+                  @if (measureLimits[i]) {
+                    <small>{{ measureLimits[i] }}</small>
+                  }
+                </th>
+              }
+              <th scope="col" class="mt-go"><span class="sr-only">Aktion</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of measures(); track row.id) {
+              <tr>
+                <td class="mt-q">
+                  <span class="rule-id">F-{{ row.id }}</span
+                  ><b>{{ row.q.text }}</b>
+                  <small>{{ row.q.category }}</small>
+                </td>
+                @for (c of row.cells; track c.label) {
+                  <td>
+                    <span class="mt-cell" [class.is-bad]="c.bad">{{ c.value }}</span>
+                  </td>
+                }
+                <td class="mt-go">
+                  <ng-container
+                    *ngTemplateOutlet="valueChip; context: { $implicit: row.first }"
+                  />
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @for (item of poolShown(); track item.hint.key) {
+        <div class="mt-pool">
+          <span><b>Fragenbestand:</b> {{ item.text.finding }}</span>
+          <ng-container
+            *ngTemplateOutlet="valueChip; context: { $implicit: item }"
+          />
+        </div>
+      }
+    </section>
+  }
+}
+
+@if (variant() === 'd2') {
+  @if (!bySeverity().length) {
+    <ng-container *ngTemplateOutlet="calm" />
+  } @else {
+    <div class="ladder">
+      @for (group of bySeverity(); track group.severity) {
+        <section class="ladder-step">
+          <div class="ladder-side">
+            <span class="ladder-num" [attr.data-severity]="group.severity">{{
+              group.items.length
+            }}</span>
+            <b>{{ group.title }}</b>
+            <p>{{ group.note }}</p>
+          </div>
+          <section class="chapter is-open is-flat">
+            <div class="rules-head" aria-hidden="true">
+              <span>Frage</span>
+              <span>Grenze</span>
+              <span>Gemessen</span>
+            </div>
+            @for (item of group.items; track item.hint.key) {
+              <ng-container
+                *ngTemplateOutlet="
+                  hintRow;
+                  context: { $implicit: item, withKind: true }
+                "
+              />
+            }
+          </section>
+        </section>
+      }
+    </div>
+  }
+}
+
+@if (variant() === 'd3') {
+  @if (!shown().length) {
+    <ng-container *ngTemplateOutlet="calm" />
+  } @else {
+    <div class="chapters">
+      @for (item of shown(); track item.hint.key) {
+        <section class="chapter" [class.is-open]="openQ() === item.hint.key">
+          <button
+            type="button"
+            class="chapter-head"
+            [attr.aria-expanded]="openQ() === item.hint.key"
+            (click)="openQ.set(openQ() === item.hint.key ? null : item.hint.key)"
+          >
+            <span class="chev" aria-hidden="true"></span>
+            <span class="chapter-title">
+              <b>
+                @if (item.question) {
+                  <span class="rule-id">F-{{ item.question.id }}</span>
+                }
+                {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+              </b>
+              <span>{{ kindOf(item) }} · Grenze {{ limitOf(item) }}</span>
+            </span>
+            <span
+              class="changed-tag is-count"
+              [attr.data-severity]="item.hint.severity"
+              >{{ measured(item) }}</span
+            >
+          </button>
+          @if (openQ() === item.hint.key) {
+            <div class="acc-in">
+              <p class="ws-finding">{{ item.text.finding }}</p>
+              @if (item.question) {
+                <div class="heat-cells is-big">
+                  @for (c of heatOf(item); track $index) {
+                    <span
+                      class="heat-cell"
+                      [attr.data-kind]="c.kind"
+                      [class.is-light]="c.share < 0.22"
+                      [style.--a]="0.12 + c.share * 0.88"
+                    >
+                      <small>{{ c.text }}</small>
+                      <b>{{ percent(c.share) }}</b>
+                    </span>
+                  }
+                </div>
+              }
+              <div class="ws-advice">
+                <b>Empfehlung</b>
+                <p>{{ item.text.advice }}</p>
+              </div>
+              <div class="acc-acts">
+                @if (!item.hint.ignored) {
+                  <button
+                    type="button"
+                    class="btn-primary"
+                    (click)="run('act', item)"
+                  >
+                    {{ actionOf(item) }}
+                  </button>
+                  @if (item.question?.active) {
+                    <button
+                      type="button"
+                      class="btn-secondary"
+                      (click)="run('pause', item)"
+                    >
+                      Pausieren
+                    </button>
+                  }
+                }
+                <button
+                  type="button"
+                  class="link-btn is-quiet-btn"
+                  (click)="run('ignore', item)"
+                >
+                  {{ item.hint.ignored ? 'Wieder öffnen' : 'Ignorieren' }}
+                </button>
+              </div>
+            </div>
+          }
+        </section>
+      }
+    </div>
+  }
+}
+
+@if (variant() === 'd4') {
+  @if (!shown().length) {
+    <ng-container *ngTemplateOutlet="calm" />
+  } @else {
+    <div class="grid2">
+      @for (item of shown(); track item.hint.key) {
+        <ng-container *ngTemplateOutlet="bigCard; context: { $implicit: item }" />
+      }
+    </div>
+  }
+}
+
+<ng-template #bigCard let-item>
+  <article class="ws-card">
+    <div class="ws-card-head">
+      <span class="changed-tag is-count" [attr.data-severity]="item.hint.severity"
+        >{{ severityText(item) }} · {{ kindOf(item) }}</span
+      >
+      <span class="ws-ref">{{
+        item.question
+          ? 'F-' + item.question.id + ' · ' + item.question.category
+          : 'Fragenbestand'
+      }}</span>
+    </div>
+    <h3>{{ item.question?.text ?? item.text.title }}</h3>
+    <p class="ws-finding">{{ item.text.finding }}</p>
+    @if (item.question) {
+      <div class="heat-cells is-big">
+        @for (c of heatOf(item); track $index) {
+          <span
+            class="heat-cell"
+            [attr.data-kind]="c.kind"
+            [class.is-light]="c.share < 0.22"
+            [style.--a]="0.12 + c.share * 0.88"
+          >
+            <small>{{ c.text }}</small>
+            <b>{{ percent(c.share) }}</b>
+          </span>
+        }
+      </div>
+    }
+    <div class="ws-advice">
+      <b>Empfehlung</b>
+      <p>{{ item.text.advice }}</p>
+    </div>
+    <footer class="ws-foot">
+      <button
+        type="button"
+        class="link-btn is-quiet-btn"
+        (click)="run('ignore', item)"
+      >
+        {{ item.hint.ignored ? 'Wieder öffnen' : 'Ignorieren' }}
+      </button>
+      @if (item.question?.active && !item.hint.ignored) {
+        <button type="button" class="btn-secondary" (click)="run('pause', item)">
+          Pausieren
+        </button>
+      }
+      @if (!item.hint.ignored) {
+        <button type="button" class="btn-primary" (click)="run('act', item)">
+          {{ actionOf(item) }}
+        </button>
+      }
+    </footer>
+  </article>
+</ng-template>
+
+<ng-template #head>
+  @switch (top()) {
+    @case ('rings') {
+      <section class="rings-card">
+        <header class="hd-head">
+          <div>
+            <h2>So gut bestehen die Fragen die Prüfungen</h2>
+            <p>Anteil der {{ judged() }} beurteilten Fragen ohne Befund</p>
+          </div>
+          @if (ignored().length || showIgnored()) {
+            <button
+              type="button"
+              class="hd-toggle"
+              (click)="showIgnored.set(!showIgnored())"
+            >
+              {{ showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert' }}
+            </button>
+          }
+        </header>
+        <div class="rings">
+          @for (c of checkShares(); track c.id) {
+            <div class="ring-item" [class.is-bad]="c.bad">
+              <svg viewBox="0 0 80 80" aria-hidden="true">
+                <circle class="ri-track" cx="40" cy="40" r="32" />
+                <circle
+                  class="ri-fill"
+                  cx="40"
+                  cy="40"
+                  r="32"
+                  [attr.stroke-dasharray]="ringOf(c.share, 32)"
+                />
+              </svg>
+              <span class="ri-val">{{ percent(c.share) }}</span>
+              <b>{{ c.title }}</b>
+              <small>{{ c.bad ? c.bad + ' auffällig' : 'Bestanden' }}</small>
+            </div>
+          }
+        </div>
+      </section>
+    }
+    @case ('gauge') {
+      <section class="gauge-card">
+        <div class="gauge">
+          <svg viewBox="0 0 200 112" aria-hidden="true">
+            <path class="g-track" d="M 20 100 A 80 80 0 0 1 180 100" />
+            @if (quality() !== null) {
+              <path class="g-fill" [attr.d]="gaugeArc(quality() ?? 0)" />
+            }
+          </svg>
+          <span class="g-val">{{
+            quality() === null ? '–' : percent(quality())
+          }}</span>
+          <span class="g-cap">Fragenqualität</span>
+        </div>
+        <div class="gauge-text">
+          <h2>
+            @if (!judged()) {
+              Noch keine Frage beurteilt
+            } @else if (!open().length) {
+              Alle Fragen sind in Ordnung
+            } @else {
+              {{ judged() - flagged() }} von {{ judged() }} Fragen sind in Ordnung
+            }
+          </h2>
+          <p>
+            {{
+              open().length
+                ? flagged() +
+                  ' Fragen fallen auf, ' +
+                  urgent().length +
+                  ' davon solltest du bald ansehen.'
+                : 'Eine Frage wird ab 20 Antworten geprüft.'
+            }}
+          </p>
+          <div class="gauge-legend">
+            <span><i class="is-ok"></i>in Ordnung</span>
+            <span><i></i>noch Luft</span>
+          </div>
+        </div>
+      </section>
+    }
+    @case ('chips') {
+      <div class="pchips">
+        <span class="pchips-label">Laufend geprüft</span>
+        @for (c of groups(); track c.id) {
+          <span class="pchip" [class.is-bad]="c.items.length">
+            <css-icon
+              [attr.icon]="c.items.length ? 'priority-warning' : 'checkmark'"
+              size="xs"
+            ></css-icon>
+            {{ c.title }}
+            @if (c.items.length) {
+              <b>{{ c.items.length }}</b>
+            }
+          </span>
+        }
+        <span class="pchips-q"
+          >Fragenqualität
+          <b>{{ quality() === null ? '–' : percent(quality()) }}</b></span
+        >
+      </div>
+    }
+    @case ('hero2') {
+      <section class="hero2">
+        <div class="hero2-num" [class.is-ok]="!open().length">
+          <b>{{ open().length ? flagged() : '0' }}</b>
+          <span>{{
+            open().length
+              ? flagged() === 1
+                ? 'Frage fällt auf'
+                : 'Fragen fallen auf'
+              : 'Fragen fallen auf'
+          }}</span>
+          <small
+            >von {{ judged() }} beurteilten · Qualität
+            {{ quality() === null ? '–' : percent(quality()) }}</small
+          >
+        </div>
+        <ul class="hero2-list">
+          @for (c of groups(); track c.id) {
+            <li [class.is-bad]="c.items.length">
+              <span
+                class="vrail-node"
+                [class.is-bad]="c.items.length"
+                aria-hidden="true"
+              >
+                <css-icon
+                  [attr.icon]="c.items.length ? 'priority-warning' : 'checkmark'"
+                  size="xs"
+                ></css-icon>
+              </span>
+              <span class="hero2-check">
+                <b>{{ c.title }}</b>
+                <small>{{ c.limit }}</small>
+              </span>
+              <span class="hero2-state">{{
+                c.items.length ? c.items.length + ' auffällig' : 'Bestanden'
+              }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+    @case ('score') {
+      <section class="scorecard">
+        <div class="sc-row is-head">
+          <span>Prüfung</span>
+          <span>Grenze</span>
+          <span>Fragen ohne Befund</span>
+          <span>Befunde</span>
+        </div>
+        @for (c of checkShares(); track c.id) {
+          <div class="sc-row">
+            <b>{{ c.title }}</b>
+            <span class="sc-limit">{{ c.limit }}</span>
+            <span class="sc-bar"
+              ><span [class.is-bad]="c.bad" [style.width.%]="c.share * 100"></span
+              ><em>{{ percent(c.share) }}</em></span
+            >
+            <span class="sc-state" [class.is-bad]="c.bad">{{ c.bad || '–' }}</span>
+          </div>
+        }
+        <div class="sc-foot">
+          <span>Fragenqualität gesamt</span>
+          <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+        </div>
+      </section>
+    }
+    @case ('prose') {
+      <p class="prose">
+        @if (!judged()) {
+          Noch hat keine Frage 20 Antworten – geprüft wird, sobald gespielt wird.
+        } @else {
+          Von <mark class="is-n">{{ judged() }} Fragen</mark> sind
+          <mark class="is-ok">{{ judged() - flagged() }} in Ordnung</mark>.
+          @if (urgent().length) {
+            <mark class="is-bad"
+              >{{ urgent().length }}
+              {{ urgent().length === 1 ? 'Hinweis' : 'Hinweise' }}</mark
+            >
+            solltest du bald ansehen,
+          }
+          @if (open().length - urgent().length) {
+            <mark class="is-mid">{{ open().length - urgent().length }}</mark> haben
+            Zeit.
+          }
+          @if (!open().length) {
+            Nichts zu tun.
+          }
+        }
+        @if (ignored().length || showIgnored()) {
+          <button
+            type="button"
+            class="link-btn prose-link"
+            (click)="showIgnored.set(!showIgnored())"
+          >
+            {{ showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert' }}
+          </button>
+        }
+      </p>
+    }
+    @case ('spectrum') {
+      <section class="spec-card">
+        <header class="spec-head">
+          <div>
+            <span class="r-eyebrow">Schwierigkeit · laufend geprüft</span>
+            <h2>
+              @if (!judged()) {
+                Noch keine Frage beurteilt
+              } @else {
+                <em>{{ inZone() }}</em> von {{ judged() }} Fragen liegen in der guten
+                Zone
+              }
+            </h2>
+          </div>
+          <div class="spec-score">
+            <span>Fragenqualität</span>
+            <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+          </div>
+        </header>
+        <div class="spec-plot">
+          <div class="spec-zone" aria-hidden="true">
+            <span>Gute Zone · 30 bis 95 % richtig</span>
+          </div>
+          <span class="spec-side is-left" aria-hidden="true">zu schwer</span>
+          <span class="spec-side is-right" aria-hidden="true">zu leicht</span>
+          @for (p of swarm(); track p.id) {
+            <span
+              class="spec-dot"
+              tabindex="0"
+              [class.is-bad]="p.flagged"
+              [class.is-end]="p.x > 70"
+              [style.left.%]="p.x"
+              [style.top.px]="84 + p.y * 15"
+              [attr.aria-label]="percent(p.rate) + ' richtig: ' + (p.text ?? '')"
+            >
+              <span class="r-tip"
+                ><b>{{ percent(p.rate) }} richtig</b>{{ p.text }}</span
+              >
+            </span>
+          }
+          @if (!spread().length) {
+            <p class="spec-empty">
+              Jede Frage erscheint hier als Punkt, sobald sie 20 Antworten hat.
+            </p>
+          }
+        </div>
+        <div class="spec-axis" aria-hidden="true">
+          <span style="left: 0">0 %</span>
+          <span style="left: 30%">30 %</span>
+          <span style="left: 50%">50 %</span>
+          <span style="left: 95%">95 %</span>
+          <span style="left: 100%">100 %</span>
+        </div>
+        <footer class="r-legend">
+          <span><i class="is-ok"></i>In Ordnung</span>
+          <span><i class="is-bad"></i>Mit Hinweis</span>
+          <span class="r-legend-note"
+            >Ein Punkt je Frage, nach Anteil richtiger Antworten</span
+          >
+          @if (ignored().length || showIgnored()) {
+            <button
+              type="button"
+              class="hd-toggle"
+              (click)="showIgnored.set(!showIgnored())"
+            >
+              {{ showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert' }}
+            </button>
+          }
+        </footer>
+      </section>
+    }
+    @case ('aurora') {
+      <section class="aur">
+        <div class="aur-glow" aria-hidden="true"></div>
+        <div class="aur-main">
+          <div class="aur-ring">
+            <svg viewBox="0 0 160 160" aria-hidden="true">
+              <defs>
+                <linearGradient id="aurGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#7fd3f7" />
+                  <stop offset="1" stop-color="#5fe3b0" />
+                </linearGradient>
+              </defs>
+              <circle class="ar-track" cx="80" cy="80" r="68" />
+              @if (quality() !== null) {
+                <circle
+                  class="ar-fill"
+                  cx="80"
+                  cy="80"
+                  r="68"
+                  [attr.stroke-dasharray]="ringOf(quality() ?? 0, 68)"
+                />
+              }
+            </svg>
+            <span class="ar-val">{{
+              quality() === null ? '–' : percent(quality())
+            }}</span>
+            <span class="ar-cap">Fragenqualität</span>
+          </div>
+          <div class="aur-text">
+            <span class="aur-live"><i></i>Laufend geprüft · {{ checkedAt }}</span>
+            <h2>
+              @if (!judged()) {
+                Noch keine Frage beurteilt
+              } @else if (!open().length) {
+                Alle {{ judged() }} Fragen sind in Ordnung
+              } @else {
+                {{ judged() - flagged() }} von {{ judged() }} Fragen sind in Ordnung
+              }
+            </h2>
+            <p>
+              @if (!judged()) {
+                Eine Frage wird ab 20 Antworten geprüft.
+              } @else if (urgent().length) {
+                {{ urgent().length }}
+                {{ urgent().length === 1 ? 'Hinweis' : 'Hinweise' }} solltest du bald
+                ansehen, {{ open().length - urgent().length }} haben Zeit.
+              } @else {
+                Nichts Dringendes – was offen ist, hat Zeit.
+              }
+            </p>
+            <div class="aur-checks">
+              @for (c of checkShares(); track c.id) {
+                <div class="aur-check" [class.is-bad]="c.bad">
+                  <span>{{ c.title }}</span>
+                  <b>{{ judged() ? percent(c.share) : '–' }}</b>
+                  <i><u [style.width.%]="judged() ? c.share * 100 : 0"></u></i>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+        <div class="aur-lights">
+          @for (p of lightsRow(); track p.id) {
+            <span
+              [class.is-bad]="p.flagged"
+              [style.animation-delay.ms]="$index * 25"
+            ></span>
+          }
+          <small>
+            {{
+              spread().length
+                ? 'Jede beurteilte Frage ein Licht'
+                : 'Noch keine Lichter'
+            }}
+            @if (ignored().length || showIgnored()) {
+              ·
+              <button type="button" (click)="showIgnored.set(!showIgnored())">
+                {{
+                  showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert'
+                }}
+              </button>
+            }
+          </small>
+        </div>
+      </section>
+    }
+    @case ('barcode') {
+      <section class="bc-card">
+        <header class="hd-head">
+          <div>
+            <h2>Jede Frage ein Strich</h2>
+            <p>
+              Die Höhe ist der Anteil richtiger Antworten, die Linien zeigen die gute
+              Zone von 30 bis 95 %.
+            </p>
+          </div>
+          <div class="r-legend is-top">
+            <span><i class="is-ok"></i>In Ordnung</span>
+            <span><i class="is-bad"></i>Mit Hinweis</span>
+          </div>
+        </header>
+        <div class="bc-scroll">
+          @if (barcode().length) {
+            <div class="bc-area">
+              <span class="bc-line" style="bottom: 95%"><em>95 %</em></span>
+              <span class="bc-line" style="bottom: 30%"><em>30 %</em></span>
+              @for (cat of barcode(); track cat.name) {
+                <div class="bc-cat" [style.flex-grow]="cat.bars.length">
+                  @for (b of cat.bars; track b.id) {
+                    <span
+                      class="bc-bar"
+                      tabindex="0"
+                      [class.is-bad]="b.flagged"
+                      [style.height.%]="Math.max(3, b.rate * 100)"
+                      [attr.aria-label]="
+                        percent(b.rate) + ' richtig: ' + (b.text ?? '')
+                      "
+                      ><span class="r-tip"
+                        ><b>{{ percent(b.rate) }} richtig</b>{{ b.text }}</span
+                      ></span
+                    >
+                  }
+                </div>
+              }
+            </div>
+            <div class="bc-names">
+              @for (cat of barcode(); track cat.name) {
+                <div class="bc-name" [style.flex-grow]="cat.bars.length">
+                  <b>{{ cat.name }}</b>
+                  <small [class.is-bad]="cat.bad">{{
+                    cat.bad ? cat.bad + ' auffällig' : 'in Ordnung'
+                  }}</small>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="spec-empty is-static">
+              Jede Frage erscheint hier als Strich, sobald sie 20 Antworten hat.
+            </p>
+          }
+        </div>
+      </section>
+    }
+    @case ('donut') {
+      @let pick = slicePick();
+      <section class="dn-card">
+        <div class="dn-chart">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="dn-track" cx="100" cy="100" r="78" />
+            @for (s of donut(); track s.name) {
+              <g class="dn-slice" [class.is-dim]="pick && pick.name !== s.name">
+                <path class="dn-ok" [attr.d]="s.ok" />
+                @if (s.bad) {
+                  <path class="dn-bad" [attr.d]="s.bad" />
+                }
+              </g>
+            }
+          </svg>
+          <div class="dn-center">
+            <b>{{
+              pick
+                ? percent(pick.score)
+                : quality() === null
+                  ? '–'
+                  : percent(quality())
+            }}</b>
+            <span>{{ pick ? pick.name : 'alle Kategorien' }}</span>
+            @if (pick) {
+              <small>{{
+                pick.bad
+                  ? pick.bad + ' von ' + pick.total + ' auffällig'
+                  : 'alle ' + pick.total + ' in Ordnung'
+              }}</small>
+            }
+          </div>
+        </div>
+        <div class="dn-list">
+          <span class="r-eyebrow">Qualität nach Kategorie</span>
+          <h2>
+            @if (!categories().length) {
+              Noch keine Kategorie beurteilt
+            } @else if (!flagged()) {
+              Alle {{ categories().length }} Kategorien ohne Befund
+            } @else {
+              {{ catsWithBad() }} von {{ categories().length }} Kategorien haben
+              Hinweise
+            }
+          </h2>
+          @if (!categories().length) {
+            <p class="dn-empty">
+              Sobald Fragen 20 Antworten haben, zeigt der Ring jede Kategorie und wie
+              viel davon auffällt.
+            </p>
+          }
+          <ul>
+            @for (cat of categories(); track cat.name) {
+              <li>
+                <button
+                  type="button"
+                  class="dn-row"
+                  [class.is-on]="pick?.name === cat.name"
+                  (mouseenter)="pickedSlice.set(cat.name)"
+                  (mouseleave)="pickedSlice.set(null)"
+                  (focus)="pickedSlice.set(cat.name)"
+                  (blur)="pickedSlice.set(null)"
+                >
+                  <span class="dn-name">{{ cat.name }}</span>
+                  <span class="dn-bar"
+                    ><i [style.width.%]="cat.score * 100"></i
+                  ></span>
+                  <b>{{ percent(cat.score) }}</b>
+                  <small [class.is-bad]="cat.bad">{{
+                    cat.bad ? cat.bad + ' auffällig' : cat.total + ' Fragen'
+                  }}</small>
+                </button>
+              </li>
+            }
+          </ul>
+        </div>
+      </section>
+    }
+    @case ('map') {
+      <section class="map-card">
+        <div class="map-side">
+          <span class="r-eyebrow">Fragenkarte</span>
+          <h2>
+            @if (!judged()) {
+              Noch keine Frage beurteilt
+            } @else {
+              <em>{{ inField() }}</em> von {{ judged() }} Fragen im grünen Feld
+            }
+          </h2>
+          <p>
+            Jede Frage nach richtigen Antworten und nach Antworten, die ausbleiben.
+            Das grüne Feld sind die Grenzen der Prüfungen.
+          </p>
+          <div class="r-legend is-stack">
+            <span><i class="is-ok"></i>In Ordnung</span>
+            <span><i class="is-bad"></i>Mit Hinweis</span>
+          </div>
+          @if (ignored().length || showIgnored()) {
+            <button
+              type="button"
+              class="hd-toggle"
+              (click)="showIgnored.set(!showIgnored())"
+            >
+              {{ showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert' }}
+            </button>
+          }
+        </div>
+        <div class="map-frame">
+          <span class="map-ylab" aria-hidden="true">ohne Antwort</span>
+          <div class="map-plot">
+            <div class="map-field" aria-hidden="true"><span>Gute Zone</span></div>
+            <span class="map-tick is-y" style="bottom: 50%" aria-hidden="true"
+              ><em>20 %</em></span
+            >
+            <span class="map-tick is-y" style="bottom: 100%" aria-hidden="true"
+              ><em>40 %</em></span
+            >
+            <span class="map-tick is-x" style="left: 30%" aria-hidden="true"
+              ><em>30 %</em></span
+            >
+            <span class="map-tick is-x" style="left: 95%" aria-hidden="true"
+              ><em>95 %</em></span
+            >
+            @for (p of mapPoints(); track p.id) {
+              <span
+                class="map-dot"
+                tabindex="0"
+                [class.is-bad]="p.flagged"
+                [class.is-end]="p.x > 70"
+                [style.left.%]="p.x"
+                [style.bottom.%]="p.y"
+                [attr.aria-label]="
+                  percent(p.rate) +
+                  ' richtig, ' +
+                  percent(p.time ?? 0) +
+                  ' ohne Antwort'
+                "
+                ><span class="r-tip"
+                  ><b
+                    >{{ percent(p.rate) }} richtig · {{ percent(p.time ?? 0) }} ohne
+                    Antwort</b
+                  >{{ p.text }}</span
+                ></span
+              >
+            }
+          </div>
+          <span class="map-xlab" aria-hidden="true">richtig beantwortet →</span>
+        </div>
+      </section>
+    }
+    @case ('focus') {
+      @let f = focus();
+      @if (!f) {
+        <section class="fc-calm">
+          <span class="calm-icon"
+            ><css-icon icon="checkmark" size="sm"></css-icon
+          ></span>
+          <div>
+            <h2>
+              {{
+                judged()
+                  ? 'Gerade gibt es nichts anzugehen'
+                  : 'Noch keine Frage beurteilt'
+              }}
+            </h2>
+            <p>
+              {{
+                judged()
+                  ? 'Alle ' + judged() + ' beurteilten Fragen bestehen jede Prüfung.'
+                  : 'Eine Frage wird ab 20 Antworten geprüft.'
+              }}
+            </p>
+          </div>
+        </section>
+      } @else {
+        <section class="fc-card" [attr.data-severity]="f.hint.severity">
+          <div class="fc-main">
+            <span class="fc-eyebrow"
+              ><i></i>Jetzt angehen · {{ kinds[f.hint.type] }}</span
+            >
+            <p class="fc-quote">
+              {{
+                f.question ? '«' + f.question.text + '»' : 'Der ganze Fragenbestand'
+              }}
+            </p>
+            <p class="fc-why">{{ f.text.finding }} {{ f.text.advice }}</p>
+            <div class="fc-facts">
+              <span
+                ><b>{{ measured(f) }}</b
+                >Grenze {{ limitOf(f) }}</span
+              >
+              <span
+                ><b>{{ f.hint.sample }}</b
+                >Antworten gewertet</span
+              >
+              <span
+                ><b>{{ severities[f.hint.severity] }}</b
+                >Dringlichkeit</span
+              >
+            </div>
+            <div class="fc-actions">
+              <button type="button" class="fc-go" (click)="act.emit(f)">
+                {{ actionOf(f) }}<css-icon icon="arrow-right" size="xs"></css-icon>
+              </button>
+              <button type="button" class="fc-ghost" (click)="details.emit(f)">
+                Alle Details
+              </button>
+            </div>
+          </div>
+          @if (f.question) {
+            <div class="fc-side">
+              <span class="fc-label">So wurde geantwortet</span>
+              <app-ad-answer-distribution [question]="f.question" />
+            </div>
+          }
+          @if (focusNext().length) {
+            <footer class="fc-next">
+              <span class="fc-next-label">Danach</span>
+              @for (n of focusNext(); track n.hint.key) {
+                <button type="button" (click)="details.emit(n)">
+                  <b>{{ kinds[n.hint.type] }}</b>
+                  <span>{{ n.question?.text ?? 'Fragenbestand' }}</span>
+                </button>
+              }
+            </footer>
+          }
+        </section>
+      }
+    }
+    @case ('spec-gauge') {
+      <section class="s-card s-split">
+        <div class="s-aside">
+          <span class="r-eyebrow">Laufend geprüft · {{ checkedAt }}</span>
+          <ng-container *ngTemplateOutlet="sGauge; context: { size: 'md' }" />
+          <ng-container *ngTemplateOutlet="sSummary" />
+        </div>
+        <div class="s-main">
+          <header class="s-main-head">
+            <div>
+              <h2>Schwierigkeit jeder Frage</h2>
+              <p>Ein Punkt je Frage mit mindestens 20 Antworten</p>
+            </div>
+            <ng-container *ngTemplateOutlet="sLegend" />
+          </header>
+          <ng-container *ngTemplateOutlet="sSpectrum" />
+        </div>
+      </section>
+    }
+    @case ('map-margins') {
+      <section class="s-card">
+        <header class="s-head">
+          <div>
+            <span class="r-eyebrow">Fragenkarte · laufend geprüft</span>
+            <h2 class="s-title">
+              @if (!judged()) {
+                Noch keine Frage beurteilt
+              } @else {
+                <em>{{ inField() }}</em> von {{ judged() }} Fragen liegen im grünen
+                Feld
+              }
+            </h2>
+            <p class="s-lead">
+              Jede Frage nach richtigen Antworten und nach Antworten, die ausbleiben.
+              Die Ränder zeigen, wie sich die Fragen verteilen.
+            </p>
+          </div>
+          <div class="s-head-gauge">
+            <ng-container *ngTemplateOutlet="sGauge; context: { size: 'sm' }" />
+          </div>
+        </header>
+        <ng-container *ngTemplateOutlet="sMapT; context: { margins: true }" />
+        <footer class="s-foot">
+          <ng-container *ngTemplateOutlet="sLegend" />
+          <ng-container *ngTemplateOutlet="sIgnored" />
+        </footer>
+      </section>
+    }
+    @case ('gauge-lg') {
+      <section class="s-card s-hero">
+        <ng-container
+          *ngTemplateOutlet="sGauge; context: { size: 'lg', needle: true }"
+        />
+        <h2 class="s-title is-center">
+          @if (!judged()) {
+            Noch keine Frage beurteilt
+          } @else if (!open().length) {
+            Alle {{ judged() }} Fragen sind in Ordnung
+          } @else {
+            {{ judged() - flagged() }} von {{ judged() }} Fragen sind in Ordnung
+          }
+        </h2>
+        <p class="s-lead is-center">
+          @if (!judged()) {
+            Eine Frage wird ab 20 Antworten geprüft.
+          } @else if (goal().reached) {
+            Das Ziel von 95 % ist erreicht.
+          } @else {
+            Noch {{ goal().needed }}
+            {{ goal().needed === 1 ? 'Frage' : 'Fragen' }} bis zum Ziel von 95 %.
+          }
+        </p>
+        <div class="s-checks">
+          @for (c of checkShares(); track c.id) {
+            <div class="s-check" [class.is-bad]="c.bad">
+              <svg viewBox="0 0 240 136" aria-hidden="true">
+                <path class="sg-track" d="M 28 124 A 92 92 0 0 1 212 124" />
+                @if (judged()) {
+                  <path class="sg-fill" [attr.d]="gaugePath(c.share)" />
+                }
+              </svg>
+              <b>{{ judged() ? percent(c.share) : '–' }}</b>
+              <span>{{ c.title }}</span>
+              <small>{{ c.bad ? c.bad + ' auffällig' : 'Bestanden' }}</small>
+            </div>
+          }
+        </div>
+        <ng-container *ngTemplateOutlet="sIgnored" />
+      </section>
+    }
+    @case ('switch') {
+      <section class="s-card s-split">
+        <div class="s-aside">
+          <span class="r-eyebrow">Laufend geprüft · {{ checkedAt }}</span>
+          <ng-container *ngTemplateOutlet="sGauge; context: { size: 'md' }" />
+          <ng-container *ngTemplateOutlet="sSummary" />
+        </div>
+        <div class="s-main">
+          <header class="s-main-head">
+            <div class="s-seg" role="group" aria-label="Ansicht">
+              <button
+                type="button"
+                [class.is-on]="sView() === 'spectrum'"
+                [attr.aria-pressed]="sView() === 'spectrum'"
+                (click)="sView.set('spectrum')"
+              >
+                Spektrum
+              </button>
+              <button
+                type="button"
+                [class.is-on]="sView() === 'map'"
+                [attr.aria-pressed]="sView() === 'map'"
+                (click)="sView.set('map')"
+              >
+                Karte
+              </button>
+            </div>
+            <ng-container *ngTemplateOutlet="sLegend" />
+          </header>
+          <p class="s-view-note">
+            {{
+              sView() === 'spectrum'
+                ? 'Jede Frage nach dem Anteil richtiger Antworten.'
+                : 'Jede Frage nach richtigen Antworten und Antworten, die ausbleiben.'
+            }}
+          </p>
+          @if (sView() === 'spectrum') {
+            <ng-container *ngTemplateOutlet="sSpectrum" />
+          } @else {
+            <ng-container *ngTemplateOutlet="sMapT; context: { margins: false }" />
+          }
+        </div>
+      </section>
+    }
+    @case ('spec-head') {
+      <section class="s-open">
+        <header class="s-open-head">
+          <h2 class="s-title is-xl">
+            @if (!judged()) {
+              Noch keine Frage beurteilt
+            } @else {
+              <em>{{ inZone() }}</em> von {{ judged() }} Fragen liegen in der guten
+              Zone
+            }
+          </h2>
+          <div class="s-figs">
+            <div>
+              <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+              <span>Fragenqualität</span>
+            </div>
+            <div>
+              <b class="is-warm">{{ urgent().length }}</b>
+              <span>bald ansehen</span>
+            </div>
+            <div>
+              <b>{{ open().length - urgent().length }}</b>
+              <span>haben Zeit</span>
+            </div>
+          </div>
+        </header>
+        <ng-container *ngTemplateOutlet="sSpectrum" />
+        <footer class="s-foot is-open">
+          <ng-container *ngTemplateOutlet="sLegend" />
+          <ng-container *ngTemplateOutlet="sIgnored" />
+        </footer>
+      </section>
+    }
+    @case ('strips') {
+      <section class="s-card">
+        <header class="s-head">
+          <div>
+            <span class="r-eyebrow">Laufend geprüft · {{ checkedAt }}</span>
+            <h2 class="s-title">Jede Prüfung mit ihrer Grenze</h2>
+            <p class="s-lead">
+              Ein Punkt je Frage. Was im grünen Feld liegt, besteht die Prüfung.
+            </p>
+          </div>
+          <div class="s-head-gauge">
+            <ng-container *ngTemplateOutlet="sGauge; context: { size: 'sm' }" />
+          </div>
+        </header>
+        <div class="st-rows">
+          @for (row of strips(); track row.id) {
+            <div class="st-row">
+              <div class="st-label">
+                <b>{{ row.title }}</b>
+                <span>{{ row.limit }}</span>
+                <small [class.is-bad]="row.bad">{{
+                  row.bad ? row.bad + ' auffällig' : 'Bestanden'
+                }}</small>
+              </div>
+              <div class="st-track">
+                <div class="st-line">
+                  <span
+                    class="st-zone"
+                    [style.left.%]="row.zone.from"
+                    [style.width.%]="row.zone.to - row.zone.from"
+                  ></span>
+                  @for (d of row.dots; track d.id) {
+                    @if (d.n) {
+                      <button
+                        type="button"
+                        class="s-mark is-sm"
+                        [class.is-end]="d.x > 70"
+                        [style.left.%]="d.x"
+                        [style.top.px]="36 + d.lane * 9"
+                        [attr.aria-label]="d.n + ': ' + d.label + ', ' + d.text"
+                        (click)="openPoint(d.id)"
+                      >
+                        {{ d.n
+                        }}<span class="r-tip"
+                          ><b>{{ d.label }}</b
+                          >{{ d.text }}</span
+                        >
+                      </button>
+                    } @else {
+                      <span
+                        class="s-dot is-sm"
+                        tabindex="0"
+                        [class.is-bad]="d.bad"
+                        [class.is-end]="d.x > 70"
+                        [style.left.%]="d.x"
+                        [style.top.px]="36 + d.lane * 9"
+                        [attr.aria-label]="d.label + ', ' + d.text"
+                        ><span class="r-tip"
+                          ><b>{{ d.label }}</b
+                          >{{ d.text }}</span
+                        ></span
+                      >
+                    }
+                  }
+                </div>
+                <div class="st-ticks" aria-hidden="true">
+                  @for (t of row.ticks; track t.at) {
+                    <span [style.left.%]="t.at">{{ t.text }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+          @let pool = poolItem();
+          <div class="st-row">
+            <div class="st-label">
+              <b>Fragenbestand</b>
+              <span>Genug aktive Fragen für Abwechslung</span>
+              <small [class.is-bad]="pool">{{
+                pool ? 'Zu klein' : 'Bestanden'
+              }}</small>
+            </div>
+            <div class="st-track">
+              @if (pool) {
+                <div class="st-pool">
+                  <span
+                    class="st-pool-fill"
+                    [style.width.%]="(pool.hint.value / pool.hint.sample) * 100"
+                  ></span>
+                  <span class="st-pool-goal"></span>
+                </div>
+                <div class="st-ticks is-pool">
+                  <span style="left: 0">{{ pool.hint.value }} aktiv</span>
+                  <span style="left: 100%">mind. {{ pool.hint.sample }}</span>
+                </div>
+              } @else {
+                <p class="st-ok">Genug aktive Fragen für jedes Duell.</p>
+              }
+            </div>
+          </div>
+        </div>
+        <footer class="s-foot">
+          <ng-container *ngTemplateOutlet="sLegend" />
+          <ng-container *ngTemplateOutlet="sIgnored" />
+        </footer>
+      </section>
+    }
+    @case ('stepper') {
+      <section class="stepper-card">
+        <div class="stepper-head">
+          <div>
+            <h2>Laufende Prüfung</h2>
+            <p>
+              {{ judged() }} Fragen mit mindestens 20 Antworten ·
+              {{ passedChecks() }} von {{ groups().length }} Prüfungen ohne Befund
+            </p>
+          </div>
+          <span class="stepper-score">
+            <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+            <small>Fragenqualität</small>
+          </span>
+        </div>
+        <ol class="stepper">
+          @for (group of groups(); track group.id) {
+            <li [class.is-bad]="group.items.length">
+              <span class="stepper-node">
+                <css-icon
+                  [attr.icon]="group.items.length ? 'priority-warning' : 'checkmark'"
+                  size="xs"
+                ></css-icon>
+              </span>
+              <b>{{ group.title }}</b>
+              <span>{{
+                group.items.length ? group.items.length + ' auffällig' : 'Bestanden'
+              }}</span>
+            </li>
+          }
+        </ol>
+      </section>
+    }
+    @case ('overview-step') {
+      <section class="block" aria-labelledby="over-title">
+        <div class="step">
+          <span class="step-no is-light" aria-hidden="true">
+            <css-icon icon="statistic" size="xs"></css-icon>
+          </span>
+          <div class="step-text">
+            <h2 id="over-title">
+              @if (!judged()) {
+                Noch keine Frage beurteilt
+              } @else if (!open().length) {
+                Alle {{ judged() }} Fragen in Ordnung
+              } @else {
+                {{ flagged() }} von {{ judged() }} Fragen fallen auf
+              }
+            </h2>
+            <p>
+              Fragenqualität {{ quality() === null ? '–' : percent(quality()) }} ·
+              {{ urgent().length }} davon bald angehen
+            </p>
+          </div>
+          @if (ignored().length || showIgnored()) {
+            <button
+              type="button"
+              class="link-btn"
+              (click)="showIgnored.set(!showIgnored())"
+            >
+              {{ showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert' }}
+            </button>
+          }
+        </div>
+        <div class="over-meter">
+          <span class="over-ok" [style.flex-grow]="judged() - flagged()"></span>
+          @if (flagged()) {
+            <span class="over-bad" [style.flex-grow]="flagged()"></span>
+          }
+          @if (!judged()) {
+            <span class="over-none"></span>
+          }
+        </div>
+      </section>
+    }
+    @case ('navy') {
+      <section class="navy">
+        <div class="navy-main">
+          <span class="navy-kicker">Hinweise heute</span>
+          <h2>
+            @if (!judged()) {
+              Noch keine Frage beurteilt.
+            } @else if (!open().length) {
+              Alle Fragen sind in Ordnung.
+            } @else {
+              {{ flagged() }} Fragen brauchen deine Aufmerksamkeit.
+            }
+          </h2>
+        </div>
+        <dl class="navy-facts">
+          <div>
+            <dt>Fragenqualität</dt>
+            <dd>{{ quality() === null ? '–' : percent(quality()) }}</dd>
+          </div>
+          <div>
+            <dt>Bald angehen</dt>
+            <dd>{{ urgent().length }}</dd>
+          </div>
+          <div>
+            <dt>Beurteilt</dt>
+            <dd>{{ judged() }}</dd>
+          </div>
+        </dl>
+      </section>
+    }
+    @case ('split') {
+      <section class="split-card">
+        <div class="split-top">
+          <h2>
+            {{ open().length }} offene
+            {{ open().length === 1 ? 'Hinweis' : 'Hinweise' }}
+          </h2>
+          <span class="split-q"
+            >Fragenqualität
+            <b>{{ quality() === null ? '–' : percent(quality()) }}</b></span
+          >
+        </div>
+        @if (sevSplit().length) {
+          <div class="split-bar">
+            @for (part of sevSplit(); track part.sev) {
+              <span
+                class="split-part"
+                [attr.data-severity]="part.sev"
+                [style.flex-grow]="part.count"
+              >
+                <b>{{ part.count }}</b> {{ part.label }}
+              </span>
+            }
+          </div>
+        } @else {
+          <div class="split-bar">
+            <span class="split-part is-ok"><b>0</b> alles in Ordnung</span>
+          </div>
+        }
+      </section>
+    }
+    @case ('filter') {
+      <div class="fhead">
+        <div class="fseg" role="group" aria-label="Wichtigkeit">
+          <button
+            type="button"
+            [class.is-on]="sevFilter() === 'all' && !showIgnored()"
+            (click)="sevFilter.set('all'); showIgnored.set(false)"
+          >
+            <b>{{ open().length }}</b
+            ><span>Alle offenen</span>
+          </button>
+          <button
+            type="button"
+            [class.is-on]="sevFilter() === 'urgent' && !showIgnored()"
+            [disabled]="!urgent().length"
+            (click)="sevFilter.set('urgent'); showIgnored.set(false)"
+          >
+            <b class="is-warm">{{ urgent().length }}</b
+            ><span>Bald angehen</span>
+          </button>
+          <button
+            type="button"
+            [class.is-on]="sevFilter() === 'medium' && !showIgnored()"
+            (click)="sevFilter.set('medium'); showIgnored.set(false)"
+          >
+            <b class="is-mild">{{ open().length - urgent().length }}</b
+            ><span>Bei Gelegenheit</span>
+          </button>
+          <button
+            type="button"
+            [class.is-on]="showIgnored()"
+            (click)="sevFilter.set('all'); showIgnored.set(true)"
+          >
+            <b class="is-dim">{{ ignored().length }}</b
+            ><span>Ignoriert</span>
+          </button>
+        </div>
+        <span class="fhead-q"
+          >Fragenqualität
+          <b>{{ quality() === null ? '–' : percent(quality()) }}</b></span
+        >
+      </div>
+    }
+    @case ('meta') {
+      <p class="meta">
+        <span class="meta-live"><i></i>Geprüft um {{ checkedAt }}</span>
+        <span>{{ judged() }} Fragen beurteilt</span>
+        <span
+          >Fragenqualität
+          <b>{{ quality() === null ? '–' : percent(quality()) }}</b></span
+        >
+        @if (open().length) {
+          <span class="meta-warm"
+            ><b>{{ open().length }}</b> offen, davon {{ urgent().length }} bald
+            angehen</span
+          >
+        } @else {
+          <span class="meta-ok">Alles in Ordnung</span>
+        }
+        @if (ignored().length || showIgnored()) {
+          <button
+            type="button"
+            class="link-btn"
+            (click)="showIgnored.set(!showIgnored())"
+          >
+            {{ showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert' }}
+          </button>
+        }
+      </p>
+    }
+    @case ('sentence') {
+      <section class="sent">
+        <h2>
+          @if (!judged()) {
+            Noch keine Frage beurteilt.
+          } @else if (!open().length) {
+            Alle {{ judged() }} Fragen sind in Ordnung.
+          } @else {
+            {{ flagged() }} von {{ judged() }} Fragen fallen auf<span>{{
+              urgent().length ? ', ' + urgent().length + ' davon bald angehen.' : '.'
+            }}</span>
+          }
+        </h2>
+        <p class="sent-meta">
+          Fragenqualität <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+          @if (ignored().length || showIgnored()) {
+            <button
+              type="button"
+              class="hd-toggle"
+              (click)="showIgnored.set(!showIgnored())"
+            >
+              {{ showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert' }}
+            </button>
+          }
+        </p>
+      </section>
+    }
+    @case ('lage') {
+      <section class="lage">
+        <div class="lage-top">
+          <div class="ring is-sm">
+            <svg viewBox="0 0 128 128" aria-hidden="true">
+              <circle class="ring-track" cx="64" cy="64" r="54" />
+              @if (quality() !== null) {
+                <circle
+                  class="ring-fill"
+                  cx="64"
+                  cy="64"
+                  r="54"
+                  [attr.stroke-dasharray]="ringDash()"
+                />
+              }
+            </svg>
+            <span class="ring-value">{{
+              quality() === null ? '–' : percent(quality())
+            }}</span>
+          </div>
+          <div class="ring-text">
+            <h2>
+              @if (!judged()) {
+                Noch keine Frage beurteilt.
+              } @else if (!open().length) {
+                Alle {{ judged() }} Fragen sind in Ordnung.
+              } @else {
+                {{ flagged() }} von {{ judged() }} Fragen fallen auf.
+              }
+            </h2>
+            <p>
+              {{
+                !judged()
+                  ? 'Eine Frage wird beurteilt, sobald sie 20 Antworten hat.'
+                  : urgent().length
+                    ? urgent().length + ' davon solltest du bald ansehen.'
+                    : 'Nichts davon eilt.'
+              }}
+            </p>
+          </div>
+          @if (ignored().length || showIgnored()) {
+            <button
+              type="button"
+              class="hd-toggle"
+              (click)="showIgnored.set(!showIgnored())"
+            >
+              {{ showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert' }}
+            </button>
+          }
+        </div>
+        <div class="lage-checks">
+          @for (group of groups(); track group.id) {
+            <div class="lage-check">
+              <span
+                class="vrail-node"
+                [class.is-bad]="group.items.length"
+                aria-hidden="true"
+              >
+                <css-icon
+                  [attr.icon]="group.items.length ? 'priority-warning' : 'checkmark'"
+                  size="xs"
+                ></css-icon>
+              </span>
+              <span class="vrail-text" [class.is-bad]="group.items.length">
+                <b>{{ group.title }}</b>
+                <span>{{
+                  group.items.length
+                    ? group.items.length + ' auffällig'
+                    : 'Bestanden'
+                }}</span>
+              </span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+    @case ('analyse') {
+      <div class="duo">
+        <section class="hd-card">
+          <header class="hd-head">
+            <div>
+              <h2>So schwer sind die Fragen</h2>
+              <p>Anzahl Fragen nach Anteil richtiger Antworten</p>
+            </div>
+          </header>
+          @if (spread().length) {
+            <div class="histo is-sm">
+              @for (bin of histo(); track bin.from) {
+                <div class="histo-col" [attr.data-zone]="bin.zone">
+                  <span class="histo-count">{{ bin.total || '' }}</span>
+                  <span class="histo-bar" [style.height.%]="bin.height">
+                    @if (bin.flagged) {
+                      <span
+                        class="histo-flag"
+                        [style.height.%]="(bin.flagged / bin.total) * 100"
+                      ></span>
+                    }
+                  </span>
+                  <span class="histo-label">{{ bin.from * 100 }}</span>
+                </div>
+              }
+            </div>
+            <ul class="band-key">
+              <li><i class="is-ok"></i>gut spielbar</li>
+              <li><i data-check="clear"></i>mit Hinweis</li>
+            </ul>
+          } @else {
+            <p class="hd-none">Erscheint, sobald Fragen 20 Antworten haben.</p>
+          }
+        </section>
+        <section class="hd-card">
+          <header class="hd-head">
+            <div>
+              <h2>Qualität je Kategorie</h2>
+              <p>Anteil unauffälliger Fragen</p>
+            </div>
+            <span class="hd-quality"
+              >Gesamt
+              <b>{{ quality() === null ? '–' : percent(quality()) }}</b></span
+            >
+          </header>
+          @if (categories().length) {
+            <ul class="catbars is-sm">
+              @for (cat of categories(); track cat.name) {
+                <li>
+                  <span class="catbars-name">{{ cat.name }}</span>
+                  <span class="catbars-track"
+                    ><span
+                      class="catbars-fill"
+                      [style.width.%]="cat.score * 100"
+                    ></span
+                  ></span>
+                  <b>{{ percent(cat.score) }}</b>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="hd-none">Erscheint, sobald Fragen 20 Antworten haben.</p>
+          }
+        </section>
+      </div>
+    }
+    @case ('trend') {
+      <section class="hd-card">
+        <header class="hd-head">
+          <div>
+            <h2>Wie sich die auffälligen Fragen entwickeln</h2>
+            <p>Richtige Antworten der letzten 14 Tage gegen die 14 davor</p>
+          </div>
+          @if (trends().length) {
+            <span class="trend-sum">
+              <span class="is-worse"
+                ><b>{{ trendCount('worse') }}</b> schlechter</span
+              >
+              <span
+                ><b>{{ trendCount('same') }}</b> gleich</span
+              >
+              <span class="is-better"
+                ><b>{{ trendCount('better') }}</b> besser</span
+              >
+            </span>
+          }
+        </header>
+        @if (trends().length) {
+          <ul class="trends">
+            @for (row of trends(); track row.item.hint.key) {
+              <li [attr.data-verdict]="row.verdict">
+                <span class="trends-q">
+                  <span class="rule-id">F-{{ row.item.question!.id }}</span
+                  >{{ row.item.question!.text }}
+                </span>
+                <span class="trends-track">
+                  @if (row.before !== null && row.now !== null) {
+                    <span
+                      class="trends-line"
+                      [style.left.%]="
+                        (row.before < row.now ? row.before : row.now) * 100
+                      "
+                      [style.width.%]="
+                        (row.diff! < 0 ? -row.diff! : row.diff!) * 100
+                      "
+                    ></span>
+                    <i
+                      class="trends-dot is-before"
+                      [style.left.%]="row.before * 100"
+                    ></i>
+                    <i class="trends-dot" [style.left.%]="row.now * 100"></i>
+                  }
+                </span>
+                <b class="trends-val"
+                  >{{ row.before === null ? '–' : percent(row.before) }} →
+                  {{ row.now === null ? '–' : percent(row.now) }}</b
+                >
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="hd-none">Erscheint, sobald Fragen auffallen.</p>
+        }
+      </section>
+    }
+    @case ('heat') {}
+    @case ('whatif') {
+      <section class="hd-goal">
+        <div class="goal-text">
+          <p class="goal-kicker">Was wäre, wenn</p>
+          <h2>
+            @if (projected() === null) {
+              Noch keine Frage beurteilt
+            } @else if (fixed().size) {
+              {{ fixed().size }} behoben: {{ percent(quality()) }} →
+              {{ percent(projected()) }}
+            } @else {
+              Heute {{ percent(quality()) }} Fragenqualität
+            }
+          </h2>
+          <p>
+            {{
+              fixed().size
+                ? 'So viel besser wird das Spiel mit deiner Auswahl.'
+                : 'Wähle unten, was du beheben willst.'
+            }}
+          </p>
+        </div>
+        <div class="goal-meter">
+          <span class="goal-track">
+            <span
+              class="goal-fill is-future"
+              [style.width.%]="(projected() ?? 0) * 100"
+            ></span>
+            <span
+              class="goal-fill is-now"
+              [style.width.%]="(quality() ?? 0) * 100"
+            ></span>
+          </span>
+          <span class="goal-scale"
+            ><span>heute {{ quality() === null ? '–' : percent(quality()) }}</span
+            ><span
+              >mit Auswahl
+              {{ projected() === null ? '–' : percent(projected()) }}</span
+            ></span
+          >
+        </div>
+      </section>
+    }
+    @case ('line') {
+      <p class="statusline">
+        <span class="statusline-dot" [class.is-ok]="!open().length"></span>
+        <b>{{
+          open().length ? open().length + ' offene Hinweise' : 'Alles in Ordnung'
+        }}</b>
+        <span class="statusline-sep"></span>
+        Fragenqualität <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+        <span class="statusline-sep"></span>
+        <b>{{ urgent().length }}</b> bald angehen
+        <span class="statusline-sep"></span>
+        <b>{{ judged() }}</b> beurteilt
+        @if (ignored().length || showIgnored()) {
+          <button
+            type="button"
+            class="hd-toggle statusline-btn"
+            (click)="showIgnored.set(!showIgnored())"
+          >
+            {{ showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert' }}
+          </button>
+        }
+      </p>
+    }
+    @case ('tabs') {
+      <nav class="ctabs" role="tablist" aria-label="Prüfungen">
+        @for (group of groups(); track group.id) {
+          <button
+            type="button"
+            role="tab"
+            class="ctab"
+            [class.is-active]="tabActive() === group.id"
+            [attr.aria-selected]="tabActive() === group.id"
+            (click)="tabCheck.set(group.id)"
+          >
+            <span class="ctab-title">{{ group.title }}</span>
+            <span class="ctab-state" [class.is-bad]="group.items.length">
+              <css-icon
+                [attr.icon]="group.items.length ? 'priority-warning' : 'checkmark'"
+                size="xs"
+              ></css-icon>
+              {{
+                group.items.length ? group.items.length + ' auffällig' : 'Bestanden'
+              }}
+            </span>
+          </button>
+        }
+      </nav>
+    }
+    @case ('funnel') {
+      <section class="hd-card">
+        <header class="hd-head">
+          <div>
+            <h2>Von allen Fragen zu dem, was zählt</h2>
+            <p>Jede Stufe ein Teil der vorherigen</p>
+          </div>
+        </header>
+        @if (judged()) {
+          <ol class="funnel">
+            @for (step of funnel(); track step.label) {
+              <li [attr.data-step]="step.i">
+                <span class="funnel-bar" [style.width.%]="step.width"
+                  ><b>{{ step.value }}</b></span
+                >
+                <span class="funnel-text"
+                  ><b>{{ step.label }}</b
+                  ><span>{{ step.note }}</span></span
+                >
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="hd-none">Erscheint, sobald Fragen 20 Antworten haben.</p>
+        }
+      </section>
+    }
+    @case ('cats') {
+      <section class="hd-card">
+        <header class="hd-head">
+          <div>
+            <h2>Qualität je Kategorie</h2>
+            <p>Anteil unauffälliger Fragen</p>
+          </div>
+          <span class="hd-quality"
+            >Gesamt <b>{{ quality() === null ? '–' : percent(quality()) }}</b></span
+          >
+        </header>
+        @if (categories().length) {
+          <ul class="catbars">
+            @for (cat of categories(); track cat.name) {
+              <li>
+                <span class="catbars-name">{{ cat.name }}</span>
+                <span class="catbars-track">
+                  <span
+                    class="catbars-fill"
+                    [style.width.%]="cat.score * 100"
+                  ></span>
+                </span>
+                <b>{{ percent(cat.score) }}</b>
+                <small>{{
+                  cat.bad ? cat.bad + ' von ' + cat.total : 'alle ' + cat.total
+                }}</small>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="hd-none">Erscheint, sobald Fragen 20 Antworten haben.</p>
+        }
+      </section>
+    }
+    @case ('waffle') {
+      <section class="hd-card">
+        <header class="hd-head">
+          <div>
+            <h2>{{ judged() - flagged() }} von {{ judged() }} Fragen in Ordnung</h2>
+            <p>Jedes Feld eine aktive Frage mit mindestens 20 Antworten</p>
+          </div>
+          <span class="hd-quality"
+            >Fragenqualität
+            <b>{{ quality() === null ? '–' : percent(quality()) }}</b></span
+          >
+        </header>
+        @if (squares().length) {
+          <div class="squares">
+            @for (sq of squares(); track sq.id) {
+              <span
+                class="square"
+                [class.is-bad]="sq.flagged"
+                [attr.title]="'F-' + sq.id"
+              >
+                @if (sq.flagged) {
+                  F-{{ sq.id }}
+                }
+              </span>
+            }
+          </div>
+        } @else {
+          <p class="hd-none">Erscheint, sobald Fragen 20 Antworten haben.</p>
+        }
+      </section>
+    }
+    @case ('spot') {
+      @if (urgent()[0] ?? open()[0]; as item) {
+        <section class="hd-spot">
+          <div class="spot-text">
+            <p class="goal-kicker">Zuerst angehen · {{ kindOf(item) }}</p>
+            <h2>
+              @if (item.question) {
+                <span class="rule-id">F-{{ item.question.id }}</span>
+              }
+              {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+            </h2>
+            <p>{{ item.text.finding }}</p>
+            <p class="spot-advice">{{ item.text.advice }}</p>
+            <div class="spot-acts">
+              <button type="button" class="btn-primary" (click)="run('act', item)">
+                {{ actionOf(item) }}
+              </button>
+              <button type="button" class="btn-ghost" (click)="run('ignore', item)">
+                Ignorieren
+              </button>
+            </div>
+          </div>
+          @if (item.question; as q) {
+            <div class="spot-answers">
+              <app-ad-answer-distribution [question]="q" />
+            </div>
+          }
+        </section>
+      } @else {
+        <ng-container *ngTemplateOutlet="calm" />
+      }
+    }
+    @case ('search') {
+      <div class="srch">
+        <label class="srch-field">
+          <css-icon icon="search" size="xs"></css-icon>
+          <span class="sr-only">Hinweise durchsuchen</span>
+          <input
+            type="search"
+            placeholder="Frage, Befund oder F-12 suchen"
+            [value]="query()"
+            (input)="onQuery($event)"
+          />
+          <span class="srch-count"
+            >{{ found().length }}
+            {{ found().length === 1 ? 'Hinweis' : 'Hinweise' }}</span
+          >
+        </label>
+        <div class="srch-chips" role="group" aria-label="Prüfung">
+          <button
+            type="button"
+            class="srch-chip"
+            [class.is-active]="!chip()"
+            (click)="chip.set(null)"
+          >
+            Alle
+          </button>
+          @for (group of groups(); track group.id) {
+            <button
+              type="button"
+              class="srch-chip"
+              [class.is-active]="chip() === group.id"
+              [disabled]="!group.items.length"
+              (click)="chip.set(chip() === group.id ? null : group.id)"
+            >
+              {{ group.title }} <span>{{ group.items.length }}</span>
+            </button>
+          }
+          <span class="srch-spacer"></span>
+          <button
+            type="button"
+            class="srch-chip is-quiet"
+            (click)="showIgnored.set(!showIgnored())"
+          >
+            {{
+              showIgnored()
+                ? 'Offene zeigen'
+                : 'Ignorierte (' + ignored().length + ')'
+            }}
+          </button>
+        </div>
+      </div>
+    }
+    @case ('none') {}
+    @case ('band') {
+      <section class="hd-card">
+        <header class="hd-head">
+          <div>
+            <h2>Alle beurteilten Fragen</h2>
+            <p>{{ judged() }} aktive Fragen mit mindestens 20 Antworten</p>
+          </div>
+          @if (ignored().length || showIgnored()) {
+            <button
+              type="button"
+              class="hd-toggle"
+              (click)="showIgnored.set(!showIgnored())"
+            >
+              {{ showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert' }}
+            </button>
+          }
+        </header>
+        @if (judged()) {
+          <div
+            class="band"
+            role="img"
+            [attr.aria-label]="band().ok + ' unauffällig'"
+          >
+            <span
+              class="band-part is-ok"
+              [style.width.%]="band().width(band().ok)"
+            ></span>
+            @for (part of band().parts; track part.id) {
+              <span
+                class="band-part"
+                [attr.data-check]="part.id"
+                [style.width.%]="band().width(part.count)"
+              ></span>
+            }
+          </div>
+          <ul class="band-key">
+            <li>
+              <i class="is-ok"></i><b>{{ band().ok }}</b> unauffällig
+            </li>
+            @for (part of band().parts; track part.id) {
+              <li>
+                <i [attr.data-check]="part.id"></i><b>{{ part.count }}</b>
+                {{ part.title }}
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="hd-none">Erscheint, sobald Fragen 20 Antworten haben.</p>
+        }
+      </section>
+    }
+    @case ('ring') {
+      <section class="hd-ring">
+        <div class="ring">
+          <svg viewBox="0 0 128 128" aria-hidden="true">
+            <circle class="ring-track" cx="64" cy="64" r="54" />
+            @if (quality() !== null) {
+              <circle
+                class="ring-fill"
+                cx="64"
+                cy="64"
+                r="54"
+                [attr.stroke-dasharray]="ringDash()"
+              />
+            }
+          </svg>
+          <span class="ring-value">{{
+            quality() === null ? '–' : percent(quality())
+          }}</span>
+        </div>
+        <div class="ring-text">
+          <h2>
+            @if (!judged()) {
+              Noch keine Frage beurteilt.
+            } @else if (!open().length) {
+              Alle Fragen sind in Ordnung.
+            } @else {
+              {{ flagged() }} von {{ judged() }} Fragen fallen auf.
+            }
+          </h2>
+          <p>
+            {{
+              urgent().length
+                ? urgent().length + ' davon solltest du bald ansehen.'
+                : 'Nichts davon eilt.'
+            }}
+          </p>
+          <div class="ring-facts">
+            <span
+              ><b>{{ open().length }}</b> offen</span
+            >
+            <span
+              ><b>{{ urgent().length }}</b> bald angehen</span
+            >
+            @if (ignored().length || showIgnored()) {
+              <button
+                type="button"
+                class="hd-toggle"
+                (click)="showIgnored.set(!showIgnored())"
+              >
+                {{
+                  showIgnored() ? 'Offene zeigen' : ignored().length + ' ignoriert'
+                }}
+              </button>
+            }
+          </div>
+        </div>
+      </section>
+    }
+    @case ('histo') {
+      <section class="hd-card">
+        <header class="hd-head">
+          <div>
+            <h2>So schwer sind die Fragen</h2>
+            <p>Anzahl Fragen nach Anteil richtiger Antworten</p>
+          </div>
+          <span class="hd-quality"
+            >Gut spielbar
+            <b>{{ quality() === null ? '–' : percent(quality()) }}</b></span
+          >
+        </header>
+        @if (spread().length) {
+          <div class="histo">
+            @for (bin of histo(); track bin.from) {
+              <div class="histo-col" [attr.data-zone]="bin.zone">
+                <span class="histo-count">{{ bin.total || '' }}</span>
+                <span class="histo-bar" [style.height.%]="bin.height">
+                  @if (bin.flagged) {
+                    <span
+                      class="histo-flag"
+                      [style.height.%]="(bin.flagged / bin.total) * 100"
+                    ></span>
+                  }
+                </span>
+                <span class="histo-label"
+                  >{{ bin.from * 100 }}–{{ bin.from * 100 + 10 }}</span
+                >
+              </div>
+            }
+          </div>
+          <ul class="band-key">
+            <li><i class="is-ok"></i>gut spielbar</li>
+            <li><i class="is-zone"></i>zu schwer oder zu leicht</li>
+            <li><i data-check="clear"></i>davon mit Hinweis</li>
+          </ul>
+        } @else {
+          <p class="hd-none">Erscheint, sobald Fragen 20 Antworten haben.</p>
+        }
+      </section>
+    }
+    @case ('matrix') {
+      <section class="hd-card">
+        <header class="hd-head">
+          <div>
+            <h2>Wo es hakt</h2>
+            <p>
+              Kategorien und Prüfungen – ein Feld wählen, um die Hinweise zu sehen
+            </p>
+          </div>
+          @if (cell()) {
+            <button type="button" class="hd-toggle" (click)="cell.set(null)">
+              Alle zeigen
+            </button>
+          }
+        </header>
+        @if (lights().length) {
+          <div class="lights">
+            <div class="lights-row is-head">
+              <span>Kategorie</span>
+              @for (check of matrixChecks; track check.id) {
+                <span>{{ check.title }}</span>
+              }
+            </div>
+            @for (row of lights(); track row.name) {
+              <div class="lights-row">
+                <span class="lights-name"
+                  >{{ row.name }} <small>{{ row.total }}</small></span
+                >
+                @for (c of row.cells; track c.id) {
+                  <button
+                    type="button"
+                    class="light"
+                    [attr.data-severity]="c.worst"
+                    [class.is-ok]="!c.count"
+                    [class.is-active]="
+                      cell()?.cat === row.name && cell()?.check === c.id
+                    "
+                    [disabled]="!c.count"
+                    (click)="pickCell(row.name, c.id)"
+                  >
+                    @if (c.count) {
+                      {{ c.count }}
+                    } @else {
+                      <css-icon icon="checkmark" size="xs"></css-icon>
+                    }
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="hd-none">Erscheint, sobald Fragen 20 Antworten haben.</p>
+        }
+      </section>
+    }
+    @case ('goal') {
+      <section class="hd-goal" [class.is-reached]="goal().reached">
+        <div class="goal-text">
+          <p class="goal-kicker">Ziel: 95 % unauffällige Fragen</p>
+          <h2>
+            @if (quality() === null) {
+              Noch keine Frage beurteilt
+            } @else if (goal().reached) {
+              Ziel erreicht
+            } @else {
+              Noch {{ goal().needed }}
+              {{ goal().needed === 1 ? 'Frage' : 'Fragen' }} bis zum Ziel
+            }
+          </h2>
+          <p>
+            Heute {{ quality() === null ? '–' : percent(quality()) }} – jede
+            entschiedene Frage zählt.
+          </p>
+        </div>
+        <div class="goal-meter">
+          <span class="goal-track">
+            <span class="goal-fill" [style.width.%]="(quality() ?? 0) * 100"></span>
+            <span class="goal-flag"><em>Ziel</em></span>
+          </span>
+          <span class="goal-scale"><span>0 %</span><span>100 %</span></span>
+        </div>
+      </section>
+    }
+  }
+</ng-template>
+
+<ng-template #checkChapters>
+  <div class="chapters">
+    @for (group of groups(); track group.id) {
+      <section
+        class="chapter"
+        [class.is-open]="isOpen(group.id, group.items.length > 0)"
+        [class.is-passed]="!group.items.length"
+      >
+        <button
+          type="button"
+          class="chapter-head"
+          [attr.aria-expanded]="group.items.length ? isOpen(group.id, true) : null"
+          [disabled]="!group.items.length"
+          (click)="toggleGroup(group.id, group.items.length > 0)"
+        >
+          <span class="chev" aria-hidden="true"></span>
+          <span class="chapter-title">
+            <b>{{ group.title }}</b>
+            <span>{{ group.limit }}</span>
+          </span>
+          @if (group.items.length) {
+            <span
+              class="changed-tag is-count"
+              [attr.data-severity]="group.items[0]?.hint?.severity"
+              >{{ group.items.length }}
+              {{ group.items.length === 1 ? 'auffällig' : 'auffällig' }}</span
+            >
+          } @else {
+            <span class="passed-tag"
+              ><css-icon icon="checkmark" size="xs"></css-icon>Bestanden</span
+            >
+          }
+        </button>
+        @if (group.items.length && isOpen(group.id, true)) {
+          <div class="rules-head" aria-hidden="true">
+            <span>Frage</span>
+            <span>Grenze</span>
+            <span>Gemessen</span>
+          </div>
+          @for (item of group.items; track item.hint.key) {
+            <ng-container
+              *ngTemplateOutlet="
+                hintRow;
+                context: { $implicit: item, withKind: false }
+              "
+            />
+          }
+        }
+      </section>
+    }
+  </div>
+</ng-template>
+
+<ng-template #hintRow let-item let-withKind="withKind">
+  <div class="rule is-hint" [class.is-expanded]="openRow() === item.hint.key">
+    <button
+      type="button"
+      class="rule-text as-button"
+      (click)="toggleRow(item.hint.key)"
+    >
+      <span class="rule-label">
+        @if (variant().startsWith('s') && markOf(item.hint.questionId); as n) {
+          <span class="s-mark is-inline">{{ n }}</span>
+        }
+        @if (item.question) {
+          <span class="rule-id">F-{{ item.question.id }}</span>
+        }
+        {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+      </span>
+      <p class="rule-description">
+        @if (withKind) {
+          <b>{{ kindOf(item) }}.</b>
+        }
+        {{ item.text.finding }}
+      </p>
+    </button>
+    <div class="rule-control">
+      <span class="rule-standard">
+        <span class="rule-standard-label">Grenze</span>
+        {{ limitOf(item) }}
+      </span>
+      <ng-container *ngTemplateOutlet="valueChip; context: { $implicit: item }" />
+    </div>
+    @if (openRow() === item.hint.key && item.question) {
+      <div class="rule-more">
+        <app-ad-answer-distribution [question]="item.question" />
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #valueChip let-item>
+  <div class="value-wrap" data-menu>
+    <button
+      type="button"
+      class="value is-flag"
+      [attr.data-severity]="item.hint.severity"
+      [class.is-open]="menuKey() === item.hint.key"
+      aria-haspopup="dialog"
+      [attr.aria-expanded]="menuKey() === item.hint.key"
+      (click)="toggleMenu(item.hint.key)"
+    >
+      <b>{{ measured(item) }}</b>
+      <css-icon icon="angle-right" size="xs"></css-icon>
+    </button>
+    @if (menuKey() === item.hint.key) {
+      <div class="menu" role="dialog" [attr.aria-label]="item.text.title">
+        <b class="menu-title">{{ item.text.title }}</b>
+        <p class="menu-advice">{{ item.text.advice }}</p>
+        <div class="options">
+          @if (!item.hint.ignored) {
+            <button type="button" class="option" (click)="run('act', item)">
+              <span class="option-icon"
+                ><css-icon icon="edit" size="xs"></css-icon
+              ></span>
+              <span class="option-value is-wide">{{ actionOf(item) }}</span>
+            </button>
+            @if (item.question?.active) {
+              <button type="button" class="option" (click)="run('pause', item)">
+                <span class="option-icon"
+                  ><css-icon icon="pause-circle" size="xs"></css-icon
+                ></span>
+                <span class="option-value is-wide">Pausieren</span>
+                <span class="option-note">kommt in keinem Duell mehr vor</span>
+              </button>
+            }
+          }
+          <button type="button" class="option" (click)="run('ignore', item)">
+            <span class="option-icon"
+              ><css-icon
+                [attr.icon]="item.hint.ignored ? 'undo' : 'hide'"
+                size="xs"
+              ></css-icon
+            ></span>
+            <span class="option-value is-wide">{{
+              item.hint.ignored ? 'Wieder öffnen' : 'Ignorieren'
+            }}</span>
+            @if (!item.hint.ignored) {
+              <span class="option-note">bewusst so lassen</span>
+            }
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>
+
+<ng-template #calm>
+  <div class="calm">
+    <span class="calm-icon"><css-icon icon="checkmark" size="sm"></css-icon></span>
+    <div>
+      <b>{{ showIgnored() ? 'Nichts ignoriert' : 'Nichts zu tun' }}</b>
+      <p>
+        {{
+          showIgnored()
+            ? 'Ignorierte Hinweise erscheinen hier und lassen sich wieder öffnen.'
+            : 'Keine Frage fällt auf. Hinweise erscheinen hier, sobald eine Frage auffällt.'
+        }}
+      </p>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #sGauge let-size="size" let-needle="needle">
+  <div class="sg" [attr.data-size]="size">
+    <svg viewBox="0 0 240 136" aria-hidden="true">
+      <path class="sg-track" d="M 28 124 A 92 92 0 0 1 212 124" />
+      @if (quality() !== null) {
+        <path class="sg-fill" [attr.d]="gaugePath(quality() ?? 0)" />
+      }
+      @if (size !== 'sm') {
+        @for (t of gaugeTicks; track t.i) {
+          <line
+            class="sg-tick"
+            [class.is-major]="t.i % 10 === 0"
+            [attr.x1]="t.x1"
+            [attr.y1]="t.y1"
+            [attr.x2]="t.x2"
+            [attr.y2]="t.y2"
+          />
+        }
+      }
+      <line
+        class="sg-goal"
+        [attr.x1]="gaugeGoal.x1"
+        [attr.y1]="gaugeGoal.y1"
+        [attr.x2]="gaugeGoal.x2"
+        [attr.y2]="gaugeGoal.y2"
+      />
+      @if (needle && quality() !== null) {
+        <g class="sg-needle" [attr.transform]="needleOf(quality() ?? 0)">
+          <path d="M 116.5 124 L 120 60 L 123.5 124 Z" />
+          <circle cx="120" cy="124" r="8" />
+        </g>
+      }
+    </svg>
+    <div class="sg-text">
+      <b>{{ quality() === null ? '–' : percent(quality()) }}</b>
+      <span>Fragenqualität</span>
+    </div>
+    @if (size !== 'sm') {
+      <span class="sg-scale is-min" aria-hidden="true">0</span>
+      <span class="sg-goal-label">Ziel 95 %</span>
+    }
+  </div>
+</ng-template>
+
+<ng-template #sSummary>
+  <dl class="s-sum">
+    <div>
+      <dt><i class="is-ok"></i>In Ordnung</dt>
+      <dd>{{ judged() - flagged() }}</dd>
+    </div>
+    <div>
+      <dt><i class="is-bad"></i>Bald ansehen</dt>
+      <dd>{{ urgent().length }}</dd>
+    </div>
+    <div>
+      <dt><i class="is-mid"></i>Hat Zeit</dt>
+      <dd>{{ open().length - urgent().length }}</dd>
+    </div>
+  </dl>
+  <ng-container *ngTemplateOutlet="sIgnored" />
+</ng-template>
+
+<ng-template #sIgnored>
+  @if (ignored().length || showIgnored()) {
+    <button type="button" class="s-link" (click)="showIgnored.set(!showIgnored())">
+      {{
+        showIgnored()
+          ? 'Offene Hinweise zeigen'
+          : ignored().length +
+            (ignored().length === 1
+              ? ' ignorierter Hinweis'
+              : ' ignorierte Hinweise')
+      }}
+    </button>
+  }
+</ng-template>
+
+<ng-template #sLegend>
+  <div class="s-legend">
+    <span><i class="s-dot is-key"></i>In Ordnung</span>
+    <span><i class="s-mark is-key">1</i>Mit Hinweis, wie unten nummeriert</span>
+  </div>
+</ng-template>
+
+<ng-template #sSpectrum>
+  <div class="ss">
+    <div class="ss-ruler" aria-hidden="true">
+      <span class="is-warm" style="width: 30%">Zu schwer</span>
+      <span class="is-good" style="width: 65%">Gute Zone · 30 bis 95 % richtig</span>
+      <span class="is-warm is-thin" style="width: 5%"></span>
+    </div>
+    <div class="ss-plot">
+      <span class="ss-band" aria-hidden="true"></span>
+      <span class="ss-base" aria-hidden="true"></span>
+      @for (p of sSwarm(); track p.id) {
+        @if (p.n) {
+          <button
+            type="button"
+            class="s-mark"
+            [class.is-end]="p.x > 70"
+            [style.left.%]="p.x"
+            [style.top]="'calc(50% + ' + p.lane * 22 + 'px)'"
+            [attr.aria-label]="
+              p.n + ': ' + percent(p.rate) + ' richtig, ' + (p.text ?? '')
+            "
+            (click)="openPoint(p.id)"
+          >
+            {{ p.n
+            }}<span class="r-tip"
+              ><b>{{ percent(p.rate) }} richtig</b>{{ p.text }}</span
+            >
+          </button>
+        } @else {
+          <span
+            class="s-dot"
+            tabindex="0"
+            [class.is-end]="p.x > 70"
+            [style.left.%]="p.x"
+            [style.top]="'calc(50% + ' + p.lane * 22 + 'px)'"
+            [attr.aria-label]="percent(p.rate) + ' richtig, ' + (p.text ?? '')"
+            ><span class="r-tip"
+              ><b>{{ percent(p.rate) }} richtig</b>{{ p.text }}</span
+            ></span
+          >
+        }
+      }
+      @if (!spread().length) {
+        <p class="s-empty">
+          <span>Jede Frage erscheint hier, sobald sie 20 Antworten hat.</span>
+        </p>
+      }
+    </div>
+    <div class="ss-axis" aria-hidden="true">
+      <span style="left: 0">0 %</span>
+      <span style="left: 30%">30 %</span>
+      <span class="is-mid" style="left: 50%">50 %</span>
+      <span class="is-end" style="left: 95%">95 %</span>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #sMapT let-margins="margins">
+  <div class="sm" [class.has-margins]="margins">
+    @if (margins) {
+      <div class="sm-top" aria-hidden="true">
+        @for (b of rateBins(); track b.i) {
+          <i
+            [class.is-out]="b.from < 0.3 || b.from >= 0.95"
+            [style.height.%]="b.n ? Math.max(8, b.h) : 0"
+          ></i>
+        }
+      </div>
+    }
+    <div class="sm-y" aria-hidden="true">
+      <span style="bottom: 100%">40 %</span>
+      <span style="bottom: 50%">20 %</span>
+      <span style="bottom: 0">0 %</span>
+    </div>
+    <div class="sm-plot">
+      <span class="sm-y-name" aria-hidden="true">↑ ohne Antwort</span>
+      <div class="sm-field" aria-hidden="true"><span>Gute Zone</span></div>
+      <span class="sm-zone-label is-hard" aria-hidden="true">zu schwer</span>
+      <span class="sm-zone-label is-slow" aria-hidden="true"
+        >zu oft ohne Antwort</span
+      >
+      @for (p of sMap(); track p.id) {
+        @if (p.n) {
+          <button
+            type="button"
+            class="s-mark"
+            [class.is-end]="p.x > 70"
+            [class.is-low]="p.y > 70"
+            [style.left.%]="p.x"
+            [style.bottom.%]="p.y"
+            [attr.aria-label]="p.n + ': ' + (p.text ?? '')"
+            (click)="openPoint(p.id)"
+          >
+            {{ p.n
+            }}<span class="r-tip"
+              ><b
+                >{{ percent(p.rate) }} richtig · {{ percent(p.time ?? 0) }} ohne
+                Antwort</b
+              >{{ p.text }}</span
+            >
+          </button>
+        } @else {
+          <span
+            class="s-dot is-map"
+            tabindex="0"
+            [class.is-end]="p.x > 70"
+            [class.is-low]="p.y > 70"
+            [style.left.%]="p.x"
+            [style.bottom.%]="p.y"
+            [attr.aria-label]="(p.text ?? '') + ', ' + percent(p.rate) + ' richtig'"
+            ><span class="r-tip"
+              ><b
+                >{{ percent(p.rate) }} richtig · {{ percent(p.time ?? 0) }} ohne
+                Antwort</b
+              >{{ p.text }}</span
+            ></span
+          >
+        }
+      }
+      @if (!spread().length) {
+        <p class="s-empty">
+          <span>Jede Frage erscheint hier, sobald sie 20 Antworten hat.</span>
+        </p>
+      }
+    </div>
+    @if (margins) {
+      <div class="sm-right" aria-hidden="true">
+        @for (b of timeBins(); track b.i) {
+          <i
+            [class.is-out]="b.from >= 0.2"
+            [style.width.%]="b.n ? Math.max(8, b.h) : 0"
+          ></i>
+        }
+      </div>
+    }
+    <div class="sm-x" aria-hidden="true">
+      <span style="left: 0">0 %</span>
+      <span style="left: 30%">30 %</span>
+      <span style="left: 95%">95 %</span>
+      <span class="sm-x-name">richtig beantwortet</span>
+    </div>
+  </div>
+</ng-template>

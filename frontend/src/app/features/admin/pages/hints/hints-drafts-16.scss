@@ -1,0 +1,611 @@
+// Temporary: sixteenth round of drafts of the hints page.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+$ok: #2e8540;
+
+@mixin sev-colors {
+  &[data-severity='critical'] {
+    --sev: #b42318;
+    --sev-bg: #fdf0ee;
+  }
+
+  &[data-severity='high'] {
+    --sev: #c2410c;
+    --sev-bg: #fdf1ea;
+  }
+
+  &[data-severity='medium'] {
+    --sev: #8a6a00;
+    --sev-bg: #fbf6e6;
+  }
+}
+
+// h69: a conversation with an assistant.
+.chat {
+  max-width: 880px;
+}
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #0078bb, #00327d);
+  color: #fff;
+}
+
+.chat-body {
+  display: grid;
+  gap: 12px;
+  padding: 24px;
+  background: #f7f9fc;
+  border-radius: 0 0 12px 12px;
+
+  @media (max-width: 640px) {
+    padding: 16px;
+  }
+}
+
+.msg {
+  @include sev-colors;
+  display: grid;
+  gap: 10px;
+  max-width: 560px;
+  padding: 14px 16px;
+  border-radius: 4px 16px 16px 16px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 40, 100, 0.06);
+  font-size: 14.5px;
+  line-height: 1.5;
+
+  b {
+    color: var(--sev, #{t.$text});
+  }
+
+  a {
+    color: $blue;
+  }
+
+  &.is-me {
+    justify-self: end;
+    border-radius: 16px 4px 16px 16px;
+    background: t.$text;
+    color: #fff;
+  }
+
+  .game.is-compact {
+    box-shadow: none;
+  }
+}
+
+.msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.msg-ask {
+  font-weight: t.$bold;
+}
+
+.replies {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.reply {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid rgba(0, 120, 187, 0.4);
+  border-radius: 18px;
+  background: #fff;
+  color: $blue;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: t.$medium;
+  cursor: pointer;
+
+  &:hover {
+    background: $blue;
+    color: #fff;
+  }
+}
+
+// h70: an editorial magazine page.
+.mag {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 40px;
+  padding: 32px 36px;
+  border: 1px solid $hair;
+  border-radius: 16px;
+  background: #fff;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  @media (max-width: 640px) {
+    padding: 20px 18px;
+  }
+}
+
+.mag-rubric {
+  color: $blue;
+  font-size: 11.5px;
+  font-weight: t.$bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mag-lead {
+  @include sev-colors;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  column-gap: 32px;
+  row-gap: 12px;
+  justify-items: start;
+  padding-bottom: 30px;
+  border-bottom: 2px solid t.$text;
+
+  > :not(.mag-visual) {
+    grid-column: 1;
+  }
+
+  .btn-primary {
+    gap: 8px;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mag-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+
+  @media (max-width: 640px) {
+    font-size: 28px;
+  }
+}
+
+.mag-deck {
+  color: t.$text-2;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.mag-visual {
+  grid-column: 2;
+  grid-row: 1 / span 4;
+  align-self: center;
+  justify-self: stretch;
+
+  @media (max-width: 900px) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+.mag-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.mag-story {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 8px;
+  padding: 22px 24px 22px 0;
+  border-bottom: 1px solid t.$line;
+
+  &:nth-child(even) {
+    padding-right: 0;
+    padding-left: 24px;
+    border-left: 1px solid t.$line;
+  }
+
+  h3 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  p:not(.mag-rubric) {
+    color: t.$text-2;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 640px) {
+    &:nth-child(even) {
+      padding-left: 0;
+      border-left: 0;
+    }
+  }
+}
+
+.mag-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: t.$text;
+  font: inherit;
+  font-size: 13px;
+  font-weight: t.$bold;
+  cursor: pointer;
+
+  &:hover {
+    color: $blue;
+  }
+}
+
+.mag-side {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding-left: 28px;
+  border-left: 1px solid t.$line;
+
+  dl {
+    display: grid;
+    gap: 0;
+    margin: 0;
+  }
+
+  dl > div {
+    padding: 14px 0;
+    border-bottom: 1px solid t.$line-soft;
+  }
+
+  dt {
+    color: t.$text-3;
+    font-size: 12.5px;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 30px;
+    font-weight: 700;
+    @include t.numeric;
+  }
+
+  @media (max-width: 1024px) {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+// h71: one gauge per hint.
+.gauges2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.gg {
+  @include sev-colors;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 24px 22px 0;
+  border: 1px solid $hair;
+  border-radius: 16px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: 0 18px 36px -26px rgba(0, 40, 100, 0.55);
+  }
+}
+
+.gg-svg {
+  width: 180px;
+  overflow: visible;
+}
+
+.gg-track,
+.gg-band,
+.gg-fill {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.gg-track {
+  stroke: rgba(0, 50, 125, 0.08);
+  stroke-width: 12;
+}
+
+.gg-band {
+  stroke: #c7e5d0;
+  stroke-width: 12;
+  stroke-linecap: butt;
+}
+
+.gg-fill {
+  stroke: var(--sev);
+  stroke-width: 4;
+  opacity: 0.6;
+}
+
+.gg-needle {
+  stroke: var(--sev);
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.gg-hub {
+  fill: var(--sev);
+}
+
+.gg-val {
+  margin-top: -6px;
+  color: var(--sev);
+  font-size: 20px;
+  font-weight: t.$bold;
+  @include t.numeric;
+}
+
+.gg-title {
+  font-size: 15px;
+}
+
+.gg-q {
+  display: -webkit-box;
+  overflow: hidden;
+  color: t.$text-3;
+  font-size: 12.5px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.gg-foot {
+  display: flex;
+  align-self: end;
+  justify-content: space-between;
+  width: calc(100% + 44px);
+  margin-top: 10px;
+  padding: 12px 22px;
+  border-top: 1px solid t.$line-soft;
+}
+
+.gg-cta {
+  color: $blue;
+  font-size: 13px;
+  font-weight: t.$medium;
+}
+
+// h72: a treemap of the categories.
+.tm-card {
+  margin-bottom: 20px;
+
+  .ad-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.tm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 18px;
+}
+
+.tm-tile {
+  display: grid;
+  flex-basis: 160px;
+  align-content: space-between;
+  gap: 4px;
+  min-height: 120px;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+
+  &[data-tone='good'] {
+    background: linear-gradient(160deg, #3a9a5b, #2e8540);
+  }
+
+  &[data-tone='fair'] {
+    background: linear-gradient(160deg, #b99a2a, #8a6a00);
+  }
+
+  &[data-tone='poor'] {
+    background: linear-gradient(160deg, #df6a35, #c2410c);
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &.is-active {
+    box-shadow:
+      0 0 0 3px #fff,
+      0 0 0 5px t.$text;
+  }
+
+  &.is-dim {
+    opacity: 0.4;
+  }
+
+  b {
+    font-size: 15px;
+  }
+
+  small {
+    opacity: 0.85;
+    font-size: 12px;
+  }
+}
+
+.tm-score {
+  font-size: 30px;
+  font-weight: t.$bold;
+  letter-spacing: -0.02em;
+  @include t.numeric;
+}
+
+// h73: a radar per question.
+.radar-key {
+  display: flex;
+  gap: 16px;
+  color: t.$text-3;
+  font-size: 12.5px;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  i {
+    width: 14px;
+    height: 10px;
+    border-radius: 3px;
+
+    &.is-self {
+      background: rgba(194, 65, 12, 0.35);
+      box-shadow: inset 0 0 0 2px #c2410c;
+    }
+
+    &.is-base {
+      background: rgba(0, 50, 125, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(0, 50, 125, 0.35);
+    }
+  }
+}
+
+.radars {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.rd {
+  @include sev-colors;
+  display: grid;
+  gap: 12px;
+  padding: 20px 22px;
+  border: 1px solid $hair;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.rd-svg {
+  width: 100%;
+  max-width: 300px;
+  justify-self: center;
+  overflow: visible;
+}
+
+.rd-ring {
+  fill: none;
+  stroke: rgba(0, 50, 125, 0.1);
+}
+
+.rd-base {
+  fill: rgba(0, 50, 125, 0.06);
+  stroke: rgba(0, 50, 125, 0.35);
+  stroke-dasharray: 3 3;
+}
+
+.rd-self {
+  fill: color-mix(in srgb, var(--sev) 25%, transparent);
+  stroke: var(--sev);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.rd-label {
+  fill: t.$text-3;
+  font-size: 10px;
+}
+
+.rd-value {
+  fill: t.$text;
+  font-weight: 700;
+}
+
+.rd-pool {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  min-height: 180px;
+
+  b {
+    color: var(--sev);
+    font-size: 52px;
+    line-height: 1;
+  }
+
+  span {
+    color: t.$text-3;
+    font-size: 13px;
+  }
+}
+
+.rd-text {
+  display: grid;
+  gap: 6px;
+
+  b {
+    font-size: 14.5px;
+    line-height: 1.4;
+  }
+}
+
+.rd-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid t.$line-soft;
+}

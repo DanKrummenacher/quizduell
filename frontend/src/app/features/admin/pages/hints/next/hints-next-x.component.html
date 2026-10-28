@@ -1,0 +1,375 @@
+@switch (variant()) {
+  @case ('x1') {
+    <section class="ad-card flush">
+      <header class="ad-card-head head-row">
+        <div>
+          <h2>Hinweise</h2>
+          <p>Eine Zeile öffnen für die Antworten und den nächsten Schritt</p>
+        </div>
+        <div class="tools">
+          @if (types().length > 1) {
+            <label class="ad-select">
+              <span class="ad-sr">Art</span>
+              <select [value]="type()" (change)="onType($event)">
+                <option value="">Alle Arten</option>
+                @for (t of types(); track t) {
+                  <option [value]="t">{{ typeLabel(t) }}</option>
+                }
+              </select>
+            </label>
+          }
+          <ng-container *ngTemplateOutlet="statusSeg" />
+        </div>
+      </header>
+      @if (!rows().length) {
+        <ng-container *ngTemplateOutlet="calm" />
+      } @else {
+        <div class="ad-table-wrap">
+          <table class="ad-table x-table">
+            <thead>
+              <tr>
+                <th scope="col" class="c-sev">Wichtigkeit</th>
+                <th scope="col">Frage</th>
+                <th scope="col" class="c-kind">Befund</th>
+                <th scope="col" class="c-val">Gemessen</th>
+                <th scope="col" class="c-go"><span class="ad-sr">Öffnen</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of rows(); track item.hint.key) {
+                <tr
+                  class="x-row"
+                  [class.is-open]="openKey() === item.hint.key"
+                  [attr.aria-expanded]="openKey() === item.hint.key"
+                  (click)="toggle(item.hint.key)"
+                >
+                  <td class="c-sev">
+                    <span class="pill" [attr.data-severity]="item.hint.severity">{{
+                      severityOf(item)
+                    }}</span>
+                  </td>
+                  <td class="c-q">
+                    @if (item.question) {
+                      <span class="qid">F-{{ item.question.id }}</span>
+                    }
+                    {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+                  </td>
+                  <td class="c-kind">{{ kindOf(item) }}</td>
+                  <td class="c-val">
+                    <b [attr.data-severity]="item.hint.severity">{{
+                      measured(item)
+                    }}</b>
+                    <small>Grenze {{ limitOf(item) }}</small>
+                  </td>
+                  <td class="c-go"><span class="chev" aria-hidden="true"></span></td>
+                </tr>
+                @if (openKey() === item.hint.key) {
+                  <tr class="x-detail">
+                    <td colspan="5">
+                      <div class="x-detail-grid">
+                        <div class="x-answers">
+                          @if (item.question; as q) {
+                            <p class="x-label">Antworten der Spielenden</p>
+                            <app-ad-answer-distribution [question]="q" />
+                          } @else {
+                            <p class="x-label">Aktive Fragen</p>
+                            <p class="x-big">
+                              {{ item.hint.value }}
+                              <span>von {{ item.hint.sample }} empfohlenen</span>
+                            </p>
+                          }
+                        </div>
+                        <div class="x-side">
+                          <p class="x-label">Befund</p>
+                          <p>{{ item.text.finding }}</p>
+                          <p class="x-label">Empfehlung</p>
+                          <p>{{ item.text.advice }}</p>
+                          <ng-container
+                            *ngTemplateOutlet="actions; context: { $implicit: item }"
+                          />
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  }
+
+  @case ('x2') {
+    <div class="board">
+      @for (col of columns(); track col.id) {
+        <section class="ad-card flush col" [attr.data-col]="col.id">
+          <header class="ad-card-head">
+            <div>
+              <h2>
+                {{ col.title }} <span class="count">{{ col.items.length }}</span>
+              </h2>
+              <p>{{ col.note }}</p>
+            </div>
+          </header>
+          <div class="col-body">
+            @for (item of col.items; track item.hint.key) {
+              <article class="task" [attr.data-severity]="item.hint.severity">
+                <p class="task-top">
+                  <span class="pill" [attr.data-severity]="item.hint.severity">{{
+                    severityOf(item)
+                  }}</span>
+                  <b class="task-val" [attr.data-severity]="item.hint.severity">{{
+                    measured(item)
+                  }}</b>
+                </p>
+                <p class="task-q">
+                  @if (item.question) {
+                    <span class="qid">F-{{ item.question.id }}</span>
+                  }
+                  {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+                </p>
+                <p class="task-kind">{{ kindOf(item) }}</p>
+                <footer class="task-foot">
+                  @switch (col.id) {
+                    @case ('todo') {
+                      <button
+                        type="button"
+                        class="btn-ghost btn-sm"
+                        (click)="setLater(item.hint.key, true)"
+                      >
+                        Vormerken
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-ghost btn-sm"
+                        (click)="ignoreOne.emit({ item, ignored: true })"
+                      >
+                        Ignorieren
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-secondary btn-sm"
+                        (click)="act.emit(item)"
+                      >
+                        {{ actionOf(item) }}
+                      </button>
+                    }
+                    @case ('later') {
+                      <button
+                        type="button"
+                        class="btn-ghost btn-sm"
+                        (click)="setLater(item.hint.key, false)"
+                      >
+                        Zurück
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-primary btn-sm"
+                        (click)="act.emit(item)"
+                      >
+                        {{ actionOf(item) }}
+                      </button>
+                    }
+                    @default {
+                      <button
+                        type="button"
+                        class="btn-secondary btn-sm"
+                        (click)="ignoreOne.emit({ item, ignored: false })"
+                      >
+                        Wieder öffnen
+                      </button>
+                    }
+                  }
+                </footer>
+              </article>
+            } @empty {
+              <p class="col-empty">
+                {{
+                  col.id === 'later'
+                    ? 'Hinweise vormerken, die du bald überarbeitest.'
+                    : col.id === 'todo'
+                      ? 'Nichts offen.'
+                      : 'Nichts ignoriert.'
+                }}
+              </p>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+
+  @case ('x3') {
+    <div class="day">
+      <section class="ad-card flush">
+        @if (focus(); as item) {
+          <header class="ad-card-head head-row">
+            <div>
+              <h2>Als Nächstes</h2>
+              <p>{{ severityOf(item) }} · {{ kindOf(item) }}</p>
+            </div>
+            <span class="pill" [attr.data-severity]="item.hint.severity">{{
+              measured(item)
+            }}</span>
+          </header>
+          <div class="day-focus">
+            <h3>
+              @if (item.question) {
+                <span class="qid">F-{{ item.question.id }}</span>
+              }
+              {{ item.question?.text ?? 'Ganzer Fragenbestand' }}
+            </h3>
+            <p class="day-finding">{{ item.text.finding }}</p>
+            @if (item.question; as q) {
+              <app-ad-answer-distribution [question]="q" />
+            }
+            <div class="day-advice">
+              <css-icon icon="bulb" size="sm"></css-icon>
+              <p>{{ item.text.advice }}</p>
+            </div>
+            <ng-container
+              *ngTemplateOutlet="actions; context: { $implicit: item }"
+            />
+          </div>
+          @if (rest().length) {
+            <div class="day-rest">
+              <p class="x-label">Danach</p>
+              @for (next of rest(); track next.hint.key) {
+                <button
+                  type="button"
+                  class="day-row"
+                  (click)="focusKey.set(next.hint.key)"
+                >
+                  <span class="pill" [attr.data-severity]="next.hint.severity">{{
+                    severityOf(next)
+                  }}</span>
+                  <span class="day-row-q">{{
+                    next.question?.text ?? 'Ganzer Fragenbestand'
+                  }}</span>
+                  <b [attr.data-severity]="next.hint.severity">{{
+                    measured(next)
+                  }}</b>
+                  <span class="chev" aria-hidden="true"></span>
+                </button>
+              }
+            </div>
+          }
+        } @else {
+          <ng-container *ngTemplateOutlet="calm" />
+        }
+      </section>
+      <aside class="day-side">
+        <section class="ad-card">
+          <header class="ad-card-head">
+            <div>
+              <h2>Fragenqualität</h2>
+              <p>{{ judged() }} Fragen mit mindestens 20 Antworten</p>
+            </div>
+          </header>
+          <p class="side-big">{{ quality() === null ? '–' : percent(quality()) }}</p>
+          <ul class="side-checks">
+            @for (c of checks(); track c.id) {
+              <li [class.is-bad]="c.count">
+                <css-icon
+                  [attr.icon]="c.count ? 'priority-warning' : 'checkmark'"
+                  size="xs"
+                ></css-icon>
+                <span>{{ c.title }}</span>
+                <b>{{ c.count ? c.count + ' auffällig' : 'in Ordnung' }}</b>
+              </li>
+            }
+          </ul>
+        </section>
+        <section class="ad-card">
+          <header class="ad-card-head">
+            <div>
+              <h2>Ignoriert</h2>
+              <p>Bewusst so gelassen</p>
+            </div>
+          </header>
+          @for (item of ignored(); track item.hint.key) {
+            <div class="side-ign">
+              <span
+                >{{ item.question ? 'F-' + item.question.id + ' · ' : ''
+                }}{{ kindOf(item) }}</span
+              >
+              <button
+                type="button"
+                class="link"
+                (click)="ignoreOne.emit({ item, ignored: false })"
+              >
+                Öffnen
+              </button>
+            </div>
+          } @empty {
+            <p class="side-none">Nichts ignoriert.</p>
+          }
+        </section>
+      </aside>
+    </div>
+  }
+}
+
+<ng-template #statusSeg>
+  <div class="ad-segmented" role="group" aria-label="Status">
+    <button
+      type="button"
+      [class.is-active]="status() === 'open'"
+      [attr.aria-pressed]="status() === 'open'"
+      (click)="setStatus('open')"
+    >
+      Offen <span class="seg-n">{{ open().length }}</span>
+    </button>
+    <button
+      type="button"
+      [class.is-active]="status() === 'ignored'"
+      [attr.aria-pressed]="status() === 'ignored'"
+      (click)="setStatus('ignored')"
+    >
+      Ignoriert <span class="seg-n">{{ ignored().length }}</span>
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #actions let-item>
+  <div class="acts">
+    @if (item.hint.ignored) {
+      <button
+        type="button"
+        class="btn-secondary"
+        (click)="ignoreOne.emit({ item, ignored: false })"
+      >
+        Wieder öffnen
+      </button>
+    } @else {
+      <button type="button" class="btn-primary" (click)="act.emit(item)">
+        {{ actionOf(item) }}
+      </button>
+      @if (item.question?.active) {
+        <button type="button" class="btn-secondary" (click)="pauseOne.emit(item)">
+          Pausieren
+        </button>
+      }
+      <button
+        type="button"
+        class="btn-ghost"
+        (click)="ignoreOne.emit({ item, ignored: true })"
+      >
+        Ignorieren
+      </button>
+    }
+  </div>
+</ng-template>
+
+<ng-template #calm>
+  <div class="calm">
+    <span class="calm-icon"><css-icon icon="checkmark" size="sm"></css-icon></span>
+    <div>
+      <b>{{ status() === 'ignored' ? 'Nichts ignoriert' : 'Nichts zu tun' }}</b>
+      <p>
+        Keine Frage fällt auf. Hinweise erscheinen hier, sobald eine Frage auffällt.
+      </p>
+    </div>
+  </div>
+</ng-template>

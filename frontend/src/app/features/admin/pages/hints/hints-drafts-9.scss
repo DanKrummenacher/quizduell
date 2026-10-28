@@ -1,0 +1,824 @@
+// Temporary: ninth round, built like the approved pages.
+@use '../../styles/tokens' as t;
+
+$blue: #0078bb;
+$hair: rgba(0, 50, 125, 0.08);
+$ok: #2e8540;
+
+@mixin sev-colors {
+  &[data-severity='critical'] {
+    --sev: #b42318;
+    --sev-bg: #fdf0ee;
+  }
+
+  &[data-severity='high'] {
+    --sev: #b54708;
+    --sev-bg: #fdf4ea;
+  }
+
+  &[data-severity='medium'] {
+    --sev: #8a6a00;
+    --sev-bg: #fbf6e6;
+  }
+}
+
+.r9-figures {
+  margin-bottom: 20px;
+}
+
+// The toolbar as on the questions page.
+.r9-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+
+  .search {
+    flex: 1 1 300px;
+    min-width: 220px;
+  }
+
+  .ad-select {
+    flex: 0 1 auto;
+    min-width: 200px;
+  }
+}
+
+.search-count {
+  flex: none;
+  margin-right: 4px;
+  color: t.$text-3;
+  font-size: 13px;
+  @include t.numeric;
+}
+
+// Chapters as on the questions page.
+.r9-chapters {
+  display: grid;
+  gap: 16px;
+}
+
+.chapter {
+  @include sev-colors;
+  overflow: hidden;
+  border: 1px solid $hair;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.chapter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  width: 100%;
+  padding: 16px 20px;
+  border: 0;
+  border-bottom: 1px solid $hair;
+  background: #f7f9fc;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: #f1f5fa;
+  }
+
+  &[aria-expanded='false'] {
+    border-bottom: 0;
+    background: #fff;
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    background: var(--sev);
+  }
+
+  @media (max-width: 640px) {
+    padding: 14px 16px;
+  }
+}
+
+.group-chev {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin: 0 4px 2px 2px;
+  border-right: 1.5px solid t.$text-2;
+  border-bottom: 1.5px solid t.$text-2;
+  transform: rotate(45deg);
+  transition: transform 0.15s ease;
+
+  &.is-closed {
+    margin-bottom: 0;
+    transform: rotate(-45deg);
+  }
+}
+
+.chapter-name {
+  margin-right: 4px;
+  font-size: 17px;
+  font-weight: t.$bold;
+  letter-spacing: -0.01em;
+}
+
+.cchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid rgba(0, 50, 125, 0.12);
+  border-radius: 99px;
+  background: #fff;
+  color: t.$text-2;
+  font-size: 12.5px;
+
+  b {
+    color: t.$text;
+    font-weight: t.$bold;
+    @include t.numeric;
+  }
+}
+
+.chapter-meta {
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+// The tables.
+.r9-table {
+  table-layout: fixed;
+
+  tbody tr {
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+
+    &:nth-child(even) {
+      background: #f9fbfd;
+    }
+
+    &:hover {
+      background: #eef3f9;
+    }
+  }
+
+  td {
+    vertical-align: middle;
+  }
+
+  .c-hint {
+    width: 34%;
+  }
+
+  .c-q {
+    width: auto;
+    color: t.$text-2;
+    font-size: 13.5px;
+  }
+
+  .c-val {
+    width: 200px;
+  }
+
+  .c-act {
+    width: 190px;
+    text-align: right;
+  }
+
+  .c-go {
+    width: 44px;
+    text-align: right;
+
+    .chev {
+      display: inline-block;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .c-q {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .c-act,
+    .c-val {
+      display: none;
+    }
+  }
+}
+
+.r9-hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .hint-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+  }
+
+  > span {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  b {
+    font-size: 14.5px;
+  }
+
+  small {
+    color: t.$text-3;
+    font-size: 12.5px;
+  }
+}
+
+.r9-title {
+  display: block;
+  font-size: 14.5px;
+}
+
+.r9-sub {
+  color: t.$text-3;
+  font-size: 12.5px;
+}
+
+.r9-id {
+  margin-right: 8px;
+  color: t.$text-3;
+  font-size: 12.5px;
+  @include t.numeric;
+}
+
+// The measured value on its scale, small.
+.r9-meter {
+  @include sev-colors;
+  display: grid;
+  gap: 6px;
+  min-width: 140px;
+}
+
+.r9-meter-val {
+  color: var(--sev);
+  font-size: 13.5px;
+  font-weight: t.$bold;
+  @include t.numeric;
+}
+
+.r9-meter-track {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 50, 125, 0.08);
+}
+
+.r9-meter-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
+  background: #bfe0c8;
+}
+
+.r9-meter-mark {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--sev);
+  box-shadow: 0 1px 2px rgba(0, 40, 100, 0.3);
+}
+
+// h44: a board like the overview.
+.r9-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.r9-side {
+  display: grid;
+  gap: 20px;
+}
+
+.r9-main {
+  .ad-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 20px;
+  }
+}
+
+.r9-row {
+  @include sev-colors;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 22px;
+  border: 0;
+  border-top: 1px solid t.$line-soft;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:first-of-type {
+    border-top: 0;
+  }
+
+  &:hover {
+    background: #f6f9fc;
+  }
+
+  .r9-meter {
+    flex: none;
+    width: 170px;
+  }
+
+  .hint-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+  }
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+
+    .r9-meter {
+      width: 100%;
+      padding-left: 50px;
+    }
+
+    .chev {
+      display: none;
+    }
+  }
+}
+
+.r9-row-text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+
+  b {
+    font-size: 14.5px;
+  }
+
+  small {
+    overflow: hidden;
+    color: t.$text-2;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    flex-basis: calc(100% - 60px);
+  }
+}
+
+.r9-bars {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.r9-bar-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 13.5px;
+
+  b {
+    @include t.numeric;
+  }
+}
+
+.r9-bar {
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #fbe9dd;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: 3px;
+    background: t.$brand;
+  }
+
+  &.is-ok {
+    background: rgba(0, 50, 125, 0.08);
+  }
+
+  &.is-kind {
+    background: rgba(0, 50, 125, 0.08);
+
+    span {
+      background: #c2410c;
+    }
+  }
+}
+
+.r9-note {
+  margin-top: 14px;
+  color: t.$text-3;
+  font-size: 13px;
+}
+
+.r9-checks {
+  display: grid;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    @include sev-colors;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-top: 1px solid t.$line-soft;
+
+    &:first-child {
+      border-top: 0;
+    }
+  }
+}
+
+.r9-check-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--sev-bg);
+  color: var(--sev);
+
+  .is-ok & {
+    background: #e8f4ec;
+    color: $ok;
+  }
+}
+
+.r9-check-text {
+  display: grid;
+  flex: 1;
+  gap: 1px;
+  min-width: 0;
+
+  b {
+    font-size: 13.5px;
+  }
+
+  small {
+    color: t.$text-3;
+    font-size: 12px;
+  }
+}
+
+.r9-check-state {
+  color: var(--sev);
+  font-size: 14px;
+  font-weight: t.$bold;
+  @include t.numeric;
+
+  .is-ok & {
+    color: $ok;
+  }
+}
+
+// h45: like the live page.
+.head-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.view-icons {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: t.$bg-muted;
+
+  button {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: t.$text-3;
+    cursor: pointer;
+
+    &.is-active {
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 40, 100, 0.12);
+      color: t.$text;
+    }
+  }
+}
+
+.r9-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 20px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 14px;
+  }
+}
+
+.r9-card {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  padding: 8px;
+  border: 1px solid $hair;
+  border-radius: 14px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0 18px 36px -26px rgba(0, 40, 100, 0.55);
+  }
+
+  .game.is-compact {
+    box-shadow: none;
+  }
+}
+
+.r9-card-foot {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  padding: 12px 8px 6px;
+
+  b {
+    font-size: 14.5px;
+  }
+
+  small {
+    color: t.$text-3;
+    font-size: 12.5px;
+  }
+}
+
+.r9-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.r9-trends {
+  display: grid;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid t.$line-soft;
+    font-size: 13.5px;
+
+    &:first-child {
+      border-top: 0;
+    }
+
+    b {
+      flex: none;
+      @include t.numeric;
+    }
+
+    &[data-verdict='worse'] b {
+      color: #c2410c;
+    }
+
+    &[data-verdict='better'] b {
+      color: $ok;
+    }
+  }
+}
+
+.r9-trend-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: t.$text-2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// h46: list and detail inside one card.
+.r9-split {
+  display: grid;
+  grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+  min-height: 520px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 0;
+  }
+}
+
+.r9-split-list {
+  border-right: 1px solid $hair;
+
+  @media (max-width: 1024px) {
+    border-right: 0;
+    border-bottom: 1px solid $hair;
+  }
+}
+
+.r9-pick {
+  @include sev-colors;
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 14px 20px;
+  border: 0;
+  border-bottom: 1px solid t.$line-soft;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: #f6f9fc;
+  }
+
+  &.is-selected {
+    background: #eef5fc;
+    box-shadow: inset 3px 0 0 t.$text;
+  }
+
+  b {
+    font-size: 14.5px;
+  }
+
+  small {
+    overflow: hidden;
+    color: t.$text-2;
+    font-size: 12.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.r9-pick-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.r9-pick-val {
+  color: var(--sev);
+  font-size: 12.5px;
+  font-weight: t.$bold;
+  @include t.numeric;
+}
+
+.r9-split-detail {
+  position: static;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  padding: 26px 30px;
+  border-radius: 0;
+
+  @media (max-width: 640px) {
+    padding: 18px 16px;
+  }
+}
+
+// Empty, as on the live page.
+.r9-empty {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 36px 20px 40px;
+  text-align: center;
+
+  .btn-secondary {
+    margin-top: 8px;
+  }
+}
+
+.r9-empty-card {
+  padding: 0;
+}
+
+.ghost {
+  display: grid;
+  gap: 8px;
+  width: min(460px, 100%);
+  margin-bottom: 18px;
+}
+
+.ghost-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 90px;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px dashed t.$line;
+  border-radius: 12px;
+
+  b,
+  span,
+  i {
+    height: 8px;
+    border-radius: 4px;
+    background: t.$bg-muted;
+  }
+
+  b {
+    height: 24px;
+    border-radius: 7px;
+  }
+
+  span {
+    width: 70%;
+  }
+}
+
+.empty-title {
+  color: t.$text;
+  font-size: 16px;
+  font-weight: t.$bold;
+}
+
+.empty-text {
+  max-width: 420px;
+  color: t.$text-2;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.r9-table td {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.r9-pair > *,
+.r9-board > *,
+.r9-side > * {
+  min-width: 0;
+}
+
+.r9-trends li .r9-id {
+  flex: none;
+}
+
+.r9-trends li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
