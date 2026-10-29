@@ -45,12 +45,11 @@ const GROUPS: { id: Group; label: string; actions: AuditAction[] | null }[] = [
     ],
   },
   { id: 'hints', label: 'Hinweise', actions: ['hint.ignore', 'hint.restore'] },
-  { id: 'login', label: 'Anmeldungen', actions: ['login', 'password.change'] },
+  { id: 'login', label: 'Anmeldungen', actions: ['login'] },
 ];
 
 const ICONS: Record<AuditAction, string> = {
   login: 'unlock',
-  'password.change': 'lock',
   'settings.update': 'settings',
   'settings.restore': 'undo',
   'game.pause': 'pause-circle',

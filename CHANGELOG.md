@@ -24,7 +24,6 @@ Erste produktive Version.
 - Auswertung über 7, 30 oder 90 Tage
 - Spielregeln mit Vorlagen und Vorschau der Auswirkung
 - Verlauf jeder Änderung, frühere Spielregeln wiederherstellbar
-- Admin-Passwort im Admin änderbar, gehasht gespeichert
 - Hinweise-Seite als «Bald verfügbar»; die Prüfungen laufen bereits im Editor
 
 ### Betrieb

@@ -36,7 +36,7 @@
       [attr.aria-invalid]="errorMessage() ? true : null"
       aria-describedby="friendCodeStatus"
       (input)="onCodeInput($event)"
-      (focus)="focused.set(true)"
+      (focus)="onFocus()"
       (blur)="focused.set(false)"
     />
     @for (slot of slots; track slot) {

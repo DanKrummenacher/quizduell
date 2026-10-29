@@ -10,6 +10,8 @@ $track: #dfe3ea;
 $symbol: functions.rem(64);
 // As before: buttons and message are a bit narrower than the cards.
 $actions-inset: functions.rem(24);
+// Height reserved under the buttons for the rematch message.
+$rematch-space: functions.rem(84);
 
 :host {
   display: flex;
@@ -17,10 +19,8 @@ $actions-inset: functions.rem(24);
   min-height: 100dvh;
 }
 
-// On phones the buttons sit in the lower part of the screen (easy to reach)
-// and the result is centred above them. The space below grows with the
-// screen height, so the buttons are neither glued to the bottom edge nor
-// floating too high.
+// The result above, the buttons in the lower part of the screen (easy to
+// reach). On phones the whole block sits in the middle of the screen instead.
 .main-content {
   flex-grow: 1;
   display: flex;
@@ -29,6 +29,11 @@ $actions-inset: functions.rem(24);
   padding: functions.rem(32) functions.rem(20)
     clamp(#{functions.rem(28)}, 4.5vh, #{functions.rem(48)});
   box-sizing: border-box;
+
+  @media (max-width: 767px) {
+    justify-content: center;
+    padding-block: functions.rem(24);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -42,6 +47,11 @@ $actions-inset: functions.rem(24);
   justify-content: center;
   padding-bottom: functions.rem(32);
   text-align: center;
+
+  @media (max-width: 767px) {
+    flex-grow: 0;
+    padding-bottom: functions.rem(40);
+  }
 }
 
 .result-icon {
@@ -89,7 +99,7 @@ app-result-players {
 // appears or changes.
 .rematch-area {
   position: relative;
-  min-height: functions.rem(80);
+  min-height: calc(#{$rematch-space} - #{functions.rem(4)});
   padding-top: functions.rem(4);
 }
 
@@ -277,6 +287,18 @@ app-result-players {
 
   app-result-players {
     margin-top: functions.rem(16);
+  }
+}
+
+// Phones: the space reserved for the rematch message (below the buttons) is
+// mirrored at the top, so the visible part sits exactly in the middle. Short
+// phones (e.g. iPhone SE) have no room for the mirror; there the content
+// fills the screen anyway.
+@media (max-width: 767px) and (min-height: 640px) {
+  .main-content::before {
+    content: '';
+    flex: none;
+    height: $rematch-space;
   }
 }
 

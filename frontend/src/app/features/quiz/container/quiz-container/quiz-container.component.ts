@@ -9,6 +9,7 @@ import {
   untracked,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import type { GameStateView } from '../../../../core/contracts/game.contract';
 import { ANSWER_LETTERS } from '../../../../core/game/answer-letters';
 import { GAME_SCREEN_NAVIGATION } from '../../../../core/game/game-screen';
 import { GameClient } from '../../../../core/game/game-client.service';
@@ -30,6 +31,21 @@ export class QuizContainerComponent implements OnDestroy {
 
   private readonly game = this.gameClient.state;
   private readonly now = signal(this.gameClient.serverNow());
+  /**
+   * The last question with its reveal. Once the duel is finished the state
+   * carries no question any more; the page keeps showing the last reveal
+   * until the result page takes over, so nothing empty flashes in between.
+   */
+  private readonly lastRound = signal<{
+    question: NonNullable<GameStateView['question']>;
+    reveal: GameStateView['reveal'];
+  } | null>(null);
+  private readonly shown = computed(() => {
+    const game = this.game();
+    return game?.question
+      ? { question: game.question, reveal: game.reveal }
+      : (this.lastRound() ?? { question: null, reveal: null });
+  });
   /** Answer chosen locally, shown immediately before the server confirms it. */
   private readonly selectedIndex = signal<number | null>(null);
 
@@ -65,12 +81,12 @@ export class QuizContainerComponent implements OnDestroy {
     }
   });
   readonly questionText = computed(
-    () => this.game()?.question?.text ?? 'Warte auf Frage...',
+    () => this.shown().question?.text ?? 'Warte auf Frage...',
   );
 
   readonly quizPhase = computed<QuizPhase>(() => {
     const game = this.game();
-    if (game?.phase === 'reveal') {
+    if (game?.phase === 'reveal' || game?.phase === 'finished') {
       return 'REVEAL';
     }
     return this.selectedIndex() !== null || game?.you.hasAnswered
@@ -89,12 +105,11 @@ export class QuizContainerComponent implements OnDestroy {
   });
 
   readonly answersView = computed<AnswerViewData[]>(() => {
-    const game = this.game();
-    const reveal = game?.reveal;
+    const { question, reveal } = this.shown();
     const phase = this.quizPhase();
     const selected = reveal ? reveal.yourAnswerIndex : this.selectedIndex();
 
-    return (game?.question?.options ?? []).map((text, index) => {
+    return (question?.options ?? []).map((text, index) => {
       let state: AnswerViewData['state'] = 'default';
       if (phase === 'WAITING' && index === selected) {
         state = 'selected';
@@ -122,7 +137,7 @@ export class QuizContainerComponent implements OnDestroy {
     if (phase === 'WAITING') {
       return 'Warte auf den Gegner...';
     }
-    const reveal = this.game()?.reveal;
+    const reveal = this.shown().reveal;
     if (reveal?.yourAnswerIndex === undefined || reveal.yourAnswerIndex === null) {
       return 'Zeit abgelaufen! +0 Punkte';
     }
@@ -137,7 +152,7 @@ export class QuizContainerComponent implements OnDestroy {
     if (phase === 'WAITING') {
       return 'default';
     }
-    const reveal = this.game()?.reveal;
+    const reveal = this.shown().reveal;
     return reveal && reveal.yourAnswerIndex === reveal.correctIndex
       ? 'success'
       : 'error';
@@ -163,6 +178,15 @@ export class QuizContainerComponent implements OnDestroy {
         void this.router.navigate(['/result'], GAME_SCREEN_NAVIGATION);
       } else if (game.phase === 'waiting' || game.phase === 'countdown') {
         void this.router.navigate(['/lobby'], GAME_SCREEN_NAVIGATION);
+      }
+    });
+
+    effect(() => {
+      const game = this.game();
+      if (game?.question) {
+        untracked(() =>
+          this.lastRound.set({ question: game.question!, reveal: game.reveal }),
+        );
       }
     });
 
