@@ -8,10 +8,10 @@ eine Antwort; behobene Lücken werden im CHANGELOG genannt.
 
 ## Was die Anwendung schützt
 
-- **Admin:** ein gemeinsames Passwort, gehasht gespeichert (scrypt), mindestens
-  12 Zeichen, im Admin änderbar. Sitzungen sind signierte Tokens (12 Stunden), die
-  mit jedem Passwortwechsel ungültig werden. Höchstens 10 Anmeldeversuche pro
-  Minute und IP.
+- **Admin:** ein gemeinsames Passwort, gesetzt als Umgebungsvariable beim Hoster
+  (mindestens 12 Zeichen), im Code nie im Klartext. Sitzungen sind signierte Tokens
+  (12 Stunden), die mit jedem Passwortwechsel ungültig werden. Höchstens 10
+  Anmeldeversuche pro Minute und IP.
 - **Spiel:** keine Konten, keine Personendaten. Spielernamen leben nur während
   eines Duells im Arbeitsspeicher.
 - **API:** Eingaben werden validiert (DTOs, eigene Parser für Socket-Events),

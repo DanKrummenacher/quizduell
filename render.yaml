@@ -27,8 +27,7 @@ services:
           property: connectionString
       - key: CORS_ORIGINS
         value: https://playduelio.onrender.com
-      # The admin password of the first start; afterwards it is changed in the
-      # admin. See docs/BETRIEB.md to reset a forgotten one.
+      # The one admin password, at least 12 characters (see docs/BETRIEB.md).
       - key: ADMIN_PASSWORD
         sync: false
 
@@ -71,4 +70,4 @@ databases:
   - name: playduelio-db
     region: frankfurt
     plan: basic-256mb
-    postgresMajorVersion: '17'
+    postgresMajorVersion: '18'

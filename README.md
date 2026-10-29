@@ -36,7 +36,6 @@ pflegt man im eingebauten Admin.
   (Wochentag × Stunde), Trefferquote, Kategorien, schwerste und leichteste Fragen
 - **Spielregeln:** Vorlagen, jede Regel einzeln, Auswirkung vor dem Speichern
 - **Verlauf:** jede Änderung im Admin; frühere Spielregeln lassen sich wiederherstellen
-- **Passwort:** das Admin-Passwort im Admin ändern
 
 ## Technik
 
@@ -96,6 +95,7 @@ sein – `npm run check:contracts` prüft das.
 
 ## Dokumentation
 
+- [Go-live, Schritt für Schritt](docs/GO-LIVE.md)
 - [Deployment auf Render](docs/DEPLOYMENT.md)
 - [Betrieb](docs/BETRIEB.md) – Checklisten, Notfallplan, Datenbank zurücksetzen
 - [Übergabe](docs/UEBERGABE.md) – Konten, Geheimnisse, Kosten, wer was weiss

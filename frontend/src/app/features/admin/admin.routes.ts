@@ -86,14 +86,6 @@ export const ADMIN_ROUTES: Routes = [
             title: `Spielregeln · ${TITLE}`,
           },
           {
-            path: 'passwort',
-            loadComponent: () =>
-              import('./pages/password/password.component').then(
-                (m) => m.PasswordComponent,
-              ),
-            title: `Passwort · ${TITLE}`,
-          },
-          {
             path: 'verlauf',
             loadComponent: () =>
               import('./pages/audit/audit.component').then((m) => m.AuditComponent),
