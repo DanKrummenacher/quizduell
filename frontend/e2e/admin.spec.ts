@@ -143,47 +143,6 @@ test.describe('admin', () => {
     await expect(row).toHaveCount(1);
   });
 
-  test('changes the admin password and back', async ({ page }) => {
-    const NEW_PASSWORD = 'e2e-admin-password-new';
-    const change = async (current: string, next: string) => {
-      await page.getByLabel('Bisheriges Passwort').fill(current);
-      await page.getByLabel('Neues Passwort', { exact: true }).fill(next);
-      await page.getByLabel('Neues Passwort wiederholen').fill(next);
-      await page.getByRole('button', { name: 'Passwort ändern' }).click();
-    };
-
-    await signIn(page);
-    await page.getByRole('link', { name: 'Passwort ändern' }).click();
-    await expect(
-      page.getByRole('heading', { name: 'Passwort', level: 1 }),
-    ).toBeVisible();
-
-    // Nothing happens with a wrong current password or a short new one.
-    await change('falsch', NEW_PASSWORD);
-    await expect(page.getByRole('alert')).toHaveText(
-      'Das bisherige Passwort stimmt nicht.',
-    );
-    await change(PASSWORD, 'kurz');
-    await expect(page.getByText('Mindestens 12 Zeichen.')).toBeVisible();
-
-    await change(PASSWORD, NEW_PASSWORD);
-    await expect(page.getByRole('status')).toContainText('Passwort geändert');
-
-    // This device stays signed in; the new password opens the admin.
-    await page.reload();
-    await expect(
-      page.getByRole('heading', { name: 'Passwort', level: 1 }),
-    ).toBeVisible();
-    await page.getByRole('link', { name: 'Verlauf' }).first().click();
-    await expect(page.getByText('Admin-Passwort geändert').first()).toBeVisible();
-
-    // Back to the shared password, so the other tests can sign in.
-    await page.goto('/admin/passwort');
-    await change(NEW_PASSWORD, PASSWORD);
-    await expect(page.getByRole('status')).toContainText('Passwort geändert');
-    session = null;
-  });
-
   test('changes a rule and restores it from the history', async ({ page }) => {
     await signIn(page, '/admin/regeln');
     await page.getByRole('button', { name: /^Fragen pro Duell ändern/ }).click();
@@ -229,7 +188,6 @@ test.describe('admin', () => {
       '/auswertung',
       '/regeln',
       '/verlauf',
-      '/passwort',
     ]) {
       await page.goto(`/admin${path}`);
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

@@ -19,7 +19,7 @@ in den Passwort-Manager, hier stehen nur die Orte.
 
 | Geheimnis              | Wo es liegt                                           | Drehen                                                                 |
 | ---------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------- |
-| Admin-Passwort         | gehasht in der Datenbank; Erstwert in Render `ADMIN_PASSWORD` | im Admin unter **Passwort**; vergessen → [BETRIEB.md](BETRIEB.md#admin-passwort) |
+| Admin-Passwort         | Render → `playduelio-api` → Environment `ADMIN_PASSWORD` | Variable ändern, Dienst startet neu → [BETRIEB.md](BETRIEB.md#admin-passwort) |
 | `GITHUB_TOKEN` (Render Static Site) | Render → `playduelio` → Environment       | neues Token auf GitHub (read:packages), in Render ersetzen, Deploy auslösen |
 | `CSS_PACKAGES_TOKEN` (CI, Dependabot) | GitHub → Settings → Secrets               | dito                                                                   |
 | `DATABASE_URL`         | von Render verwaltet                                  | Render → Datenbank → *Rotate credentials*, Backend neu deployen        |

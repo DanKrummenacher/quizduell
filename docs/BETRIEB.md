@@ -8,7 +8,6 @@ einem Anlass oder im Dauerbetrieb.
 - [ ] Blueprint angewendet, `/health` liefert `{"status":"ok"}` ([DEPLOYMENT.md](DEPLOYMENT.md))
 - [ ] Backend auf Plan **Starter** (schläft nicht ein)
 - [ ] GitHub: Secret `CSS_PACKAGES_TOKEN` gesetzt, Branch-Schutz auf `main` aktiv
-- [ ] Im Admin ein eigenes Passwort gesetzt (**Passwort**)
 - [ ] Datenbank leer übergeben oder mit dem gewünschten Fragenbestand gefüllt
 - [ ] Fragenkatalog fertig, genügend aktive Fragen (Startseite zeigt keinen Hinweis)
 - [ ] **Spielregeln** geprüft: Fragen pro Duell, Zeit pro Frage, automatischer Neustart
@@ -54,19 +53,15 @@ und starten einfach neu). Fragen, Einstellungen und Statistik bleiben erhalten.
 
 ## Admin-Passwort
 
-- Ändern: im Admin unter **Passwort**. Alle anderen Anmeldungen enden damit; das
-  eigene Gerät bleibt angemeldet. Jede Änderung steht im **Verlauf**.
-- Vergessen: in Render bei `playduelio-api` → *Environment* die Variable
-  `ADMIN_PASSWORD` auf ein neues Passwort setzen **und** `ADMIN_PASSWORD_RESET=true`
-  hinzufügen → *Save* (der Dienst startet neu und übernimmt das Passwort). Danach
-  `ADMIN_PASSWORD_RESET` wieder entfernen, sonst wird das Passwort bei jedem Start
-  überschrieben.
+- Ändern oder vergessen: in Render bei `playduelio-api` → *Environment* die Variable
+  `ADMIN_PASSWORD` auf ein neues Passwort setzen (mindestens 12 Zeichen) → *Save*.
+  Der Dienst startet neu, und alle bestehenden Anmeldungen enden; laufende Duelle
+  werden dabei beendet, deshalb nicht während eines Anlasses.
 
 ## Datenbank zurücksetzen
 
 Für die Übergabe oder einen Neuanfang. Das Skript leert Fragen, Statistik, Duelle,
-Verlauf und ignorierte Hinweise und setzt die Spielregeln auf Standard. Das
-Admin-Passwort bleibt.
+Verlauf und ignorierte Hinweise und setzt die Spielregeln auf Standard.
 
 ```bash
 # Nur anzeigen, was passieren würde:
@@ -94,4 +89,4 @@ importieren.
 Es werden keine Personendaten gespeichert. Spielernamen existieren nur während eines
 Duells im Arbeitsspeicher (und sind so lange im Admin unter **Live** sichtbar). In der
 Datenbank liegen nur Fragen, Spielregeln, anonyme Zahlen zu Duellen und Antworten,
-der Verlauf der Änderungen im Admin und das gehashte Admin-Passwort.
+und der Verlauf der Änderungen im Admin.

@@ -76,7 +76,7 @@ Umsetzung:
 | `questions/` | Fragen in der Datenbank, Zufallsauswahl, Trefferstatistik, Beispielfragen |
 | `settings/`  | Spieleinstellungen (im Speicher gecacht, gelten ab dem nächsten Duell) |
 | `stats/`     | Gespielte und abgebrochene Duelle mit Dauer, Punkten und Revanche      |
-| `admin/`     | Admin-API: Anmeldung und Passwort, Live-Stand, Auswertung, Fragen, Regeln, Hinweise, Verlauf |
+| `admin/`     | Admin-API: Anmeldung, Live-Stand, Auswertung, Fragen, Regeln, Hinweise, Verlauf |
 | `testing/`   | Teststeuerung `/api/test/*` für die E2E-Tests (nur mit `TEST_CONTROL=true`) |
 | `database/`  | Drizzle-Schema, Verbindung, Migrationen beim Start                     |
 | `config/`    | Validierte Konfiguration aus Umgebungsvariablen                        |
@@ -168,11 +168,8 @@ für diesen Einsatz ist das bewusst nicht nötig.
 - Helmet-Security-Header, CORS nur für die konfigurierte Frontend-Domain
 - Schreibzugriffe nur über die Admin-API mit gültiger Anmeldung (die Teststeuerung ist in
   der Produktion gesperrt)
-- Admin-Anmeldung: ein gemeinsames Passwort, als scrypt-Hash in `admin_credentials`
-  gespeichert. `ADMIN_PASSWORD` (in der Produktion Pflicht, mindestens 12 Zeichen) gilt
-  nur für den ersten Start; danach ändert das Admin es auf der Seite **Passwort**, und
-  `ADMIN_PASSWORD_RESET=true` setzt es beim nächsten Start zurück. Vergleich in
-  konstanter Zeit, höchstens 10 Anmeldeversuche pro Minute und IP. Die Sitzung ist ein
-  mit HMAC-SHA256 signiertes Token (12 Stunden), dessen Schlüssel aus dem gespeicherten
-  Hash abgeleitet ist: Ein neues Passwort beendet alle Sitzungen.
+- Admin-Anmeldung: ein gemeinsames Passwort (`ADMIN_PASSWORD`, in der Produktion Pflicht,
+  mindestens 12 Zeichen), Vergleich in konstanter Zeit, höchstens 10 Versuche pro Minute
+  und IP. Die Sitzung ist ein mit HMAC-SHA256 signiertes Token (12 Stunden), dessen
+  Schlüssel aus dem Passwort abgeleitet ist: Ein neues Passwort beendet alle Sitzungen.
 - Keine Personendaten in der Datenbank
