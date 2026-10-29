@@ -30,28 +30,28 @@ Zeit eine Revanche gegen denselben Gegner starten. Mit der ersten Anfrage beginn
 neu, damit der Gegner die volle Zeit zum Antworten hat und die angezeigte Restzeit bei der
 Anfrage voll startet. Der Server meldet jedem Spieler den Stand als `rematch`:
 
-| Status          | Bedeutung                                         | Ergebnis-Screen                    |
-| --------------- | ------------------------------------------------- | ---------------------------------- |
-| `open`          | Noch niemand hat gefragt                          | «Revanche fordern»                 |
-| `requested`     | Ich habe gefragt                                  | «Anfrage gesendet» + Restzeit      |
-| `offered`       | Der Gegner hat gefragt                            | «Revanche annehmen!» + Restzeit    |
-| `paused`        | Eine Verbindung ist unterbrochen                  | Warten auf die Wiederverbindung    |
-| `opponent-left` | Der Gegner hat das Spiel verlassen                | «Neuen Gegner suchen» / «Neues Spiel erstellen» |
-| `unanswered`    | Ich habe gefragt, der Gegner hat nicht reagiert   | dito, mit Hinweis                  |
-| `expired`       | Die Zeit ist abgelaufen                           | dito                               |
+| Status          | Bedeutung                                       | Ergebnis-Screen                                 |
+| --------------- | ----------------------------------------------- | ----------------------------------------------- |
+| `open`          | Noch niemand hat gefragt                        | «Revanche fordern»                              |
+| `requested`     | Ich habe gefragt                                | «Anfrage gesendet» + Restzeit                   |
+| `offered`       | Der Gegner hat gefragt                          | «Revanche annehmen!» + Restzeit                 |
+| `paused`        | Eine Verbindung ist unterbrochen                | Warten auf die Wiederverbindung                 |
+| `opponent-left` | Der Gegner hat das Spiel verlassen              | «Neuen Gegner suchen» / «Neues Spiel erstellen» |
+| `unanswered`    | Ich habe gefragt, der Gegner hat nicht reagiert | dito, mit Hinweis                               |
+| `expired`       | Die Zeit ist abgelaufen                         | dito                                            |
 
 ## Verbindung und Spiel verlassen
 
 Niemand soll allein weiterspielen. Die Regeln dafür stehen an genau einer Stelle, im
 `GameLifecycleService` (Frontend):
 
-| Situation                                              | Verhalten                                                  |
-| ------------------------------------------------------ | ---------------------------------------------------------- |
+| Situation                                                      | Verhalten                                             |
+| -------------------------------------------------------------- | ----------------------------------------------------- |
 | Spielseite verlassen (Link, Zurück, Adresse, unbekannter Pfad) | Duell wird sofort beendet, der Gegner sieht es direkt |
-| Seite neu geladen                                      | Das Duell läuft nahtlos weiter (`sessionToken`)            |
-| Tab geschlossen oder andere Website geöffnet           | Seite trennt bewusst, Server wartet 5 s, dann beendet      |
-| Netzwerkproblem (WLAN weg, Handy gesperrt)             | Server wartet 20 s, Gegner sieht einen Hinweis             |
-| Seite wird beim Tippen der Adresse vorgeladen          | Erst beim tatsächlichen Öffnen (Enter) passiert etwas      |
+| Seite neu geladen                                              | Das Duell läuft nahtlos weiter (`sessionToken`)       |
+| Tab geschlossen oder andere Website geöffnet                   | Seite trennt bewusst, Server wartet 5 s, dann beendet |
+| Netzwerkproblem (WLAN weg, Handy gesperrt)                     | Server wartet 20 s, Gegner sieht einen Hinweis        |
+| Seite wird beim Tippen der Adresse vorgeladen                  | Erst beim tatsächlichen Öffnen (Enter) passiert etwas |
 
 Umsetzung:
 
@@ -70,16 +70,16 @@ Umsetzung:
 
 ## Backend (`backend/src`)
 
-| Modul        | Aufgabe                                                                |
-| ------------ | ---------------------------------------------------------------------- |
+| Modul        | Aufgabe                                                                                                                                                                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `game/`      | Spiel-Engine: `GameService` (Ablauf), `SessionRegistry` (Sitzungen und Spieler), `LiveMonitor` (Live-Stand für das Admin), `scoring` (Punkte und Statistik einer Runde), `game-view` (Spielstand pro Spieler), Socket-Gateway, Namensfilter, Rate-Limit |
-| `questions/` | Fragen in der Datenbank, Zufallsauswahl, Trefferstatistik, Beispielfragen |
-| `settings/`  | Spieleinstellungen (im Speicher gecacht, gelten ab dem nächsten Duell) |
-| `stats/`     | Gespielte und abgebrochene Duelle mit Dauer, Punkten und Revanche      |
-| `admin/`     | Admin-API: Anmeldung, Live-Stand, Auswertung, Fragen, Regeln, Hinweise, Verlauf |
-| `testing/`   | Teststeuerung `/api/test/*` für die E2E-Tests (nur mit `TEST_CONTROL=true`) |
-| `database/`  | Drizzle-Schema, Verbindung, Migrationen beim Start                     |
-| `config/`    | Validierte Konfiguration aus Umgebungsvariablen                        |
+| `questions/` | Fragen in der Datenbank, Zufallsauswahl, Trefferstatistik, Beispielfragen                                                                                                                                                                               |
+| `settings/`  | Spieleinstellungen (im Speicher gecacht, gelten ab dem nächsten Duell)                                                                                                                                                                                  |
+| `stats/`     | Gespielte und abgebrochene Duelle mit Dauer, Punkten und Revanche                                                                                                                                                                                       |
+| `admin/`     | Admin-API: Anmeldung, Live-Stand, Auswertung, Fragen, Regeln, Hinweise, Verlauf                                                                                                                                                                         |
+| `testing/`   | Teststeuerung `/api/test/*` für die E2E-Tests (nur mit `TEST_CONTROL=true`)                                                                                                                                                                             |
+| `database/`  | Drizzle-Schema, Verbindung, Migrationen beim Start                                                                                                                                                                                                      |
+| `config/`    | Validierte Konfiguration aus Umgebungsvariablen                                                                                                                                                                                                         |
 
 Die Beispielfragen (`questions/sample-questions.ts`) sind von Hand geschrieben und fest im
 Code hinterlegt. Eine leere In-Memory-Datenbank (lokal ohne `DATABASE_URL`) startet damit,
@@ -88,16 +88,16 @@ gesperrt: Die Konfiguration verweigert dort `TEST_CONTROL=true`.
 
 ## Frontend (`frontend/src/app`)
 
-| Ordner             | Inhalt                                                              |
-| ------------------ | ------------------------------------------------------------------- |
-| `core/game/`       | `GameClient` (Verbindung, Befehle, Spielstand als Signal), `GameLifecycleService` (Seite und Bildschirm ↔ Spiel) |
-| `core/platform/`   | Stand-Modus (Idle-Reset), Wake-Lock, sicherer Storage               |
-| `core/ui/`         | Header, Logo-Symbol, Verbindungsbanner                              |
-| `features/start`   | Startseite mit Namenseingabe                                        |
-| `features/lobby`   | Spielmodus, Freund herausfordern, Suche, Warten, Gegner gefunden    |
-| `features/quiz`    | Frage, Timer, Scoreboard, Auflösung                                 |
-| `features/result`  | Endstand, Revanche, neues Spiel                                     |
-| `features/admin`   | Admin: Anmeldung, Rahmen, Seiten, Diagramme und Admin-Styles        |
+| Ordner            | Inhalt                                                                                                           |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `core/game/`      | `GameClient` (Verbindung, Befehle, Spielstand als Signal), `GameLifecycleService` (Seite und Bildschirm ↔ Spiel) |
+| `core/platform/`  | Stand-Modus (Idle-Reset), Wake-Lock, sicherer Storage                                                            |
+| `core/ui/`        | Header, Logo-Symbol, Verbindungsbanner                                                                           |
+| `features/start`  | Startseite mit Namenseingabe                                                                                     |
+| `features/lobby`  | Spielmodus, Freund herausfordern, Suche, Warten, Gegner gefunden                                                 |
+| `features/quiz`   | Frage, Timer, Scoreboard, Auflösung                                                                              |
+| `features/result` | Endstand, Revanche, neues Spiel                                                                                  |
+| `features/admin`  | Admin: Anmeldung, Rahmen, Seiten, Diagramme und Admin-Styles                                                     |
 
 - **Angular ohne Zone.js**, durchgehend Signals und Standalone-Komponenten.
 - **Smart/Dumb-Pattern** in den Spiel-Features: Ein Container verbindet den `GameClient`
@@ -153,9 +153,9 @@ Admin-API (`/api/admin/*`, Vertrag in `contracts/admin.contract.ts`).
 Laufende Duelle liegen im Arbeitsspeicher einer Backend-Instanz; das hält jede Antwort im
 Millisekundenbereich. Lasttest lokal (`npm --prefix backend run load-test -- <url> 500`):
 
-| Gleichzeitig    | Fehler | Antwortzeit (Median / 99 %) |
-| --------------- | ------ | --------------------------- |
-| 500 Duelle (1000 Spielende) | 0 | 1 ms / 4 ms        |
+| Gleichzeitig                | Fehler | Antwortzeit (Median / 99 %) |
+| --------------------------- | ------ | --------------------------- |
+| 500 Duelle (1000 Spielende) | 0      | 1 ms / 4 ms                 |
 
 Das ist ein Vielfaches dessen, was im vorgesehenen Betrieb anfällt. Für mehrere Instanzen
 bräuchte es einen gemeinsamen Spielstand (z. B. Redis mit dem Socket.IO-Redis-Adapter);

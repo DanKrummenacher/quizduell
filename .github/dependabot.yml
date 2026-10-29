@@ -1,3 +1,6 @@
+# Weekly dependency updates. Minor and patch updates are grouped and merged
+# automatically when the CI is green (.github/workflows/dependabot-automerge.yml);
+# major updates stay open for a review.
 version: 2
 updates:
   - package-ecosystem: npm
@@ -7,10 +10,15 @@ updates:
       day: monday
       time: '06:00'
       timezone: Europe/Zurich
+    labels: [dependencies]
     groups:
       backend:
         patterns: ['*']
         update-types: [minor, patch]
+    ignore:
+      # The types follow the Node version the app runs on (see .nvmrc).
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
     open-pull-requests-limit: 5
 
   - package-ecosystem: npm
@@ -20,15 +28,39 @@ updates:
       day: monday
       time: '06:00'
       timezone: Europe/Zurich
+    labels: [dependencies]
     groups:
       frontend:
         patterns: ['*']
         update-types: [minor, patch]
+    ignore:
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
     open-pull-requests-limit: 5
     # The private @css-ch packages need the token from the repository secrets
     # (Settings → Secrets → Dependabot), see docs/DEPLOYMENT.md.
 
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Zurich
+    labels: [dependencies]
+    groups:
+      tooling:
+        patterns: ['*']
+        update-types: [minor, patch]
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Zurich
+    labels: [dependencies, ci]
+    groups:
+      actions:
+        patterns: ['*']

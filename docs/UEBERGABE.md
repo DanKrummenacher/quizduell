@@ -7,22 +7,22 @@ in den Passwort-Manager, hier stehen nur die Orte.
 
 ## Konten und Zugänge
 
-| Was                      | Wo                                             | Wer hat Zugriff |
-| ------------------------ | ---------------------------------------------- | --------------- |
-| Quellcode                | GitHub `DanKrummenacher/quizduell`             | <Namen>         |
-| Hosting                  | Render-Konto <E-Mail>, Team <Name>             | <Namen>         |
-| Admin-Passwort           | Passwort-Manager, Eintrag «playduelio Admin»   | <Namen>         |
-| GitHub-Token `read:packages` | Passwort-Manager, Eintrag «playduelio css-ch Token» | <Namen>   |
-| Domain / QR-URL          | `https://playduelio.onrender.com`              | –               |
+| Was                          | Wo                                                  | Wer hat Zugriff |
+| ---------------------------- | --------------------------------------------------- | --------------- |
+| Quellcode                    | GitHub `DanKrummenacher/quizduell`                  | <Namen>         |
+| Hosting                      | Render-Konto <E-Mail>, Team <Name>                  | <Namen>         |
+| Admin-Passwort               | Passwort-Manager, Eintrag «playduelio Admin»        | <Namen>         |
+| GitHub-Token `read:packages` | Passwort-Manager, Eintrag «playduelio css-ch Token» | <Namen>         |
+| Domain / QR-URL              | `https://playduelio.onrender.com`                   | –               |
 
 ## Geheimnisse und wie man sie dreht
 
-| Geheimnis              | Wo es liegt                                           | Drehen                                                                 |
-| ---------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------- |
-| Admin-Passwort         | Render → `playduelio-api` → Environment `ADMIN_PASSWORD` | Variable ändern, Dienst startet neu → [BETRIEB.md](BETRIEB.md#admin-passwort) |
-| `GITHUB_TOKEN` (Render Static Site) | Render → `playduelio` → Environment       | neues Token auf GitHub (read:packages), in Render ersetzen, Deploy auslösen |
-| `CSS_PACKAGES_TOKEN` (CI, Dependabot) | GitHub → Settings → Secrets               | dito                                                                   |
-| `DATABASE_URL`         | von Render verwaltet                                  | Render → Datenbank → *Rotate credentials*, Backend neu deployen        |
+| Geheimnis                             | Wo es liegt                                              | Drehen                                                                        |
+| ------------------------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Admin-Passwort                        | Render → `playduelio-api` → Environment `ADMIN_PASSWORD` | Variable ändern, Dienst startet neu → [BETRIEB.md](BETRIEB.md#admin-passwort) |
+| `GITHUB_TOKEN` (Render Static Site)   | Render → `playduelio` → Environment                      | neues Token auf GitHub (read:packages), in Render ersetzen, Deploy auslösen   |
+| `CSS_PACKAGES_TOKEN` (CI, Dependabot) | GitHub → Settings → Secrets                              | dito                                                                          |
+| `DATABASE_URL`                        | von Render verwaltet                                     | Render → Datenbank → _Rotate credentials_, Backend neu deployen               |
 
 ## Was wo läuft
 
@@ -34,22 +34,22 @@ in den Passwort-Manager, hier stehen nur die Orte.
 
 ## Kosten
 
-| Dienst      | Plan         | ca. pro Monat |
-| ----------- | ------------ | ------------- |
-| Backend     | Starter      | 7 $           |
-| Datenbank   | Basic-256mb  | 6 $           |
-| Static Site | Free         | 0 $           |
+| Dienst      | Plan        | ca. pro Monat |
+| ----------- | ----------- | ------------- |
+| Backend     | Starter     | 7 $           |
+| Datenbank   | Basic-256mb | 6 $           |
+| Static Site | Free        | 0 $           |
 
 Ausserhalb der Nutzung lässt sich das Backend auf Free stellen (schläft ein, erster
 Aufruf dauert ~1 Min.), die Datenbank sollte bleiben.
 
 ## Routine
 
-| Wann          | Was                                                                   |
-| ------------- | --------------------------------------------------------------------- |
-| wöchentlich   | Dependabot-PRs prüfen und mergen (CI muss grün sein)                  |
-| vor Anlässen  | Checkliste in [BETRIEB.md](BETRIEB.md)                                |
-| bei Bedarf    | Fragen pflegen, Statistik im Admin ansehen, CSV-Export als Sicherung  |
+| Wann          | Was                                                                                    |
+| ------------- | -------------------------------------------------------------------------------------- |
+| wöchentlich   | Dependabot-PRs prüfen und mergen (CI muss grün sein)                                   |
+| vor Anlässen  | Checkliste in [BETRIEB.md](BETRIEB.md)                                                 |
+| bei Bedarf    | Fragen pflegen, Statistik im Admin ansehen, CSV-Export als Sicherung                   |
 | nach Anlässen | Statistik behalten oder zurücksetzen ([BETRIEB.md](BETRIEB.md#datenbank-zurücksetzen)) |
 
 ## Bekannte offene Punkte

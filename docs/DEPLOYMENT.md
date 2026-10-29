@@ -1,13 +1,24 @@
 # Deployment auf Render
 
-playduelio besteht auf Render aus drei Diensten, alle in der Region **Frankfurt**.
-Sie sind als Blueprint in [`render.yaml`](../render.yaml) beschrieben.
+playduelio läuft auf Render in zwei Umgebungen, alle Dienste in der Region
+**Frankfurt**. Sie sind als Blueprint in [`render.yaml`](../render.yaml) beschrieben.
+
+**Produktion** (die URL auf den QR-Codes):
 
 | Dienst           | Render-Typ  | Name             | URL                                   | Kosten (ca.)     |
 | ---------------- | ----------- | ---------------- | ------------------------------------- | ---------------- |
 | Frontend (Spiel) | Static Site | `playduelio`     | `https://playduelio.onrender.com`     | gratis           |
 | Backend (API)    | Web Service | `playduelio-api` | `https://playduelio-api.onrender.com` | Starter ~7 $/Mt. |
 | Datenbank        | PostgreSQL  | `playduelio-db`  | nur intern                            | Basic ~6 $/Mt.   |
+
+**Test** (gleicher Code, eigene Daten, eigenes Admin-Passwort; zum Ausprobieren vor
+der Freigabe):
+
+| Dienst           | Render-Typ  | Name                  | URL                                        | Kosten (ca.)             |
+| ---------------- | ----------- | --------------------- | ------------------------------------------ | ------------------------ |
+| Frontend (Spiel) | Static Site | `playduelio-test`     | `https://playduelio-test.onrender.com`     | gratis                   |
+| Backend (API)    | Web Service | `playduelio-api-test` | `https://playduelio-api-test.onrender.com` | Free (schläft ein)       |
+| Datenbank        | PostgreSQL  | `playduelio-db-test`  | nur intern                                 | Free oder Basic ~6 $/Mt. |
 
 > **Die URL des Frontends ist die URL auf den QR-Codes.** Die Static Site darf nie
 > gelöscht oder neu erstellt werden. Einstellungen lassen sich jederzeit ändern, ohne
@@ -42,36 +53,56 @@ die Einstellungen ab.
 die Spielregeln aus der Datenbank. Health-Check auf `/health`.
 Es startet nur mit gültiger Konfiguration, sonst steht im Log genau, was fehlt.
 
-| Variable               | Bedeutung                                                                |
-| ---------------------- | ------------------------------------------------------------------------ |
-| `NODE_ENV`             | `production`: erzwingt Datenbank, CORS und Passwort                      |
-| `DATABASE_URL`         | interne URL der Render-Datenbank (automatisch)                           |
-| `CORS_ORIGINS`         | exakte Frontend-URL ohne `/`, mehrere mit Komma                          |
-| `ADMIN_PASSWORD`       | das Admin-Passwort, mindestens 12 Zeichen; ändern = Variable ändern, der Dienst startet neu und alle Anmeldungen enden |
+| Variable         | Bedeutung                                                                                                              |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`       | `production`: erzwingt Datenbank, CORS und Passwort                                                                    |
+| `DATABASE_URL`   | interne URL der Render-Datenbank (automatisch)                                                                         |
+| `CORS_ORIGINS`   | exakte Frontend-URL ohne `/`, mehrere mit Komma                                                                        |
+| `ADMIN_PASSWORD` | das Admin-Passwort, mindestens 12 Zeichen; ändern = Variable ändern, der Dienst startet neu und alle Anmeldungen enden |
 
 **Frontend** (`rootDir: frontend`): `npm ci && npm run build`, veröffentlicht
 `dist/frontend/browser`. Jede Adresse wird auf `index.html` umgeschrieben (Angular
 Router), dazu die Security-Header aus dem Blueprint.
 
 **Datenbank:** PostgreSQL 18, Plan Basic-256mb (der Gratis-Plan wird nach 30 Tagen
-gelöscht). Render sichert sie täglich; Wiederherstellung unter *Backups* im
+gelöscht). Render sichert sie täglich; Wiederherstellung unter _Backups_ im
 Dashboard der Datenbank.
 
-## 3. Automatische Deploys
+## 3. Deploy-Pipeline
 
-Beide Dienste deployen `main` mit **Auto-Deploy: After CI Checks Pass**
-(`autoDeployTrigger: checksPass` im Blueprint). Nur was die GitHub-Actions-CI
-bestanden hat, geht live.
+Render deployt nicht mehr von selbst (Auto-Deploy ist auf allen Diensten aus).
+GitHub steuert die Deploys mit dem Workflow [`deploy.yml`](../.github/workflows/deploy.yml):
+
+1. Ein Merge auf `main` startet die CI. Ist sie grün, deployt der Workflow die
+   **Test-Umgebung** und wartet, bis `/health` den neuen Commit meldet.
+2. Danach wartet der Job **Production** auf eine Freigabe: GitHub → _Actions_ →
+   Lauf «Deploy» → **Review deployments** → `production` → **Approve and deploy**.
+   Wer freigeben darf, steht in _Settings → Environments → production_.
+3. Die Produktion wird deployt und ebenfalls auf den neuen Commit geprüft.
+
+Ein Deploy lässt sich auch von Hand starten: _Actions → Deploy → Run workflow_.
+Ohne Freigabe bleibt die Produktion auf dem alten Stand; offene Freigaben verfallen
+nach 30 Tagen.
 
 Auf GitHub (einmalig, von Hand):
 
-- *Settings → Secrets and variables → Actions*: Secret **`CSS_PACKAGES_TOKEN`**
-  (GitHub-Token mit `read:packages`), damit die CI die `@css-ch`-Pakete installieren kann.
-  Dasselbe Token unter *Dependabot secrets* als **`CSS_PACKAGES_TOKEN`**, damit
-  Dependabot die Frontend-Updates prüfen kann.
-- *Settings → Branches → Branch protection rule* für `main`: «Require status checks to
-  pass» mit den Checks *Shared contracts*, *Backend*, *Frontend* und *End-to-end*;
-  «Do not allow force pushes»; optional «Require a pull request before merging».
+- _Settings → Secrets and variables → Actions_:
+  - **`CSS_PACKAGES_TOKEN`** (GitHub-Token mit `read:packages`), damit die CI die
+    `@css-ch`-Pakete installieren kann. Dasselbe Token unter _Dependabot secrets_.
+  - **`RENDER_HOOK_TEST_API`**, **`RENDER_HOOK_TEST_WEB`**, **`RENDER_HOOK_PROD_API`**,
+    **`RENDER_HOOK_PROD_WEB`**: die Deploy-Hook-URLs der vier Dienste (Render →
+    Dienst → _Settings → Deploy Hook_). Die URLs sind Geheimnisse.
+- _Settings → Environments_: `test` ohne Schutz, `production` mit **Required
+  reviewers** (die Person, die freigibt) und nur vom Branch `main`.
+- _Settings → Rules → Rulesets_, Ruleset `main`: Pull Request Pflicht, nur Squash-Merge,
+  lineare Historie, die vier Checks _Shared contracts_, _Backend_, _Frontend_ und
+  _End-to-end_ müssen grün und der Branch aktuell sein; kein Löschen, kein Force-Push.
+
+Weitere Workflows: `uptime.yml` prüft die Produktion alle 30 Minuten und eröffnet bei
+einem Ausfall ein Issue «incident»; `dependabot-automerge.yml` mergt Minor- und
+Patch-Updates bei grüner CI; `release.yml` macht aus einem Tag `v1.2.3` ein
+GitHub-Release mit den Notizen aus dem CHANGELOG; `pr-title.yml` prüft den PR-Titel;
+`dependency-review.yml` blockiert neue Pakete mit bekannten Schwachstellen.
 
 ## 4. Nach dem ersten Deploy
 
