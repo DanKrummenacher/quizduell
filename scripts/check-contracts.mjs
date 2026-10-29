@@ -28,6 +28,8 @@ for (const file of files) {
 }
 
 if (failed) {
-  console.error('\nCopy the changed contract to the other side so both stay identical.');
+  console.error(
+    '\nCopy the changed contract to the other side so both stay identical.',
+  );
   process.exit(1);
 }

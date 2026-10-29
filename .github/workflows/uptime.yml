@@ -1,0 +1,55 @@
+# Checks production every 30 minutes without a third-party service. When the
+# game or the API does not answer, an issue with the label «incident» is
+# opened (and closed again once everything is back).
+name: Uptime
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  check:
+    name: Production reachable
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      WEB_URL: https://playduelio.onrender.com
+      HEALTH_URL: https://playduelio-api.onrender.com/health
+    steps:
+      - id: probe
+        name: Probe
+        run: |
+          set +e
+          problems=""
+          web=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 "$WEB_URL")
+          [ "$web" = "200" ] || problems="$problems- Spiel: $WEB_URL antwortet mit HTTP $web\n"
+          health=$(curl -sS --max-time 60 "$HEALTH_URL")
+          echo "$health" | grep -q '"status":"ok"' || problems="$problems- API: $HEALTH_URL antwortet mit «${health:-keine Antwort}»\n"
+          printf 'problems<<EOF\n%b\nEOF\n' "$problems" >> "$GITHUB_OUTPUT"
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          PROBLEMS: ${{ steps.probe.outputs.problems }}
+        with:
+          script: |
+            const problems = process.env.PROBLEMS.trim();
+            const { owner, repo } = context.repo;
+            const open = await github.rest.issues.listForRepo({ owner, repo, state: 'open', labels: 'incident' });
+            const when = new Date().toLocaleString('de-CH', { timeZone: 'Europe/Zurich' });
+            if (problems) {
+              const body = `Die Prüfung um ${when} ist fehlgeschlagen:\n\n${problems}\n\nNächste Schritte: [BETRIEB.md](../blob/main/docs/BETRIEB.md#wenn-etwas-nicht-funktioniert).`;
+              if (open.data.length) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: open.data[0].number, body });
+              } else {
+                await github.rest.issues.create({ owner, repo, title: 'Produktion antwortet nicht', labels: ['incident'], body });
+              }
+              core.setFailed(problems);
+            } else {
+              for (const issue of open.data) {
+                await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: `Seit ${when} antwortet die Produktion wieder.` });
+                await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: 'closed' });
+              }
+            }

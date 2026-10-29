@@ -1,0 +1,67 @@
+# Deployment pipeline: a green CI on main deploys the test environment; the
+# production deployment then waits for an approval in the GitHub environment
+# «production» (Settings → Environments). Deploys go through the Render API
+# (secret RENDER_API_KEY, service ids as repository variables), see
+# docs/DEPLOYMENT.md.
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: test
+      url: https://playduelio-test.onrender.com
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - run: node scripts/render-deploy.mjs
+        env:
+          TARGET: test
+          COMMIT: ${{ github.event.workflow_run.head_sha || github.sha }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE_API: ${{ vars.RENDER_SERVICE_TEST_API }}
+          SERVICE_WEB: ${{ vars.RENDER_SERVICE_TEST_WEB }}
+          HEALTH_URL: https://playduelio-api-test.onrender.com/health
+          WEB_URL: https://playduelio-test.onrender.com
+
+  production:
+    name: Production
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: production
+      url: https://playduelio.onrender.com
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+      - run: node scripts/render-deploy.mjs
+        env:
+          TARGET: production
+          COMMIT: ${{ github.event.workflow_run.head_sha || github.sha }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE_API: ${{ vars.RENDER_SERVICE_PROD_API }}
+          SERVICE_WEB: ${{ vars.RENDER_SERVICE_PROD_WEB }}
+          HEALTH_URL: https://playduelio-api.onrender.com/health
+          WEB_URL: https://playduelio.onrender.com
