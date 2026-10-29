@@ -1,7 +1,8 @@
 # Deployment pipeline: a green CI on main deploys the test environment; the
 # production deployment then waits for an approval in the GitHub environment
-# «production» (Settings → Environments). Render deploys via deploy hooks,
-# which are stored as repository secrets (see docs/DEPLOYMENT.md).
+# «production» (Settings → Environments). Deploys go through the Render API
+# (secret RENDER_API_KEY, service ids as repository variables), see
+# docs/DEPLOYMENT.md.
 name: Deploy
 
 on:
@@ -23,7 +24,7 @@ jobs:
     name: Test
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     environment:
       name: test
       url: https://playduelio-test.onrender.com
@@ -36,8 +37,9 @@ jobs:
         env:
           TARGET: test
           COMMIT: ${{ github.event.workflow_run.head_sha || github.sha }}
-          HOOK_API: ${{ secrets.RENDER_HOOK_TEST_API }}
-          HOOK_WEB: ${{ secrets.RENDER_HOOK_TEST_WEB }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE_API: ${{ vars.RENDER_SERVICE_TEST_API }}
+          SERVICE_WEB: ${{ vars.RENDER_SERVICE_TEST_WEB }}
           HEALTH_URL: https://playduelio-api-test.onrender.com/health
           WEB_URL: https://playduelio-test.onrender.com
 
@@ -45,7 +47,7 @@ jobs:
     name: Production
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     environment:
       name: production
       url: https://playduelio.onrender.com
@@ -58,7 +60,8 @@ jobs:
         env:
           TARGET: production
           COMMIT: ${{ github.event.workflow_run.head_sha || github.sha }}
-          HOOK_API: ${{ secrets.RENDER_HOOK_PROD_API }}
-          HOOK_WEB: ${{ secrets.RENDER_HOOK_PROD_WEB }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          SERVICE_API: ${{ vars.RENDER_SERVICE_PROD_API }}
+          SERVICE_WEB: ${{ vars.RENDER_SERVICE_PROD_WEB }}
           HEALTH_URL: https://playduelio-api.onrender.com/health
           WEB_URL: https://playduelio.onrender.com
