@@ -65,6 +65,16 @@ export class LobbyActionsComponent {
     });
   }
 
+  /** The boxes stay visible above the keyboard of a phone. */
+  protected onFocus(): void {
+    this.focused.set(true);
+    const boxes = this.field()?.nativeElement.parentElement;
+    setTimeout(
+      () => boxes?.scrollIntoView({ block: 'center', behavior: 'smooth' }),
+      300,
+    );
+  }
+
   protected onCodeInput(event: Event): void {
     this.setCode((event.target as HTMLInputElement).value);
     this.serverErrorShown.set(false);
