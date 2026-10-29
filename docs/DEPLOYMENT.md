@@ -71,7 +71,7 @@ Dashboard der Datenbank.
 ## 3. Deploy-Pipeline
 
 Render deployt nicht mehr von selbst (Auto-Deploy ist auf allen Diensten aus).
-GitHub steuert die Deploys mit dem Workflow [`deploy.yml`](../.github/workflows/deploy.yml):
+GitHub steuert die Deploys über die Render-API mit dem Workflow [`deploy.yml`](../.github/workflows/deploy.yml):
 
 1. Ein Merge auf `main` startet die CI. Ist sie grün, deployt der Workflow die
    **Test-Umgebung** und wartet, bis `/health` den neuen Commit meldet.
@@ -89,9 +89,12 @@ Auf GitHub (einmalig, von Hand):
 - _Settings → Secrets and variables → Actions_:
   - **`CSS_PACKAGES_TOKEN`** (GitHub-Token mit `read:packages`), damit die CI die
     `@css-ch`-Pakete installieren kann. Dasselbe Token unter _Dependabot secrets_.
-  - **`RENDER_HOOK_TEST_API`**, **`RENDER_HOOK_TEST_WEB`**, **`RENDER_HOOK_PROD_API`**,
-    **`RENDER_HOOK_PROD_WEB`**: die Deploy-Hook-URLs der vier Dienste (Render →
-    Dienst → _Settings → Deploy Hook_). Die URLs sind Geheimnisse.
+  - **`RENDER_API_KEY`**: ein API-Key aus Render (_Account Settings → API Keys_),
+    mit dem der Workflow die Deploys startet. Der Key ist ein Geheimnis.
+- _Settings → Secrets and variables → Actions → Variables_: die Render-Service-IDs
+  (`srv-…`, in Render in der URL des Dienstes) als **`RENDER_SERVICE_PROD_API`**,
+  **`RENDER_SERVICE_PROD_WEB`**, **`RENDER_SERVICE_TEST_API`** und
+  **`RENDER_SERVICE_TEST_WEB`**.
 - _Settings → Environments_: `test` ohne Schutz, `production` mit **Required
   reviewers** (die Person, die freigibt) und nur vom Branch `main`.
 - _Settings → Rules → Rulesets_, Ruleset `main`: Pull Request Pflicht, nur Squash-Merge,
