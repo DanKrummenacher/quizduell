@@ -27,13 +27,14 @@ $turn: cubic-bezier(0.65, 0, 0.35, 1);
   min-height: 100dvh;
 }
 
-// The content sits in the middle of the screen.
+// As the lobby: the content sits slightly above the middle; on phones it
+// sits in the middle of the screen (see the end of this file).
 .main {
   display: flex;
   flex-grow: 1;
   flex-direction: column;
   justify-content: center;
-  padding: functions.rem(32) functions.rem(20);
+  padding: functions.rem(32) functions.rem(20) functions.rem(80);
 }
 
 .content {
@@ -243,7 +244,7 @@ $turn: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
   .main {
-    padding-block: functions.rem(20);
+    padding-block: functions.rem(20) functions.rem(48);
   }
 }
 
@@ -257,7 +258,7 @@ $turn: cubic-bezier(0.65, 0, 0.35, 1);
   }
 
   .main {
-    padding-block: functions.rem(12);
+    padding-block: functions.rem(12) functions.rem(16);
   }
 
   .title {
@@ -276,6 +277,13 @@ $turn: cubic-bezier(0.65, 0, 0.35, 1);
   .notice {
     margin-top: 0;
     font-size: functions.rem(14);
+  }
+}
+
+// Phones: the content sits in the middle of the screen, whatever the height.
+@media (max-width: 767px) {
+  :host .main {
+    padding-block: functions.rem(24);
   }
 }
 
