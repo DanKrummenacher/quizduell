@@ -41,7 +41,14 @@ export class LobbyContainerComponent implements OnDestroy {
     if (phase === 'waiting') {
       return 'WAITING';
     }
-    if (phase === 'countdown') {
+    if (
+      phase === 'countdown' ||
+      phase === 'question' ||
+      phase === 'reveal' ||
+      phase === 'finished'
+    ) {
+      // The duel runs: the countdown screen stays until the quiz page shows,
+      // so the menu never flashes in between.
       return 'FOUND';
     }
     if (this.gameClient.searching()) {
