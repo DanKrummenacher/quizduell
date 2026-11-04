@@ -6,6 +6,10 @@ Gerät vom Handy bis zum grossen Bildschirm. Fragen, Spielregeln und Auswertung
 pflegt man im eingebauten Admin.
 
 [![CI](https://github.com/DanKrummenacher/quizduell/actions/workflows/ci.yml/badge.svg)](https://github.com/DanKrummenacher/quizduell/actions/workflows/ci.yml)
+[![Deploy](https://github.com/DanKrummenacher/quizduell/actions/workflows/deploy.yml/badge.svg)](https://github.com/DanKrummenacher/quizduell/actions/workflows/deploy.yml)
+[![Uptime](https://github.com/DanKrummenacher/quizduell/actions/workflows/uptime.yml/badge.svg)](https://github.com/DanKrummenacher/quizduell/actions/workflows/uptime.yml)
+[![CodeQL](https://github.com/DanKrummenacher/quizduell/actions/workflows/dynamic/github-code-scanning/codeql/badge.svg)](https://github.com/DanKrummenacher/quizduell/security/code-scanning)
+[![Lizenz](https://img.shields.io/github/license/DanKrummenacher/quizduell)](LICENSE)
 
 ## Funktionen
 
@@ -39,13 +43,13 @@ pflegt man im eingebauten Admin.
 
 ## Technik
 
-| Bereich   | Technologie                                                                |
-| --------- | -------------------------------------------------------------------------- |
+| Bereich   | Technologie                                                                 |
+| --------- | --------------------------------------------------------------------------- |
 | Frontend  | Angular 22 (Standalone, Signals, zoneless), Shared Library `@css-ch`        |
-| Backend   | NestJS 12, Socket.IO, Drizzle ORM                                          |
-| Datenbank | PostgreSQL (lokal via Docker, Tests mit In-Memory-PGlite)                  |
+| Backend   | NestJS 12, Socket.IO, Drizzle ORM                                           |
+| Datenbank | PostgreSQL (lokal via Docker, Tests mit In-Memory-PGlite)                   |
 | Tests     | Vitest (Unit/Integration mit Abdeckung), Playwright (End-to-End, 14 Geräte) |
-| Hosting   | Render (Static Site + Web Service + Postgres, als Blueprint `render.yaml`) |
+| Hosting   | Render (Static Site + Web Service + Postgres, als Blueprint `render.yaml`)  |
 
 Mehr dazu in [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md).
 

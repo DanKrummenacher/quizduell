@@ -1,0 +1,30 @@
+name: Fehler melden
+description: Etwas funktioniert nicht wie erwartet.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Was passiert?
+      description: Was hast du gemacht, was ist passiert, was hättest du erwartet?
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Wo?
+      options: [Spiel, Admin, Betrieb/Deployment]
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Gerät und Browser
+      placeholder: z. B. iPhone 15, Safari
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte zum Nachstellen
+      placeholder: |
+        1. Startseite öffnen
+        2. …

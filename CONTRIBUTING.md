@@ -6,8 +6,18 @@
 2. Kleine, abgeschlossene Commits im Stil von
    [Conventional Commits](https://www.conventionalcommits.org): `feat(frontend): …`,
    `fix(backend): …`, `chore: …`. Die Betreffzeile sagt, was sich für wen ändert.
-3. Pull Request gegen `main` mit der Vorlage; die CI muss grün sein.
-4. Nach dem Merge deployt Render automatisch (nur nach grüner CI).
+3. Pull Request gegen `main` mit der Vorlage. Der PR-Titel folgt Conventional Commits,
+   denn er wird beim Squash-Merge zur Commit-Nachricht auf `main`. Die vier Checks
+   müssen grün sein, dann **Squash and merge** (andere Merge-Arten sind gesperrt).
+4. Nach dem Merge deployt GitHub die Test-Umgebung; die Produktion wartet auf eine
+   Freigabe (siehe [DEPLOYMENT.md](docs/DEPLOYMENT.md)).
+
+Beim ersten Einrichten einmal `npm install` im Hauptordner ausführen: Das richtet
+den Git-Hook ein, der vor jedem Commit Prettier und ESLint über die geänderten
+Dateien laufen lässt.
+
+Dependabot-PRs mit Minor- und Patch-Updates werden bei grüner CI automatisch
+gemergt; Major-Updates bekommen das Label «needs-review» und warten auf eine Person.
 
 ## Regeln im Code
 

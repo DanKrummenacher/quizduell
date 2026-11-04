@@ -20,11 +20,11 @@ Die privaten `@css-ch`-Pakete brauchen ein Token zum Lesen.
 2. Dasselbe unter **Secrets and variables** → **Dependabot** → **New repository secret**:
    Name `CSS_PACKAGES_TOKEN`, Wert = das Token.
 3. Prüfen: **Actions** → letzter Lauf auf `main` → bei Bedarf **Re-run all jobs**.
-   Alle vier Jobs müssen grün sein: *Shared contracts*, *Backend*, *Frontend*, *End-to-end*.
+   Alle vier Jobs müssen grün sein: _Shared contracts_, _Backend_, _Frontend_, _End-to-end_.
 
 ## 3. Branch-Schutz für `main` (3 Min.)
 
-1. Repository → **Settings** → **Branches** → **Add branch ruleset** (oder *Add rule*).
+1. Repository → **Settings** → **Branches** → **Add branch ruleset** (oder _Add rule_).
 2. Name `main`, Ziel-Branch `main`.
 3. Einschalten: **Require status checks to pass** und die vier Checks aus Schritt 2 auswählen;
    **Block force pushes**. Optional: **Require a pull request before merging**.
@@ -41,34 +41,34 @@ Umgebung wie die Static Site anlegen.
 1. Render → **New** → **Postgres**.
 2. Name `playduelio-db`, Project/Environment wie die Static Site, Region **Frankfurt (EU Central)**,
    PostgreSQL **18**, Plan **Basic-256mb** (der Gratis-Plan wird nach 30 Tagen gelöscht).
-3. **Create Database** und warten, bis der Status *Available* ist.
+3. **Create Database** und warten, bis der Status _Available_ ist.
 
 **4b. Backend**
 
-1. Render → **New** → **Web Service** → *Build and deploy from a Git repository* →
+1. Render → **New** → **Web Service** → _Build and deploy from a Git repository_ →
    Repository `DanKrummenacher/quizduell`.
 2. Einstellungen:
 
-   | Feld           | Wert                                      |
-   | -------------- | ----------------------------------------- |
-   | Name           | `playduelio-api`                          |
-   | Region         | Frankfurt (EU Central)                    |
-   | Branch         | `main`                                    |
-   | Root Directory | `backend`                                 |
-   | Language       | Node                                      |
-   | Build Command  | `npm ci --include=dev && npm run build`   |
-   | Start Command  | `npm run start:prod`                      |
-   | Instance Type  | **Starter**                               |
+   | Feld           | Wert                                    |
+   | -------------- | --------------------------------------- |
+   | Name           | `playduelio-api`                        |
+   | Region         | Frankfurt (EU Central)                  |
+   | Branch         | `main`                                  |
+   | Root Directory | `backend`                               |
+   | Language       | Node                                    |
+   | Build Command  | `npm ci --include=dev && npm run build` |
+   | Start Command  | `npm run start:prod`                    |
+   | Instance Type  | **Starter**                             |
 
 3. **Environment Variables** (Add Environment Variable):
 
-   | Key              | Value                                                     |
-   | ---------------- | --------------------------------------------------------- |
-   | `NODE_VERSION`   | `24`                                                      |
-   | `NODE_ENV`       | `production`                                              |
-   | `CORS_ORIGINS`   | `https://playduelio.onrender.com`                         |
+   | Key              | Value                                                              |
+   | ---------------- | ------------------------------------------------------------------ |
+   | `NODE_VERSION`   | `24`                                                               |
+   | `NODE_ENV`       | `production`                                                       |
+   | `CORS_ORIGINS`   | `https://playduelio.onrender.com`                                  |
    | `ADMIN_PASSWORD` | das Admin-Passwort, mindestens 12 Zeichen, in den Passwort-Manager |
-   | `DATABASE_URL`   | *Add from Database* → `playduelio-db` → **Internal Database URL** |
+   | `DATABASE_URL`   | _Add from Database_ → `playduelio-db` → **Internal Database URL**  |
 
 4. **Advanced** aufklappen: **Health Check Path** `/health`.
 5. **Deploy Web Service**. Der erste Build dauert ein paar Minuten. Im Log steht am Ende
@@ -88,20 +88,20 @@ Bei `playduelio` → **Settings**:
 - **Redirects/Rewrites:** eine Regel: Source `/*`, Destination `/index.html`, Action **Rewrite**.
 - **Headers**, je für Path `/*`:
 
-  | Name                        | Value                                        |
-  | --------------------------- | -------------------------------------------- |
-  | `X-Frame-Options`           | `DENY`                                       |
-  | `X-Content-Type-Options`    | `nosniff`                                    |
-  | `Referrer-Policy`           | `strict-origin-when-cross-origin`            |
-  | `Permissions-Policy`        | `camera=(), microphone=(), geolocation=()`   |
-  | `Strict-Transport-Security` | `max-age=31536000; includeSubDomains`        |
+  | Name                        | Value                                      |
+  | --------------------------- | ------------------------------------------ |
+  | `X-Frame-Options`           | `DENY`                                     |
+  | `X-Content-Type-Options`    | `nosniff`                                  |
+  | `Referrer-Policy`           | `strict-origin-when-cross-origin`          |
+  | `Permissions-Policy`        | `camera=(), microphone=(), geolocation=()` |
+  | `Strict-Transport-Security` | `max-age=31536000; includeSubDomains`      |
 
 - Zum Schluss **Manual Deploy → Deploy latest commit**, damit der aktuelle Stand live ist.
 
 Prüfen: `https://playduelio.onrender.com` zeigt das Spiel, `/admin` die Anmeldung.
 
 **4d. Aufräumen:** Static Sites, die nicht gebraucht werden (alte Versuche), unter
-*Settings → Delete* löschen. `playduelio` bleibt.
+_Settings → Delete_ löschen. `playduelio` bleibt.
 
 `render.yaml` im Repo beschreibt dieselben drei Dienste; es dient als Referenz und zum
 Aufbau in einem neuen Workspace (Render → New → Blueprint).

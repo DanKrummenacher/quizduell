@@ -37,24 +37,24 @@ Duells oder einer Gegnersuche passiert das nie. Einstellbar im Admin unter
 
 ## Wenn etwas nicht funktioniert
 
-| Problem                                    | Lösung                                                                              |
-| ------------------------------------------ | ----------------------------------------------------------------------------------- |
-| Banner «Verbindung wird wiederhergestellt» | Kurz warten – Spiele laufen 20 s weiter und werden automatisch fortgesetzt          |
-| Startseite: «Server nicht erreichbar»      | WLAN prüfen, ggf. Hotspot nutzen; Render-Dashboard → `playduelio-api` → Logs        |
+| Problem                                    | Lösung                                                                             |
+| ------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Banner «Verbindung wird wiederhergestellt» | Kurz warten – Spiele laufen 20 s weiter und werden automatisch fortgesetzt         |
+| Startseite: «Server nicht erreichbar»      | WLAN prüfen, ggf. Hotspot nutzen; Render-Dashboard → `playduelio-api` → Logs       |
 | Startseite: «wird gerade vorbereitet»      | Zu wenige aktive Fragen → im Admin unter **Fragen** aktivieren oder erfassen       |
-| Eine Frage ist falsch                      | Im Admin unter **Fragen** pausieren oder korrigieren (gilt sofort für neue Duelle)  |
+| Eine Frage ist falsch                      | Im Admin unter **Fragen** pausieren oder korrigieren (gilt sofort für neue Duelle) |
 | Läuft gerade etwas?                        | Admin → **Live**: laufende Duelle, Gegnersuche und Ereignisse in Echtzeit          |
-| Ein Gerät hängt                            | Seite neu laden – ein laufendes Duell wird fortgesetzt                              |
-| Backend reagiert gar nicht                 | Render → `playduelio-api` → *Manual Deploy → Restart service*                       |
-| Neue Duelle sollen kurz nicht starten      | Admin → **Übersicht → Spiel pausieren**; laufende Duelle spielen zu Ende            |
+| Ein Gerät hängt                            | Seite neu laden – ein laufendes Duell wird fortgesetzt                             |
+| Backend reagiert gar nicht                 | Render → `playduelio-api` → _Manual Deploy → Restart service_                      |
+| Neue Duelle sollen kurz nicht starten      | Admin → **Übersicht → Spiel pausieren**; laufende Duelle spielen zu Ende           |
 
 Ein Neustart des Backends beendet laufende Duelle (die Spielenden sehen eine Meldung
 und starten einfach neu). Fragen, Einstellungen und Statistik bleiben erhalten.
 
 ## Admin-Passwort
 
-- Ändern oder vergessen: in Render bei `playduelio-api` → *Environment* die Variable
-  `ADMIN_PASSWORD` auf ein neues Passwort setzen (mindestens 12 Zeichen) → *Save*.
+- Ändern oder vergessen: in Render bei `playduelio-api` → _Environment_ die Variable
+  `ADMIN_PASSWORD` auf ein neues Passwort setzen (mindestens 12 Zeichen) → _Save_.
   Der Dienst startet neu, und alle bestehenden Anmeldungen enden; laufende Duelle
   werden dabei beendet, deshalb nicht während eines Anlasses.
 
@@ -79,7 +79,7 @@ den Backend-Dienst neu starten, damit er die Standardregeln übernimmt.
 
 ## Sicherung und Wiederherstellung
 
-Render sichert die Datenbank täglich (Dashboard → `playduelio-db` → *Backups*).
+Render sichert die Datenbank täglich (Dashboard → `playduelio-db` → _Backups_).
 Dort lässt sich ein Stand wiederherstellen oder als Datei herunterladen. Zusätzlich
 lässt sich der Fragenbestand jederzeit im Admin als CSV exportieren und wieder
 importieren.
